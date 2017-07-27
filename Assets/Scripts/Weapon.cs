@@ -13,15 +13,22 @@ public class Weapon : MonoBehaviour {
     public bool Reloading;
     public bool Chambering;
 
+    public AudioClip[] ShootSounds;
+    public AudioClip[] AnimationSounds;
+
     [HideInInspector] public bool Stored;
     private bool localStored;
     private Animator anim;
     private Hands hands;
+    private AudioSource shotAudio, animationAudio;
 
     public void Start()
     {
         anim = GetComponentInChildren<Animator>();
         hands = GetComponentInParent<Hands>();
+
+        shotAudio = this.gameObject.AddComponent<AudioSource>();
+        animationAudio = this.gameObject.AddComponent<AudioSource>();
     }
 
     public void Update()
@@ -101,6 +108,11 @@ public class Weapon : MonoBehaviour {
         }
     }
 
+    public void Anim_Sound(int index)
+    {
+        this.animationAudio.PlayOneShot(this.AnimationSounds[index]);
+    }
+
     public void SpawnMag()
     {
         if(RealMag == null || MagPrefab == null)
@@ -138,6 +150,13 @@ public class Weapon : MonoBehaviour {
             BulletsInMag -= 1;
             BulletInChamber = true;
         }
+
+        if (this.ShootSounds.Length == 0)
+            return;
+
+        int index = Random.Range(0, this.ShootSounds.Length - 1);
+        AudioClip c = this.ShootSounds[index];
+        this.shotAudio.PlayOneShot(c);
     }
 
     public void Anim_Reload()
