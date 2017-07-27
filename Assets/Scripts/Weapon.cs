@@ -4,19 +4,20 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour {
 
+    public Transform BulletSpawn;
     public GameObject MagPrefab, RealMag;
-
     public int MAX_BULLETS_IN_MAG = 20;
-
-    public bool BulletInChamber;
     public int BulletsInMag = 9;
-    public bool Reloading;
-    public bool Chambering;
-
+    public float Range = 20f;
     public AudioClip[] ShootSounds;
     public AudioClip[] AnimationSounds;
 
+    [HideInInspector] public bool BulletInChamber;
+    [HideInInspector] public bool Reloading;
+    [HideInInspector] public bool Chambering;
     [HideInInspector] public bool Stored;
+
+
     private bool localStored;
     private Animator anim;
     private Hands hands;
@@ -120,7 +121,7 @@ public class Weapon : MonoBehaviour {
             return;
         }
 
-        Instantiate(MagPrefab, RealMag.transform.position, RealMag.transform.rotation).GetComponent<SpriteRenderer>().flipX = !hands.Right;
+        Instantiate(MagPrefab, RealMag.transform.position, RealMag.transform.rotation).GetComponentInChildren<SpriteRenderer>().flipX = !hands.Right;
     }
 
     public int MaxBulletsInMag() // From OOP days...
@@ -151,12 +152,39 @@ public class Weapon : MonoBehaviour {
             BulletInChamber = true;
         }
 
+        // Spawn bullet trail
+        this.PlaceVisualBullet();
+
         if (this.ShootSounds.Length == 0)
             return;
 
         int index = Random.Range(0, this.ShootSounds.Length - 1);
         AudioClip c = this.ShootSounds[index];
         this.shotAudio.PlayOneShot(c);
+    }
+
+    public void PlaceVisualBullet()
+    {
+        if (this.BulletSpawn == null)
+            return;
+
+        Vector3 v3 = Input.mousePosition;
+        v3.z = 0;
+        v3 = Camera.main.ScreenToWorldPoint(v3);
+
+        float dstX = transform.parent.position.x - v3.x;
+        float dstY = transform.parent.position.y - v3.y;
+
+        float angle = Mathf.Atan2(dstY, dstX);
+
+        float x = Mathf.Cos(angle);
+        float y = Mathf.Sin(angle);
+
+        Vector3 pos = transform.parent.position - new Vector3(x, y, 0) * this.Range;
+
+        VisualBullet b = Instantiate<VisualBullet>(Spawnables.I.BulletTrail, Vector3.zero, Quaternion.identity);
+        b.TimeRemaining = 1f;
+        b.Set(this.BulletSpawn.position, pos);
     }
 
     public void Anim_Reload()

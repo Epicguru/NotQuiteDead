@@ -4,13 +4,15 @@ using System.Collections;
 public class Ghost : MonoBehaviour
 {
     public float TimeAlive;
+    public Transform TurnObject;
+    public float Turn;
     private float timer;
     private new SpriteRenderer renderer;
     private static Color colour = new Color();
 
     public void Start()
     {
-        renderer = GetComponent<SpriteRenderer>();
+        renderer = GetComponentInChildren<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -32,5 +34,8 @@ public class Ghost : MonoBehaviour
         }
 
         transform.Translate(0, -2.5f * Time.deltaTime, 0);
+
+        if(TurnObject != null)
+            TurnObject.RotateAround(transform.position, transform.forward, Turn * Time.deltaTime * (renderer.flipX ? -1 : 1));
     }
 }

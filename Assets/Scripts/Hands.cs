@@ -100,6 +100,7 @@ public class Hands : MonoBehaviour {
         }
     }
 
+
     public void OnGUI()
     {
         Weapon weapon = Weapons[this.Holding];
