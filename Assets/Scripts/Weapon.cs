@@ -9,6 +9,8 @@ public class Weapon : MonoBehaviour {
     public int MAX_BULLETS_IN_MAG = 20;
     public int BulletsInMag = 9;
     public float Range = 20f;
+    public float Inaccuracy = 8f;
+    public int BulletsPerShot = 1;
     public AudioClip[] ShootSounds;
     public AudioClip[] AnimationSounds;
 
@@ -153,7 +155,10 @@ public class Weapon : MonoBehaviour {
         }
 
         // Spawn bullet trail
-        this.PlaceVisualBullet();
+        for (int i = 0; i < this.BulletsPerShot; i++)
+        {
+            this.PlaceVisualBullet();
+        }
 
         if (this.ShootSounds.Length == 0)
             return;
@@ -176,6 +181,8 @@ public class Weapon : MonoBehaviour {
         float dstY = transform.parent.position.y - v3.y;
 
         float angle = Mathf.Atan2(dstY, dstX);
+
+        angle += Random.Range(-this.Inaccuracy / 2f, this.Inaccuracy / 2f) * Mathf.Deg2Rad;
 
         float x = Mathf.Cos(angle);
         float y = Mathf.Sin(angle);

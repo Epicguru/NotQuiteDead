@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Hands : MonoBehaviour {
 
-    public Weapon[] Weapons = new Weapon[2];
+    public Weapon[] Weapons = new Weapon[3];
     public Transform Rotation;
-    [Range(0, 1)]
+    [Range(0, 3)]
     public int Holding;
 
     public bool Running;
@@ -35,25 +35,20 @@ public class Hands : MonoBehaviour {
         {
             Holding = 1;
         }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            Holding = 2;
+        }
 
         Weapon weapon = Weapons[this.Holding];
-        Weapon stored = Weapons[this.Holding == 1 ? 0 : 1];
-        stored.gameObject.SetActive(true);
-        weapon.gameObject.SetActive(true);
 
-        if (stored != null)
-        {
-            Animator storedAnim = stored.GetComponentInChildren<Animator>();
-            storedAnim.SetBool(STORED, true);
-            storedAnim.SetBool(AIMING, false);
-            storedAnim.SetBool(SHOOT, false);
-            storedAnim.SetBool(RUNNING, false);
-            stored.transform.SetParent(this.transform);
-            stored.Stored = true;
-        }
+        // Deactivate other weapons
+        this.DeactivateStoredWeapons();
 
         if (weapon == null)
             return;
+
+        weapon.gameObject.SetActive(true);
 
         weapon.transform.SetParent(Rotation);
         weapon.Stored = false;
@@ -100,6 +95,32 @@ public class Hands : MonoBehaviour {
         }
     }
 
+    public void DeactivateStoredWeapons()
+    {
+        foreach(Weapon w in this.Weapons)
+        {
+            if (w == null)
+                continue;
+
+            Weapon stored = w;
+
+            if (w == this.Weapons[this.Holding])
+                continue;
+
+            stored.gameObject.SetActive(true);
+
+            if (stored != null)
+            {
+                Animator storedAnim = stored.GetComponentInChildren<Animator>();
+                storedAnim.SetBool(STORED, true);
+                storedAnim.SetBool(AIMING, false);
+                storedAnim.SetBool(SHOOT, false);
+                storedAnim.SetBool(RUNNING, false);
+                stored.transform.SetParent(this.transform);
+                stored.Stored = true;
+            }
+        }
+    }
 
     public void OnGUI()
     {
