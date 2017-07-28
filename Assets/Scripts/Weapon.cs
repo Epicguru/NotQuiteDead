@@ -5,20 +5,15 @@ using UnityEngine;
 public class Weapon : MonoBehaviour {
 
     public Transform BulletSpawn;
-    public GameObject MagPrefab, RealMag;
-    public int MAX_BULLETS_IN_MAG = 20;
-    public int BulletsInMag = 9;
-    public float Range = 20f;
-    public float Inaccuracy = 8f;
-    public int BulletsPerShot = 1;
-    public AudioClip[] ShootSounds;
-    public AudioClip[] AnimationSounds;
+
+    public Shooting Shooting = new Shooting();
+    public Visuals Visuals = new Visuals();
+    public Sound Sound = new Sound();
 
     [HideInInspector] public bool BulletInChamber;
     [HideInInspector] public bool Reloading;
     [HideInInspector] public bool Chambering;
     [HideInInspector] public bool Stored;
-
 
     private bool localStored;
     private Animator anim;
@@ -70,7 +65,7 @@ public class Weapon : MonoBehaviour {
         if (Stored)
             return;
 
-        if(BulletsInMag > 0 && !BulletInChamber && !Reloading && !Chambering)
+        if(this.Shooting.BulletsInMag > 0 && !BulletInChamber && !Reloading && !Chambering)
         {
             anim.SetBool("Chamber", true);
             Chambering = true;
@@ -96,14 +91,14 @@ public class Weapon : MonoBehaviour {
         if (Reloading || Chambering)
             return;
 
-        if (BulletsInMag < MaxBulletsInMag())
+        if (this.Shooting.BulletsInMag < MaxBulletsInMag())
         {
             this.anim.SetBool("Reload", true);
             this.Reloading = true;
         }
         else
         {
-            if (!BulletInChamber && BulletsInMag > 0)
+            if (!BulletInChamber && this.Shooting.BulletsInMag > 0)
             {
                 this.anim.SetBool("Chamber", true);
                 this.Chambering = true;
@@ -113,29 +108,29 @@ public class Weapon : MonoBehaviour {
 
     public void Anim_Sound(int index)
     {
-        this.animationAudio.PlayOneShot(this.AnimationSounds[index]);
+        this.animationAudio.PlayOneShot(this.Sound.AnimationSounds[index]);
     }
 
     public void SpawnMag()
     {
-        if(RealMag == null || MagPrefab == null)
+        if(this.Visuals.RealMag == null || this.Visuals.MagPrefab == null)
         {
             return;
         }
 
-        Instantiate(MagPrefab, RealMag.transform.position, RealMag.transform.rotation).GetComponentInChildren<SpriteRenderer>().flipX = !hands.Right;
+        Instantiate(this.Visuals.MagPrefab, this.Visuals.RealMag.transform.position, this.Visuals.RealMag.transform.rotation).GetComponentInChildren<SpriteRenderer>().flipX = !hands.Right;
     }
 
     public int MaxBulletsInMag() // From OOP days...
     {
-        return this.MAX_BULLETS_IN_MAG;
+        return this.Shooting.MAX_BULLETS_IN_MAG;
     }
 
     public void Anim_Chamber()
     {
         this.anim.SetBool("Chamber", false);
         BulletInChamber = true;
-        BulletsInMag--;
+        this.Shooting.BulletsInMag--;
 
         this.Chambering = false;
 
@@ -148,23 +143,23 @@ public class Weapon : MonoBehaviour {
 
         // Try to chamber a round from the mag.
         // If we have no bullets left, then we will simply leave the chamber empty.
-        if (BulletsInMag >= 1)
+        if (this.Shooting.BulletsInMag >= 1)
         {
-            BulletsInMag -= 1;
+            this.Shooting.BulletsInMag -= 1;
             BulletInChamber = true;
         }
 
         // Spawn bullet trail
-        for (int i = 0; i < this.BulletsPerShot; i++)
+        for (int i = 0; i < this.Shooting.BulletsPerShot; i++)
         {
             this.PlaceVisualBullet();
         }
 
-        if (this.ShootSounds.Length == 0)
+        if (this.Sound.ShootSounds.Length == 0)
             return;
 
-        int index = Random.Range(0, this.ShootSounds.Length - 1);
-        AudioClip c = this.ShootSounds[index];
+        int index = Random.Range(0, this.Sound.ShootSounds.Length - 1);
+        AudioClip c = this.Sound.ShootSounds[index];
         this.shotAudio.PlayOneShot(c);
     }
 
@@ -182,21 +177,80 @@ public class Weapon : MonoBehaviour {
 
         float angle = Mathf.Atan2(dstY, dstX);
 
-        angle += Random.Range(-this.Inaccuracy / 2f, this.Inaccuracy / 2f) * Mathf.Deg2Rad;
+        angle += Random.Range(-this.Shooting.Inaccuracy / 2f, this.Shooting.Inaccuracy / 2f) * Mathf.Deg2Rad;
 
         float x = Mathf.Cos(angle);
         float y = Mathf.Sin(angle);
 
-        Vector3 pos = transform.parent.position - new Vector3(x, y, 0) * this.Range;
+        Vector3 pos = transform.parent.position - new Vector3(x, y, 0) * this.Shooting.Range;
+
+        this.HitObjects(pos, angle * Mathf.Rad2Deg);
 
         VisualBullet b = Instantiate<VisualBullet>(Spawnables.I.BulletTrail, Vector3.zero, Quaternion.identity);
         b.TimeRemaining = 1f;
         b.Set(this.BulletSpawn.position, pos);
     }
 
+    public void HitObjects(Vector2 endPoint, float angle)
+    {
+        // This is called once per bullet or pellet.
+        // The list of hits is all penetrations.
+
+        RaycastHit2D[] hits = Physics2D.LinecastAll(transform.parent.position, endPoint);
+
+        float maxDistance = Vector2.Distance(transform.parent.position, endPoint);
+
+        int penetration = 0;
+        foreach (RaycastHit2D hit in hits)
+        {
+            float damage = this.GetDamageFor(hit.point, maxDistance, penetration);
+
+            Debug.Log("Hit a " + hit.collider.gameObject.name + " for " + damage + " damage");
+
+            // Deal Damage
+            hit.collider.gameObject.SendMessageUpwards("Shot", new Hit() {
+                Position = hit.point,
+                Damage = damage,
+                Gun = this.gameObject.name, // TODO chamge name (make name var)
+                Angle = angle
+            }, SendMessageOptions.DontRequireReceiver);
+
+            penetration++;
+            if(penetration == this.Shooting.Penetration) // Stop if we have reached penetration limit.
+                break;                
+        }
+    }
+
+    public virtual float GetDamageFor(Vector2 point, float totalDistance, int penetrationCount)
+    {
+        float basic = this.Shooting.Damage;
+        float distance = Vector2.Distance(transform.parent.position, point);
+        float p = distance / totalDistance; // 0 Means we hit closest, 1 is furthest.
+
+        float reduced = basic * this.Shooting.DamageFalloff; // This is the damage at the very edge of the range
+        float applied = Mathf.Lerp(basic, reduced, p); // This value is the lenear interpolation between the maximum and minimum damage.
+
+        float final = applied * Mathf.Pow(this.Shooting.DamageFalloffPenetration, penetrationCount); // Multiply by the damage falloff per penetration raised to the number of penetrations.
+
+        // For example:
+        // Falloff = 0.5
+        // Damage = 100,
+        // Distance = 10
+        // Total Distance = 20
+        // Means that P = (10 / 20) = 0.5
+        // Reduced = Damage * Falloff = 50
+        // Meaning that Applied = Lerp(100, 50, 0.5)
+        // Applied = 75
+        // Final = Applied * PenetrationFalloff raied to Penetration
+        // Final = 75 * (0.5 pow 1)
+        // Final = 37.5
+
+        return final;
+    }
+
     public void Anim_Reload()
     {
-        BulletsInMag = MaxBulletsInMag(); // Pool chack
+        this.Shooting.BulletsInMag = MaxBulletsInMag(); // Pool chack
         this.anim.SetBool("Reload", false);
 
         this.Reloading = false;
@@ -207,4 +261,31 @@ public class Weapon : MonoBehaviour {
             this.Chambering = true;
         }
     }
+}
+
+[System.Serializable]
+public class Shooting
+{
+    public int MAX_BULLETS_IN_MAG = 20;
+    public int BulletsInMag = 9;
+    public float Range = 20f;
+    public float Inaccuracy = 8f;
+    public int BulletsPerShot = 1;
+    public int Penetration = 1;
+    public float Damage = 100;
+    public float DamageFalloffPenetration = 0.5f;
+    public float DamageFalloff = 1f;
+}
+
+[System.Serializable]
+public class Sound
+{
+    public AudioClip[] ShootSounds;
+    public AudioClip[] AnimationSounds;
+}
+
+[System.Serializable]
+public class Visuals
+{
+    public GameObject MagPrefab, RealMag;
 }

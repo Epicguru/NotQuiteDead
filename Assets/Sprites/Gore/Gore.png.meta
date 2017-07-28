@@ -1,0 +1,248 @@
+fileFormatVersion: 2
+guid: d8995a4b278e49d4bb090b29317bd508
+timeCreated: 1501245562
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: Gore_0
+    21300002: Gore_1
+    21300004: Gore_2
+    21300006: Gore_3
+    21300008: Gore_4
+    21300010: Gore_5
+    21300012: Gore_6
+    21300014: Gore_7
+    21300016: Gore_8
+  serializedVersion: 4
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: 2
+    aniso: -1
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 128
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  platformSettings:
+  - buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: Standalone
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Gore_0
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 116
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -3, y: 3.5}
+        - {x: -3, y: -3.5}
+        - {x: 3, y: -3.5}
+        - {x: 3, y: 3.5}
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Gore_1
+      rect:
+        serializedVersion: 2
+        x: 43
+        y: 118
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -2.5, y: 2.5}
+        - {x: -2.5, y: -2.5}
+        - {x: 2.5, y: -2.5}
+        - {x: 2.5, y: 2.5}
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Gore_2
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 108
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -2.5, y: 4.5}
+        - {x: -3.5, y: 3.5}
+        - {x: -3.5, y: -4.5}
+        - {x: 3.5, y: -4.5}
+        - {x: 3.5, y: 4.5}
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Gore_3
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 102
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -4.5, y: 4.5}
+        - {x: -4.5, y: -4.5}
+        - {x: 4.5, y: -4.5}
+        - {x: 4.5, y: 2.5}
+        - {x: 2.5, y: 4.5}
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Gore_4
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 100
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -4, y: 4}
+        - {x: -4, y: -4}
+        - {x: 4, y: -4}
+        - {x: 4, y: 4}
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Gore_5
+      rect:
+        serializedVersion: 2
+        x: 27
+        y: 92
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -4, y: 3.5}
+        - {x: -5, y: 2.5}
+        - {x: -5, y: -3.5}
+        - {x: 4, y: -3.5}
+        - {x: 5, y: -2.5}
+        - {x: 5, y: 3.5}
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Gore_6
+      rect:
+        serializedVersion: 2
+        x: 43
+        y: 92
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -4.5, y: 4}
+        - {x: -4.5, y: -4}
+        - {x: 4.5, y: -4}
+        - {x: 4.5, y: 4}
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Gore_7
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 67
+        width: 83
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -16.5, y: 11}
+        - {x: -39.5, y: 5}
+        - {x: -41.5, y: 1}
+        - {x: -41.5, y: -11}
+        - {x: 21.5, y: -11}
+        - {x: 41.5, y: -5}
+        - {x: 41.5, y: 5}
+        - {x: 30.5, y: 11}
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Gore_8
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 37
+        width: 78
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -39, y: 11.5}
+        - {x: -39, y: -10.5}
+        - {x: -38, y: -11.5}
+        - {x: 36, y: -11.5}
+        - {x: 39, y: -9.5}
+        - {x: 39, y: 11.5}
+      tessellationDetail: 0
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

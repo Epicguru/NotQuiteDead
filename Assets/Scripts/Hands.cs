@@ -133,7 +133,7 @@ public class Hands : MonoBehaviour {
         {
             GUI.Label(new Rect(10, 10, 500, 100), weapon.gameObject.name);
             GUI.Label(new Rect(10, 30, 500, 100), weapon.BulletInChamber ? "Bullet In Chamber" : "No Bullet In Chamber");
-            GUI.Label(new Rect(10, 60, 500, 100), weapon.BulletsInMag + " bullets in mag (" + (weapon.BulletsInMag + (weapon.BulletInChamber ? 1 : 0)) +  ")");
+            GUI.Label(new Rect(10, 60, 500, 100), weapon.Shooting.BulletsInMag + " bullets in mag (" + (weapon.Shooting.BulletsInMag + (weapon.BulletInChamber ? 1 : 0)) +  ")");
         }
     }
 }

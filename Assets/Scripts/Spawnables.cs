@@ -7,6 +7,8 @@ public class Spawnables : MonoBehaviour {
     public static Spawnables I;
 
     public VisualBullet BulletTrail;
+    public Sprite[] BloodParticles;
+    public Sprite[] BloodPools;
 
     public void Start()
     {
