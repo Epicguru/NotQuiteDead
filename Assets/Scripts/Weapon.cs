@@ -184,19 +184,19 @@ public class Weapon : MonoBehaviour {
 
         Vector3 pos = transform.parent.position - new Vector3(x, y, 0) * this.Shooting.Range;
 
-        this.HitObjects(pos, angle * Mathf.Rad2Deg);
+        Vector2 endPoint = this.HitObjects(pos, angle * Mathf.Rad2Deg);
 
         VisualBullet b = Instantiate<VisualBullet>(Spawnables.I.BulletTrail, Vector3.zero, Quaternion.identity);
         b.TimeRemaining = 1f;
-        b.Set(this.BulletSpawn.position, pos);
+        b.Set(this.BulletSpawn.position, endPoint);
     }
 
-    public void HitObjects(Vector2 endPoint, float angle)
+    public Vector2 HitObjects(Vector2 endPoint, float angle)
     {
         // This is called once per bullet or pellet.
         // The list of hits is all penetrations.
 
-        RaycastHit2D[] hits = Physics2D.LinecastAll(transform.parent.position, endPoint);
+        RaycastHit2D[] hits = Physics2D.LinecastAll(transform.parent.position, endPoint, hands.ShootableLayers);
 
         float maxDistance = Vector2.Distance(transform.parent.position, endPoint);
 
@@ -204,8 +204,6 @@ public class Weapon : MonoBehaviour {
         foreach (RaycastHit2D hit in hits)
         {
             float damage = this.GetDamageFor(hit.point, maxDistance, penetration);
-
-            Debug.Log("Hit a " + hit.collider.gameObject.name + " for " + damage + " damage");
 
             // Deal Damage
             hit.collider.gameObject.SendMessageUpwards("Shot", new Hit() {
@@ -216,9 +214,15 @@ public class Weapon : MonoBehaviour {
             }, SendMessageOptions.DontRequireReceiver);
 
             penetration++;
-            if(penetration == this.Shooting.Penetration) // Stop if we have reached penetration limit.
-                break;                
+            if (penetration == this.Shooting.Penetration)
+            {
+                // Stop if we have reached penetration limit.
+                // Also stop trail here.
+                return hit.point;
+            }
         }
+
+        return endPoint;
     }
 
     public virtual float GetDamageFor(Vector2 point, float totalDistance, int penetrationCount)

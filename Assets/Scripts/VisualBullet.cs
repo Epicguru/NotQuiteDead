@@ -13,6 +13,8 @@ public class VisualBullet : MonoBehaviour
     public void Set(Vector3 start, Vector3 end)
     {
         renderer = GetComponent<LineRenderer>();
+        start.z = -0.5f;
+        end.z = -0.5f;
         renderer.SetPositions(new Vector3[] { start, end });
         totalTime = TimeRemaining;
     }

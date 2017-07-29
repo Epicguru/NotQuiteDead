@@ -6,6 +6,8 @@ public class Ghost : MonoBehaviour
     public float TimeAlive;
     public Transform TurnObject;
     public float Turn;
+    public float Speed = 2.5f;
+
     private float timer;
     private new SpriteRenderer renderer;
     private static Color colour = new Color();
@@ -33,7 +35,7 @@ public class Ghost : MonoBehaviour
             Destroy(this.gameObject);
         }
 
-        transform.Translate(0, -2.5f * Time.deltaTime, 0);
+        transform.Translate(0, -Speed * Time.deltaTime, 0);
 
         if(TurnObject != null)
             TurnObject.RotateAround(transform.position, transform.forward, Turn * Time.deltaTime * (renderer.flipX ? -1 : 1));

@@ -75,9 +75,8 @@ public class PlayerController : MonoBehaviour {
 
         speed.Normalize();
         speed *= realSpeed;
-        speed *= Time.deltaTime;
 
-        transform.Translate(speed.x, speed.y, 0);
+        this.GetComponent<Rigidbody2D>().velocity = speed;
     }
 
     public bool MouseToRight()

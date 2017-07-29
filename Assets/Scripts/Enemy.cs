@@ -11,6 +11,8 @@ public class Enemy : MonoBehaviour {
 
     private PlayerAnim anim;
     private Vector2 vel = new Vector2();
+    private bool dead;
+    private float timeDead = 0;
 
     public void Start()
     {
@@ -21,15 +23,36 @@ public class Enemy : MonoBehaviour {
     {
         MoveToTarget();
         CheckHealth();
+        UpdateDeath();
     }
 
     public void Shot(Hit hit)
     {
         Health -= hit.Damage;
+
+        int amount = Random.Range(5, 10);
+        for(int i = 0; i < amount; i++)
+        {
+            BloodParticle b = Instantiate<BloodParticle>(Spawnables.I.BloodParticle, hit.Position, Quaternion.identity);
+        }
+    }
+
+    public void UpdateDeath()
+    {
+        if (!dead)
+            return;
+
+        anim.Dead = true;
+        timeDead += Time.deltaTime;
+
+        if (timeDead > 30)
+            Destroy(this.gameObject);
     }
 
     public void CheckHealth()
     {
+        if (dead)
+            return;
         if(Health <= 0)
         {
             Die();
@@ -38,14 +61,16 @@ public class Enemy : MonoBehaviour {
 
     public void Die()
     {
+        if (dead)
+            return;
         Health = 0;
-
-        // TODO
-        Destroy(this.gameObject);
+        dead = true;
     }
 
     public void MoveToTarget()
     {
+        if (dead)
+            return;
         if (Target == null)
         {
             anim.Walking = false;

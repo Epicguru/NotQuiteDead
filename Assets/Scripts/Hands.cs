@@ -14,6 +14,8 @@ public class Hands : MonoBehaviour {
     public bool Aiming;
     public bool Right;
 
+    public LayerMask ShootableLayers;
+
     private const string RUNNING = "Running";
     private const string AIMING = "Aiming";
     private const string RUN_SPEED = "RunSpeed";
