@@ -30,10 +30,14 @@ public class Enemy : MonoBehaviour {
     {
         Health -= hit.Damage;
 
-        int amount = Random.Range(5, 10);
-        for(int i = 0; i < amount; i++)
+        // Spawn blood spurt
+        GameObject o = Instantiate(Spawnables.I.BloodSpurt, hit.Position, Quaternion.Euler(Vector2.Angle(hit.Position, hit.Normal), 90, 0));
+        Destroy(o, 1f);
+
+        if(Random.Range(0f, 100f) <= 25f)
         {
-            BloodParticle b = Instantiate<BloodParticle>(Spawnables.I.BloodParticle, hit.Position, Quaternion.identity);
+            GameObject b = Instantiate(Spawnables.I.BloodBleeding, hit.Position, Quaternion.Euler(Vector2.Angle(hit.Position, hit.Normal), 90, 0), hit.Collider.gameObject.transform);
+            Destroy(b, Random.Range(2f, 6f));
         }
     }
 
@@ -65,6 +69,11 @@ public class Enemy : MonoBehaviour {
             return;
         Health = 0;
         dead = true;
+
+        foreach(Collider2D c in GetComponentsInChildren<Collider2D>())
+        {
+            Destroy(c);
+        }
     }
 
     public void MoveToTarget()

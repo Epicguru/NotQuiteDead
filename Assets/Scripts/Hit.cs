@@ -10,5 +10,6 @@ public class Hit
     public float Damage;
     public string Gun;
     public float Angle;
-
+    public Collider2D Collider;
+    public Vector2 Normal;
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour {
 
+    public string Prefab = "Weapons/";
     public Transform BulletSpawn;
 
     public Shooting Shooting = new Shooting();
@@ -13,7 +14,7 @@ public class Weapon : MonoBehaviour {
     [HideInInspector] public bool BulletInChamber;
     [HideInInspector] public bool Reloading;
     [HideInInspector] public bool Chambering;
-    [HideInInspector] public bool Stored;
+    [HideInInspector] public bool Stored, Dropped;
 
     private bool localStored;
     private Animator anim;
@@ -31,9 +32,9 @@ public class Weapon : MonoBehaviour {
 
     public void Update()
     {
-        if (Stored)
+        if (Stored || Dropped)
         {
-            if (!localStored)
+            //if (!localStored)
             {
                 // Put away
 
@@ -46,9 +47,9 @@ public class Weapon : MonoBehaviour {
                 this.localStored = true;
             }
         }
-        else
+        else if(!Stored && !Dropped)
         {
-            if (localStored)
+            //if (localStored)
             {
                 // Bring out
 
@@ -133,8 +134,6 @@ public class Weapon : MonoBehaviour {
         this.Shooting.BulletsInMag--;
 
         this.Chambering = false;
-
-        Debug.Log("Chambered");
     }
 
     public void Anim_Shoot()
@@ -206,12 +205,7 @@ public class Weapon : MonoBehaviour {
             float damage = this.GetDamageFor(hit.point, maxDistance, penetration);
 
             // Deal Damage
-            hit.collider.gameObject.SendMessageUpwards("Shot", new Hit() {
-                Position = hit.point,
-                Damage = damage,
-                Gun = this.gameObject.name, // TODO chamge name (make name var)
-                Angle = angle
-            }, SendMessageOptions.DontRequireReceiver);
+            hit.collider.gameObject.SendMessageUpwards("Shot", this.MakeHitObject(damage, angle, hit), SendMessageOptions.DontRequireReceiver);
 
             penetration++;
             if (penetration == this.Shooting.Penetration)
@@ -223,6 +217,19 @@ public class Weapon : MonoBehaviour {
         }
 
         return endPoint;
+    }
+
+    public virtual Hit MakeHitObject(float damage, float angle, RaycastHit2D hit)
+    {
+        return new Hit()
+        {
+            Position = hit.point,
+            Damage = damage,
+            Gun = this.gameObject.name, // TODO chamge name (make name var)
+            Angle = angle,
+            Collider = hit.collider,
+            Normal = hit.normal
+        };
     }
 
     public virtual float GetDamageFor(Vector2 point, float totalDistance, int penetrationCount)
@@ -250,6 +257,11 @@ public class Weapon : MonoBehaviour {
         // Final = 37.5
 
         return final;
+    }
+
+    public GameObject GetPrefab()
+    {
+        return Resources.Load<GameObject>(this.Prefab);
     }
 
     public void Anim_Reload()

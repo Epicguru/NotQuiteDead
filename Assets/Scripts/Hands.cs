@@ -22,24 +22,46 @@ public class Hands : MonoBehaviour {
     private const string SHOOT = "Shoot";
     private const string SHOOT_SPEED = "ShootSpeed";
     private const string STORED = "Stored";
+    private const string DROPPED = "Dropped";
 
     private float p;
     private Vector3 pos = new Vector3();
 
     // Update is called once per frame
-    void Update () {
+    void LateUpdate () {
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            Holding = 0;
+            if (Input.GetKey(KeyCode.Space))
+            {
+                Drop(0);
+            }
+            else
+            {
+                Holding = 0;
+            }
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            Holding = 1;
+            if (Input.GetKey(KeyCode.Space))
+            {
+                Drop(1);
+            }
+            else
+            {
+                Holding = 1;
+            }
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            Holding = 2;
+            if (Input.GetKey(KeyCode.Space))
+            {
+                Drop(2);
+            }
+            else
+            {
+                Holding = 2;
+            }
         }
 
         Weapon weapon = Weapons[this.Holding];
@@ -54,6 +76,7 @@ public class Hands : MonoBehaviour {
 
         weapon.transform.SetParent(Rotation);
         weapon.Stored = false;
+        weapon.Dropped = false;
 
         if (!Aiming)
         {
@@ -86,6 +109,7 @@ public class Hands : MonoBehaviour {
         a.SetBool(RUNNING, Running);
         a.SetBool(AIMING, Aiming);
         a.SetFloat(RUN_SPEED, RunSpeed);
+        a.SetBool(DROPPED, false);
 
         if (Aiming && Input.GetMouseButton(0) && weapon.BulletInChamber)
         {
@@ -95,6 +119,75 @@ public class Hands : MonoBehaviour {
         {
             a.SetBool(SHOOT, false);
         }
+    }
+
+    public void Drop(int weapon)
+    {
+        if (Weapons[weapon] == null)
+            return;
+
+        Weapon w = Weapons[weapon];
+        GameObject prefab = w.GetPrefab();
+
+        if(prefab == null)
+        {
+            Debug.LogError("Prefab on weapon was null! (" + w.name + ")");
+            return;
+        }
+
+        Destroy(w.gameObject);
+        Weapons[weapon] = null;
+
+        GameObject container = Instantiate(Spawnables.I.WeaponContainer, transform.position, Quaternion.identity);
+        GameObject newObject = Instantiate(prefab, container.transform);
+
+        newObject.GetComponent<Animator>().SetBool(DROPPED, true);
+        newObject.GetComponent<Weapon>().Dropped = true;
+    }
+
+    public void Equip(GameObject weapon, int slot, bool equip = true)
+    {
+        if (slot > 0 && Weapons[slot] != null)
+            return;
+
+        Weapon w = weapon.GetComponentInChildren<Weapon>();
+        if (w == null)
+            return;
+
+        GameObject prefab = w.GetPrefab();
+
+        if (prefab == null)
+            return;
+
+        if (slot < 0)
+            slot = this.GetNextAvailableSlot();
+        if (slot == -1)
+        {
+            slot = Holding;
+            Drop(Holding);
+        }
+
+
+        GameObject newWeapon = Instantiate(prefab, transform);
+
+        Weapon w2 = newWeapon.GetComponent<Weapon>();
+
+        this.Weapons[slot] = w2;
+
+        Destroy(weapon);
+        if (equip) this.Holding = slot;
+    }
+
+    public int GetNextAvailableSlot()
+    {
+        for(int i = 0; i < this.Weapons.Length; i++)
+        {
+            if(Weapons[i] == null)
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public void DeactivateStoredWeapons()
@@ -118,6 +211,7 @@ public class Hands : MonoBehaviour {
                 storedAnim.SetBool(AIMING, false);
                 storedAnim.SetBool(SHOOT, false);
                 storedAnim.SetBool(RUNNING, false);
+                storedAnim.SetBool(DROPPED, false);
                 stored.transform.SetParent(this.transform);
                 stored.Stored = true;
             }
