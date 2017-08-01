@@ -4,18 +4,22 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+    public Transform CameraTarget;
+
     private PlayerAnim anim;
-    private Hands hands;
+    private WeaponManager weapons;
     private Vector2 speed = new Vector2();
 
     private void Start()
     {
         anim = GetComponentInChildren<PlayerAnim>();
-        hands = GetComponentInChildren<Hands>();
+        weapons = GetComponentInChildren<WeaponManager>();
     }
 
     private void Update()
     {
+        this.PlaceCameraTarget();
+
         float realSpeed = 3;
         anim.Running = false;
         if (Input.GetKey(KeyCode.LeftShift))
@@ -48,27 +52,27 @@ public class PlayerController : MonoBehaviour {
         {
             anim.Walking = false;
             anim.Running = false;
-            hands.Running = false;
+            weapons.Running = false;
         }
         else
         {
             anim.Walking = true;
-            hands.Running = true;
-            hands.RunSpeed = anim.Running ? 5f : 1.7f;
-            hands.Right = anim.Right;
+            weapons.Running = true;
+            weapons.RunSpeed = anim.Running ? 5f : 1.7f;
+            weapons.Right = anim.Right;
         }
-        hands.Aiming = Input.GetMouseButton(1);
+        weapons.Aiming = Input.GetMouseButton(1);
 
-        if(hands.Aiming)
+        if(weapons.Aiming)
         {
             if (MouseToRight())
             {
                 anim.Right = true;
-                hands.Right = true;
+                weapons.Right = true;
             }
             else
             {
-                hands.Right = false;
+                weapons.Right = false;
                 anim.Right = false;
             }
         }
@@ -77,6 +81,11 @@ public class PlayerController : MonoBehaviour {
         speed *= realSpeed;
 
         this.GetComponent<Rigidbody2D>().velocity = speed;
+    }
+
+    public void PlaceCameraTarget()
+    {
+        CameraTarget.transform.localPosition = Vector3.zero;
     }
 
     public bool MouseToRight()

@@ -11,7 +11,7 @@ public class WeaponContainer : MonoBehaviour {
     {
         w = GetComponentInChildren<Weapon>();
         if(w != null)
-            a = w.GetComponent<Animator>();
+            a = w.GetComponentInChildren<Animator>();
     }
 
     public void Update()
@@ -26,7 +26,7 @@ public class WeaponContainer : MonoBehaviour {
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            GameObject.Find("Player").GetComponentInChildren<Hands>().Equip(this.gameObject, -1);
+            GameObject.Find("Player").GetComponentInChildren<WeaponManager>().Equip(this.gameObject, -1);
         }
     }
 }

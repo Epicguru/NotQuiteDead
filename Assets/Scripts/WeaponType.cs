@@ -7,6 +7,7 @@ public enum WeaponType
 {
     RIFLE,
     HANDGUN,
+    SUBMACHINEGUN,
     SHOTGUN_MAG
 }
 
