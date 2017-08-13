@@ -13,6 +13,8 @@ public class Spawnables : MonoBehaviour {
     public Sprite[] BloodParticles;
     public Sprite[] BloodPools;
     public GameObject WeaponContainer;
+    public GameObject GunSparks;
+    public GameObject GunSmoke;
 
     public void Start()
     {

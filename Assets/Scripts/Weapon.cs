@@ -105,10 +105,10 @@ public class Weapon : MonoBehaviour {
     /// </summary>
     public void Reload()
     {
-        if (Reloading || Chambering)
+        if (Reloading || Chambering || Dropped || Stored || hands.Aiming)
             return;
 
-        if (this.Shooting.BulletsInMag < MaxBulletsInMag())
+        if (this.Shooting.BulletsInMag + (Shooting.ChamberCountsAsMag ? (BulletInChamber ? 1 : 0) : 0) < MaxBulletsInMag())
         {
             this.anim.SetBool("Reload", true);
             this.Reloading = true;
@@ -271,10 +271,16 @@ public class Weapon : MonoBehaviour {
     public void Anim_Chamber()
     {
         this.anim.SetBool("Chamber", false);
+
+        if (this.Shooting.BulletsInMag <= 0)
+            return;
+
         BulletInChamber = true;
         this.Shooting.BulletsInMag--;
 
         this.Chambering = false;
+
+        Debug.Log("Chambered!");
     }
 
     public void Anim_Shoot()
@@ -454,6 +460,8 @@ public class Shooting
     public float Damage = 100;
     public float DamageFalloffPenetration = 0.5f;
     public float DamageFalloff = 1f;
+
+    public bool ChamberCountsAsMag = false;
 }
 
 [System.Serializable]
