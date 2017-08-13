@@ -10,7 +10,7 @@ public class Weapon : MonoBehaviour {
     public Visuals Visuals = new Visuals();
     public Sound Sound = new Sound();
     public WeaponInformation Info = new WeaponInformation();
-    public AttatchmentsContainer Attatchments;
+    public AttatchmentsContainer Attachments;
 
     [HideInInspector] public bool BulletInChamber = false;
     [HideInInspector] public bool Reloading;
@@ -51,9 +51,9 @@ public class Weapon : MonoBehaviour {
     {
         for(int i = 0; i < 2; i++) // UPDATE ATTACHMENT HERE!
         {
-            if (this.Attatchments.Current.GetAttatchment(i) == null)
+            if (this.Attachments.Current.GetAttatchment(i) == null)
             {
-                this.SetAttatchment(i, this.Attatchments.Default.GetAttatchment(i));
+                this.SetAttatchment(i, this.Attachments.Default.GetAttatchment(i));
             }
 
             UpdateAttatchment(i);
@@ -62,12 +62,16 @@ public class Weapon : MonoBehaviour {
 
     public void SetAttatchment(int index, Attachment a)
     {
-        this.Attatchments.Current.SetAttachment(index, a);
+        if(Attachments.Allow(index))
+            this.Attachments.Current.SetAttachment(index, a);
     }
 
     public void UpdateAttatchment(int index)
     {
-        Attachment newObject = Attatchments.Current.GetAttatchment(index);
+        if (!Attachments.Allow(index))
+            return;
+
+        Attachment newObject = Attachments.Current.GetAttatchment(index);
 
         if(newObject == null)
         {
@@ -75,24 +79,24 @@ public class Weapon : MonoBehaviour {
         }
         else
         {
-            if (Attatchments.Positions.GetPosition(index).childCount != 0 && Attatchments.Positions.GetPosition(index).GetChild(0) != null && Attatchments.Positions.GetPosition(index).GetChild(0).GetComponent<Attachment>().Equals(Attatchments.Current.GetAttatchment(index)))
+            if (Attachments.Positions.GetPosition(index).childCount != 0 && Attachments.Positions.GetPosition(index).GetChild(0) != null && Attachments.Positions.GetPosition(index).GetChild(0).GetComponent<Attachment>().Equals(Attachments.Current.GetAttatchment(index)))
                 return;
 
             RemoveAttachment(index);
 
             GameObject prefab = newObject.GetPrefab();
 
-            GameObject instance = Instantiate(prefab, this.Attatchments.Positions.GetPosition(index));
+            GameObject instance = Instantiate(prefab, this.Attachments.Positions.GetPosition(index));
             instance.transform.localPosition = new Vector3(0, 0, 0);
         }
     }
 
     public void RemoveAttachment(int index)
     {
-        if (Attatchments.Positions.GetPosition(index).childCount == 0)
+        if (Attachments.Allow(index) && Attachments.Positions.GetPosition(index).childCount == 0)
             return;
 
-        Transform x = Attatchments.Positions.GetPosition(index).GetChild(0);
+        Transform x = Attachments.Positions.GetPosition(index).GetChild(0);
         Destroy(x.gameObject);
     }
 
@@ -140,15 +144,15 @@ public class Weapon : MonoBehaviour {
 
     public Transform GetBulletSpawn()
     {
-        if (Attatchments.Current.Muzzle != null)
+        if (Attachments.Current.Muzzle != null)
         {
-            if(Attatchments.Current.Muzzle is MuzzleAttachment)
+            if(Attachments.Current.Muzzle is MuzzleAttachment)
             {
-                return (Attatchments.Positions.Muzzle.GetChild(0).GetComponent<MuzzleAttachment>()).BulletSpawn;
+                return (Attachments.Positions.Muzzle.GetChild(0).GetComponent<MuzzleAttachment>()).BulletSpawn;
             }
             else
             {
-                Debug.LogError("Attachment on muzzle (" + Attatchments.Current.Muzzle.Name + ") does not inherit from MuzzleAttachment. Please fix this.");
+                Debug.LogError("Attachment on muzzle (" + Attachments.Current.Muzzle.Name + ") does not inherit from MuzzleAttachment. Please fix this.");
                 return this.Shooting.BulletSpawn;
             }
         }
@@ -481,12 +485,34 @@ public class WeaponInformation
     public string LongDescription;
 }
 
+/*
+ * 0: Muzzle
+ * 1: Sights
+ */
+
 [System.Serializable]
 public class AttatchmentsContainer
 {
+    public bool AllowMuzzle = true;
+    public bool AllowSights = true;
+
     public AttachmentPositions Positions;
     public Attachments Current;
     public Attachments Default;
+
+    public bool Allow(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                return AllowMuzzle;
+            case 1:
+                return AllowMuzzle;
+            default:
+                Debug.LogError("UKNOWN index for 'Allow' : " + index);
+                return false;
+        }
+    }
 }
 
 [System.Serializable]
