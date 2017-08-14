@@ -7,12 +7,12 @@ using UnityEngine;
 public class Hand : MonoBehaviour
 {
     private new SpriteRenderer renderer;
-    private Weapon w;
+    private Gun w;
 
     public void Start()
     {
         renderer = GetComponent<SpriteRenderer>();
-        w = GetComponentInParent<Weapon>();
+        w = GetComponentInParent<Gun>();
     }
 
     public void Update()

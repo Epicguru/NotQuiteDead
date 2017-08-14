@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Weapon : MonoBehaviour {
+public class Gun : MonoBehaviour {
 
     public string Prefab = "Weapons/";
 
@@ -19,7 +19,7 @@ public class Weapon : MonoBehaviour {
 
     //private bool localStored;
     private Animator anim;
-    private WeaponManager hands;
+    private GunManager hands;
     private float aimPercentage;
     private AudioSource shotAudio, animationAudio;
 
@@ -28,7 +28,7 @@ public class Weapon : MonoBehaviour {
     public void Start()
     {
         anim = GetComponentInChildren<Animator>();
-        hands = GetComponentInParent<WeaponManager>();
+        hands = GetComponentInParent<GunManager>();
 
         shotAudio = this.gameObject.AddComponent<AudioSource>();
         animationAudio = this.gameObject.AddComponent<AudioSource>();
@@ -189,7 +189,7 @@ public class Weapon : MonoBehaviour {
     {
         if (!Dropped && !Stored)
         {
-            if (hands.Aiming && !Reloading && !Chambering)
+            if (hands != null && hands.Aiming && !Reloading && !Chambering)
             {
                 this.aimPercentage += Time.deltaTime * (1f / this.Visuals.AimTime);
                 if (aimPercentage > 1)

@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class WeaponContainer : MonoBehaviour {
 
-    private Weapon w;
+    private Gun w;
     private Animator a;
 
     public void Start()
     {
-        w = GetComponentInChildren<Weapon>();
+        w = GetComponentInChildren<Gun>();
         if(w != null)
             a = w.GetComponentInChildren<Animator>();
     }
@@ -26,7 +26,9 @@ public class WeaponContainer : MonoBehaviour {
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            GameObject.Find("Player").GetComponentInChildren<WeaponManager>().Equip(this.gameObject, -1);
+            GameObject o = GameObject.FindGameObjectWithTag("Local Player");
+            if(o != null)
+                o.GetComponentInChildren<GunManager>().Equip(this.gameObject, -1);
         }
     }
 }

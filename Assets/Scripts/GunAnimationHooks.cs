@@ -1,41 +1,41 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class WeaponAnimationHooks : MonoBehaviour
+public class GunAnimationHooks : MonoBehaviour
 {
-    private Weapon w;
+    private Gun g;
     private void Start()
     {
-        w = GetComponentInParent<Weapon>();
+        g = GetComponentInParent<Gun>();
     }
 
     public void Chamber()
     {
-        w.Anim_Chamber();
+        g.Anim_Chamber();
     }
 
     public void Reload()
     {
-        w.Anim_Reload();
+        g.Anim_Reload();
     }
 
     public void Shoot()
     {
-        w.Anim_Shoot();
+        g.Anim_Shoot();
     }
 
     public void PlaySound(int index)
     {
-        w.Anim_Sound(index);
+        g.Anim_Sound(index);
     }
 
     public void SpawnMagazine()
     {
-        w.Anim_SpawnMag();
+        g.Anim_SpawnMag();
     }
 
     public void SpawnShell()
     {
-        w.Anim_SpawnShell();
+        g.Anim_SpawnShell();
     }
 }

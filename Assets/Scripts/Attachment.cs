@@ -6,7 +6,7 @@ public class Attachment : MonoBehaviour
     public string Prefab = "Weapons/Attatchments/";
     public string Name = "Default Name";
     public AttachmentType Type;
-    [HideInInspector] public Weapon AttatchedWeapon;
+    [HideInInspector] public Gun AttatchedWeapon;
 
     public GameObject GetPrefab()
     {

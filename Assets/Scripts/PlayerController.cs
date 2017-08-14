@@ -7,13 +7,13 @@ public class PlayerController : MonoBehaviour {
     public Transform CameraTarget;
 
     private PlayerAnim anim;
-    private WeaponManager weapons;
+    private GunManager weapons;
     private Vector2 speed = new Vector2();
 
     private void Start()
     {
         anim = GetComponentInChildren<PlayerAnim>();
-        weapons = GetComponentInChildren<WeaponManager>();
+        weapons = GetComponentInChildren<GunManager>();
     }
 
     private void Update()

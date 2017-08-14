@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WeaponManager : MonoBehaviour {
+public class GunManager : MonoBehaviour {
 
-    public Weapon[] Weapons = new Weapon[3];
+    public Gun[] Weapons = new Gun[3];
     public Transform Rotation;
     [Range(0, 3)]
     public int Holding;
@@ -63,7 +63,7 @@ public class WeaponManager : MonoBehaviour {
             }
         }
 
-        Weapon weapon = Weapons[this.Holding];
+        Gun weapon = Weapons[this.Holding];
 
         // Deactivate other weapons
         this.DeactivateStoredWeapons();
@@ -123,7 +123,7 @@ public class WeaponManager : MonoBehaviour {
         if (Weapons[weapon] == null)
             return;
 
-        Weapon w = Weapons[weapon];
+        Gun w = Weapons[weapon];
         GameObject prefab = w.GetPrefab();
 
         if(prefab == null)
@@ -138,7 +138,7 @@ public class WeaponManager : MonoBehaviour {
         GameObject container = Instantiate(Spawnables.I.WeaponContainer, transform.position, Quaternion.identity);
         GameObject newObject = Instantiate(prefab, container.transform);
 
-        newObject.GetComponent<Weapon>().Dropped = true;
+        newObject.GetComponent<Gun>().Dropped = true;
     }
 
     public void Equip(GameObject weapon, int slot, bool equip = true)
@@ -146,7 +146,7 @@ public class WeaponManager : MonoBehaviour {
         if (slot > 0 && Weapons[slot] != null)
             return;
 
-        Weapon w = weapon.GetComponentInChildren<Weapon>();
+        Gun w = weapon.GetComponentInChildren<Gun>();
         if (w == null)
             return;
 
@@ -166,7 +166,7 @@ public class WeaponManager : MonoBehaviour {
 
         GameObject newWeapon = Instantiate(prefab, transform);
 
-        Weapon w2 = newWeapon.GetComponent<Weapon>();
+        Gun w2 = newWeapon.GetComponent<Gun>();
 
         this.Weapons[slot] = w2;
 
@@ -188,12 +188,12 @@ public class WeaponManager : MonoBehaviour {
 
     public void DeactivateStoredWeapons()
     {
-        foreach(Weapon w in this.Weapons)
+        foreach(Gun w in this.Weapons)
         {
             if (w == null)
                 continue;
 
-            Weapon stored = w;
+            Gun stored = w;
 
             if (w == this.Weapons[this.Holding])
                 continue;
@@ -216,10 +216,10 @@ public class WeaponManager : MonoBehaviour {
 
     public void OnGUI()
     {
-        Weapon weapon = Weapons[this.Holding];
+        Gun weapon = Weapons[this.Holding];
         if(weapon == null)
         {
-            GUI.Label(new Rect(10, 10, 100, 100), "Null Weapon");
+            GUI.Label(new Rect(10, 10, 100, 100), "Null Gun");
         }
         else
         {
