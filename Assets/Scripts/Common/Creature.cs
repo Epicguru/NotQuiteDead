@@ -21,6 +21,7 @@ public class Creature : NetworkBehaviour {
     private float timeSinceSource;
     private float timeSinceSecondary;
     private string secondary;
+    private bool hasBeenDead;
 
     [Command]
     public virtual void CmdDamage(float damage, string source, bool isSecondary)
@@ -41,6 +42,7 @@ public class Creature : NetworkBehaviour {
         if(Health <= 0)
         {
             Dead = true;
+            hasBeenDead = false;
         }
 
         // Log into damage system
@@ -54,22 +56,39 @@ public class Creature : NetworkBehaviour {
             timeSinceSource = 0;
             this.source = source;
         }
+
+        Debug.Log("Damaged for " + damage + " to give " + Health);
     }
 
-    public virtual void Heal(float health)
+    [Command]
+    public virtual void CmdHeal(float health)
     {
-        if (health <= 0)
+        if (Dead && !CanRevive)
             return;
-
-        if(CanRevive && Health <= 0 && health >= 0)
-        {
-            Dead = false; // Un-Die!
-        }
 
         Health += health;
 
+        if(CanRevive && Dead && Health >= 0)
+        {
+            Dead = false; // Un-Die!
+            hasBeenDead = false;
+        }
+
         if (Health > MaxHealth)
             Health = MaxHealth;
+
+        Debug.Log("Healed for " + health + ", total " + Health);
+    }
+
+    public void Update()
+    {
+        if (Dead && !hasBeenDead)
+        {
+            hasBeenDead = true;
+            UponDeath();
+        }
+        timeSinceSource += Time.deltaTime;
+        timeSinceSecondary += Time.deltaTime;
     }
 
     public float GetMaxHealth()

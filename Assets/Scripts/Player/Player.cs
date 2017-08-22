@@ -41,8 +41,8 @@ public class Player : NetworkBehaviour
     private void UponDeath()
     {
         // 'Respawn'
-        Creature.Heal(Creature.GetMaxHealth());
-        transform.position = NetworkManager.singleton.GetStartPosition().position;
+        Creature.CmdHeal(Creature.GetMaxHealth());
+        transform.position = Vector3.zero;
         Debug.Log("Player died:");
         Debug.Log("Local player was " + Creature.GetDamageReportAsPlayer("killed"));
     }

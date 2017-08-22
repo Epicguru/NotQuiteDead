@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+[RequireComponent(typeof(MeleeAttack))]
 public class MeleeWeapon : Weapon {
 
     // This represents an extension of an item that is a meele weapon.
@@ -15,6 +16,7 @@ public class MeleeWeapon : Weapon {
     public MeleeAnimatorInfo Animation;
 
     [HideInInspector] public Item Item;
+    [HideInInspector] public MeleeAttack Attack;
     public int ComboNumber;
 
     public bool IsEquiping;
@@ -26,6 +28,7 @@ public class MeleeWeapon : Weapon {
     {
         // Get references
         Item = GetComponent<Item>();
+        Attack = GetComponent<MeleeAttack>();
 
         // Set type.
         this.Type = WeaponType.MELEE;
@@ -114,6 +117,9 @@ public class MeleeWeapon : Weapon {
 
         // Flag as attacking
         IsAttacking = true;
+
+        // TODO FIXME
+        Attack.DebugHits();
     }
 
     public int Randomize(bool requireNew)
