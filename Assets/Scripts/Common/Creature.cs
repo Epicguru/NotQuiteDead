@@ -11,16 +11,19 @@ public class Creature : NetworkBehaviour {
     public delegate void UponDeathDel();
 
     [SerializeField]
+    [SyncVar]
     private float Health = 100f;
 
     [SerializeField]
     private float MaxHealth = 100f;
 
     private string source;
-    private float timeSinceDamage;
+    private float timeSinceSource;
+    private float timeSinceSecondary;
     private string secondary;
 
-    public virtual void Damage(float damage, string source, bool isSecondary = false)
+    [Command]
+    public virtual void CmdDamage(float damage, string source, bool isSecondary)
     {
         /*
         * Indicates that the creature should take damage, by supplying the damage amount and source.
@@ -39,6 +42,18 @@ public class Creature : NetworkBehaviour {
         {
             Dead = true;
         }
+
+        // Log into damage system
+        if (isSecondary)
+        {
+            timeSinceSecondary = 0;
+            secondary = source;
+        }
+        else
+        {
+            timeSinceSource = 0;
+            this.source = source;
+        }
     }
 
     public virtual void Heal(float health)
@@ -55,5 +70,117 @@ public class Creature : NetworkBehaviour {
 
         if (Health > MaxHealth)
             Health = MaxHealth;
+    }
+
+    public float GetMaxHealth()
+    {
+        return this.MaxHealth;
+    }
+
+    public float GetHealth()
+    {
+        return this.Health;
+    }
+
+    public float GetHealthPercentage()
+    {
+        // In a range from 0-1
+
+        return GetHealth() / GetMaxHealth();
+    }
+
+    public string GetLatestDamage(bool includeSecondary = false)
+    {
+        if (includeSecondary)
+        {
+            if(timeSinceSecondary < timeSinceSource)
+            {
+                return secondary;
+            }
+        }
+        return source;
+    }
+
+    public string GetLatestSecondary()
+    {
+        return secondary;
+    }
+
+    public float GetTimeSinceDamage(bool includeSecondary = false)
+    {
+        if (includeSecondary)
+        {
+            if (timeSinceSecondary < timeSinceSource)
+            {
+                return timeSinceSecondary;
+            }
+        }
+        return timeSinceSource;
+    }
+
+    public float GetTimeSinceSecondary()
+    {
+        return timeSinceSecondary;
+    }
+
+    public string GetLatestDamageReport(bool includeSecondary = false)
+    {
+        return "Damage - " + GetLatestDamage(includeSecondary) + " : " + GetTimeSinceDamage(includeSecondary) + " seconds ago.";
+    }
+
+    public string GetDamageReportAsPlayer(string status)
+    {
+        // Format for killing by player:
+        // PlayerName:Weapon
+
+        string final = "";
+        bool doneSecondary = false;
+        if(GetTimeSinceSecondary() < GetTimeSinceDamage())
+        {
+            secondary = GetLatestSecondary();
+            // Never a player action.
+
+            final += status + " by " + secondary + " " + (timeSinceSecondary - timeSinceSource) + " seconds after ";
+            doneSecondary = true;
+        }
+
+        source = GetLatestDamage(false);
+
+        // Assume killed by player or AI
+        if (string.IsNullOrEmpty(source))
+        {
+            if (doneSecondary)
+            {
+                final += " Mr.Nobody attacked them using voodoo magic.";
+            }
+            else
+            {
+                final += status + " by voodoo magic.";
+            }
+            return final;
+        }
+
+        if (!source.Contains("'"))
+        {
+            final += status + " by " + source;
+            return final;
+        }
+        else
+        {
+            string[] data = source.Split(':');
+            string killer = data[0];
+            string weapon = data[1];
+
+            if (doneSecondary)
+            {
+                final += killer + " attacked them using " + weapon + ".";
+            }
+            else
+            {
+                final += status + " by " + killer + " using " + weapon + ".";
+            }
+
+            return final;
+        }
     }
 }

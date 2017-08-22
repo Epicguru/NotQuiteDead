@@ -14,7 +14,7 @@ public class Player : NetworkBehaviour
     public PlayerMovement Movement;
     public HandyRemoval HandyRemoval;
     public NetworkIdentity NetworkIdentity;
-    public Creature Alive;
+    public Creature Creature;
     public PlayerNetUtils NetUtils;
     public Player _Player;
 
@@ -29,7 +29,7 @@ public class Player : NetworkBehaviour
             gameObject.name = "Local Player";
             PlayerInventory.inv.Inventory.Owner = this.transform;
 
-            Alive.UponDeath += UponDeath;
+            Creature.UponDeath += UponDeath;
 
         }
         else
@@ -40,15 +40,11 @@ public class Player : NetworkBehaviour
 
     private void UponDeath()
     {
-        // 'Respawn'   
-    }
-
-    public void Update()
-    {
-        if (Alive.Dead)
-        {
-            Destroy(gameObject); // TODO Network!
-        }
+        // 'Respawn'
+        Creature.Heal(Creature.GetMaxHealth());
+        transform.position = NetworkManager.singleton.GetStartPosition().position;
+        Debug.Log("Player died:");
+        Debug.Log("Local player was " + Creature.GetDamageReportAsPlayer("killed"));
     }
 
     /// <summary>
