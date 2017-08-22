@@ -14,7 +14,7 @@ public class Player : NetworkBehaviour
     public PlayerMovement Movement;
     public HandyRemoval HandyRemoval;
     public NetworkIdentity NetworkIdentity;
-    public Alive Alive;
+    public Creature Alive;
     public PlayerNetUtils NetUtils;
     public Player _Player;
 
@@ -28,11 +28,19 @@ public class Player : NetworkBehaviour
             Local._Player = this;
             gameObject.name = "Local Player";
             PlayerInventory.inv.Inventory.Owner = this.transform;
+
+            Alive.UponDeath += UponDeath;
+
         }
         else
         {
             gameObject.name = "Other Player";
         }
+    }
+
+    private void UponDeath()
+    {
+        // 'Respawn'   
     }
 
     public void Update()
