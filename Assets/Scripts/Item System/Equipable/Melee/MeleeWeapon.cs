@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class MeleeWeapon : Weapon {
 
@@ -72,7 +73,41 @@ public class MeleeWeapon : Weapon {
         }
     }
 
-    public void RandomizeAnims(bool requireNew = false)
+    public void AnimAttack(bool randomize = true)
+    {
+        if (!hasAuthority)
+        {
+            Debug.LogError("No authority to call animation with this weapon!");
+            return;
+        }
+        if (IsAttacking)
+        {
+            Debug.LogError("Already attacking!");
+            return;
+        }
+        CmdAnimAttack(randomize);
+        IsAttacking = true;
+    }
+
+    public void AnimEquip(bool randomize = true)
+    {
+        if (!hasAuthority)
+        {
+            Debug.LogError("No authority to call animation with this weapon!");
+            return;
+        }
+        if(IsEquiping)
+        {
+            Debug.LogError("Already equiping!");
+            return;
+        }
+
+        CmdAnimEquip(randomize);
+        IsEquiping = true;
+    }
+
+    [Command]
+    private void CmdRandomizeAnims(bool requireNew)
     {
         int current = Animation.Animator.GetInteger(Animation.Random);
         int random = Random.Range(Animation.MinRandom, Animation.MaxRandom + 1);
@@ -84,40 +119,46 @@ public class MeleeWeapon : Weapon {
             }
         }
 
-        Animation.Animator.SetInteger(Animation.Random, random);
+        RpcRandomizeAnims(random);
     }
 
-    public void AnimEquip(bool randomize = true)
+    [ClientRpc]
+    private void RpcRandomizeAnims(int value)
     {
-        if(IsEquiping)
-        {
-            Debug.LogError("Already equiping!");
-            return;
-        }
+        Animation.Animator.SetInteger(Animation.Random, value);
+    }
 
+    [Command]
+    private void CmdAnimEquip(bool randomize)
+    {
         if (randomize)
-            RandomizeAnims(Animation.RequireNewRandom);
+            CmdRandomizeAnims(Animation.RequireNewRandom);
         else
-            Animation.Animator.SetInteger(Animation.Random, 0);
+            RpcRandomizeAnims(0);
 
+        RpcAnimEquip();
+    }
+
+    [ClientRpc]
+    private void RpcAnimEquip()
+    {
         Animation.Animator.SetTrigger(Animation.Equip);
-        IsEquiping = true;
     }
 
-    public void AnimAttack(bool randomize = true)
+    [Command]
+    private void CmdAnimAttack(bool randomize)
     {
-        if (IsAttacking)
-        {
-            Debug.LogError("Already attacking!");
-            return;
-        }
-
         if (randomize)
-            RandomizeAnims(Animation.RequireNewRandom);
+            CmdRandomizeAnims(Animation.RequireNewRandom);
         else
-            Animation.Animator.SetInteger(Animation.Random, 0);
+            RpcRandomizeAnims(0);
+        RpcAnimAttack();
+    }
+
+    [ClientRpc]
+    private void RpcAnimAttack()
+    {
         Animation.Animator.SetTrigger(Animation.Attack);
-        IsAttacking = true;
     }
 
     public void Callback_AttackEnd()
