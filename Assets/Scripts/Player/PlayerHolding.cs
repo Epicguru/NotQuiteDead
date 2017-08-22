@@ -47,7 +47,6 @@ public class PlayerHolding : NetworkBehaviour
         created.SetEquipped(true, localPlayer);
         created.SetDropped(false);
 
-        // Tell the local player that this is their item.
         RpcSetItem(created.gameObject, localPlayer);
 
         Debug.Log("Created item!");
@@ -56,9 +55,6 @@ public class PlayerHolding : NetworkBehaviour
     [ClientRpc]
     public void RpcSetItem(GameObject item, GameObject player)
     {
-        if (Player.Local.NetworkIdentity.netId != player.GetComponent<NetworkIdentity>().netId)
-            return;
-
         this.Item = item.GetComponent<Item>();
     }
 
