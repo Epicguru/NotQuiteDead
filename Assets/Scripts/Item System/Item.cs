@@ -14,7 +14,7 @@ public class Item : NetworkBehaviour
     */
 
     [Tooltip("The location of the prefab for this item, in the resouces folder.")]
-    public string Prefab = "Resources/Items/";
+    public string Prefab = "Items/";
 
     [Tooltip("The internal (TODO) name of this item.")]
     public string Name = "Default Item Name";
@@ -38,8 +38,6 @@ public class Item : NetworkBehaviour
     [Tooltip("The image for the icon in menus and inventories.")]
     public Sprite ItemIcon;
 
-    [SyncVar]
-    private bool dropped = false;
     [SyncVar]
     private bool equiped = false;
     private NetworkTransform netTransform;
@@ -79,42 +77,6 @@ public class Item : NetworkBehaviour
     public bool IsEquipped()
     {
         return this.equiped;
-    }
-
-    /// <summary>
-    /// Gets the Dropped state. You can handle dropped items and the concequences of that in any script
-    /// that you like.
-    /// </summary>
-    /// <returns>True if this item is loose on the ground. False if it is stored in an inventory or equipped.</returns>
-    public bool IsDropped()
-    {
-        return dropped;
-    }
-
-    /// <summary>
-    /// Sets the dropped state. If the state is already active, may it be true or false,
-    /// this call will be ignored.
-    /// </summary>
-    public void SetDropped(bool dropped)
-    {
-        if (dropped)
-        {
-            if (!this.dropped)
-            {
-                // Activate equipped state.
-
-                this.dropped = true;
-            }
-        }
-        else
-        {
-            if (this.dropped)
-            {
-                // Remove equipped state.
-
-                this.dropped = false;
-            }
-        }
     }
 
     /// <summary>

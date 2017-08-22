@@ -19,6 +19,8 @@ public class MeleeWeapon : Weapon {
 
     public bool IsEquiping;
     public bool IsAttacking;
+    [SyncVar]
+    public bool IsDropped;
 
     public void Start()
     {
@@ -39,15 +41,23 @@ public class MeleeWeapon : Weapon {
 
     public void Update()
     {
-        if (!Item.IsEquipped())
+        if (IsDropped)
         {
+            Animation.Animator.SetBool(Animation.Dropped, true);
+            Hand.SetEquipHandRender(transform, false);
+        }
+        if (!Item.IsEquipped() && isServer)
+        {
+            // Assume dropped...
+            if (!IsDropped)
+                IsDropped = true;
             return;
         }
-
         if (Player.Local.Holding.Item != this.Item)
         {
             return;
         }
+
 
         UpdateSwinging();
         if (Input.GetKeyDown(KeyCode.R))
@@ -85,8 +95,40 @@ public class MeleeWeapon : Weapon {
             Debug.LogError("Already attacking!");
             return;
         }
-        CmdAnimAttack(randomize);
+        int random = 0;
+        if (randomize)
+            random = Randomize(Animation.RequireNewRandom);
+
+        // This takes place on the local client...
+        Animation.Animator.SetInteger(Animation.Random, random);
+        Animation.Animator.SetTrigger(Animation.Attack);
+
+        // Tell other clients what we are doing...
+        // On their end, animations will play but the authoritive version of events (animation speed, cancelling etc.)
+        // will happen here on the client. May be a bad idea. Oh well. This is because if the local client plays the animation
+        // when the RPC is recieved, then attack speed will vary depending on ping. Not gud.
+        // On the other hand, this will mean that if there is a high ping then attacks will seem irregular and desynchronised
+        // for other clients. Bloody multiplayer :)
+        CmdRandomizeAnims(random);
+        CmdAnimAttack();
+
+        // Flag as attacking
         IsAttacking = true;
+    }
+
+    public int Randomize(bool requireNew)
+    {
+        int current = Animation.Animator.GetInteger(Animation.Random);
+        int random = Random.Range(Animation.MinRandom, Animation.MaxRandom + 1);
+        if (requireNew)
+        {
+            while (random == current)
+            {
+                random = Random.Range(Animation.MinRandom, Animation.MaxRandom + 1);
+            }
+        }
+
+        return random;
     }
 
     public void AnimEquip(bool randomize = true)
@@ -102,63 +144,55 @@ public class MeleeWeapon : Weapon {
             return;
         }
 
-        CmdAnimEquip(randomize);
+        int random = 0;
+        if (randomize)
+            random = Randomize(Animation.RequireNewRandom);
+
+        Animation.Animator.SetInteger(Animation.Random, random);
+        Animation.Animator.SetTrigger(Animation.Equip);
+
+        CmdRandomizeAnims(random);
+        CmdAnimEquip();
         IsEquiping = true;
     }
 
     [Command]
-    private void CmdRandomizeAnims(bool requireNew)
+    private void CmdRandomizeAnims(int random)
     {
-        int current = Animation.Animator.GetInteger(Animation.Random);
-        int random = Random.Range(Animation.MinRandom, Animation.MaxRandom + 1);
-        if (requireNew)
-        {
-            while (random == current)
-            {
-                random = Random.Range(Animation.MinRandom, Animation.MaxRandom + 1);
-            }
-        }
-
         RpcRandomizeAnims(random);
     }
 
     [ClientRpc]
     private void RpcRandomizeAnims(int value)
     {
-        Animation.Animator.SetInteger(Animation.Random, value);
+        if(Item != Player.Local.Holding.Item)
+            Animation.Animator.SetInteger(Animation.Random, value);
     }
 
     [Command]
-    private void CmdAnimEquip(bool randomize)
+    private void CmdAnimEquip()
     {
-        if (randomize)
-            CmdRandomizeAnims(Animation.RequireNewRandom);
-        else
-            RpcRandomizeAnims(0);
-
         RpcAnimEquip();
     }
 
     [ClientRpc]
     private void RpcAnimEquip()
     {
-        Animation.Animator.SetTrigger(Animation.Equip);
+        if (Item != Player.Local.Holding.Item)
+            Animation.Animator.SetTrigger(Animation.Equip);
     }
 
     [Command]
-    private void CmdAnimAttack(bool randomize)
+    private void CmdAnimAttack()
     {
-        if (randomize)
-            CmdRandomizeAnims(Animation.RequireNewRandom);
-        else
-            RpcRandomizeAnims(0);
         RpcAnimAttack();
     }
 
     [ClientRpc]
     private void RpcAnimAttack()
     {
-        Animation.Animator.SetTrigger(Animation.Attack);
+        if (Item != Player.Local.Holding.Item)
+            Animation.Animator.SetTrigger(Animation.Attack);
     }
 
     public void Callback_AttackEnd()

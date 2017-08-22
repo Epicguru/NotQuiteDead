@@ -45,7 +45,6 @@ public class PlayerHolding : NetworkBehaviour
 
         // Set states
         created.SetEquipped(true, localPlayer);
-        created.SetDropped(false);
 
         RpcSetItem(created.gameObject, localPlayer);
 

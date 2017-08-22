@@ -27,6 +27,11 @@ public class Player : NetworkBehaviour
             Local = this;
             Local._Player = this;
             gameObject.name = "Local Player";
+            PlayerInventory.inv.Inventory.Owner = this.transform;
+        }
+        else
+        {
+            gameObject.name = "Other Player";
         }
     }
 
