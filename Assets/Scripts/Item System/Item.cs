@@ -62,7 +62,7 @@ public class Item : NetworkBehaviour
     {
         if (IsEquipped())
         {
-            transform.SetParent(PlayerHolding.transform);
+            transform.SetParent(PlayerHolding.GetComponent<Player>().Holding.Holding);
             transform.localPosition = Vector3.zero;
             transform.localScale = Vector3.one;
         }
