@@ -32,7 +32,7 @@ public class PlayerHolding : NetworkBehaviour
         // Checks
         if (string.IsNullOrEmpty(prefab))
         {
-            Debug.LogError("PRefab string was null or empty.");
+            Debug.LogError("Prefab string was null or empty.");
             return;
         }
 

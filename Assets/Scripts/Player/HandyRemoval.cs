@@ -11,6 +11,7 @@ public class HandyRemoval : NetworkBehaviour {
 
     public Transform[] hands;
 
+    [Command]
     public void CmdSetShowHands(bool flag)
     {
         ShowHands = flag;
