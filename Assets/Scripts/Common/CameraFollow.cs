@@ -9,17 +9,19 @@ public class CameraFollow : MonoBehaviour {
 
     public void FixedUpdate()
     {
-        if (!PhysicsMode)
+        if (!PhysicsMode || Target == null)
             return;
 
         transform.position = Target.position;
+        transform.Translate(transform.forward * -10);
     }
 
     public void Update()
     {
-        if (PhysicsMode)
+        if (PhysicsMode || Target == null)
             return;
 
         transform.position = Target.position;
+        transform.Translate(transform.forward * -10);
     }
 }

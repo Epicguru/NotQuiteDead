@@ -9,7 +9,7 @@ using UnityEngine.Networking;
 public class ItemPickup : NetworkBehaviour
 {
     public bool AllowPickup = true;
-    [HideInInspector] public bool MouseOver;
+    public bool MouseOver;
     [HideInInspector] public Item Item;
 
     private new PolygonCollider2D collider;
