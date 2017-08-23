@@ -17,6 +17,11 @@ public class HandyRemoval : NetworkBehaviour {
         ShowHands = flag;
     }
 
+    public bool IsShowingHands()
+    {
+        return ShowHands;
+    }
+
     public void Update()
     {
         foreach (Transform s in hands)

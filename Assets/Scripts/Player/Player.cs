@@ -46,7 +46,7 @@ public class Player : NetworkBehaviour
         Creature.CmdHeal(Creature.GetMaxHealth());
         transform.position = Vector3.zero;
         Debug.Log("Player died:");
-        Debug.Log("Local player was " + Creature.GetDamageReportAsPlayer("killed"));
+        Debug.Log("Local player was " + Creature.GetDamageReport("killed"));
     }
 
     /// <summary>

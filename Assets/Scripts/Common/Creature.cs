@@ -6,207 +6,212 @@ using UnityEngine.Networking;
 [NetworkSettings(sendInterval = 0.05f)]
 public class Creature : NetworkBehaviour {
 
-    [SyncVar]
-    public bool Dead;
-    public bool CanRevive;
-
-    public event UponDeathDel UponDeath;
-    public delegate void UponDeathDel();
-
-    [SerializeField]
-    [SyncVar]
-    private float Health = 100f;
+    /*
+    * This class represents a object that can be damaged/hurt and destroyed/killed.
+    * The script executes almost exclusively on the server. Most vars are SyncVars that contain data like health and
+    * max health.
+    */
 
     [SerializeField]
-    private float MaxHealth = 100f;
+    [SyncVar]
+    private float Health = 100;
+    [SyncVar]
+    [SerializeField]
+    private float MaxHealth = 100;
+    [SyncVar]
+    public bool CanRevive = false;
 
+    // START SERVER ONLY
     private string source;
+    private string secondary;
     private float timeSinceSource;
     private float timeSinceSecondary;
-    private string secondary;
     private bool hasBeenDead;
+    // END SERVER ONLY
+
+    public DED UponDeath;
+    public delegate void DED(); // Death event delegate
 
     [Command]
-    public virtual void CmdDamage(float damage, string source, bool isSecondary)
+    public void CmdSetMaxHealth(float health)
     {
-        /*
-        * Indicates that the creature should take damage, by supplying the damage amount and source.
-        * This class records the time when the damage was dealt, unless isSecondary is true.
-        * If it is true then the damage is considered to be a consequence of another type of damage,
-        * namely the previous damage. For example bleeding would be secondary damage. If the bleeding kills
-        * the creature, then the death will be bleeding but the source will be the last damage dealt,
-        * for example an arrow.
-        */
-
-        if (damage <= 0)
+        if (health <= 0)
             return;
-        Health -= damage;
+        this.MaxHealth = health;
 
-        if(Health <= 0)
-        {
-            Dead = true;
-            hasBeenDead = false;
-        }
-
-        // Log into damage system
-        if (isSecondary)
-        {
-            timeSinceSecondary = 0;
-            secondary = source;
-        }
-        else
-        {
-            timeSinceSource = 0;
-            this.source = source;
-        }
-
-        Debug.Log("Damaged for " + damage + " to give " + Health);
+        if (this.Health > MaxHealth)
+            this.SetHealth(MaxHealth);
     }
 
-    [Command]
-    public virtual void CmdHeal(float health)
+    [Server]
+    private void SetHealth(float health)
     {
-        if (Dead && !CanRevive)
-            return;
-
-        Health += health;
-
-        if(CanRevive && Dead && Health >= 0)
+        Health = health;
+        if (Health < 0)
         {
-            Dead = false; // Un-Die!
-            hasBeenDead = false;
+            Health = 0;
+            // This is where the player dies.
+            // At this point, we want to notify the local object that owns this, (the one with authority).
+            hasBeenDead = false; // This does not represent the dead state, but it is used in callbacks.
         }
-
         if (Health > MaxHealth)
             Health = MaxHealth;
 
-        Debug.Log("Healed for " + health + ", total " + Health);
+        Debug.Log("Set health to " + Health + ".");
+    }
+
+    [Command]
+    public void CmdDamage(float damage, string dealer, bool isSecondary)
+    {
+        SetHealth(Health - Mathf.Abs(damage));
+
+        if (!isSecondary)
+        {
+            this.timeSinceSource = 0;
+            this.source = dealer;
+        }
+        else
+        {
+            this.secondary = dealer;
+            this.timeSinceSecondary = 0;
+        }
+    }
+
+    [Command]
+    public void CmdHeal(float health)
+    {
+        health = Mathf.Abs(health);
+        if(health == 0)
+        {
+            return;
+        }
+        if (Health <= 0)
+        {
+            if (!CanRevive)
+            {
+                Debug.LogWarning("Creature " + gameObject.name + " cannot be revived, but has attempted to heal for " + health + " health.");
+                return;
+            }
+            else
+            {
+                // Revive
+                hasBeenDead = false;
+                // Simply allow the heal.
+            }            
+        }
+        SetHealth(Health + health);
+    }
+
+    [Server]
+    private void DeadEventServer(string source, string secondary, float timeSource, float timeSecondary)
+    {
+        RpcDeadEventClient(source, secondary, timeSource, timeSecondary);
+    }
+
+    [ClientRpc]
+    private void RpcDeadEventClient(string source, string secondary, float timeSource, float timeSecondary)
+    {
+        if (hasAuthority) // If we own or have authority over this object...
+        {
+            DeadEvent(source, secondary, timeSource, timeSecondary);
+        }
+    }
+
+    [Client]
+    private void DeadEvent(string source, string secondary, float timeSource, float timeSecondary)
+    {
+        // Assign local values.
+
+        this.source = source;
+        this.secondary = secondary;
+        this.timeSinceSource = timeSource;
+        this.timeSinceSecondary = timeSecondary;
+
+        if(UponDeath != null)
+            UponDeath();
     }
 
     public void Update()
     {
-        if (!hasAuthority)
-            return;
-
-        if (Dead && !hasBeenDead)
+        if (!isServer)
         {
-            hasBeenDead = true;
-            if(UponDeath != null)
-                UponDeath();
+            return;
         }
-        timeSinceSource += Time.deltaTime;
-        timeSinceSecondary += Time.deltaTime;
+
+        if (Health <= 0)
+        {
+            // Assume dead, check if is first frame dead...
+            Health = 0;
+            if (!hasBeenDead)
+            {
+                hasBeenDead = true;
+                // Dead message
+                // Send message to client who has authority
+                this.DeadEventServer(source, secondary, timeSinceSource, timeSinceSecondary);
+            }
+        }
     }
 
     public float GetMaxHealth()
     {
-        return this.MaxHealth;
+        return MaxHealth;
     }
 
     public float GetHealth()
     {
-        return this.Health;
+        return Health;
     }
 
     public float GetHealthPercentage()
     {
-        // In a range from 0-1
-
         return GetHealth() / GetMaxHealth();
     }
 
-    public string GetLatestDamage(bool includeSecondary = false)
+    public string GetDamageReport(string status)
     {
-        if (includeSecondary)
+        string s = "";
+
+        if(!string.IsNullOrEmpty(secondary))
         {
-            if(timeSinceSecondary < timeSinceSource)
-            {
-                return secondary;
-            }
-        }
-        return source;
-    }
-
-    public string GetLatestSecondary()
-    {
-        return secondary;
-    }
-
-    public float GetTimeSinceDamage(bool includeSecondary = false)
-    {
-        if (includeSecondary)
-        {
-            if (timeSinceSecondary < timeSinceSource)
-            {
-                return timeSinceSecondary;
-            }
-        }
-        return timeSinceSource;
-    }
-
-    public float GetTimeSinceSecondary()
-    {
-        return timeSinceSecondary;
-    }
-
-    public string GetLatestDamageReport(bool includeSecondary = false)
-    {
-        return "Damage - " + GetLatestDamage(includeSecondary) + " : " + GetTimeSinceDamage(includeSecondary) + " seconds ago.";
-    }
-
-    public string GetDamageReportAsPlayer(string status)
-    {
-        // Format for killing by player:
-        // PlayerName:Weapon
-
-        string final = "";
-        bool doneSecondary = false;
-        if(GetTimeSinceSecondary() < GetTimeSinceDamage())
-        {
-            secondary = GetLatestSecondary();
-            // Never a player action.
-
-            final += status + " by " + secondary + " " + (timeSinceSecondary - timeSinceSource) + " seconds after ";
-            doneSecondary = true;
+            s += status + " by " + secondary + " ";
+            float interval = timeSinceSource - timeSinceSecondary;
+            if(source != null && interval > 0)
+                s += interval + " seconds after ";
         }
 
-        source = GetLatestDamage(false);
-
-        // Assume killed by player or AI
-        if (string.IsNullOrEmpty(source))
+        if(string.IsNullOrEmpty(source))
         {
-            if (doneSecondary)
-            {
-                final += " Mr.Nobody attacked them using voodoo magic.";
-            }
+            if (string.IsNullOrEmpty(secondary))
+                s += status + " by voodoo magic.";
             else
-            {
-                final += status + " by voodoo magic.";
-            }
-            return final;
-        }
-
-        if (!source.Contains("'"))
-        {
-            final += status + " by " + source;
-            return final;
+                s += " absolutely nothing hit them.";
         }
         else
         {
-            string[] data = source.Split(':');
-            string killer = data[0];
-            string weapon = data[1];
+            bool isPlayerAttack = source.Contains(":");
 
-            if (doneSecondary)
+            if (isPlayerAttack)
             {
-                final += killer + " attacked them using " + weapon + ".";
+                string[] data = source.Split(':');
+                string player = data[0];
+                string weapon = data[1];
+
+                if(!string.IsNullOrEmpty(secondary))
+                {
+                    // For example 'XYZ killed by bleeding 6 seconds after ASD hit them with Sharp Stick.'
+                    s += player + " hit them with " + weapon + ".";
+                }
+                else
+                {
+                    s += status + " by " + player + " using " + weapon + ".";
+                }
             }
             else
             {
-                final += status + " by " + killer + " using " + weapon + ".";
+                s += status + " by " + source + ".";
             }
-
-            return final;
         }
+
+        return s;
     }
 }

@@ -15,10 +15,12 @@ public class PlayerHolding : NetworkBehaviour
     public Transform Holding; // The game obejct that holds items that are currenty equiped.
     public Item Item; // The currently equipped item.
     private HandyRemoval handyRemoval;
+    private PlayerLooking looking;
 
     public void Start()
     {
         handyRemoval = GetComponent<HandyRemoval>();
+        looking = GetComponent<PlayerLooking>();
     }
 
     [Command]
@@ -66,7 +68,11 @@ public class PlayerHolding : NetworkBehaviour
 
     public void Update()
     {
-        if(isLocalPlayer)
-            handyRemoval.CmdSetShowHands(Item == null);
+        if (isLocalPlayer)
+        {
+            if(handyRemoval.IsShowingHands() != (Item == null))
+                handyRemoval.CmdSetShowHands(Item == null);
+            //looking.Looking = Item != null;
+        }
     }
 }
