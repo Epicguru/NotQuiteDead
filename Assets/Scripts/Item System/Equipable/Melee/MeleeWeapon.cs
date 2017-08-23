@@ -119,7 +119,7 @@ public class MeleeWeapon : Weapon {
         IsAttacking = true;
 
         // TODO FIXME
-        Attack.DebugHits();
+        // DO real attack here, in CMD
     }
 
     public int Randomize(bool requireNew)

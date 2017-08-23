@@ -8,6 +8,7 @@ public class MeleeAttack : MonoBehaviour {
     public Collider2D Collider;
 
     private MeleeWeapon weapon;
+    private List<Collider2D> touching;
 
     public void Start()
     {
@@ -20,19 +21,8 @@ public class MeleeAttack : MonoBehaviour {
         }
     }   
     
-    public Collider2D[] GetHitColliders()
+    public void OnCollisionEnter2D(Collision2D c)
     {
-        Collider2D[] list;
-        Collider.GetContacts(list = new Collider2D[0]);
-
-        return list;
-    } 
-
-    public void DebugHits()
-    {
-        foreach(Collider2D c in GetHitColliders())
-        {
-            Debug.Log(c);
-        }
+        Debug.Log(c.collider);
     }
 }
