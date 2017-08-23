@@ -5,19 +5,27 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(PolygonCollider2D))]
+[RequireComponent(typeof(PolygonCollider2D), typeof(Rigidbody2D))]
 public class ItemPickup : NetworkBehaviour
 {
     public bool AllowPickup = true;
-
-    public bool MouseOver;
-    private new PolygonCollider2D collider;
+    [HideInInspector] public bool MouseOver;
     [HideInInspector] public Item Item;
+
+    private new PolygonCollider2D collider;
+    private new Rigidbody2D rigidbody;
 
     public void Start()
     {
         Item = GetComponent<Item>();
         collider = GetComponent<PolygonCollider2D>();
+        rigidbody = GetComponent<Rigidbody2D>();
+
+        rigidbody.drag = 3f;
+        rigidbody.angularDrag = 2f;
+        rigidbody.useAutoMass = true; // Meh.
+
+        GetComponent<NetworkTransform>().transformSyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody2D;
 
         collider.isTrigger = true;
     }
@@ -25,6 +33,18 @@ public class ItemPickup : NetworkBehaviour
     public void Update()
     {
         // This is an item, on the floor, that has a collider. Yep.
+
+        // Set values for rigidbody.
+        rigidbody.gravityScale = 0; // Float, because we are a top down map.
+        if (!Item.IsEquipped())
+        {
+            // Activate rigidbody.
+            rigidbody.isKinematic = false;
+        }
+        else
+        {
+            rigidbody.isKinematic = true;
+        }
 
         if (MouseOver)
         {

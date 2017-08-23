@@ -9,9 +9,6 @@ public class MeleeWeapon : Weapon {
     // This represents an extension of an item that is a meele weapon.
     // This contains data such as damage and other info.
 
-    [Tooltip("Information about the damage that this weapon inflicts.")]
-    public MeleeDamage Damage;
-
     [Tooltip("Information about animations for this weapon.")]
     public MeleeAnimatorInfo Animation;
 
@@ -106,7 +103,10 @@ public class MeleeWeapon : Weapon {
         Animation.Animator.SetInteger(Animation.Random, random);
         Animation.Animator.SetTrigger(Animation.Attack);
 
-        // Tell other clients what we are doing...
+        // Deal damage using the MeleeAttack class:
+        Attack.Attack(); // Attack any Creatures in the area.
+
+        // Tell other clients what animations we are doing...
         // On their end, animations will play but the authoritive version of events (animation speed, cancelling etc.)
         // will happen here on the client. May be a bad idea. Oh well. This is because if the local client plays the animation
         // when the RPC is recieved, then attack speed will vary depending on ping. Not gud.
