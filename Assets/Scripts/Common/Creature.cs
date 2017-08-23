@@ -85,7 +85,8 @@ public class Creature : NetworkBehaviour {
         if (Dead && !hasBeenDead)
         {
             hasBeenDead = true;
-            UponDeath();
+            if(UponDeath != null)
+                UponDeath();
         }
         timeSinceSource += Time.deltaTime;
         timeSinceSecondary += Time.deltaTime;

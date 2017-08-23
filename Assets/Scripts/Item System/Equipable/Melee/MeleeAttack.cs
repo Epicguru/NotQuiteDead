@@ -13,7 +13,7 @@ public class MeleeAttack : NetworkBehaviour {
     public MeleeDamage Damage;
 
     private MeleeWeapon weapon;
-    private List<Collider2D> touching;
+    private List<Collider2D> touching = new List<Collider2D>();
     private Rigidbody2D body;
 
     public void Start()
