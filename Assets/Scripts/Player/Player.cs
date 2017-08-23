@@ -29,6 +29,8 @@ public class Player : NetworkBehaviour
             gameObject.name = "Local Player";
             PlayerInventory.inv.Inventory.Owner = this.transform;
 
+            Camera.main.GetComponent<CameraFollow>().Target = transform;
+
             Creature.UponDeath += UponDeath;
 
         }

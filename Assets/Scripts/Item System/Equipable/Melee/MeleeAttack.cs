@@ -33,6 +33,9 @@ public class MeleeAttack : NetworkBehaviour {
     
     public void Update()
     {
+        if (weapon == null || weapon.Item == null)
+            return;
+
         if (weapon.Item.IsEquipped())
         {
             foreach(Collider2D c in GetComponentsInChildren<Collider2D>())
@@ -87,6 +90,9 @@ public class MeleeAttack : NetworkBehaviour {
         foreach(Collider2D coll in GetContacts())
         {
             Creature c = coll.GetComponentInParent<Creature>();
+
+            if (c == null)
+                continue;
 
             if (!Damage.AllowSelfDamage && c == Player.Local.Creature)
                 continue;

@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+[NetworkSettings(sendInterval = 0.05f)]
 public class Creature : NetworkBehaviour {
 
+    [SyncVar]
     public bool Dead;
     public bool CanRevive;
+
     public event UponDeathDel UponDeath;
     public delegate void UponDeathDel();
 
@@ -82,6 +85,9 @@ public class Creature : NetworkBehaviour {
 
     public void Update()
     {
+        if (!hasAuthority)
+            return;
+
         if (Dead && !hasBeenDead)
         {
             hasBeenDead = true;

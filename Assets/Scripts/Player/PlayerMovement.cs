@@ -27,7 +27,9 @@ public class PlayerMovement : NetworkBehaviour
     public void Update()
     {
         if (!isLocalPlayer)
+        {
             return;
+        }
 
         MovePlayer();
     }
