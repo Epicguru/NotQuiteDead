@@ -11,7 +11,7 @@ public class InputManagerSetup : MonoBehaviour
         InputManager.LoadKeyBindings();
     }
 
-    public void Update()
+    public void FixedUpdate()
     {
         InputManager.UpdateMousePos();
     }

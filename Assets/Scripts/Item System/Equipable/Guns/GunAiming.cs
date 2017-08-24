@@ -25,6 +25,5 @@ public class GunAiming : NetworkBehaviour
             return;
 
         animation.AnimAim(InputManager.InputPressed("Aim")); // Set aiming based on input.
-
     }
 }

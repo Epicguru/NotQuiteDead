@@ -122,7 +122,7 @@ public class PlayerHolding : NetworkBehaviour
             // Is gun, activate.
 
             // Detect aiming...
-            if (InputManager.InputPressed("Aim"))
+            if (InputManager.InputPressed("Aim") && !g.Animaiton.IsReloading && !g.Animaiton.IsChambering)
             {
                 // Increate percentage and lerp.
                 timer += Time.deltaTime;                

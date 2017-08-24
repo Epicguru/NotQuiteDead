@@ -19,8 +19,9 @@ public class GunAnimation : NetworkBehaviour
     [HideInInspector] [SyncVar] public bool IsAiming;
     [HideInInspector] [SyncVar] public bool IsRunning;
     [HideInInspector] [SyncVar] public bool IsShooting;
+    [HideInInspector] public bool IsEquipping;
     [HideInInspector] public bool IsReloading;
-    [HideInInspector] public bool IsChambering;
+    [HideInInspector] public bool IsChambering = true; // Only true when the object is created, then false forever more!
 
     private Animator animator;
     private Gun gun;
@@ -127,6 +128,11 @@ public class GunAnimation : NetworkBehaviour
             Debug.LogError("Aiming, cannot chamber!");
             return;
         }
+        if (IsEquipping)
+        {
+            Debug.LogError("Equipping, cannot reload!");
+            return;
+        }
 
         CmdTrigger(Chamber); // For other clients only!
 
@@ -152,6 +158,11 @@ public class GunAnimation : NetworkBehaviour
         if (IsAiming)
         {
             Debug.LogError("Aiming, cannot reload!");
+            return;
+        }
+        if(IsEquipping)
+        {
+            Debug.LogError("Equipping, cannot reload!");
             return;
         }
 
@@ -191,5 +202,21 @@ public class GunAnimation : NetworkBehaviour
             return;
 
         IsChambering = false;
+    }
+
+    public void CallbackShoot()
+    {
+        if (!hasAuthority)
+            return;
+
+        // Pew pew!
+    }
+
+    public void CallbackEquipEnd()
+    {
+        if (!hasAuthority)
+            return;
+
+        IsEquipping = false;
     }
 }

@@ -22,4 +22,14 @@ public class GunAnimationCallbacks : MonoBehaviour
     {
         gun.Animaiton.CallbackChamberEnd();
     }
+
+    public void Shoot()
+    {
+        gun.Animaiton.CallbackShoot();
+    }
+
+    public void EquipEnd()
+    {
+
+    }
 }
