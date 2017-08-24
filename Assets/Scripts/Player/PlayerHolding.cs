@@ -126,10 +126,12 @@ public class PlayerHolding : NetworkBehaviour
             {
                 // Increate percentage and lerp.
                 timer += Time.deltaTime;                
+                looking.Looking = true;
             }
             else
             {
                 timer -= Time.deltaTime;
+                looking.Looking = false;
             }
 
             if (timer > g.Aiming.AimTime)
@@ -141,7 +143,6 @@ public class PlayerHolding : NetworkBehaviour
 
             lerp = g.Aiming.Curve.Evaluate(p);
 
-            looking.Looking = true;
 
             // Finally send angle update call!
             SendAngle(); // Does not send every frame.
