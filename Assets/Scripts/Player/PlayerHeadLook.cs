@@ -7,8 +7,7 @@ public class PlayerHeadLook : NetworkBehaviour {
 
     public Transform Neck;
     public bool Active = true;
-    public float SendRate = 2f; // Times per second.
-    public bool Interpoalte = true;
+    public float SendRate = 5f; // Times per second.
 
     private Vector2 myPos = new Vector2();
     private PlayerDirection dir;
@@ -40,7 +39,7 @@ public class PlayerHeadLook : NetworkBehaviour {
 
     public void CalculateAngle()
     {
-        if (!Active)
+        if (!Active && NeckAngle != 0)
         {
             CmdSetAngle(0);
             return;
@@ -58,7 +57,9 @@ public class PlayerHeadLook : NetworkBehaviour {
         float angle = Mathf.Atan2(dst.y, dst.x) * Mathf.Rad2Deg;
 
         angle *= 0.5f;
-        CmdSetAngle(angle);
+
+        if(NeckAngle != angle)
+            CmdSetAngle(angle);
     }
 
     [Command]

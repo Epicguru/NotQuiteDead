@@ -14,8 +14,16 @@ public class PlayerHolding : NetworkBehaviour
 {
     public Transform Holding; // The game obejct that holds items that are currenty equiped.
     public Item Item; // The currently equipped item.
+
     private HandyRemoval handyRemoval;
     private PlayerLooking looking;
+    private float timer, timer2, timer3;
+    private float lerp;
+    private float SendRate = 10f;
+
+    [SyncVar(hook = "ReceiveAngle")]
+    private float rotation;
+    private float oldRotation;
 
     public void Start()
     {
@@ -74,5 +82,165 @@ public class PlayerHolding : NetworkBehaviour
                 handyRemoval.CmdSetShowHands(Item == null);
             //looking.Looking = Item != null;
         }
+
+        UpdateRotation();
+    }
+
+    // Rotation of hands
+    [Client]
+    private void UpdateRotation()
+    {
+        // Run only on local player.
+        if (!isLocalPlayer)
+        {
+            // Set angle based on data send from authorative player.
+            LerpOtherPlayerAngle();
+            return;
+        }
+
+        if (Item == null)
+        {
+            if(rotation != 0)
+                CmdSetAngle(0);
+            looking.Looking = false;
+            return;
+        }
+            
+
+        Gun g = Item.GetComponent<Gun>();
+        if (g == null)
+        {
+            // Is not gun, quit.
+            if (rotation != 0)
+                CmdSetAngle(0);
+            timer = 0;
+
+            looking.Looking = false;
+        }
+        else
+        {
+            // Is gun, activate.
+
+            // Detect aiming...
+            if (InputManager.InputPressed("Aim"))
+            {
+                // Increate percentage and lerp.
+                timer += Time.deltaTime;                
+            }
+            else
+            {
+                timer -= Time.deltaTime;
+            }
+
+            if (timer > g.Aiming.AimTime)
+                timer = g.Aiming.AimTime;
+            if (timer < 0)
+                timer = 0;
+
+            float p = timer / g.Aiming.AimTime;
+
+            lerp = g.Aiming.Curve.Evaluate(p);
+
+            looking.Looking = true;
+
+            // Finally send angle update call!
+            SendAngle(); // Does not send every frame.
+
+            // Only runs on the local player.
+            SetRealAngle(GetFinalAngle());
+        }
+    }
+
+    [Client]
+    private float GetFinalAngle()
+    {
+        float targetAngle = CalculateAngle(0.7f);
+        float neutral = 0f;
+
+        float interpolated = Mathf.Lerp(neutral, targetAngle, this.lerp);
+
+        return interpolated;
+    }
+
+    [Client]
+    private void SendAngle()
+    {
+        timer2 += Time.deltaTime;
+
+        float interval = 1f / SendRate;
+        if(timer2 >= interval)
+        {
+            timer2 -= interval;
+
+            float angle = GetFinalAngle();
+
+            // Send
+            if(rotation != angle)
+            {
+                CmdSetAngle(angle);
+            }
+        }
+    }
+
+    private void ReceiveAngle(float newAngle)
+    {
+        // This is a syncvar hook
+
+        // Set old angle
+        oldRotation = rotation;
+
+        rotation = newAngle;
+
+        timer3 = 0;
+    }
+
+    private void LerpOtherPlayerAngle()
+    {
+        // To be run only on other players!
+
+        timer3 += Time.deltaTime;
+
+        if (timer3 > 1f / SendRate)
+            timer3 = 1f / SendRate;
+
+        float p = timer3 / (1f / SendRate);
+
+        float lerpedAngle = Mathf.Lerp(oldRotation, rotation, p);
+
+        // Set this angle.
+        SetRealAngle(lerpedAngle);
+    }
+
+    [Client]
+    private void SetRealAngle(float angle)
+    {
+        // Set the rotation of the holding object angle.
+        Holding.localRotation = Quaternion.Euler(0, 0, angle);
+    }
+
+    private static Vector2 myPos = new Vector2();
+    public float CalculateAngle(float multi)
+    {
+        Vector2 mousePos = InputManager.GetMousePos();
+        myPos.Set(transform.position.x, transform.position.y);
+
+        Vector2 dst = mousePos - myPos;
+
+        if (!Player.Local.Direction.Right)
+        {
+            dst.x = -dst.x;
+        }
+
+        float angle = Mathf.Atan2(dst.y, dst.x) * Mathf.Rad2Deg;
+
+        angle *= multi;
+
+        return angle;
+    }
+
+    [Command]
+    private void CmdSetAngle(float angle)
+    {
+        rotation = angle;
     }
 }

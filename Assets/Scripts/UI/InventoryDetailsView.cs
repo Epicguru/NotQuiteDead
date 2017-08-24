@@ -26,6 +26,10 @@ public class InventoryDetailsView : MonoBehaviour
 
         description += RichText.InBold("Rarity - ") + RichText.InColour(item.Item.Rarity.ToString(), ItemRarityUtils.GetColour(item.Item.Rarity)) + "\n";
         description += RichText.InBold("Weight - ") + item.Item.InventoryInfo.Weight + "Kg\n";
+        if(item.Item.GetComponent<Weapon>() != null)
+        {
+
+        }
         if(item.Item.GetComponent<MeleeAttack>() != null)
         {
             description += RichText.InBold("Damage - ") + item.Item.GetComponent<MeleeAttack>().Damage.Damage + "\n";
