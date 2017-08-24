@@ -24,8 +24,6 @@ public class InputScreen : MonoBehaviour {
         if (showing)
             return;
 
-        Debug.Log("Show");
-
         showing = true;
         GetComponentsInChildren<Transform>(true)[1].gameObject.SetActive(true);
         InputManagerGUI.Instance.PlaceAllObjects();
@@ -35,8 +33,6 @@ public class InputScreen : MonoBehaviour {
     {
         if (!showing)
             return;
-
-        Debug.Log("Hide");
 
         showing = false;
         GetComponentsInChildren<Transform>(true)[1].gameObject.SetActive(false);

@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(GunAiming), typeof(GunAnimation))]
+[RequireComponent(typeof(GunAiming), typeof(GunAnimation), typeof(GunShooting))]
 public class Gun : Weapon
 {
     /*
@@ -14,10 +14,20 @@ public class Gun : Weapon
 
     [HideInInspector] public GunAiming Aiming;
     [HideInInspector] public GunAnimation Animaiton;
+    [HideInInspector] public GunShooting Shooting;
 
     public void Start()
     {
         base.Type = WeaponType.RANGED;
+
         Aiming = GetComponent<GunAiming>();
+        Animaiton = GetComponent<GunAnimation>();
+        Shooting = GetComponent<GunShooting>();
+
+        if(GetComponentInChildren<GunAnimationCallbacks>() == null)
+        {
+            Debug.LogError("No gun animation callback object on children. It should be on the same object as the Animator.");
+            Debug.Break();
+        }
     }
 }

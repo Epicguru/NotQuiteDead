@@ -20,19 +20,13 @@ public class GunShooting : NetworkBehaviour
 
     public void Update()
     {
-        Debug.Log("XD");
         // Shooting...
         if (!hasAuthority)
             return; // Owner only...
 
         bool requestingShoot = ShootNow();
         bool ready = animation.IsAiming && !animation.IsDropped && !animation.IsChambering && !animation.IsReloading;
-        Debug.Log(ready + ", " + requestingShoot); ;
-        if (requestingShoot && ready)
-        {
-            // Shoot!
-            animation.AnimShoot(); // Animation, bullets and damage later.
-        }
+        animation.AnimShoot(requestingShoot && ready); // Animation, bullets and damage later.
 
         bool requestingReload = InputManager.InputDown("Reload");
         ready = !animation.IsReloading && !animation.IsAiming && !animation.IsChambering && !animation.IsDropped;

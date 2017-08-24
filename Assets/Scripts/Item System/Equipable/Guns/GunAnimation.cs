@@ -17,9 +17,10 @@ public class GunAnimation : NetworkBehaviour
 
     [HideInInspector] [SyncVar] public bool IsDropped;
     [HideInInspector] [SyncVar] public bool IsAiming;
+    [HideInInspector] [SyncVar] public bool IsRunning;
+    [HideInInspector] [SyncVar] public bool IsShooting;
     [HideInInspector] public bool IsReloading;
     [HideInInspector] public bool IsChambering;
-    [HideInInspector] [SyncVar] public bool IsRunning;
 
     private Animator animator;
     private Gun gun;
@@ -38,6 +39,7 @@ public class GunAnimation : NetworkBehaviour
         animator.SetBool(Run, IsRunning);
         animator.SetBool(Dropped, IsDropped);
         animator.SetBool(Aim, IsAiming);
+        animator.SetBool(Shoot, IsShooting);
 
         if (!isServer)
             return;
@@ -66,6 +68,14 @@ public class GunAnimation : NetworkBehaviour
         }
     }
 
+    public void AnimShoot(bool shooting)
+    {
+        if (IsShooting != shooting)
+        {
+            CmdSetShoot(shooting);
+        }
+    }
+
     public void AnimAim(bool aim)
     {
         if(IsAiming != aim)
@@ -84,6 +94,12 @@ public class GunAnimation : NetworkBehaviour
     private void CmdSetDropped(bool dropped)
     {
         this.IsDropped = dropped;
+    }
+
+    [Command]
+    private void CmdSetShoot(bool shoot)
+    {
+        IsShooting = shoot;
     }
 
     [Command]
@@ -113,7 +129,10 @@ public class GunAnimation : NetworkBehaviour
         }
 
         CmdTrigger(Chamber); // For other clients only!
+
+        // Cause local animation.
         IsChambering = true;
+        animator.SetTrigger(Chamber);
     }
     
     public void AnimReload()
@@ -137,27 +156,10 @@ public class GunAnimation : NetworkBehaviour
         }
 
         CmdTrigger(Reload); // For other clients only!
-        IsReloading = true;
-    }
-
-    public void AnimShoot()
-    {
-        // Cause shooting animation.
-        if (!hasAuthority)
-        {
-            Debug.LogError("No authority to cause animation!");
-            return;
-        }
-        if(!IsAiming)
-        {
-            Debug.LogError("Not aiming, cannot shoot!");
-            return;
-        }
-
-        CmdTrigger(Shoot); // For other clients only!
 
         // Cause local animation.
-        animator.SetTrigger(Shoot);
+        animator.SetTrigger(Reload);
+        IsReloading = true;
     }
 
     [Command]
@@ -173,5 +175,21 @@ public class GunAnimation : NetworkBehaviour
         if (hasAuthority)
             return;
         animator.SetTrigger(name);
+    }
+
+    public void CallbackReloadEnd()
+    {
+        if (!hasAuthority)
+            return;
+
+        IsReloading = false;
+    }
+
+    public void CallbackChamberEnd()
+    {
+        if (!hasAuthority)
+            return;
+
+        IsChambering = false;
     }
 }

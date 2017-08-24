@@ -23,16 +23,16 @@ public class InputContainer : MonoBehaviour {
 	public string GetText()
     {
         KeyCode c = InputManager.GetInput(InputName);
-        return GetDisplayName() + "- " + c;
+        return RichText.InBold(GetDisplayName()) + " : " + c;
     }
 
     public void Set()
     {
         // Need to diaplay
-        StartCoroutine(Test());
+        StartCoroutine(ChangeInput());
     }
 
-    public IEnumerator Test()
+    public IEnumerator ChangeInput()
     {
         InputCoverContainer.Instance.Cover.Show();
         yield return new WaitWhile(AnyInputDown);
