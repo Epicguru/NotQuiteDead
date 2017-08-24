@@ -42,6 +42,8 @@ public class GunAnimation : NetworkBehaviour
         animator.SetBool(Aim, IsAiming);
         animator.SetBool(Shoot, IsShooting);
 
+        Hand.SetEquipHandRender(transform, !IsDropped);
+
         if (!isServer)
             return;
 
