@@ -39,9 +39,10 @@ public class PlayerHeadLook : NetworkBehaviour {
 
     public void CalculateAngle()
     {
-        if (!Active && NeckAngle != 0)
+        if (!Active)
         {
-            CmdSetAngle(0);
+            if(NeckAngle != 0)
+                CmdSetAngle(0);
             return;
         }
         Vector2 mousePos = InputManager.GetMousePos();

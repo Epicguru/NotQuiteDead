@@ -10,6 +10,7 @@ using UnityEngine.Networking;
 // An item object, which exists only on the ground or equiped, can be equiped by the player and is then
 // held in the players hands.
 
+[NetworkSettings(sendInterval = 0.05f)]
 public class PlayerHolding : NetworkBehaviour
 {
     public Transform Holding; // The game obejct that holds items that are currenty equiped.
@@ -104,8 +105,7 @@ public class PlayerHolding : NetworkBehaviour
                 CmdSetAngle(0);
             looking.Looking = false;
             return;
-        }
-            
+        }            
 
         Gun g = Item.GetComponent<Gun>();
         if (g == null)
@@ -154,7 +154,7 @@ public class PlayerHolding : NetworkBehaviour
     [Client]
     private float GetFinalAngle()
     {
-        float targetAngle = CalculateAngle(0.7f);
+        float targetAngle = CalculateAngle();
         float neutral = 0f;
 
         float interpolated = Mathf.Lerp(neutral, targetAngle, this.lerp);
@@ -219,7 +219,7 @@ public class PlayerHolding : NetworkBehaviour
     }
 
     private static Vector2 myPos = new Vector2();
-    public float CalculateAngle(float multi)
+    public float CalculateAngle()
     {
         Vector2 mousePos = InputManager.GetMousePos();
         myPos.Set(transform.position.x, transform.position.y);
@@ -232,8 +232,6 @@ public class PlayerHolding : NetworkBehaviour
         }
 
         float angle = Mathf.Atan2(dst.y, dst.x) * Mathf.Rad2Deg;
-
-        angle *= multi;
 
         return angle;
     }
