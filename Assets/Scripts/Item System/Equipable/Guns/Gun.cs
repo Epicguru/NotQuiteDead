@@ -5,13 +5,15 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(GunAiming))]
+[RequireComponent(typeof(GunAiming), typeof(GunAnimation))]
 public class Gun : Weapon
 {
     /*
     * Holds information about how a gun behaves and shoots.
     */
+
     [HideInInspector] public GunAiming Aiming;
+    [HideInInspector] public GunAnimation Animaiton;
 
     public void Start()
     {

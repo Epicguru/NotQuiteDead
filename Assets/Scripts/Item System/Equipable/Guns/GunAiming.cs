@@ -11,4 +11,20 @@ public class GunAiming : NetworkBehaviour
     public float AimTime = 0.5f;
     [Tooltip("The curve that the angle of the weapon takes when rotating to the correct angle.")]
     public AnimationCurve Curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+
+    private new GunAnimation animation;
+
+    public void Start()
+    {
+        animation = GetComponent<GunAnimation>();
+    }
+
+    public void Update()
+    {
+        if (!hasAuthority)
+            return;
+
+        animation.AnimAim(InputManager.InputPressed("Aim")); // Set aiming based on input.
+
+    }
 }
