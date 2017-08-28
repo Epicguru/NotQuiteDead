@@ -45,7 +45,7 @@ public class GunHUD : MonoBehaviour {
         pos.Set(x, 0);
         rect.anchoredPosition = pos;
 
-        Open = holding != null;
+        Open = holding != null && !PlayerInventory.IsOpen;
 
         UpdateText();
     }

@@ -96,7 +96,7 @@ public class Placeable : NetworkBehaviour
             // Do not allow pickup when placed!
             Item.pickup.AllowPickup = !IsPlaced;
 
-            Health.CmdSetCanHit(IsPlaced);
+            Health.CanHit = IsPlaced;
             
         }
         if(isClient && hasAuthority) // More checks in method

@@ -8,6 +8,13 @@ public class PlayerInventory : MonoBehaviour
 {
     public Inventory Inventory;
     public static PlayerInventory inv;
+    public static bool IsOpen
+    {
+        get
+        {
+            return inv.Inventory.isActiveAndEnabled;
+        }
+    }
 
     public void Start()
     {

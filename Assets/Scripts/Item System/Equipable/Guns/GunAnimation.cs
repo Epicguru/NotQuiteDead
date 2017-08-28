@@ -63,7 +63,7 @@ public class GunAnimation : NetworkBehaviour
 
     public void AnimRun(bool run)
     {
-        if(IsRunning != run)
+        if (IsRunning != run)
         {
             CmdSetRun(run);
         }
@@ -87,7 +87,7 @@ public class GunAnimation : NetworkBehaviour
 
     public void AnimAim(bool aim)
     {
-        if(IsAiming != aim)
+        if (IsAiming != aim)
         {
             CmdSetAim(aim);
         }
