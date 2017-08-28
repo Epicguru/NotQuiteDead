@@ -89,6 +89,8 @@ public class MeleeAttack : NetworkBehaviour {
 
         foreach(Collider2D coll in GetContacts())
         {
+            if (coll == null)
+                continue; // Can happen when multi collider object is destroyed.
             Health c = coll.GetComponentInParent<Health>();
 
             if (c == null)

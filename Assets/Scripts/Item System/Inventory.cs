@@ -46,6 +46,7 @@ public class Inventory : MonoBehaviour
 
     private List<InventoryItem> Contents = new List<InventoryItem>();
     private float weight;
+    private int items;
     [HideInInspector] public ItemOptionsPanel Options;
 
     public void Start()
@@ -56,7 +57,7 @@ public class Inventory : MonoBehaviour
     public void Update()
     {
         // TODO make less frequent.
-        Details.text = "Items: " + Contents.Count + "/" + (MaxItems < 0 ? "---" : MaxItems.ToString()) + "\nWeight: " + weight + "/" +  (MaxWeight < 0 ? "---" : MaxWeight.ToString() + "Kg");
+        Details.text = "Items: " + items + "/" + (MaxItems < 0 ? "---" : MaxItems.ToString()) + "\nWeight: " + weight + "/" +  (MaxWeight < 0 ? "---" : MaxWeight.ToString() + "Kg");
 
         if(Title.text != Name)
         {
@@ -71,7 +72,7 @@ public class Inventory : MonoBehaviour
 
     public InventoryItem AddItem(Item item, int amount = 1)
     {
-        if (CanAdd(item))
+        if (CanAdd(item, amount))
         {
             // Add this item to the inventory.
             // Make the InventoryItem prefab and set it up.
@@ -106,6 +107,9 @@ public class Inventory : MonoBehaviour
                 // Extend viewport
                 ViewportContent.sizeDelta = new Vector2(0, Contents.Count * 30);
 
+                // Add item count
+                items += amount;
+
                 return i;
             }
             else
@@ -115,6 +119,9 @@ public class Inventory : MonoBehaviour
 
                 // Add weight
                 weight += stack.Item.InventoryInfo.Weight * amount;
+
+                // Add item count
+                items += amount;
 
                 return stack;
             }
@@ -130,6 +137,9 @@ public class Inventory : MonoBehaviour
         int index = this.Contents.IndexOf(item);
 
         bool lastItem = Contents[index].ItemCount <= amount;
+
+        // Item count
+        items -= amount;
 
         if(Contents[index].ItemCount < amount)
         {
@@ -182,14 +192,14 @@ public class Inventory : MonoBehaviour
         return null;
     }
 
-    public bool CanAdd(Item i)
+    public bool CanAdd(Item i, int amount)
     {
-        return CanAddWeight(i) && CanAddCapacity(i);
+        return CanAddWeight(i, amount) && CanAddCapacity(i);
     }
 
-    public bool CanAddCapacity(Item i)
+    public bool CanAddCapacity(Item i, int amount)
     {
-        return this.CanAddCapacity(1); // Each item counts as 1 item! Shocking!
+        return this.CanAddCapacity(amount);
     }
 
     public bool CanAddCapacity(int extra)
@@ -200,9 +210,9 @@ public class Inventory : MonoBehaviour
         return Contents.Count + extra <= MaxItems;           
     }
 
-    public bool CanAddWeight(Item item)
+    public bool CanAddWeight(Item item, int amount)
     {
-        return this.CanAddWeight(item.InventoryInfo.Weight);
+        return this.CanAddWeight(item.InventoryInfo.Weight * amount);
     }
 
     public bool CanAddWeight(float weight)
@@ -210,6 +220,17 @@ public class Inventory : MonoBehaviour
         if (MaxWeight < 0)
             return true;
         return this.weight + weight <= MaxWeight;
+    }
+
+    public int GetCombinedItems()
+    {
+        int x = 0;
+        foreach(InventoryItem i in Contents)
+        {
+            x += i.ItemCount;
+        }
+
+        return x;
     }
 
     public float GetCombinedWeight()
