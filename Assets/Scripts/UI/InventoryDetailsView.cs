@@ -13,6 +13,7 @@ public class InventoryDetailsView : MonoBehaviour
 
     public void Enter(InventoryItem item)
     {
+        Debug.Log("Opening details for : " + item.Item.Name);
         gameObject.SetActive(true);
         // Make description.
 

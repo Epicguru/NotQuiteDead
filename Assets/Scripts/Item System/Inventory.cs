@@ -63,7 +63,7 @@ public class Inventory : MonoBehaviour
         ViewportContent.localPosition = Vector2.zero;
     }
 
-    public InventoryItem AddItem(Item item)
+    public InventoryItem AddItem(Item item, int amount = 1)
     {
         if (CanAdd(item))
         {
@@ -71,31 +71,47 @@ public class Inventory : MonoBehaviour
             // Make the InventoryItem prefab and set it up.
             // Also TODO configure the size of the inventory in UI.
 
-            GameObject spawned = Instantiate(InventoryItemPrefab, ItemsParent);
-            RectTransform rect = spawned.GetComponent<RectTransform>();
-            InventoryItem i = spawned.GetComponent<InventoryItem>();
+            bool needNewRow = !item.CanStack;
 
-            // For now, all items are separated and cannot be stacked: TODO.
+            if (needNewRow || GetOfType(item.Prefab) == null)
+            {
+                GameObject spawned = Instantiate(InventoryItemPrefab, ItemsParent);
+                RectTransform rect = spawned.GetComponent<RectTransform>();
+                InventoryItem i = spawned.GetComponent<InventoryItem>();
 
-            // Configure item.
-            i.ItemPrefab = item.Prefab;
-            i.Inventory = this;
+                // For now, all items are separated and cannot be stacked: TODO.
 
-            // Place at bottom
-            rect.localPosition = new Vector2(0, -Contents.Count * 30);
+                // Configure item.
+                i.ItemPrefab = item.Prefab;
+                i.Inventory = this;
+                i.ItemCount = amount;
 
-            i.Init();
+                // Place at bottom
+                rect.localPosition = new Vector2(0, -Contents.Count * 30);
 
-            // Add item
-            Contents.Add(i);
+                i.Init();
 
-            // Add weight
-            weight += i.Item.InventoryInfo.Weight;
+                // Add item
+                Contents.Add(i);
 
-            // Extend viewport
-            ViewportContent.sizeDelta = new Vector2(0, Contents.Count * 30);
+                // Add weight
+                weight += i.Item.InventoryInfo.Weight;
 
-            return i;
+                // Extend viewport
+                ViewportContent.sizeDelta = new Vector2(0, Contents.Count * 30);
+
+                return i;
+            }
+            else
+            {
+                InventoryItem stack = GetOfType(item.Prefab);
+                stack.SetItemCount(stack.ItemCount + amount);
+
+                // Add weight
+                weight += stack.Item.InventoryInfo.Weight * amount;
+
+                return stack;
+            }
         }
         else
         {
@@ -103,11 +119,26 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    public void RemoveItem(InventoryItem item, bool drop = true)
+    public void RemoveItem(InventoryItem item, bool drop = true, int amount = 1)
     {
         int index = this.Contents.IndexOf(item);
-        weight -= item.Item.InventoryInfo.Weight;
-        this.Contents.Remove(item);
+
+        bool lastItem = Contents[index].ItemCount <= amount;
+        if (lastItem)
+        {
+            Debug.Log("Last item!");
+        }
+        if(Contents[index].ItemCount < amount)
+        {
+            Debug.LogError("Cannot remove that many items : there are only " + Contents[index].ItemCount);
+            // Do not return, just drop as many as we have!
+            amount = Contents[index].ItemCount;
+        }
+
+        weight -= item.Item.InventoryInfo.Weight * amount;
+
+        if(lastItem)
+            this.Contents.Remove(item);
 
         // Spawn item on ground
         if (drop)
@@ -120,6 +151,11 @@ public class Inventory : MonoBehaviour
             Player.Local.NetUtils.CmdSpawnDroppedItem(item.Item.Prefab, position);
         }
 
+        if(!lastItem)
+            Contents[index].SetItemCount(Contents[index].ItemCount - amount);
+
+        if (!lastItem)
+            return;
         Destroy(item.gameObject);
 
         // Move everything below this upwards, and make viewport smaller.
@@ -131,6 +167,16 @@ public class Inventory : MonoBehaviour
 
         // Viewport
         ViewportContent.sizeDelta = new Vector2(0, ViewportContent.sizeDelta.y - 30);
+    }
+
+    private InventoryItem GetOfType(string prefab)
+    {
+        foreach (InventoryItem item in Contents)
+        {
+            if (item.ItemPrefab == prefab)
+                return item;
+        }
+        return null;
     }
 
     public bool CanAdd(Item i)
@@ -169,7 +215,7 @@ public class Inventory : MonoBehaviour
 
         foreach(InventoryItem i in Contents)
         {
-            weight += i.Item.InventoryInfo.Weight;
+            weight += i.Item.InventoryInfo.Weight * i.ItemCount;
         }
 
         return weight;

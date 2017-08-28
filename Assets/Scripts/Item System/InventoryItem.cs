@@ -13,11 +13,13 @@ public class InventoryItem : MonoBehaviour
     */
     public Text Text;
     public Image Image;
-    public Dropdown Dropdown;
     public Text Details;
 
     [Tooltip("The path to the prefab of this inventory item.")]
     public string ItemPrefab; // Used to find the item.
+
+    [HideInInspector]
+    public int ItemCount; // The number of items in this slot.
 
     [Tooltip("The inventory containing this item.")]
     public Inventory Inventory; // The inventory that 
@@ -34,11 +36,28 @@ public class InventoryItem : MonoBehaviour
         // Get prefab
         Item = Item.FindItem(ItemPrefab);
 
-        Text.text = Item.Name;
-        Text.color = ItemRarityUtils.GetColour(Item.Rarity);
-        Details.text = Item.InventoryInfo.Weight + "Kg";
+        SetText();
 
         Image.rectTransform.sizeDelta = new Vector2(Item.ItemIcon.texture.width > 200 ? 200 : Item.ItemIcon.texture.width, 29);
+
+    }
+
+    public void SetItemCount(int items)
+    {
+        if (ItemCount == items)
+            return;
+
+        ItemCount = items;
+
+        SetText();
+    }
+
+    public void SetText()
+    {
+        string quantity = ItemCount > 1 ? " x" + ItemCount : "";
+        Text.text = Item.Name + quantity;
+        Text.color = ItemRarityUtils.GetColour(Item.Rarity);
+        Details.text = (Item.InventoryInfo.Weight * ItemCount) + "Kg";
     }
 
     public void Update()
@@ -46,6 +65,11 @@ public class InventoryItem : MonoBehaviour
         StaticPos.y = (transform as RectTransform).anchoredPosition.y;
         (transform as RectTransform).anchoredPosition = StaticPos;
         Image.sprite = Item.ItemIcon;
+    }
+
+    public void Clicked()
+    {
+        Debug.Log("Click!");
     }
 
     public void OptionSelected()

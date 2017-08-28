@@ -54,8 +54,8 @@ public class ItemPickup : NetworkBehaviour
                 if(InputManager.InputDown("Pick up"))
                 {
                     // Set player authority
-                    if(!GetComponent<NetworkIdentity>().hasAuthority)
-                        Player.Local.RequestAuthority(this.gameObject);
+                    //if(!GetComponent<NetworkIdentity>().hasAuthority)
+                    //    Player.Local.RequestAuthority(this.gameObject);
                     
 
                     // Pick up!

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(ItemPickup), typeof(NetworkTransform))]
@@ -22,6 +23,9 @@ public class Item : NetworkBehaviour
     [Tooltip("The rarity (tier) of the item.")]
     public ItemRarity Rarity;
 
+    [Tooltip("Whether the item can stack with other items in the inventory.")]
+    public bool CanStack = false;
+
     /// <summary>
     /// Whether the item can be equipped.
     /// The equipped actions are handled in another script.
@@ -38,6 +42,9 @@ public class Item : NetworkBehaviour
     [Tooltip("The image for the icon in menus and inventories.")]
     public Sprite ItemIcon;
 
+    [HideInInspector]
+    public List<ItemOption> Options = new List<ItemOption>();
+
     [SyncVar]
     private bool equiped = false;
     private NetworkTransform netTransform;
@@ -49,6 +56,8 @@ public class Item : NetworkBehaviour
     {
         netTransform = GetComponent<NetworkTransform>();
         pickup = GetComponent<ItemPickup>();
+
+        // Add default options
     }
 
     public void Update()
