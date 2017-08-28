@@ -65,7 +65,12 @@ public class PlayerHolding : NetworkBehaviour
     [ClientRpc]
     public void RpcSetItem(GameObject item, GameObject player)
     {
+        if(this.Item != null)
+        {
+            CmdDrop(true, Player.Local.gameObject);
+        }
         this.Item = item.GetComponent<Item>();
+
 
         // Check if is gun and is local player
         if(player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)

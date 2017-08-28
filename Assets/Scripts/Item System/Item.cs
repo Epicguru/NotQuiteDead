@@ -42,9 +42,6 @@ public class Item : NetworkBehaviour
     [Tooltip("The image for the icon in menus and inventories.")]
     public Sprite ItemIcon;
 
-    [HideInInspector]
-    public List<ItemOption> Options = new List<ItemOption>();
-
     [SyncVar]
     private bool equiped = false;
     private NetworkTransform netTransform;
@@ -58,6 +55,18 @@ public class Item : NetworkBehaviour
         pickup = GetComponent<ItemPickup>();
 
         // Add default options
+    }
+
+    public ItemOption[] CreateOptions()
+    {
+        ItemOption[] Options = new ItemOption[]
+        {
+            new ItemOption() { OptionName = "Drop", OnSelected = Option_Drop},
+            new ItemOption() { OptionName = "Equip", OnSelected = Option_Equip},
+            new ItemOption() { OptionName = "Details", OnSelected = Option_Details}
+        };
+
+        return Options;
     }
 
     public void Update()
@@ -141,5 +150,21 @@ public class Item : NetworkBehaviour
     public static Item FindItem(string path)
     {
         return Resources.Load<GameObject>(path).GetComponent<Item>();
+    }
+
+    private void Option_Equip(InventoryItem x)
+    {
+        x.Inventory.RemoveItem(x, false); // Remove, do not drop.
+        Player.Local.Holding.CmdEquip(x.Item.Prefab, Player.Local.gameObject);
+    }
+
+    private void Option_Drop(InventoryItem x)
+    {
+        x.Inventory.RemoveItem(x, true);
+    }
+
+    private void Option_Details(InventoryItem x)
+    {
+        x.Inventory.DetailsView.Enter(x);
     }
 }

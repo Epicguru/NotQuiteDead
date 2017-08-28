@@ -50,5 +50,6 @@ public class PlayerInventory : MonoBehaviour
     public static void Close()
     {
         inv.Inventory.gameObject.SetActive(false);
+        inv.Inventory.Options.Close();
     }
 }

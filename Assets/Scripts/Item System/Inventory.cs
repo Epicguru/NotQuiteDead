@@ -46,6 +46,12 @@ public class Inventory : MonoBehaviour
 
     private List<InventoryItem> Contents = new List<InventoryItem>();
     private float weight;
+    [HideInInspector] public ItemOptionsPanel Options;
+
+    public void Start()
+    {
+        Options = GetComponentInChildren<ItemOptionsPanel>(true);
+    }
 
     public void Update()
     {

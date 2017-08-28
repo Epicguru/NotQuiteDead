@@ -69,35 +69,7 @@ public class InventoryItem : MonoBehaviour
 
     public void Clicked()
     {
-        Debug.Log("Click!");
-    }
-
-    public void OptionSelected()
-    {
-        int option = Dropdown.value;
-        switch (option)
-        {
-            case 0:
-                // Ignore, for now...
-                break;
-            case 1:
-                // Equip item: Yep. Thats it.
-                Inventory.RemoveItem(this, false); // Remove, do not drop.
-                Player.Local.Holding.CmdEquip(Item.Prefab, Player.Local.gameObject);
-                break;
-            case 2:
-                // Drop item: for now just remove from inventory.
-                Inventory.RemoveItem(this, true);
-                break;
-            case 3:
-                // Item Details: Show the item details screen.
-                Inventory.DetailsView.Enter(this);
-                break;
-            default:
-                break;
-        }
-
-        // Change back to the 'default' option.
-        Dropdown.value = 0;
+        Debug.Log("Clicked!");
+        Inventory.Options.Open(this);
     }
 }

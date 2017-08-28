@@ -8,9 +8,10 @@ public class ItemOption
 {
     public string OptionName;
     public UnityAction<InventoryItem> OnSelected;
+    public InventoryItem InvItem;
 
-    public void Clicked(InventoryItem item)
+    public void Clicked()
     {
-        OnSelected.Invoke(item);
+        OnSelected.Invoke(InvItem);
     }
 }

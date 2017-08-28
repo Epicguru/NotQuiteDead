@@ -38,6 +38,7 @@ public static class InputManager
 
         // Inventory
         defaultKeyBindings.Add("Inventory", KeyCode.Tab);
+        defaultKeyBindings.Add("Return", KeyCode.Escape);
 
         // Interaction
         defaultKeyBindings.Add("Pick up", KeyCode.E);
