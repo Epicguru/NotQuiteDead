@@ -67,7 +67,7 @@ public class PlayerHolding : NetworkBehaviour
     {
         if(this.Item != null)
         {
-            CmdDrop(true, Player.Local.gameObject);
+            CmdDrop(false, Player.Local.gameObject);
         }
         this.Item = item.GetComponent<Item>();
 
@@ -92,11 +92,14 @@ public class PlayerHolding : NetworkBehaviour
 
         if (!drop)
         {
+            PlayerInventory.Add(this.Item);
             Destroy(this.Item.gameObject); // Does this work!?!?
         }
         else
         {
-            Debug.LogError("TODO implement me!");
+            //Debug.LogError("TODO implement me!");
+            Player.Local.NetUtils.CmdSpawnDroppedItem(Item.Prefab, Player.Local.transform.position);
+            Destroy(this.Item.gameObject); // Does this work!?!?
         }
 
     }

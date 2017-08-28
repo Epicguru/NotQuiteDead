@@ -130,10 +130,7 @@ public class Inventory : MonoBehaviour
         int index = this.Contents.IndexOf(item);
 
         bool lastItem = Contents[index].ItemCount <= amount;
-        if (lastItem)
-        {
-            Debug.Log("Last item!");
-        }
+
         if(Contents[index].ItemCount < amount)
         {
             Debug.LogError("Cannot remove that many items : there are only " + Contents[index].ItemCount);

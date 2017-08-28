@@ -30,7 +30,7 @@ public class ItemOptionsPanel : MonoBehaviour
 
         ItemOption[] options = item.Item.CreateOptions();
 
-        Debug.Log(item.Item.Name + " has " + options.Length + " options.");
+        //Debug.Log(item.Item.Name + " has " + options.Length + " options.");
 
         last = item.Item;
 

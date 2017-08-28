@@ -69,7 +69,7 @@ public class InventoryItem : MonoBehaviour
 
     public void Clicked()
     {
-        Debug.Log("Clicked!");
+        //Debug.Log("Clicked!");
         Inventory.Options.Open(this);
     }
 }
