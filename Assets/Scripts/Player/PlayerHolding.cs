@@ -67,7 +67,7 @@ public class PlayerHolding : NetworkBehaviour
     {
         if(this.Item != null)
         {
-            CmdDrop(false, Player.Local.gameObject);
+            CmdDrop(false, false, Player.Local.gameObject);
         }
         this.Item = item.GetComponent<Item>();
 
@@ -85,10 +85,18 @@ public class PlayerHolding : NetworkBehaviour
 
     // TODO network!
     [Command]
-    public void CmdDrop(bool drop, GameObject localPlayer)
+    public void CmdDrop(bool drop, bool destroy, GameObject localPlayer)
     {
         // Drops the currently held item, if holding anything.
-        // TODO
+
+        // Drop - If true then the item is dropped to the floor, if false then it is stored in the players inventory.
+        // Destroy - If true the item is not stored, not dropped and is removed from existence.
+
+        if (destroy)
+        {
+            Destroy(this.Item.gameObject); // Does this work!?!?
+            return;
+        }
 
         if (!drop)
         {

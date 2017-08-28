@@ -56,8 +56,8 @@ public class ItemOptionsPanel : MonoBehaviour
         }
 
         (Parent.GetComponent<Transform>() as RectTransform).anchoredPosition = Input.mousePosition;
-        float height = START_Y + INCREMENT * options.Length * -1f;
-        (Parent.GetComponent<Transform>() as RectTransform).sizeDelta = new Vector2(120, height);
+        float height = (START_Y + INCREMENT * options.Length) * -1f + 2.5f;
+        (Parent.GetComponent<Transform>() as RectTransform).sizeDelta = new Vector2(130, height);
         Vector2 pos = (Parent.GetComponent<Transform>() as RectTransform).anchoredPosition;
         if (Input.mousePosition.x + 120 > Screen.width)
             pos.x = Screen.width - 120;

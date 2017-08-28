@@ -119,10 +119,9 @@ public class Health : NetworkBehaviour {
     [Server]
     private void DeadEventServer(string source, string secondary, float timeSource, float timeSecondary)
     {
-        UponDeathServer();
+        if(UponDeathServer != null)
+            UponDeathServer();
         RpcDeadEventClient(source, secondary, timeSource, timeSecondary);
-
-
     }
 
     [ClientRpc]

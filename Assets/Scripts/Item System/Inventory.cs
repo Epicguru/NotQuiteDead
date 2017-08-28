@@ -194,7 +194,7 @@ public class Inventory : MonoBehaviour
 
     public bool CanAdd(Item i, int amount)
     {
-        return CanAddWeight(i, amount) && CanAddCapacity(i);
+        return CanAddWeight(i, amount) && CanAddCapacity(i, amount);
     }
 
     public bool CanAddCapacity(Item i, int amount)

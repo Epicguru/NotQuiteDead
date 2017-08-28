@@ -36,7 +36,7 @@ public class Placeable : NetworkBehaviour
     {
         // Die!
         Destroy(this.gameObject);
-        Debug.Log("Placeable destroyed!");
+        //Debug.Log("Placeable destroyed!");
     }
 
     private void SetCollidersAsTriggers(bool trigger)
@@ -60,7 +60,7 @@ public class Placeable : NetworkBehaviour
     {
         Item newItem = Item.NewInstance(Item.Prefab);
 
-        Debug.Log("Placing at : " + position);
+        //Debug.Log("Placing at : " + position);
 
         newItem.transform.position = position;
         newItem.transform.rotation = rotation;
@@ -83,7 +83,7 @@ public class Placeable : NetworkBehaviour
             CmdPlace(Preview.GetPosition(), Preview.GetRotation());
 
             // Remove from hands
-            GetComponentInParent<PlayerHolding>().CmdDrop(false, Player.Local.gameObject);
+            GetComponentInParent<PlayerHolding>().CmdDrop(false, true, Player.Local.gameObject);
         }
     }
 
