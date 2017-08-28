@@ -7,8 +7,8 @@ using UnityEngine.Networking;
 
 public class PlaceablePreview : NetworkBehaviour
 {
-    public GameObject Ghost;
-    public Color colour = new Color(0, 1, 0, 0.4f);
+    public GameObject Preview;
+    public Color colour = new Color(0, 1, 0, 0.4f);   
 
     private Placeable placeable;
     private float rotation;
@@ -16,17 +16,16 @@ public class PlaceablePreview : NetworkBehaviour
 
     public void Start()
     {
-
         placeable = GetComponent<Placeable>();
 
-        if(Ghost == null)
+        if(Preview == null)
         {
             Debug.LogError("No ghost object/renderer assigned!");
             Debug.Break();
             return;
         }
 
-        foreach(SpriteRenderer r in Ghost.GetComponentsInChildren<SpriteRenderer>())
+        foreach(SpriteRenderer r in Preview.GetComponentsInChildren<SpriteRenderer>())
         {
             r.color = colour;
         }
@@ -34,17 +33,18 @@ public class PlaceablePreview : NetworkBehaviour
 
     public void Update()
     {
+        if (placeable.Item == null)
+            return;
+
         if(!placeable.IsPlaced && placeable.Item.IsEquipped() && hasAuthority)
         {
             // Show ghost...
-            Ghost.SetActive(true);
-            float x = 1f / placeable.ItemScale.x;
-            float y = 1f / placeable.ItemScale.y;
-            scale.Set(x, y, 1);
-            Ghost.transform.localScale = scale;
+            Preview.SetActive(true);
 
-            Ghost.gameObject.transform.position = InputManager.GetMousePos();
-            Ghost.gameObject.transform.rotation = Quaternion.Euler(0, 0, rotation);
+            Preview.transform.SetParent(null);
+            Preview.transform.localScale = Vector3.one;
+            Preview.transform.position = InputManager.GetMousePos();
+            Preview.transform.rotation = Quaternion.Euler(0, 0, rotation);
 
             // Rotate...
             // TODO add inputs...
@@ -60,18 +60,23 @@ public class PlaceablePreview : NetworkBehaviour
         }
         else
         {
-            Ghost.SetActive(false);
+            Preview.SetActive(false);
         }
+    }
+
+    public void OnDestroy()
+    {
+        Destroy(Preview.gameObject);
     }
 
     public Vector3 GetPosition()
     {
-        Debug.Log("Preview is at " + Ghost.transform.position);
+        Debug.Log("Preview is at " + Preview.transform.position);
         return InputManager.GetMousePos();
     }
 
     public Quaternion GetRotation()
     {
-        return Ghost.transform.rotation;
+        return Preview.transform.rotation;
     }
 }
