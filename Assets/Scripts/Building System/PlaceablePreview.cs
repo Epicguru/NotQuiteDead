@@ -48,14 +48,14 @@ public class PlaceablePreview : NetworkBehaviour
 
             // Rotate...
             // TODO add inputs...
-            float speed = 90f;
+            float speed = 120f;
             if (Input.GetKey(KeyCode.E))
             {
-                rotation += speed * Time.deltaTime;
+                rotation -= speed * Time.deltaTime;
             }
             if (Input.GetKey(KeyCode.Q))
             {
-                rotation -= speed * Time.deltaTime;
+                rotation += speed * Time.deltaTime;
             }
         }
         else
@@ -67,7 +67,7 @@ public class PlaceablePreview : NetworkBehaviour
     public Vector3 GetPosition()
     {
         Debug.Log("Preview is at " + Ghost.transform.position);
-        return Ghost.transform.position;
+        return InputManager.GetMousePos();
     }
 
     public Quaternion GetRotation()

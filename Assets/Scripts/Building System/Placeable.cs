@@ -46,7 +46,7 @@ public class Placeable : NetworkBehaviour
             c.isTrigger = trigger;
         }
 
-        if (trigger)
+        if (!trigger)
             SetItemPickupAsTrigger();
     }
 
