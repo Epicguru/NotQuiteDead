@@ -149,7 +149,10 @@ public class Item : NetworkBehaviour
     /// <returns>The item object, which is a prefab.</returns>
     public static Item FindItem(string path)
     {
-        return Resources.Load<GameObject>(path).GetComponent<Item>();
+        GameObject o = Resources.Load<GameObject>(path);
+        if (o == null)
+            return null;
+        return o.GetComponent<Item>();
     }
 
     private void Option_Equip(InventoryItem x)

@@ -9,6 +9,11 @@ public class CommandInput : MonoBehaviour {
     public Text Error;
     private InputField input;
 
+    public void Start()
+    {
+        CommandProcessing.RefreshCommands();
+    }
+
 	public void Input()
     {
         if (input == null)

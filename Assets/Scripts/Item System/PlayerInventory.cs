@@ -38,9 +38,9 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
-    public static void Add(Item item)
+    public static void Add(Item item, int amount = 1)
     {
-        inv.Inventory.AddItem(item);
+        inv.Inventory.AddItem(item, amount);
     }
 
     public static void Remove(InventoryItem item)
