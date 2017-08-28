@@ -38,8 +38,7 @@ public class InventoryItem : MonoBehaviour
         Text.color = ItemRarityUtils.GetColour(Item.Rarity);
         Details.text = Item.InventoryInfo.Weight + "Kg";
 
-        GetComponentInChildren<AspectRatioFitter>().aspectRatio = Item.ItemIcon.texture.width / Item.ItemIcon.texture.height;
-        Image.rectTransform.sizeDelta = new Vector2(0, 29);
+        Image.rectTransform.sizeDelta = new Vector2(Item.ItemIcon.texture.width > 200 ? 200 : Item.ItemIcon.texture.width, 29);
     }
 
     public void Update()
@@ -47,13 +46,6 @@ public class InventoryItem : MonoBehaviour
         StaticPos.y = (transform as RectTransform).anchoredPosition.y;
         (transform as RectTransform).anchoredPosition = StaticPos;
         Image.sprite = Item.ItemIcon;
-
-        // HAHA this code :D
-        const int MAX_WIDTH = 200;
-        while (Image.rectTransform.sizeDelta.x > MAX_WIDTH)
-        {
-            Image.rectTransform.sizeDelta = new Vector2(0, Image.rectTransform.sizeDelta.y - 1);
-        }
     }
 
     public void OptionSelected()

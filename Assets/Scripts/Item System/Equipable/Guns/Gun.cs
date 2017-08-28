@@ -15,6 +15,7 @@ public class Gun : Weapon
     [HideInInspector] public GunAiming Aiming;
     [HideInInspector] public GunAnimation Animaiton;
     [HideInInspector] public GunShooting Shooting;
+    [HideInInspector] public Item Item;
 
     public void Start()
     {
@@ -23,6 +24,7 @@ public class Gun : Weapon
         Aiming = GetComponent<GunAiming>();
         Animaiton = GetComponent<GunAnimation>();
         Shooting = GetComponent<GunShooting>();
+        Item = GetComponent<Item>();
 
         if(GetComponentInChildren<GunAnimationCallbacks>() == null)
         {

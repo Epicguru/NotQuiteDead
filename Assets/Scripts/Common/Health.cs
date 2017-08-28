@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 [NetworkSettings(sendInterval = 0.05f)]
-public class Creature : NetworkBehaviour {
+public class Health : NetworkBehaviour {
 
     /*
     * This class represents a object that can be damaged/hurt and destroyed/killed.
@@ -14,12 +14,16 @@ public class Creature : NetworkBehaviour {
 
     [SerializeField]
     [SyncVar]
-    private float Health = 100;
+    private float health = 100;
     [SyncVar]
     [SerializeField]
-    private float MaxHealth = 100;
+    private float maxHealth = 100;
     [SyncVar]
     public bool CanRevive = false;
+    [Tooltip("If false this object is never shot through. If true, it may be shot through depending on the gun type.")]
+    public bool CanPenetrate = true; // TODO MAKE IN GUN SCRIPT!!!!
+    [SyncVar]
+    public bool CanHit = true;
 
     // START SERVER ONLY
     private string source;
@@ -30,6 +34,7 @@ public class Creature : NetworkBehaviour {
     // END SERVER ONLY
 
     public DED UponDeath;
+    public DED UponDeathServer;
     public delegate void DED(); // Death event delegate
 
     [Command]
@@ -37,33 +42,36 @@ public class Creature : NetworkBehaviour {
     {
         if (health <= 0)
             return;
-        this.MaxHealth = health;
+        this.maxHealth = health;
 
-        if (this.Health > MaxHealth)
-            this.SetHealth(MaxHealth);
+        if (this.health > maxHealth)
+            this.SetHealth(maxHealth);
     }
 
     [Server]
     private void SetHealth(float health)
     {
-        Health = health;
-        if (Health < 0)
+        this.health = health;
+        if (this.health < 0)
         {
-            Health = 0;
+            this.health = 0;
             // This is where the player dies.
             // At this point, we want to notify the local object that owns this, (the one with authority).
             hasBeenDead = false; // This does not represent the dead state, but it is used in callbacks.
         }
-        if (Health > MaxHealth)
-            Health = MaxHealth;
+        if (this.health > maxHealth)
+            this.health = maxHealth;
 
-        Debug.Log("Set health to " + Health + ".");
+        //Debug.Log("Set health to " + this.health + ".");
     }
 
     [Command]
     public void CmdDamage(float damage, string dealer, bool isSecondary)
     {
-        SetHealth(Health - Mathf.Abs(damage));
+        if (!CanHit)
+            return;
+
+        SetHealth(health - Mathf.Abs(damage));
 
         if (!isSecondary)
         {
@@ -85,7 +93,7 @@ public class Creature : NetworkBehaviour {
         {
             return;
         }
-        if (Health <= 0)
+        if (this.health <= 0)
         {
             if (!CanRevive)
             {
@@ -99,13 +107,22 @@ public class Creature : NetworkBehaviour {
                 // Simply allow the heal.
             }            
         }
-        SetHealth(Health + health);
+        SetHealth(this.health + health);
+    }
+
+    [Command]
+    public void CmdSetCanHit(bool canHit)
+    {
+        this.CanHit = canHit;
     }
 
     [Server]
     private void DeadEventServer(string source, string secondary, float timeSource, float timeSecondary)
     {
+        UponDeathServer();
         RpcDeadEventClient(source, secondary, timeSource, timeSecondary);
+
+
     }
 
     [ClientRpc]
@@ -138,10 +155,10 @@ public class Creature : NetworkBehaviour {
             return;
         }
 
-        if (Health <= 0)
+        if (health <= 0)
         {
             // Assume dead, check if is first frame dead...
-            Health = 0;
+            health = 0;
             if (!hasBeenDead)
             {
                 hasBeenDead = true;
@@ -154,12 +171,12 @@ public class Creature : NetworkBehaviour {
 
     public float GetMaxHealth()
     {
-        return MaxHealth;
+        return maxHealth;
     }
 
     public float GetHealth()
     {
-        return Health;
+        return health;
     }
 
     public float GetHealthPercentage()

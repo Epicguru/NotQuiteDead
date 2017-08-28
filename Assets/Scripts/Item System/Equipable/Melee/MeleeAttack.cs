@@ -81,7 +81,7 @@ public class MeleeAttack : NetworkBehaviour {
         return Damage.Damage; // The damage value.
     }
 
-    private List<Creature> hitCreatures = new List<Creature>();
+    private List<Health> hitCreatures = new List<Health>();
     public void Attack()
     {
         // A local version that attacks all objects touching the attacking collider.
@@ -89,7 +89,7 @@ public class MeleeAttack : NetworkBehaviour {
 
         foreach(Collider2D coll in GetContacts())
         {
-            Creature c = coll.GetComponentInParent<Creature>();
+            Health c = coll.GetComponentInParent<Health>();
 
             if (c == null)
                 continue;
@@ -114,6 +114,6 @@ public class MeleeAttack : NetworkBehaviour {
         // By using a command we do not require client authority over the creature.
         // Good for hacking prevention and that kind of stuff.
         string source = "A Player" + ':' + weapon.Item.Name;
-        creature.GetComponent<Creature>().CmdDamage(damage, source, false);
+        creature.GetComponent<Health>().CmdDamage(damage, source, false);
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-public class GunAnimationCallbacks : MonoBehaviour
+public class GunAnimationCallbacks : ItemAnimationCallback
 {
     private Gun gun;
 
@@ -30,6 +30,6 @@ public class GunAnimationCallbacks : MonoBehaviour
 
     public void EquipEnd()
     {
-
+        gun.Animaiton.CallbackEquipEnd();
     }
 }

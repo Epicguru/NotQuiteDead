@@ -19,13 +19,19 @@ public class GunAnimation : NetworkBehaviour
     [HideInInspector] [SyncVar] public bool IsAiming;
     [HideInInspector] [SyncVar] public bool IsRunning;
     [HideInInspector] [SyncVar] public bool IsShooting;
-    [HideInInspector] public bool IsEquipping;
+    [HideInInspector] public bool IsEquipping = true; // Only true when the object is created, then false forever more!
     [HideInInspector] public bool IsReloading;
-    [HideInInspector] public bool IsChambering = true; // Only true when the object is created, then false forever more!
+    [HideInInspector] public bool IsChambering;
 
     private Animator animator;
     private Gun gun;
     private Item item;
+
+    public override void PreStartClient()
+    {
+        base.PreStartClient();
+        Start();
+    }
 
     public void Start()
     {
@@ -132,7 +138,7 @@ public class GunAnimation : NetworkBehaviour
         }
         if (IsEquipping)
         {
-            Debug.LogError("Equipping, cannot reload!");
+            Debug.LogError("Equipping, cannot chamber!");
             return;
         }
 
@@ -196,6 +202,8 @@ public class GunAnimation : NetworkBehaviour
             return;
 
         IsReloading = false;
+
+        gun.Shooting.FromAnimReload();
     }
 
     public void CallbackChamberEnd()
@@ -204,14 +212,16 @@ public class GunAnimation : NetworkBehaviour
             return;
 
         IsChambering = false;
+
+        gun.Shooting.FromAnimChamber();
     }
 
     public void CallbackShoot()
     {
-        if (!hasAuthority)
-            return;
+        // NOTE: We continue even with no authority!
 
         // Pew pew!
+        gun.Shooting.FromAnimShoot();
     }
 
     public void CallbackEquipEnd()

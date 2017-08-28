@@ -24,6 +24,7 @@ public class GunAiming : NetworkBehaviour
         if (!hasAuthority)
             return;
 
-        animation.AnimAim(InputManager.InputPressed("Aim")); // Set aiming based on input.
+        bool canAim = !animation.IsReloading && !animation.IsEquipping && !animation.IsChambering;
+        animation.AnimAim(InputManager.InputPressed("Aim") && canAim); // Set aiming based on input.
     }
 }

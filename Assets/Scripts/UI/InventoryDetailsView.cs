@@ -28,11 +28,32 @@ public class InventoryDetailsView : MonoBehaviour
         description += RichText.InBold("Weight - ") + item.Item.InventoryInfo.Weight + "Kg\n";
         if(item.Item.GetComponent<Weapon>() != null)
         {
-
+            description += RichText.InBold("Weapon Type - ") + item.Item.GetComponent<Weapon>().Type + "\n";
         }
         if(item.Item.GetComponent<MeleeAttack>() != null)
         {
             description += RichText.InBold("Damage - ") + item.Item.GetComponent<MeleeAttack>().Damage.Damage + "\n";
+        }
+        Gun gun = item.Item.GetComponent<Gun>();
+        if(gun != null)
+        {
+            GunDamage damage = gun.GetComponent<GunShooting>().Damage;
+            GunCapacity capacity = gun.GetComponent<GunShooting>().Capacity;
+            description += RichText.InBold("Damage - ") + damage.Damage;
+            if (damage.BulletsShareDamage && capacity.BulletsPerShot.y > 1)
+            {
+                description += "total over " + capacity.BulletsPerShot.x + " to " + capacity.BulletsPerShot.y + " projectiles per shot";
+            }
+            description += "\n";
+            description += RichText.InBold("Range - ") + damage.Range + "\n";
+            description += RichText.InBold("Magazine Capacity - ") + capacity.MagazineCapacity + "\n";
+            description += RichText.InBold("Best Accuracy - ") + damage.Inaccuracy.x + "°\n";
+            description += RichText.InBold("Worst Accuracy - ") + damage.Inaccuracy.y + "°\n";
+            description += RichText.InBold("Shots Before Worst Accuracy - ") + damage.ShotsToInaccuracy + "\n";
+            description += RichText.InBold("Accuracy Reset - ") + (int)(damage.ShotsInaccuracyCooldown * 100f) + "% per second\n";
+            description += RichText.InBold("Penetration - ") + damage.Penetration + "\n";
+            description += RichText.InBold("Penetration Falloff - ") + (int)(damage.PenetrationFalloff * 100f) + "%\n";
+            description += RichText.InBold("Damage Falloff - ") + (int)(damage.DamageFalloff * 100f) + "%\n";
         }
 
         description += "\n";

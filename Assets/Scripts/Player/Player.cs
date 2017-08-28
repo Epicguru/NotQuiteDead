@@ -14,7 +14,7 @@ public class Player : NetworkBehaviour
     public PlayerMovement Movement;
     public HandyRemoval HandyRemoval;
     public NetworkIdentity NetworkIdentity;
-    public Creature Creature;
+    public Health Creature;
     public PlayerNetUtils NetUtils;
     public Player _Player;
 

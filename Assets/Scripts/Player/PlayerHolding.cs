@@ -66,13 +66,34 @@ public class PlayerHolding : NetworkBehaviour
     public void RpcSetItem(GameObject item, GameObject player)
     {
         this.Item = item.GetComponent<Item>();
+
+        // Check if is gun and is local player
+        if(player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)
+        {
+            if(item.GetComponent<Gun>() != null)
+            {
+                // Is gun!
+                GunHUD.Instance.SetHolding(item.GetComponent<Gun>());
+            }
+        }
     }
 
     // TODO network!
-    public void Drop()
+    [Command]
+    public void CmdDrop(bool drop, GameObject localPlayer)
     {
         // Drops the currently held item, if holding anything.
         // TODO
+
+        if (!drop)
+        {
+            Destroy(this.Item.gameObject); // Does this work!?!?
+        }
+        else
+        {
+            Debug.LogError("TODO implement me!");
+        }
+
     }
 
     public void Update()
@@ -88,7 +109,6 @@ public class PlayerHolding : NetworkBehaviour
     }
 
     // Rotation of hands
-    [Client]
     private void UpdateRotation()
     {
         // Run only on local player.
@@ -152,7 +172,6 @@ public class PlayerHolding : NetworkBehaviour
         }
     }
 
-    [Client]
     private float GetFinalAngle()
     {
         float targetAngle = CalculateAngle();
@@ -163,7 +182,6 @@ public class PlayerHolding : NetworkBehaviour
         return interpolated;
     }
 
-    [Client]
     private void SendAngle()
     {
         timer2 += Time.deltaTime;
@@ -211,8 +229,6 @@ public class PlayerHolding : NetworkBehaviour
         // Set this angle.
         SetRealAngle(lerpedAngle);
     }
-
-    [Client]
     private void SetRealAngle(float angle)
     {
         // Set the rotation of the holding object angle.

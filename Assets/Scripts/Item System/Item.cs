@@ -43,10 +43,12 @@ public class Item : NetworkBehaviour
     private NetworkTransform netTransform;
     [SyncVar]
     private GameObject PlayerHolding;
+    [HideInInspector] public ItemPickup pickup;
 
     public void Start()
     {
         netTransform = GetComponent<NetworkTransform>();
+        pickup = GetComponent<ItemPickup>();
     }
 
     public void Update()

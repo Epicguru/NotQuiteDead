@@ -8,11 +8,12 @@ using UnityEngine.Networking;
 [RequireComponent(typeof(PolygonCollider2D), typeof(Rigidbody2D))]
 public class ItemPickup : NetworkBehaviour
 {
+    [SyncVar]
     public bool AllowPickup = true;
     public bool MouseOver;
     [HideInInspector] public Item Item;
 
-    private new PolygonCollider2D collider;
+    [HideInInspector] public new PolygonCollider2D collider;
     private new Rigidbody2D rigidbody;
 
     public void Start()
