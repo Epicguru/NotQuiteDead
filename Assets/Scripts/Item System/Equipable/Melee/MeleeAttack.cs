@@ -91,9 +91,16 @@ public class MeleeAttack : NetworkBehaviour {
         {
             if (coll == null)
                 continue; // Can happen when multi collider object is destroyed.
+
             Health c = coll.GetComponentInParent<Health>();
 
             if (c == null)
+                continue;
+
+            if (c.CannotHit.Contains(coll))
+                continue;
+
+            if (!c.CanHit)
                 continue;
 
             if (!Damage.AllowSelfDamage && c == Player.Local.Health)

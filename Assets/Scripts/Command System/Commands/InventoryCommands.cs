@@ -26,7 +26,7 @@ public class InventoryCommands : Command
                 return null;
             case "drop":
                 items = PlayerInventory.inv.Inventory.Contents.Count;
-                PlayerInventory.inv.Inventory.DropAll(5, Player.Local.transform.position);
+                PlayerInventory.inv.Inventory.DropAll(2f, Player.Local.transform.position);
 
                 CommandProcessing.Log("Dropped " + items + " items from the player's inventory.");
                 return null;

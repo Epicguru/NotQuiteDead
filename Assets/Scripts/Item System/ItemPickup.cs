@@ -13,13 +13,14 @@ public class ItemPickup : NetworkBehaviour
     public bool MouseOver;
     [HideInInspector] public Item Item;
 
-    [HideInInspector] public new PolygonCollider2D collider;
+    public new PolygonCollider2D collider;
     private new Rigidbody2D rigidbody;
 
     public void Start()
     {
         Item = GetComponent<Item>();
-        collider = GetComponent<PolygonCollider2D>();
+        if(collider == null)
+            collider = GetComponent<PolygonCollider2D>();
         rigidbody = GetComponent<Rigidbody2D>();
 
         rigidbody.drag = 3f;
@@ -29,6 +30,11 @@ public class ItemPickup : NetworkBehaviour
         GetComponent<NetworkTransform>().transformSyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody2D;
 
         collider.isTrigger = true;
+
+        if(GetComponent<Health>() != null)
+        {
+            GetComponent<Health>().CannotHit.Add(collider);
+        }
     }
 
     public void Update()

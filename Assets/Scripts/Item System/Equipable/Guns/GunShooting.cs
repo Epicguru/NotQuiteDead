@@ -396,11 +396,11 @@ public class GunShooting : NetworkBehaviour
                     continue;
                 }
             }
-            if(h.GetComponent<Placeable>() != null && !h.GetComponent<Placeable>())
-            {
-                // Placeable item on floor that cannot be penetrated but should not be hit...
+            if (!h.CanHit)
                 continue;
-            }
+
+            if (h.CannotHit.Contains(hit.collider))
+                continue;
 
             if (objects.Contains(h)) // Do not allow multiple hits to one object.
                 continue;

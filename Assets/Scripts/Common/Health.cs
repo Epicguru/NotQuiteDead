@@ -33,6 +33,8 @@ public class Health : NetworkBehaviour {
     private bool hasBeenDead;
     // END SERVER ONLY
 
+    [HideInInspector]
+    public List<Collider2D> CannotHit = new List<Collider2D>();
     public DED UponDeath;
     public DED UponDeathServer;
     public delegate void DED(); // Death event delegate
