@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class CommandInput : MonoBehaviour {
@@ -29,11 +31,36 @@ public class CommandInput : MonoBehaviour {
             return;
         }
 
-        CommandProcessing.Process(text);
+        try
+        {
+            if (CommandProcessing.Process(text))
+            {
+                input.text = "";                
+            }
+        }catch(Exception e)
+        {
+            CommandProcessing.Log(RichText.InColour("Exception : " + e.Message, Color.red));
+        }
+
+        EventSystem.current.SetSelectedGameObject(input.gameObject, null);
+        input.ActivateInputField();
     }
 
     public void ButtonDown()
     {
-        CommandProcessing.Process(input.text);
+        try
+        {
+            if (CommandProcessing.Process(input.text))
+            {
+                input.text = "";
+            }
+        }
+        catch (Exception e)
+        {
+            CommandProcessing.Log(RichText.InColour("Exception : " + e.Message, Color.red));
+        }
+
+        EventSystem.current.SetSelectedGameObject(input.gameObject, null);
+        input.ActivateInputField();
     }
 }

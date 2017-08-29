@@ -24,7 +24,9 @@ public static class CommandProcessing
         // Default commands
         commands.Add(new HelpCommand());
         commands.Add(new ClearCommand());
+        commands.Add(new GiveOneCommand());
         commands.Add(new GiveCommand());
+        commands.Add(new HealthCommand());
     }
 
     // Returns true to clear the console.
@@ -33,7 +35,7 @@ public static class CommandProcessing
         Error("");
 
         // Is null or empty
-        if (string.IsNullOrEmpty(command))
+        if (string.IsNullOrEmpty(command.Trim()))
         {
             Error("Input is empty!");
             return false;
@@ -46,7 +48,6 @@ public static class CommandProcessing
         }
 
         // Make objects!
-
         object[] objects = new object[parts.Length];
 
         // TODO
@@ -89,7 +90,6 @@ public static class CommandProcessing
             if(comm.Name == parts[0])
             {
                 tempCommands.Add(comm);
-                break;
             }
         }
 
@@ -108,7 +108,7 @@ public static class CommandProcessing
         int i = 0;
         foreach(Command c in tempCommands)
         {
-            bool isGood = c.IsValid(args);
+            bool isGood = args.Length == c.parameters.Count  && c.IsValid(args);
             bool isLast = i == tempCommands.Count - 1;
 
             if (isGood)

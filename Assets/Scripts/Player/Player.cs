@@ -14,7 +14,7 @@ public class Player : NetworkBehaviour
     public PlayerMovement Movement;
     public HandyRemoval HandyRemoval;
     public NetworkIdentity NetworkIdentity;
-    public Health Creature;
+    public Health Health;
     public PlayerNetUtils NetUtils;
     public Player _Player;
 
@@ -31,7 +31,7 @@ public class Player : NetworkBehaviour
 
             Camera.main.GetComponent<CameraFollow>().Target = transform;
 
-            Creature.UponDeath += UponDeath;
+            Health.UponDeath += UponDeath;
 
         }
         else
@@ -43,10 +43,10 @@ public class Player : NetworkBehaviour
     private void UponDeath()
     {
         // 'Respawn'
-        Creature.CmdHeal(Creature.GetMaxHealth());
+        Health.CmdHeal(Health.GetMaxHealth());
         transform.position = Vector3.zero;
         Debug.Log("Player died:");
-        Debug.Log("Local player was " + Creature.GetDamageReport("killed"));
+        Debug.Log("Local player was " + Health.GetDamageReport("killed"));
     }
 
     /// <summary>

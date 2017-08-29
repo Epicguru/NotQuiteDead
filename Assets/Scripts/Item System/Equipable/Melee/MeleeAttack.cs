@@ -96,7 +96,7 @@ public class MeleeAttack : NetworkBehaviour {
             if (c == null)
                 continue;
 
-            if (!Damage.AllowSelfDamage && c == Player.Local.Creature)
+            if (!Damage.AllowSelfDamage && c == Player.Local.Health)
                 continue;
 
             // Prevent a creature from being hit more that once per swing, if it has multiple colliders.

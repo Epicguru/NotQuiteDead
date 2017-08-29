@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-public class GiveCommand : Command
+public class GiveOneCommand : Command
 {
-    public GiveCommand()
+    public GiveOneCommand()
     {
         Name = "give";
         parameters.Add(typeof(string));
-        parameters.Add(typeof(int));
     }
 
     public override string Execute(object[] args)
@@ -18,7 +17,7 @@ public class GiveCommand : Command
         // Give items
 
         string itemName = (string)args[0];
-        int amount = (int)args[1];
+        int amount = 1;
 
         if (amount <= 0)
             return "Amount of items must be more than zero!";
