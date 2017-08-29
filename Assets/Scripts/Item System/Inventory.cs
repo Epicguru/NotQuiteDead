@@ -17,9 +17,6 @@ public class Inventory : MonoBehaviour
     [Tooltip("The display name of the inventory.")]
     public string Name = "Default Name";
 
-    [Tooltip("The owner of this inventory, and where items will be spawned when they are dropped.")]
-    public Transform Owner;
-
     [Tooltip("The inventory item prefab.")]
     public GameObject InventoryItemPrefab;
 
@@ -44,7 +41,8 @@ public class Inventory : MonoBehaviour
     [Tooltip("The maximum combined weight of all items in this inventory. Negaitve numbers means that there is no limit.")]
     public float MaxWeight = 100f; // If negative, ignored.
 
-    private List<InventoryItem> Contents = new List<InventoryItem>();
+    [HideInInspector]
+    public List<InventoryItem> Contents = new List<InventoryItem>();
     private float weight;
     private int items;
     [HideInInspector] public ItemOptionsPanel Options;
@@ -132,7 +130,7 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    public void RemoveItem(InventoryItem item, bool drop = true, int amount = 1)
+    public void RemoveItem(InventoryItem item, Vector2 position, bool drop = true, int amount = 1)
     {
         int index = this.Contents.IndexOf(item);
 
@@ -156,9 +154,10 @@ public class Inventory : MonoBehaviour
         // Spawn item on ground
         if (drop)
         {
-            Vector3 position = Vector3.zero;
-            if (Owner != null)
-                position = Owner.position;
+            if(position == null)
+            {
+                position = Vector3.zero;
+            }
 
             // Create new instance...
             Player.Local.NetUtils.CmdSpawnDroppedItem(item.Item.Prefab, position);
@@ -190,6 +189,34 @@ public class Inventory : MonoBehaviour
                 return item;
         }
         return null;
+    }
+
+    public void Clear()
+    {
+        // Removes all items stacks. Poof. They vanish.
+        while(Contents.Count > 0)
+        {
+            RemoveItem(Contents[0], Vector2.zero, false, Contents[0].ItemCount);
+        }
+    }
+
+    private Vector2 offset = new Vector2();
+    public void DropAll(float radius, Vector2 position)
+    {
+        // Drop all items and scatter them around the position.
+        while (Contents.Count > 0)
+        {
+            float angle = UnityEngine.Random.Range(0f, 360f);
+            float r = UnityEngine.Random.Range(0, radius);
+
+            float x = Mathf.Cos(angle * Mathf.Deg2Rad) * r;
+            float y = Mathf.Sin(angle * Mathf.Deg2Rad) * r;
+
+            offset.Set(x, y);
+
+            RemoveItem(Contents[0], position + offset, true, Contents[0].ItemCount);
+
+        }
     }
 
     public bool CanAdd(Item i, int amount)

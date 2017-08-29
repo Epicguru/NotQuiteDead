@@ -157,13 +157,13 @@ public class Item : NetworkBehaviour
 
     private void Option_Equip(InventoryItem x)
     {
-        x.Inventory.RemoveItem(x, false); // Remove, do not drop.
+        x.Inventory.RemoveItem(x, Vector2.zero, false); // Remove, do not drop.
         Player.Local.Holding.CmdEquip(x.Item.Prefab, Player.Local.gameObject);
     }
 
     private void Option_Drop(InventoryItem x)
     {
-        x.Inventory.RemoveItem(x, true);
+        x.Inventory.RemoveItem(x, Player.Local.transform.position, true);
     }
 
     private void Option_Details(InventoryItem x)

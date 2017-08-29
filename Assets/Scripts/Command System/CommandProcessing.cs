@@ -32,6 +32,7 @@ public static class CommandProcessing
         commands.Add(new PauseCommand());
         commands.Add(new TimescaleCommand());
         commands.Add(new HistoryCommand());
+        commands.Add(new InventoryCommands());
     }
 
     // Returns true to clear the console.

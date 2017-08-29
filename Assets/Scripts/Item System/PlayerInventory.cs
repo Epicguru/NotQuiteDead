@@ -45,7 +45,7 @@ public class PlayerInventory : MonoBehaviour
 
     public static void Remove(InventoryItem item)
     {
-        inv.Inventory.RemoveItem(item);
+        inv.Inventory.RemoveItem(item, Player.Local.transform.position);
     }
 
     public static void Open()

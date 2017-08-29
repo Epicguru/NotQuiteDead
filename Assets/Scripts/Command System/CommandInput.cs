@@ -8,14 +8,14 @@ using UnityEngine.UI;
 public class CommandInput : MonoBehaviour {
 
     public bool Open;
-    public float ClosedX;
     public AnimationCurve Curve;
     public float OpenTime;
-
     public Text Log;
     public Text Error;
+
     private InputField input;
     private int index;
+    private float timer;
 
     public void Start()
     {
@@ -23,6 +23,7 @@ public class CommandInput : MonoBehaviour {
     }
 
     private Vector2 pos = new Vector2();
+    private Vector2 size = new Vector2();
     public void Update()
     {
         if (InputManager.InputDown("Console"))
@@ -30,11 +31,27 @@ public class CommandInput : MonoBehaviour {
             Open = !Open;
         }
 
+        float closedX = -Screen.width - 100;
 
+        timer += Time.deltaTime * (Open ? -1f : 1f);
+        if (timer > OpenTime)
+            timer = OpenTime;
+        if (timer < 0)
+            timer = 0;
+
+        float t = timer / OpenTime;
+
+        float x = Curve.Evaluate(t) * closedX;
+
+        pos.Set(x, -Screen.height);
+        size.Set(Screen.width, Screen.height);
+        (transform as RectTransform).anchoredPosition = pos;
+        (transform as RectTransform).sizeDelta = size;
 
         if (!Open)
         {
-            input.DeactivateInputField();
+            if(input != null)
+                input.DeactivateInputField();
             return;
         }
 
@@ -93,6 +110,11 @@ public class CommandInput : MonoBehaviour {
 
     public void ButtonDown()
     {
+        if (input == null)
+            input = GetComponentInChildren<InputField>();
+
+        if (CommandProcessing.input != this)
+            CommandProcessing.input = this;
         try
         {
             if (CommandProcessing.Process(input.text))

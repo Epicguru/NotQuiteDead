@@ -27,7 +27,6 @@ public class Player : NetworkBehaviour
             Local = this;
             Local._Player = this;
             gameObject.name = "Local Player";
-            PlayerInventory.inv.Inventory.Owner = this.transform;
 
             Camera.main.GetComponent<CameraFollow>().Target = transform;
 
