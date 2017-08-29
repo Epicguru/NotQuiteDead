@@ -13,20 +13,10 @@ public class PingCommand : Command
 
     public override string Execute(object[] args)
     {
+        int time = NetworkManager.singleton.client.GetRTT();
 
-        byte error;
-        int time = NetworkTransport.GetCurrentRTT(Player.Local.NetworkIdentity.connectionToServer.hostId, Player.Local.NetworkIdentity.connectionToServer.connectionId, out error);
+        CommandProcessing.Log("Client RTT is " + time + "ms");
 
-        switch ((NetworkError)error)
-        {
-            case NetworkError.Ok:
-                CommandProcessing.Log("RTT is " + time + "ms");
-                return null;
-            default:
-                return "Error in NetworkTransport - " + (NetworkError)error;
-        }
-
-
-        
+        return null;        
     }
 }
