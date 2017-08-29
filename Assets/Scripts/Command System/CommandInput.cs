@@ -7,13 +7,57 @@ using UnityEngine.UI;
 
 public class CommandInput : MonoBehaviour {
 
+    public bool Open;
+    public float ClosedX;
+    public AnimationCurve Curve;
+    public float OpenTime;
+
     public Text Log;
     public Text Error;
     private InputField input;
+    private int index;
 
     public void Start()
     {
         CommandProcessing.RefreshCommands();
+    }
+
+    private Vector2 pos = new Vector2();
+    public void Update()
+    {
+        if (InputManager.InputDown("Console"))
+        {
+            Open = !Open;
+        }
+
+
+
+        if (!Open)
+        {
+            input.DeactivateInputField();
+            return;
+        }
+
+        if (UnityEngine.Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            index--;
+            if (index < 0)
+                index = 0;
+
+            input.text = CommandProcessing.lastCommands[index];
+            EventSystem.current.SetSelectedGameObject(input.gameObject, null);
+            input.ActivateInputField();
+        }
+        if (UnityEngine.Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            index++;
+            if (index >= CommandProcessing.lastCommands.Count)
+                index = CommandProcessing.lastCommands.Count - 1;
+
+            input.text = CommandProcessing.lastCommands[index];
+            EventSystem.current.SetSelectedGameObject(input.gameObject, null);
+            input.ActivateInputField();
+        }
     }
 
 	public void Input()
@@ -35,7 +79,8 @@ public class CommandInput : MonoBehaviour {
         {
             if (CommandProcessing.Process(text))
             {
-                input.text = "";                
+                input.text = "";
+                index = CommandProcessing.lastCommands.Count;            
             }
         }catch(Exception e)
         {
@@ -53,6 +98,7 @@ public class CommandInput : MonoBehaviour {
             if (CommandProcessing.Process(input.text))
             {
                 input.text = "";
+                index = CommandProcessing.lastCommands.Count;
             }
         }
         catch (Exception e)

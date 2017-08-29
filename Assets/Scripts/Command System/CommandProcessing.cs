@@ -27,6 +27,11 @@ public static class CommandProcessing
         commands.Add(new GiveOneCommand());
         commands.Add(new GiveCommand());
         commands.Add(new HealthCommand());
+        commands.Add(new TeleportCommand());
+        commands.Add(new PingCommand());
+        commands.Add(new PauseCommand());
+        commands.Add(new TimescaleCommand());
+        commands.Add(new HistoryCommand());
     }
 
     // Returns true to clear the console.
@@ -103,6 +108,12 @@ public static class CommandProcessing
         {
             Error("No commands found: '" + parts[0] + "'. Try typing help.");
             return false;
+        }
+
+
+        if(lastCommands.Count == 0 || lastCommands[lastCommands.Count - 1] != command)
+        {
+            lastCommands.Add(command);
         }
 
         int i = 0;

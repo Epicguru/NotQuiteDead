@@ -42,6 +42,9 @@ public static class InputManager
 
         // Interaction
         defaultKeyBindings.Add("Pick up", KeyCode.E);
+
+        // Debug
+        defaultKeyBindings.Add("Console", KeyCode.KeypadMinus);
     }
 
     public static void MergeKeyBindings()
