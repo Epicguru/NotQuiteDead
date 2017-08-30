@@ -52,14 +52,16 @@ public class GunShooting : NetworkBehaviour
 
     public virtual void Update()
     {
+        if (!isClient)
+            return; // Standalone server does not animate.
+
         // Shooting...
         if (!hasAuthority || gun.Item == null || !gun.Item.IsEquipped())
             return; // Owner only...
 
         bool requestingShoot = ShootNow();
         bool ready = animation.IsAiming && bulletInChamber && !animation.IsDropped && !animation.IsChambering && !animation.IsReloading;
-        animation.AnimShoot(requestingShoot && ready); // Animation, bullets and damage later.
-
+        animation.AnimShoot(requestingShoot && ready); // Pew pew!
 
         bool requestingChamber = !bulletInChamber && CanChamber();
         ready = !animation.IsChambering && !animation.IsEquipping && !animation.IsAiming;
@@ -68,7 +70,6 @@ public class GunShooting : NetworkBehaviour
             // Chamber new bullet!
             animation.AnimChamber();
         }
-
 
         bool requestingReload = InputManager.InputDown("Reload");
         ready = !animation.IsReloading && !animation.IsAiming && !animation.IsChambering && !animation.IsDropped && CanReload();
@@ -189,7 +190,7 @@ public class GunShooting : NetworkBehaviour
         return bulletsInMagazine >= Capacity.BulletsConsumed;
     }
 
-    public void FromAnimShoot()
+    public virtual void FromAnimShoot()
     {
         // Shoot for real now!
 
@@ -247,7 +248,7 @@ public class GunShooting : NetworkBehaviour
         // LOGIC : Only reload if less bullets that max capacity.
 
         int bullets = bulletsInMagazine;
-        if (Capacity.ChamberCountsAsClip)
+        if (Capacity.ChamberCountsAsMag)
             if (bulletInChamber)
                 bullets++;
 

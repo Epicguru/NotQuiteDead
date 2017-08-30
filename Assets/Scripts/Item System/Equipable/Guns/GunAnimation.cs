@@ -18,14 +18,14 @@ public class GunAnimation : NetworkBehaviour
     [Tooltip("Is this on a gun that has a repeated reload action, such as a shotgun or bolt action rifle?")]
     public bool IsRecursive = false;
 
-    [HideInInspector] [SyncVar] public bool IsDropped;
-    [HideInInspector] [SyncVar] public bool IsAiming;
-    [HideInInspector] [SyncVar] public bool IsRunning;
-    [HideInInspector] [SyncVar] public bool IsShooting;
-    [HideInInspector] [SyncVar] public bool IsRecursiveReload;
-    [HideInInspector] public bool IsEquipping = true; // Only true when the object is created, then false forever more!
-    [HideInInspector] public bool IsReloading;
-    [HideInInspector] public bool IsChambering;
+    /*[HideInInspector]*/ [SyncVar] public bool IsDropped;
+    /*[HideInInspector]*/ [SyncVar] public bool IsAiming;
+    /*[HideInInspector]*/ [SyncVar] public bool IsRunning;
+    /*[HideInInspector]*/ [SyncVar] public bool IsShooting;
+    /*[HideInInspector]*/ [SyncVar] public bool IsRecursiveReload;
+    /*[HideInInspector]*/ public bool IsEquipping = true; // Only true when the object is created, then false forever more!
+    /*[HideInInspector]*/ public bool IsReloading;
+    /*[HideInInspector]*/ public bool IsChambering;
 
     private Animator animator;
     private Gun gun;
@@ -189,15 +189,18 @@ public class GunAnimation : NetworkBehaviour
             return;
         }
 
-        if (!IsRecursiveReload)
+        if (!IsRecursive)
         {
             CmdTrigger(Reload); // For other clients only!
 
             // Cause local animation.
             animator.SetTrigger(Reload);
+
+            Debug.Log("Triggered reload!");
         }
         else
         {
+            Debug.Log("Doing a recursive reload!");
             AnimReload(true); // Set the recursive state.
             animator.SetBool(Reload, true); // Apply local state.
         }
@@ -207,6 +210,8 @@ public class GunAnimation : NetworkBehaviour
     // For recursive reload only!
     public void AnimReload(bool reload)
     {
+        if (IsRecursive && !reload)
+            IsReloading = false;
         if (IsRecursiveReload != reload)
             CmdSetReload(reload);
     }

@@ -18,7 +18,7 @@ public class GunCapacity
     [Tooltip("The amount of ammo consumed per shot.")]
     public int BulletsConsumed = 1;
     [Tooltip("If true, then the bullet stored in the chamber will be considered when allowing reloading. Useful for single shot weapons.")]
-    public bool ChamberCountsAsClip = false;
+    public bool ChamberCountsAsMag = false;
     [Tooltip("The amount of shots per burst fire. Only applies if the gun has burst fire firing mode active.")]
     public int BurstShots = 3;
 }

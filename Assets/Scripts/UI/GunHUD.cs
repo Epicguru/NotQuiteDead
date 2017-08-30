@@ -47,6 +47,17 @@ public class GunHUD : MonoBehaviour {
 
         Open = holding != null && !PlayerInventory.IsOpen;
 
+        Crosshair.Instance.Active = Open;
+        if (holding != null)
+        {
+            Crosshair.Instance.MaxDistance = holding.Shooting.Damage.Inaccuracy.y;
+            Crosshair.Instance.Distance = holding.Shooting.GetCurrentInaccuracy();
+        }
+        else
+        {
+            Crosshair.Instance.Distance = 0;
+        }
+
         UpdateText();
     }
 

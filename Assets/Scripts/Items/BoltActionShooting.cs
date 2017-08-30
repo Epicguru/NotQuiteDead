@@ -5,27 +5,40 @@ using System.Text;
 
 public class BoltActionShooting : GunShooting
 {
-    private Gun gun;
+    private Gun gun2;
 
     public override void Start()
     {
         base.Start();
 
         GetComponent<GunAnimation>().IsRecursive = true;
-        gun = GetComponent<Gun>();
+        gun2 = GetComponent<Gun>();
+        Capacity.ChamberCountsAsMag = true; // No chambering.
+        bulletsInMagazine--; // Base script fills magazine
+        bulletInChamber = true; // Otherwise it will never start shooting...
+    }
+
+    public override void FromAnimShoot()
+    {
+        base.FromAnimShoot();
+
+        //if(bulletsInMagazine > 0)
+        //    bulletInChamber = true;
     }
 
     public override void FromAnimReload()
     {
-        // Add a bullet
-        bulletsInMagazine++;
+        // Add a bullet...
+        if(bulletInChamber) //... IF there is already one in the chamber! 
+            bulletsInMagazine++;
+        bulletInChamber = true; // After first bullet, chamber is full.
 
         if (!CanReload())
         {
             // Gun is full of bullets, and we do not chamber because we are a bolt action rifle that chambers when it closes.
             // Stop the reloading animations.
 
-            gun.Animation.AnimReload(false);
+            gun2.Animation.AnimReload(false);
         }
     }
 }
