@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(AudioSource))]
+[DisallowMultipleComponent]
 public class GunShooting : NetworkBehaviour
 {
     public FiringMode FiringMode = FiringMode.SEMI;
@@ -30,7 +31,7 @@ public class GunShooting : NetworkBehaviour
     [Range(0f, 1f)]
     private float shotInaccuracy;
 
-    public void Start()
+    public virtual void Start()
     {
         gun = GetComponent<Gun>();
         animation = GetComponent<GunAnimation>();
@@ -49,7 +50,7 @@ public class GunShooting : NetworkBehaviour
         bulletsInMagazine = Capacity.MagazineCapacity;
     }
 
-    public void Update()
+    public virtual void Update()
     {
         // Shooting...
         if (!hasAuthority || gun.Item == null || !gun.Item.IsEquipped())
@@ -239,7 +240,7 @@ public class GunShooting : NetworkBehaviour
         AudioSource.PlayOneShot(clip);
     }
 
-    public bool CanReload()
+    public virtual bool CanReload()
     {
         // Can we even try to reload?
 
@@ -256,7 +257,7 @@ public class GunShooting : NetworkBehaviour
         return false;
     }
 
-    public void FromAnimReload()
+    public virtual void FromAnimReload()
     {
         // Reload!
         if (!CanReload())

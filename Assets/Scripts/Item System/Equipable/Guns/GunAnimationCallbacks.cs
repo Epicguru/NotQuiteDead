@@ -15,21 +15,21 @@ public class GunAnimationCallbacks : ItemAnimationCallback
 
     public void ReloadEnd()
     {
-        gun.Animaiton.CallbackReloadEnd();
+        gun.Animation.CallbackReloadEnd();
     }
 
     public void ChamberEnd()
     {
-        gun.Animaiton.CallbackChamberEnd();
+        gun.Animation.CallbackChamberEnd();
     }
 
     public void Shoot()
     {
-        gun.Animaiton.CallbackShoot();
+        gun.Animation.CallbackShoot();
     }
 
     public void EquipEnd()
     {
-        gun.Animaiton.CallbackEquipEnd();
+        gun.Animation.CallbackEquipEnd();
     }
 }

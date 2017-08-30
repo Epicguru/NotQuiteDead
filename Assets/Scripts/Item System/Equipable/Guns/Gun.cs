@@ -13,7 +13,7 @@ public class Gun : Weapon
     */
 
     [HideInInspector] public GunAiming Aiming;
-    [HideInInspector] public GunAnimation Animaiton;
+    [HideInInspector] public GunAnimation Animation;
     [HideInInspector] public GunShooting Shooting;
     [HideInInspector] public Item Item;
 
@@ -22,7 +22,7 @@ public class Gun : Weapon
         base.Type = WeaponType.RANGED;
 
         Aiming = GetComponent<GunAiming>();
-        Animaiton = GetComponent<GunAnimation>();
+        Animation = GetComponent<GunAnimation>();
         Shooting = GetComponent<GunShooting>();
         Item = GetComponent<Item>();
 
@@ -31,5 +31,10 @@ public class Gun : Weapon
             Debug.LogError("No gun animation callback object on children. It should be on the same object as the Animator.");
             Debug.Break();
         }
+    }
+
+    public void Update()
+    {
+        Animation.AnimRun(Item.IsEquipped() && InputManager.InputPressed("Sprint"));
     }
 }

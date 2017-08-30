@@ -15,10 +15,14 @@ public class GunAnimation : NetworkBehaviour
     public string Run = "Run";
     public string Dropped = "Dropped";
 
+    [Tooltip("Is this on a gun that has a repeated reload action, such as a shotgun or bolt action rifle?")]
+    public bool IsRecursive = false;
+
     [HideInInspector] [SyncVar] public bool IsDropped;
     [HideInInspector] [SyncVar] public bool IsAiming;
     [HideInInspector] [SyncVar] public bool IsRunning;
     [HideInInspector] [SyncVar] public bool IsShooting;
+    [HideInInspector] [SyncVar] public bool IsRecursiveReload;
     [HideInInspector] public bool IsEquipping = true; // Only true when the object is created, then false forever more!
     [HideInInspector] public bool IsReloading;
     [HideInInspector] public bool IsChambering;
@@ -47,6 +51,11 @@ public class GunAnimation : NetworkBehaviour
         animator.SetBool(Dropped, IsDropped);
         animator.SetBool(Aim, IsAiming);
         animator.SetBool(Shoot, IsShooting);
+
+        if (IsRecursive)
+        {
+            animator.SetBool(Reload, IsRecursiveReload);
+        }
 
         Hand.SetEquipHandRender(transform, !IsDropped);
 
@@ -117,6 +126,12 @@ public class GunAnimation : NetworkBehaviour
         IsAiming = aim;
     }
 
+    [Command] // FOR RECURSIVE RELOADS ONLY, such as shotguns or old rifles.
+    private void CmdSetReload(bool reload)
+    {
+        IsRecursiveReload = reload;
+    }
+
     public void AnimChamber()
     {
         // Cause chamber animation.
@@ -174,11 +189,26 @@ public class GunAnimation : NetworkBehaviour
             return;
         }
 
-        CmdTrigger(Reload); // For other clients only!
+        if (!IsRecursiveReload)
+        {
+            CmdTrigger(Reload); // For other clients only!
 
-        // Cause local animation.
-        animator.SetTrigger(Reload);
+            // Cause local animation.
+            animator.SetTrigger(Reload);
+        }
+        else
+        {
+            AnimReload(true); // Set the recursive state.
+            animator.SetBool(Reload, true); // Apply local state.
+        }
         IsReloading = true;
+    }
+
+    // For recursive reload only!
+    public void AnimReload(bool reload)
+    {
+        if (IsRecursiveReload != reload)
+            CmdSetReload(reload);
     }
 
     [Command]
