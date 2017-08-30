@@ -14,10 +14,10 @@ public class Item : NetworkBehaviour
     * Some items are equipable, but the equping actions will be handled in another script.
     */
 
-    [Tooltip("The location of the prefab for this item, in the resouces folder.")]
-    public string Prefab = "Items/";
+    [Tooltip("The unique ID of this item. Used to spawn new items.")]
+    public string Prefab = "Prefab Name";
 
-    [Tooltip("The internal (TODO) name of this item.")]
+    [Tooltip("The display name of this item.")]
     public string Name = "Default Item Name";
 
     [Tooltip("The rarity (tier) of the item.")]
@@ -129,30 +129,44 @@ public class Item : NetworkBehaviour
         }
     }
 
+    private static Dictionary<string, Item> Items;
+
+    public static void LoadItems()
+    {
+        Items = new Dictionary<string, Item>();
+        Object[] items = Resources.LoadAll("Items/", typeof(Item));
+
+        foreach(Object o in items)
+        {
+            Item x = (Item)o;
+            Items.Add(x.Prefab, (Item)o);
+            Debug.Log("Loaded item '" + x.Prefab + "'");
+        }
+    }
+
     /// <summary>
     /// Creates a new instance of an object and spawns it into the world.
     /// </summary>
-    public static Item NewInstance(string path)
+    public static Item NewInstance(string prefab)
     {
         // Create new instance of item.
-        Item prefab = FindItem(path);
+        Item x = FindItem(prefab);
         // TODO DATA!
-        Item newItem = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+        Item newItem = Instantiate(x, Vector3.zero, Quaternion.identity);
 
         return newItem;
     }
 
     /// <summary>
-    /// Gets an item from the resouces folder, this does not create a new instance.
+    /// Gets an item from the loaded items, this does not create a new instance.
     /// </summary>
-    /// <param name="path">The path to the item, as in Item.Prefab .</param>
+    /// <param name="path">The prefab name of the item, as in Item.Prefab .</param>
     /// <returns>The item object, which is a prefab.</returns>
-    public static Item FindItem(string path)
+    public static Item FindItem(string prefab)
     {
-        GameObject o = Resources.Load<GameObject>(path);
-        if (o == null)
-            return null;
-        return o.GetComponent<Item>();
+        if (Items == null)
+            LoadItems();
+        return Items[prefab];
     }
 
     private void Option_Equip(InventoryItem x)
