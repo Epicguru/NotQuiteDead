@@ -45,7 +45,7 @@ public class GunHUD : MonoBehaviour {
         pos.Set(x, 0);
         rect.anchoredPosition = pos;
 
-        Open = holding != null && !PlayerInventory.IsOpen;
+        Open = holding != null && !PlayerInventory.IsOpen && !CommandInput.Instance.Open;
 
         Crosshair.Instance.Active = Open;
         if (holding != null)

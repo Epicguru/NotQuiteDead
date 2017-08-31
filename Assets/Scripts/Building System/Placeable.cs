@@ -94,7 +94,8 @@ public class Placeable : NetworkBehaviour
             // TOOD
 
             // Do not allow pickup when placed!
-            Item.pickup.AllowPickup = !IsPlaced;
+            if(Item != null && Item.pickup != null)
+                Item.pickup.AllowPickup = !IsPlaced;
 
             Health.CanHit = IsPlaced;
             

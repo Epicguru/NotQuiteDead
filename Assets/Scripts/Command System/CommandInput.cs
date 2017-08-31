@@ -17,18 +17,33 @@ public class CommandInput : MonoBehaviour {
     private int index;
     private float timer;
 
+    public static CommandInput Instance;
+
     public void Start()
     {
         CommandProcessing.RefreshCommands();
+        Instance = this;
     }
 
     private Vector2 pos = new Vector2();
     private Vector2 size = new Vector2();
     public void Update()
     {
+        if (input == null)
+            input = GetComponentInChildren<InputField>();
+
         if (InputManager.InputDown("Console"))
         {
             Open = !Open;
+            Debug.Log("Now : " + (Open ? "Open" : "Closed"));
+            if (Open)
+            {
+                Debug.Log("setting...");
+
+                input.text = "";
+                EventSystem.current.SetSelectedGameObject(input.gameObject, null);
+                input.ActivateInputField();
+            }
         }
 
         float closedX = -Screen.width - 100;
@@ -50,8 +65,7 @@ public class CommandInput : MonoBehaviour {
 
         if (!Open)
         {
-            if(input != null)
-                input.DeactivateInputField();
+            input.DeactivateInputField();
             return;
         }
 
