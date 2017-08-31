@@ -18,7 +18,7 @@ public class MuzzleFlash : MonoBehaviour {
 
     public static GameObject Place(Vector3 position, Quaternion rotation, Transform parent = null)
     {
-        GameObject GO = Instantiate(Instance.Prefab.gameObject, position, rotation, parent);
+        GameObject GO = ObjectPool.Instantiate(Instance.Prefab.gameObject, PoolType.MUZZLE_FLASH, position, rotation, parent);
         GO.GetComponentInChildren<SpriteRenderer>().sprite = Instance.sprites[Random.Range(0, Instance.sprites.Length)];
 
         return GO;

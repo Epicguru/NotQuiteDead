@@ -423,7 +423,7 @@ public class GunShooting : NetworkBehaviour
         }
 
         // Spawn visual line...
-        GameObject GO = Instantiate(GunEffects.Instance.BulletTrail.gameObject);
+        GameObject GO = ObjectPool.Instantiate(GunEffects.Instance.BulletTrail.gameObject, PoolType.BULLET_PATH);
         GO.GetComponent<BulletPath>().Setup(GetBulletSpawn().position, trailEnd);
 
         CmdSpawnVisual(GetBulletSpawn().position, trailEnd);

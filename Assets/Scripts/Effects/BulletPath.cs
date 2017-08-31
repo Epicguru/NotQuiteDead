@@ -31,7 +31,7 @@ public class BulletPath : MonoBehaviour {
 
         if (p <= 0)
         {
-            Destroy(gameObject);
+            ObjectPool.Destroy(gameObject, PoolType.BULLET_PATH);
             return;
         }
 

@@ -4,8 +4,14 @@ using UnityEngine;
 
 public class InputScreen : MonoBehaviour {
 
+    public static InputScreen Instance;
     public bool ShowScreen;
     private bool showing;
+
+    public void Start()
+    {
+        Instance = this;
+    }
 
     public void Update()
     {

@@ -8,6 +8,7 @@ public class Ghost : MonoBehaviour
 {
     public float Time;
     public AnimationCurve Fade = AnimationCurve.EaseInOut(0, 1, 1, 0);
+    public PoolType PoolType;
 
     private float Top;
     private SpriteRenderer[] renderers;
@@ -27,7 +28,7 @@ public class Ghost : MonoBehaviour
 
         if(p <= 0)
         {
-            Destroy(gameObject);
+            ObjectPool.Destroy(gameObject, PoolType);
             return;
         }
 
