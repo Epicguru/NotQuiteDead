@@ -12,6 +12,8 @@ public class Gun : Weapon
     * Holds information about how a gun behaves and shoots.
     */
 
+    public GunType GunType = GunType.RIFLE;
+
     [HideInInspector] public GunAiming Aiming;
     [HideInInspector] public GunAnimation Animation;
     [HideInInspector] public GunShooting Shooting;

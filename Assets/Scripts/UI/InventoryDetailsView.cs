@@ -40,6 +40,7 @@ public class InventoryDetailsView : MonoBehaviour
         {
             GunDamage damage = gun.GetComponent<GunShooting>().Damage;
             GunCapacity capacity = gun.GetComponent<GunShooting>().Capacity;
+            description += RichText.InBold("Gun Type - ") + gun.GunType.ToString().Replace('_', ' ') + "\n";
             description += RichText.InBold("Damage - ") + damage.Damage;
             if (damage.BulletsShareDamage && capacity.BulletsPerShot.y > 1)
             {
