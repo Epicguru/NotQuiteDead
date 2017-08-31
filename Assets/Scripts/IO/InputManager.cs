@@ -12,6 +12,8 @@ public static class InputManager
     * This is a sort of wrapper around unity's class 'Input'.
     */
 
+    public static bool Active = true;
+
     private static Dictionary<string, KeyCode> keyBindings;
     private static Dictionary<string, KeyCode> defaultKeyBindings;
     private static Vector2 mousePos = new Vector2();
@@ -39,6 +41,9 @@ public static class InputManager
         // Inventory
         defaultKeyBindings.Add("Inventory", KeyCode.Tab);
         defaultKeyBindings.Add("Return", KeyCode.Escape);
+
+        // Control
+        defaultKeyBindings.Add("Fullscreen", KeyCode.F11);
 
         // Interaction
         defaultKeyBindings.Add("Pick up", KeyCode.E);
@@ -114,18 +119,24 @@ public static class InputManager
         OutputUtils.ObjectToFile(new SerializableDictionary<string, KeyCode>(keyBindings), path); // Will be auto
     }
 
-    public static bool InputPressed(string input)
+    public static bool InputPressed(string input, bool bypass = false)
     {
+        if (!Active && !bypass)
+            return false;
         return Input.GetKey(GetInput(input));
     }
 
-    public static bool InputDown(string input)
+    public static bool InputDown(string input, bool bypass = false)
     {
+        if (!Active && !bypass)
+            return false;
         return Input.GetKeyDown(GetInput(input));
     }
 
-    public static bool InputUp(string input)
+    public static bool InputUp(string input, bool bypass = false)
     {
+        if (!Active && !bypass)
+            return false;
         return Input.GetKeyUp(GetInput(input));
     }
 

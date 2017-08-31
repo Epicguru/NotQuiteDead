@@ -32,7 +32,7 @@ public class CommandInput : MonoBehaviour {
         if (input == null)
             input = GetComponentInChildren<InputField>();
 
-        if (InputManager.InputDown("Console"))
+        if (InputManager.InputDown("Console", true))
         {
             Open = !Open;
             Debug.Log("Now : " + (Open ? "Open" : "Closed"));
@@ -45,6 +45,8 @@ public class CommandInput : MonoBehaviour {
                 input.ActivateInputField();
             }
         }
+
+        InputManager.Active = !Open;
 
         float closedX = -Screen.width - 100;
 

@@ -13,6 +13,10 @@ public class InputManagerSetup : MonoBehaviour
 
     public void FixedUpdate()
     {
+        // Fullscreen
+        if (InputManager.InputDown("Fullscreen"))
+            Screen.fullScreen = !Screen.fullScreen;
+
         InputManager.UpdateMousePos();
     }
 }
