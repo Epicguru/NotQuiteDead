@@ -9,6 +9,7 @@ public class Hand : MonoBehaviour {
     // Does nothing for now.
 
     public bool Render = true;
+    public bool AnimationOnly = false;
 
     private SpriteRenderer r;
 
@@ -27,6 +28,7 @@ public class Hand : MonoBehaviour {
 
     public void Update()
     {
-        r.enabled = Render;
+        if(!AnimationOnly)
+            r.enabled = Render;
     }
 }
