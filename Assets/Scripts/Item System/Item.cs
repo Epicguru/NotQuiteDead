@@ -169,18 +169,18 @@ public class Item : NetworkBehaviour
         return Items[prefab];
     }
 
-    private void Option_Equip(InventoryItem x)
+    public static void Option_Equip(InventoryItem x)
     {
         x.Inventory.RemoveItem(x, Vector2.zero, false); // Remove, do not drop.
         Player.Local.Holding.CmdEquip(x.Item.Prefab, Player.Local.gameObject);
     }
 
-    private void Option_Drop(InventoryItem x)
+    public static void Option_Drop(InventoryItem x)
     {
         x.Inventory.RemoveItem(x, Player.Local.transform.position, true);
     }
 
-    private void Option_Details(InventoryItem x)
+    public static void Option_Details(InventoryItem x)
     {
         x.Inventory.DetailsView.Enter(x);
     }

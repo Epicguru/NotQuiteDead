@@ -80,10 +80,19 @@ public class Placeable : NetworkBehaviour
         if (InputManager.InputDown("Shoot"))
         {
             // Place!
+            float angle = Preview.GetRotationAngles();
             CmdPlace(Preview.GetPosition(), Preview.GetRotation());
 
             // Remove from hands
             GetComponentInParent<PlayerHolding>().CmdDrop(false, true, Player.Local.gameObject);
+
+            // TODO : Look for new one in inventory and equip.
+            InventoryItem i = PlayerInventory.inv.Inventory.GetOfType(Item.Prefab);
+            if(i != null)
+            {
+                Item.Option_Equip(i);
+                PlaceablePreview.LastRotation = angle;
+            }
         }
     }
 

@@ -8,15 +8,18 @@ using UnityEngine.Networking;
 public class PlaceablePreview : NetworkBehaviour
 {
     public GameObject Preview;
-    public Color colour = new Color(0, 1, 0, 0.4f);   
+    public Color colour = new Color(0, 1, 0, 0.4f);
+    public static float LastRotation;
 
     private Placeable placeable;
     private float rotation;
-    private static Vector3 scale = new Vector3();
 
     public void Start()
     {
+        Debug.Log("Started with " + rotation);
         placeable = GetComponent<Placeable>();
+
+        rotation = LastRotation;
 
         if(Preview == null)
         {
@@ -71,12 +74,16 @@ public class PlaceablePreview : NetworkBehaviour
 
     public Vector3 GetPosition()
     {
-        Debug.Log("Preview is at " + Preview.transform.position);
         return InputManager.GetMousePos();
     }
 
     public Quaternion GetRotation()
     {
         return Preview.transform.rotation;
+    }
+
+    public float GetRotationAngles()
+    {
+        return rotation;
     }
 }

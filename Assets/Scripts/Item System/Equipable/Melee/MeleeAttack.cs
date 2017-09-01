@@ -14,12 +14,10 @@ public class MeleeAttack : NetworkBehaviour {
 
     private MeleeWeapon weapon;
     private List<Collider2D> touching = new List<Collider2D>();
-    private Rigidbody2D body;
 
     public void Start()
     {
         weapon = GetComponent<MeleeWeapon>();
-        body = GetComponent<Rigidbody2D>();
 
         if(Collider == null)
         {

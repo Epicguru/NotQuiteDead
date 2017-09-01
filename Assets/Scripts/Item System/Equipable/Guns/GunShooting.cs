@@ -413,8 +413,11 @@ public class GunShooting : NetworkBehaviour
             if (damage != 0)
                 CmdHitObject(h.gameObject, "A Player:" + gun.Item.Name, damage);
 
-            trailEnd.Set(hit.point.x, hit.point.y);
             penetrationCount++;
+            if (penetrationCount >= Damage.Penetration)
+                trailEnd.Set(hit.point.x, hit.point.y);
+
+            Debug.Log("Hit object, can penetrate :" + h.CanPenetrate);
 
             if (!h.CanPenetrate)
             {

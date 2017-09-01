@@ -52,11 +52,13 @@ public class PlayerInventory : MonoBehaviour
     {
         inv.Inventory.gameObject.SetActive(true);
         inv.Inventory.ResetViewport();
+        InputManager.Active = false;
     }
 
     public static void Close()
     {
         inv.Inventory.gameObject.SetActive(false);
         inv.Inventory.Options.Close();
+        InputManager.Active = true;
     }
 }

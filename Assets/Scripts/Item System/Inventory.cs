@@ -154,11 +154,6 @@ public class Inventory : MonoBehaviour
         // Spawn item on ground
         if (drop)
         {
-            if(position == null)
-            {
-                position = Vector3.zero;
-            }
-
             // Create new instance...
             Player.Local.NetUtils.CmdSpawnDroppedItem(item.Item.Prefab, position);
         }
@@ -181,7 +176,7 @@ public class Inventory : MonoBehaviour
         ViewportContent.sizeDelta = new Vector2(0, ViewportContent.sizeDelta.y - 30);
     }
 
-    private InventoryItem GetOfType(string prefab)
+    public InventoryItem GetOfType(string prefab)
     {
         foreach (InventoryItem item in Contents)
         {
