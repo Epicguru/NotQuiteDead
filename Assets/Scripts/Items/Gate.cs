@@ -33,16 +33,10 @@ public class Gate : NetworkBehaviour
             ActionHUD.DisplayAction("Press " + InputManager.GetInput("Interact") + " to " + (IsOpen ? "close" : "open") + " the gate.");
             if (InputManager.InputDown("Interact"))
             {
-                CmdSetOpen(!IsOpen);
+                Player.Local.NetUtils.CmdOpenGate(gameObject, !IsOpen);
             }
         }
 
         Animator.SetBool(OpenBool, IsOpen);
-    }
-
-    [Command]
-    public void CmdSetOpen(bool open)
-    {
-        IsOpen = open;
     }
 }

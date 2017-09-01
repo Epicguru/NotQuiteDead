@@ -21,4 +21,10 @@ public class PlayerNetUtils : NetworkBehaviour
     {
         Destroy(obj);
     }
+
+    [Command]
+    public void CmdOpenGate(GameObject gate, bool open)
+    {
+        gate.GetComponent<Gate>().IsOpen = open;
+    }
 }
