@@ -22,6 +22,7 @@ public class Player : NetworkBehaviour
 
     public void Start()
     {
+
         if (isLocalPlayer)
         {
             Local = this;
@@ -31,11 +32,22 @@ public class Player : NetworkBehaviour
             Camera.main.GetComponent<CameraFollow>().Target = transform;
 
             Health.UponDeath += UponDeath;
-
         }
         else
         {
             gameObject.name = "Other Player";
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                ItemData data = new ItemData();
+                ItemData.Add(data); // Register!
+            }
         }
     }
 

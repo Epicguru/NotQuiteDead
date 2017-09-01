@@ -129,7 +129,7 @@ public class Item : NetworkBehaviour
         }
     }
 
-    private static Dictionary<string, Item> Items;
+    public static Dictionary<string, Item> Items;
 
     public static void LoadItems()
     {

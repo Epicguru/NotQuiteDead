@@ -34,6 +34,7 @@ public static class CommandProcessing
         commands.Add(new HistoryCommand());
         commands.Add(new InventoryCommands());
         commands.Add(new PoolCommand());
+        commands.Add(new ItemsCommand());
     }
 
     // Returns true to clear the console.
