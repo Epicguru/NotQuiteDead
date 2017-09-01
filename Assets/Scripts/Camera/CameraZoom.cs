@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CameraZoom : MonoBehaviour {
 
+    public float MaxSize = 10f;
     public float Size
     {
         get
@@ -12,7 +13,7 @@ public class CameraZoom : MonoBehaviour {
         }
         set
         {
-            _Size = Mathf.Clamp(value, 0.1f, 100f);
+            _Size = Mathf.Clamp(value, 1f, MaxSize);
         }
     }
     [Range(0f, 1f)]
@@ -20,7 +21,7 @@ public class CameraZoom : MonoBehaviour {
 
     public static CameraZoom I;
 
-    private float _Size;
+    private float _Size = 5;
     private Camera cam;
 
     public void Start()
@@ -33,7 +34,7 @@ public class CameraZoom : MonoBehaviour {
 
     public void Update()
     {
-        Size -= (Input.mouseScrollDelta).y;
+        Size -= (Input.mouseScrollDelta).y * (Size / 10f);
     }
 
     public void Tick()
