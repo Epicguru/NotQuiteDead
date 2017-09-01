@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-public class ObjectPool
+public class ObjectPool : MonoBehaviour
 {
     private static Transform IdleParent;
     private static Dictionary<PoolType, List<GameObject>> objects = new Dictionary<PoolType, List<GameObject>>();
@@ -58,6 +58,8 @@ public class ObjectPool
         {
             int c = GetObjectCount(t);
             int p = (int)(((float)c / total) * 100f);
+            if (c == 0)
+                p = 0;
 
             string percentage = p.ToString() + '%';
             while(percentage.Length < 4)
@@ -183,6 +185,7 @@ public class ObjectPool
             return null;
 
         GameObject o = objs[0];
+        objs.RemoveAt(0);
         while(o == null && objs.Count > 0)
         {
             Debug.LogError("Idle pooled object of type '" + type + "' was destroyed! Why?");
@@ -191,6 +194,7 @@ public class ObjectPool
         }
 
         MakeBorrowed(o);
+        o.SendMessage("Start", null, SendMessageOptions.DontRequireReceiver);
 
         return o;
     }

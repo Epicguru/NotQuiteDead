@@ -44,9 +44,11 @@ public static class InputManager
 
         // Control
         defaultKeyBindings.Add("Fullscreen", KeyCode.F11);
+        defaultKeyBindings.Add("Key Config", KeyCode.F1);
 
         // Interaction
         defaultKeyBindings.Add("Pick up", KeyCode.E);
+        defaultKeyBindings.Add("Interact", KeyCode.F);
 
         // Debug
         defaultKeyBindings.Add("Console", KeyCode.KeypadMinus);

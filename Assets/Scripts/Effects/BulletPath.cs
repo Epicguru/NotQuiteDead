@@ -4,18 +4,19 @@ using UnityEngine;
 
 public class BulletPath : MonoBehaviour {
 
-    public float Time = 0.2f;
+    public float StartWidth;
 
-    private float startWidth;
+    private float time = 0.2f;
     private float startTime;
     private LineRenderer line;
 
     private static Vector3 temp = new Vector3();
     public void Setup(Vector3 start, Vector2 end)
     {
+        time = 0.2f;
+        startTime = time;
         line = GetComponent<LineRenderer>();
-        startTime = Time;
-        startWidth = line.widthMultiplier;
+        line.widthMultiplier = StartWidth;
 
         temp.Set(end.x, end.y, 0);
 
@@ -26,8 +27,8 @@ public class BulletPath : MonoBehaviour {
 
     public void Update()
     {
-        Time -= UnityEngine.Time.deltaTime;
-        float p = Time / startTime;
+        time -= UnityEngine.Time.deltaTime;
+        float p = time / startTime;
 
         if (p <= 0)
         {
@@ -35,6 +36,6 @@ public class BulletPath : MonoBehaviour {
             return;
         }
 
-        line.widthMultiplier = p * startWidth;
+        line.widthMultiplier = p * StartWidth;
     }
 }

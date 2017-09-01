@@ -15,6 +15,10 @@ public class InputScreen : MonoBehaviour {
 
     public void Update()
     {
+        if(InputManager.InputDown("Key Config"))
+        {
+            ShowScreen = !ShowScreen;
+        }
         if (ShowScreen)
         {
             Show();

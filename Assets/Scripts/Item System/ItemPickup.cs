@@ -57,6 +57,8 @@ public class ItemPickup : NetworkBehaviour
         {
             if (AllowPickup && !Item.IsEquipped())
             {
+                // Show the user that they can pick this item up.
+                ActionHUD.DisplayAction("Press " + InputManager.GetInput("Pick up") + " to pick up " + RichText.InBold(RichText.InColour(Item.Name, ItemRarityUtils.GetColour(Item.Rarity))) + ".");
                 if(InputManager.InputDown("Pick up"))
                 {
                     // Set player authority

@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 0710f430ea4ec854191435c26f00c7eb
+timeCreated: 1504260355
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Tuce
+  fontNames:
+  - Tuce
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

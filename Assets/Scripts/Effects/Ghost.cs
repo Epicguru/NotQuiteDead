@@ -10,23 +10,23 @@ public class Ghost : MonoBehaviour
     public AnimationCurve Fade = AnimationCurve.EaseInOut(0, 1, 1, 0);
     public PoolType PoolType;
 
-    private float Top;
+    private float RealTime;
     private SpriteRenderer[] renderers;
 
     public void Start()
     {
-        Top = Time;
+        RealTime = Time;
         renderers = GetComponentsInChildren<SpriteRenderer>();
     }
 
     private static Color colour = new Color();
     public void Update()
     {
-        Time -= UnityEngine.Time.deltaTime;
-        float p = Time / Top;
+        RealTime -= UnityEngine.Time.deltaTime;
+        float p = RealTime / Time;
         float value = Fade.Evaluate(1f - p);
 
-        if(p <= 0)
+        if (p <= 0)
         {
             ObjectPool.Destroy(gameObject, PoolType);
             return;
