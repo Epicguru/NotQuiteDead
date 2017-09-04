@@ -48,13 +48,22 @@ public class Item : NetworkBehaviour
     [SyncVar]
     private GameObject PlayerHolding;
     [HideInInspector] public ItemPickup pickup;
+    private string currentLayer;
 
     public void Start()
     {
         netTransform = GetComponent<NetworkTransform>();
         pickup = GetComponent<ItemPickup>();
+    }
 
-        // Add default options
+    public void SetLayer(string layer)
+    {
+        if (currentLayer == layer)
+            return;
+        foreach(SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>())
+        {
+            r.sortingLayerName = layer;
+        }
     }
 
     public ItemOption[] CreateOptions()
@@ -73,6 +82,10 @@ public class Item : NetworkBehaviour
     {
         // Does not matter where this is running...
         netTransform.enabled = (transform.parent == null);
+
+        // Layer
+        SetLayer(IsEquipped() ? "Equipped Items" : "Dropped Items");
+
         UpdateParent();
     }
 

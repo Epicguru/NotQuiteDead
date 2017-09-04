@@ -15,7 +15,6 @@ public class ItemData
     public virtual void Init(int ID)
     {
         this.ID = ID;
-        Debug.Log(ID);
     }
 
     public virtual void Apply()

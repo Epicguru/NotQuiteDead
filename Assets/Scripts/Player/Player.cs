@@ -37,6 +37,11 @@ public class Player : NetworkBehaviour
         {
             gameObject.name = "Other Player";
         }
+
+        foreach(SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>())
+        {
+            r.sortingLayerName = "Player";
+        }
     }
 
     private void Update()

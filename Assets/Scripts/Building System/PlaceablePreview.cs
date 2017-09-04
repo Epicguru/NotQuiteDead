@@ -16,7 +16,6 @@ public class PlaceablePreview : NetworkBehaviour
 
     public void Start()
     {
-        Debug.Log("Started with " + rotation);
         placeable = GetComponent<Placeable>();
 
         rotation = LastRotation;
