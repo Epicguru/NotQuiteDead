@@ -9,6 +9,7 @@ public class ItemData
 {
     // GENERAL
     public bool Created = false; // Because unity serializes this.
+    public int Flag = 0; // Beucase unity bugs out if data is completely standard.
 
     // GUN
     public int GUN_BulletsInMagazine;

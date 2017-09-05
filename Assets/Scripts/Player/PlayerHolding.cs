@@ -49,6 +49,11 @@ public class PlayerHolding : NetworkBehaviour
 
         Item created = Item.NewInstance(prefab);
         created.Data = data; // This should sync.
+        if(data == null)
+        {
+            data = new ItemData();
+            data.Flag = 1;
+        }
         // Data is applied upon 'Start'
 
         // Assuming that this item has not been spawned...
@@ -71,9 +76,10 @@ public class PlayerHolding : NetworkBehaviour
         {
             // Put in inventory.
             CmdDrop(false, false, Player.Local.gameObject, this.Item.Data);
+            Debug.Log("Already holding item, put away...");
         }
         this.Item = item.GetComponent<Item>();
-
+        Debug.Log("Equipped item '" + this.Item.Name + "'");
 
         // Check if is gun and is local player
         if(player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)

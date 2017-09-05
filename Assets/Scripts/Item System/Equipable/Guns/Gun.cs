@@ -37,7 +37,8 @@ public class Gun : Weapon
 
     public void Update()
     {
-        Animation.AnimRun(Item.IsEquipped() && InputManager.InputPressed("Sprint"));
+        if(isClient && hasAuthority)
+            Animation.AnimRun(Item.IsEquipped() && InputManager.InputPressed("Sprint"));
     }
 
     public void UpdateData(ItemData data)

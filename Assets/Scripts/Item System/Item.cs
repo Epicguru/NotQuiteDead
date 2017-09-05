@@ -61,8 +61,10 @@ public class Item : NetworkBehaviour
         pickup = GetComponent<ItemPickup>();
         Lighting = GetComponent<SpriteLighting>();
 
-        if (Data.Created == false)
+        if (Data == null || Data.Created == false)
         {
+            if (Data == null)
+                Data = new ItemData();
             Data.Created = true;
             RequestSetDefaultData();
             RequestDataApplication(); // Apply loaded or transmitted data.

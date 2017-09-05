@@ -467,6 +467,7 @@ public class GunShooting : NetworkBehaviour
 
             if (!h.CanPenetrate)
             {
+                trailEnd.Set(hit.point.x, hit.point.y);
                 break;
             }
         }
