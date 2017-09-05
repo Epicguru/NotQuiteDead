@@ -8,10 +8,11 @@ using UnityEngine.Networking;
 public class PlayerNetUtils : NetworkBehaviour
 {
     [Command]
-    public void CmdSpawnDroppedItem(string prefab, Vector3 position)
+    public void CmdSpawnDroppedItem(string prefab, Vector3 position, ItemData data)
     {
         Item newItem = Item.NewInstance(prefab);
         newItem.transform.position = position; // Set position.
+        newItem.Data = data;
 
         NetworkServer.Spawn(newItem.gameObject);
     }

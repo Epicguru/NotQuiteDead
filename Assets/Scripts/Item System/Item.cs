@@ -42,6 +42,10 @@ public class Item : NetworkBehaviour
     [Tooltip("The image for the icon in menus and inventories.")]
     public Sprite ItemIcon;
 
+    [Tooltip("Current item data.")]
+    [SyncVar]
+    public ItemData Data;
+
     [SyncVar]
     private bool equiped = false;
     private NetworkTransform netTransform;
@@ -56,6 +60,17 @@ public class Item : NetworkBehaviour
         netTransform = GetComponent<NetworkTransform>();
         pickup = GetComponent<ItemPickup>();
         Lighting = GetComponent<SpriteLighting>();
+
+        if (Data.Created == false)
+        {
+            Data.Created = true;
+            RequestSetDefaultData();
+            RequestDataApplication(); // Apply loaded or transmitted data.
+        }
+        else
+        {
+            RequestDataApplication(); // Apply loaded or transmitted data.
+        }
     }
 
     public void SetLayer(string layer)
@@ -90,6 +105,24 @@ public class Item : NetworkBehaviour
         SetLayer(IsEquipped() ? "Equipped Items" : "Dropped Items");
 
         UpdateParent();
+    }
+
+    public void RequestDataUpdate()
+    {
+        // Indicates that we should get Data up-to-date. Happens when the item changes state.
+        this.BroadcastMessage("UpdateData", Data, SendMessageOptions.DontRequireReceiver);
+    }
+
+    public void RequestDataApplication()
+    {
+        // Indicates that we should apply the data. Happens when the item changes state.
+        this.BroadcastMessage("ApplyData", Data, SendMessageOptions.DontRequireReceiver);
+    }
+
+    public void RequestSetDefaultData()
+    {
+        // Called when item spawns out of nowhere, such as a random spawn event or a mob drop.
+        this.BroadcastMessage("SetDataDefaults", Data, SendMessageOptions.DontRequireReceiver);
     }
 
     public void UpdateParent()
@@ -160,6 +193,20 @@ public class Item : NetworkBehaviour
         }
     }
 
+    public static void RegisterItems()
+    {
+        if (Items == null)
+        {
+            Debug.LogError("Items is null!");
+            return;
+        }
+
+        foreach(Item i in Items.Values)
+        {
+            NetworkManager.singleton.spawnPrefabs.Add(i.gameObject);
+        }
+    }
+
     /// <summary>
     /// Creates a new instance of an object and spawns it into the world.
     /// </summary>
@@ -187,8 +234,9 @@ public class Item : NetworkBehaviour
 
     public static void Option_Equip(InventoryItem x)
     {
+        ItemData d = x.Data;
         x.Inventory.RemoveItem(x, Vector2.zero, false); // Remove, do not drop.
-        Player.Local.Holding.CmdEquip(x.Item.Prefab, Player.Local.gameObject);
+        Player.Local.Holding.CmdEquip(x.Item.Prefab, Player.Local.gameObject, d);
     }
 
     public static void Option_Drop(InventoryItem x)

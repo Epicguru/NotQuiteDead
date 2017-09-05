@@ -45,18 +45,6 @@ public class Player : NetworkBehaviour
         }
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            for (int i = 0; i < 5; i++)
-            {
-                ItemData data = new ItemData();
-                ItemData.Add(data); // Register!
-            }
-        }
-    }
-
     private void UponDeath()
     {
         // 'Respawn'

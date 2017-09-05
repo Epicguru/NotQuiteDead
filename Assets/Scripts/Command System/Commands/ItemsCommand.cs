@@ -31,11 +31,6 @@ public class ItemsCommand : Command
                 CommandProcessing.Log("There are " + (Item.Items == null ? 0 : Item.Items.Count) + " loaded items, and " + GameObject.FindObjectsOfType<Item>().Length + " instances of items.");
 
                 return null;
-            case "data":
-
-                CommandProcessing.Log("There are " + ItemData.data.Count + " instances of object data.");
-
-                return null;
             case "clear":
 
                 Item[] items = GameObject.FindObjectsOfType<Item>();
@@ -49,7 +44,7 @@ public class ItemsCommand : Command
                 return null;
             default:
 
-                return "Invalid action. Valid actions are list, count, data and clear.";
+                return "Invalid action. Valid actions are list, count and clear.";
         }
     }
 }

@@ -94,7 +94,7 @@ public class Inventory : MonoBehaviour
                 // Place at bottom
                 rect.localPosition = new Vector2(0, -Contents.Count * 30);
 
-                i.Init();
+                i.Init(item.Data); // Data may be null, who knows!
 
                 // Add item
                 Contents.Add(i);
@@ -112,6 +112,7 @@ public class Inventory : MonoBehaviour
             }
             else
             {
+                // No item data because items can stack.
                 InventoryItem stack = GetOfType(item.Prefab);
                 stack.SetItemCount(stack.ItemCount + amount);
 
@@ -155,7 +156,8 @@ public class Inventory : MonoBehaviour
         if (drop)
         {
             // Create new instance...
-            Player.Local.NetUtils.CmdSpawnDroppedItem(item.Item.Prefab, position);
+            // No need to apply data, because it is up to date.
+            Player.Local.NetUtils.CmdSpawnDroppedItem(item.Item.Prefab, position, item.Data);
         }
 
         if(!lastItem)

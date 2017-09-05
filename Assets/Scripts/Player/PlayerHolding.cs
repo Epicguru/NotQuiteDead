@@ -33,7 +33,7 @@ public class PlayerHolding : NetworkBehaviour
     }
 
     [Command]
-    public void CmdEquip(string prefab, GameObject localPlayer)
+    public void CmdEquip(string prefab, GameObject localPlayer, ItemData data)
     {
         // We need to equip this item.
         // This runs on the server, which we can think of as in the middle of nowhere.
@@ -48,6 +48,8 @@ public class PlayerHolding : NetworkBehaviour
         }
 
         Item created = Item.NewInstance(prefab);
+        created.Data = data; // This should sync.
+        // Data is applied upon 'Start'
 
         // Assuming that this item has not been spawned...
         NetworkServer.SpawnWithClientAuthority(created.gameObject, localPlayer);
@@ -67,7 +69,8 @@ public class PlayerHolding : NetworkBehaviour
     {
         if(this.Item != null)
         {
-            CmdDrop(false, false, Player.Local.gameObject);
+            // Put in inventory.
+            CmdDrop(false, false, Player.Local.gameObject, this.Item.Data);
         }
         this.Item = item.GetComponent<Item>();
 
@@ -85,7 +88,7 @@ public class PlayerHolding : NetworkBehaviour
 
     // TODO network!
     [Command]
-    public void CmdDrop(bool drop, bool destroy, GameObject localPlayer)
+    public void CmdDrop(bool drop, bool destroy, GameObject localPlayer, ItemData data)
     {
         // Drops the currently held item, if holding anything.
 
@@ -94,19 +97,22 @@ public class PlayerHolding : NetworkBehaviour
 
         if (destroy)
         {
+            // Completely destroy.
             Destroy(this.Item.gameObject); // Does this work!?!?
             return;
         }
 
         if (!drop)
         {
+            // Put in inventory.
+            this.Item.RequestDataUpdate(); // Refresh data.
             PlayerInventory.Add(this.Item);
             Destroy(this.Item.gameObject); // Does this work!?!?
         }
         else
         {
-            //Debug.LogError("TODO implement me!");
-            Player.Local.NetUtils.CmdSpawnDroppedItem(Item.Prefab, Player.Local.transform.position);
+            // Drop item
+            Player.Local.NetUtils.CmdSpawnDroppedItem(Item.Prefab, Player.Local.transform.position, data);
             Destroy(this.Item.gameObject); // Does this work!?!?
         }
 

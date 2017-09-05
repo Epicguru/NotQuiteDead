@@ -17,7 +17,7 @@ public class ItemOptionsPanel : MonoBehaviour
 
     public void Update()
     {
-        if (InputManager.InputDown("Return"))
+        if (InputManager.InputDown("Return", true))
         {
             Close();
         }

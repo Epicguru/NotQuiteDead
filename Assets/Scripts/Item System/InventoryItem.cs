@@ -27,9 +27,12 @@ public class InventoryItem : MonoBehaviour
     [Tooltip("The prefab version of this item. Not an instance.")]
     public Item Item; // The prefab version, not an instance!!!
 
+    [Tooltip("The data for an item. Only used if there is one item in the stack.")]
+    public ItemData Data;
+
     private static Vector2 StaticPos = new Vector2();
 
-    public void Init()
+    public void Init(ItemData data)
     {
         // Nothing to do here, all rendering done in editor/game.
 
@@ -37,6 +40,8 @@ public class InventoryItem : MonoBehaviour
         Item = Item.FindItem(ItemPrefab);
 
         SetText();
+
+        this.Data = data;
 
         Image.rectTransform.sizeDelta = new Vector2(Item.ItemIcon.texture.width > 200 ? 200 : Item.ItemIcon.texture.width, 29);
 
@@ -48,6 +53,9 @@ public class InventoryItem : MonoBehaviour
             return;
 
         ItemCount = items;
+
+        if (ItemCount > 1)
+            Data = null; // Should already be null...
 
         SetText();
     }

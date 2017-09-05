@@ -62,13 +62,14 @@ public class ItemPickup : NetworkBehaviour
                     ActionHUD.DisplayAction("Press " + InputManager.GetInput("Pick up") + " to pick up " + RichText.InBold(RichText.InColour(Item.Name, ItemRarityUtils.GetColour(Item.Rarity))) + ".");
                 if(InputManager.InputDown("Pick up"))
                 {
-                    // Set player authority
+                    // Set player authority : EDIT - Not needed.
                     //if(!GetComponent<NetworkIdentity>().hasAuthority)
                     //    Player.Local.RequestAuthority(this.gameObject);
-                    
+
 
                     // Pick up!
-                    PlayerInventory.Add(Item.FindItem(Item.Prefab)); // Give prefab version.
+                    Item.RequestDataUpdate(); // Update data.
+                    PlayerInventory.Add(Item); // Give real version with data.
                     Player.Local.NetUtils.CmdDestroyItem(this.gameObject);
                 }
             }

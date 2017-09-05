@@ -18,6 +18,9 @@ public class ItemRarityUtils : MonoBehaviour
 
     public void Start()
     {
+        // TODO WHY HERE :D
+        Item.LoadItems();
+        Item.RegisterItems();
         instance = this;
     }
 

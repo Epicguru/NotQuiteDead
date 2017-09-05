@@ -33,7 +33,8 @@ public class GunShooting : NetworkBehaviour
     [Range(0f, 1f)]
     private float shotInaccuracy;
 
-    private int firingModeIndex = 0;
+    [HideInInspector]
+    public int firingModeIndex = 0;
 
     public virtual void Start()
     {
@@ -50,8 +51,6 @@ public class GunShooting : NetworkBehaviour
         AudioSource.spatialBlend = 1;
 
         // TODO FIXME!
-
-        bulletsInMagazine = Capacity.MagazineCapacity;
 
         if (AllowedModes.Length == 0)
             throw new System.Exception("No allowed firing modes on " + gun.Item.Name);

@@ -39,4 +39,29 @@ public class Gun : Weapon
     {
         Animation.AnimRun(Item.IsEquipped() && InputManager.InputPressed("Sprint"));
     }
+
+    public void UpdateData(ItemData data)
+    {
+        Shooting = GetComponent<GunShooting>();
+        data.GUN_BulletInChamber = Shooting.bulletInChamber;
+        data.GUN_BulletsInMagazine = Shooting.bulletsInMagazine;
+        data.GUN_FiringMode = Shooting.firingModeIndex;
+    }
+
+    public void ApplyData(ItemData data)
+    {
+        Shooting = GetComponent<GunShooting>();
+        Shooting.bulletInChamber = data.GUN_BulletInChamber;
+        Shooting.bulletsInMagazine = data.GUN_BulletsInMagazine;
+        Shooting.firingModeIndex = data.GUN_FiringMode;
+    }
+
+    public void SetDataDefaults(ItemData data)
+    {
+        // Set gun data.
+        Shooting = GetComponent<GunShooting>();
+        data.GUN_BulletInChamber = false;
+        data.GUN_BulletsInMagazine = Shooting.Capacity.MagazineCapacity;
+        data.GUN_FiringMode = 0;
+    }
 }
