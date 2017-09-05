@@ -6,7 +6,8 @@ using UnityEngine;
 
 public class TileMeshes : MonoBehaviour
 {
-    public Mesh Plane, Cube;
+    public Mesh Quad, Cube;
+    public Material LitSprite;
 
     public static TileMeshes Instance;
 

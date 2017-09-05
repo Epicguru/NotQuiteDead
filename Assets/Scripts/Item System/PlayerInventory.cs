@@ -23,7 +23,7 @@ public class PlayerInventory : MonoBehaviour
 
     public void Update()
     {
-        if (InputManager.InputDown("Inventory"))
+        if (InputManager.InputDown("Inventory", true))
         {
             if (inv.Inventory.gameObject.activeSelf)
             {

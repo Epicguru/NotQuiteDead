@@ -16,6 +16,7 @@ public class Player : NetworkBehaviour
     public NetworkIdentity NetworkIdentity;
     public Health Health;
     public PlayerNetUtils NetUtils;
+    public SpriteLighting Lighting;
     public Player _Player;
 
     public static Player Local;

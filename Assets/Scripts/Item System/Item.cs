@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(ItemPickup), typeof(NetworkTransform))]
+[RequireComponent(typeof(ItemPickup), typeof(NetworkTransform), typeof(SpriteLighting))]
 public class Item : NetworkBehaviour
 {
 
@@ -48,12 +48,14 @@ public class Item : NetworkBehaviour
     [SyncVar]
     private GameObject PlayerHolding;
     [HideInInspector] public ItemPickup pickup;
+    [HideInInspector] public SpriteLighting Lighting;
     private string currentLayer;
 
     public void Start()
     {
         netTransform = GetComponent<NetworkTransform>();
         pickup = GetComponent<ItemPickup>();
+        Lighting = GetComponent<SpriteLighting>();
     }
 
     public void SetLayer(string layer)
@@ -64,6 +66,7 @@ public class Item : NetworkBehaviour
         {
             r.sortingLayerName = layer;
         }
+        currentLayer = layer;
     }
 
     public ItemOption[] CreateOptions()

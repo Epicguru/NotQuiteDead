@@ -12,7 +12,9 @@ public class GunShooting : NetworkBehaviour
     public Transform DefaultBulletSpawn;
     public GunDamage Damage;
     public GunCapacity Capacity;
+    public ShellData Shells;
     public GunAudio Audio;
+    public FiringMode[] AllowedModes = new FiringMode[] { FiringMode.SEMI };
     [HideInInspector] public AudioSource AudioSource;
 
     //[HideInInspector]
@@ -31,6 +33,8 @@ public class GunShooting : NetworkBehaviour
     [Range(0f, 1f)]
     private float shotInaccuracy;
 
+    private int firingModeIndex = 0;
+
     public virtual void Start()
     {
         gun = GetComponent<Gun>();
@@ -48,6 +52,9 @@ public class GunShooting : NetworkBehaviour
         // TODO FIXME!
 
         bulletsInMagazine = Capacity.MagazineCapacity;
+
+        if (AllowedModes.Length == 0)
+            throw new System.Exception("No allowed firing modes on " + gun.Item.Name);
     }
 
     public virtual void Update()
@@ -58,6 +65,14 @@ public class GunShooting : NetworkBehaviour
         // Shooting...
         if (!hasAuthority || gun.Item == null || !gun.Item.IsEquipped())
             return; // Owner only...
+
+        // Change firing mode...
+        if(InputManager.InputDown("Firing Mode"))
+        {
+            NextFiringMode();
+        }
+
+        FiringMode = AllowedModes[firingModeIndex];
 
         bool requestingShoot = ShootNow();
         bool ready = animation.IsAiming && bulletInChamber && !animation.IsDropped && !animation.IsChambering && !animation.IsReloading;
@@ -81,6 +96,13 @@ public class GunShooting : NetworkBehaviour
         }
 
         UpdateInaccuracy();
+    }
+
+    public void NextFiringMode()
+    {
+        firingModeIndex++;
+        if (firingModeIndex == AllowedModes.Length)
+            firingModeIndex = 0;
     }
 
     public float GetCurrentInaccuracy()
@@ -205,6 +227,10 @@ public class GunShooting : NetworkBehaviour
         // Play audio
         PlayLocalShot();
 
+        // Spwan shell, if enabled.
+        if(Shells.SpawnOnShoot)
+            SpawnShell();
+
         if (!hasAuthority)
             return;
 
@@ -225,6 +251,22 @@ public class GunShooting : NetworkBehaviour
             bulletsInMagazine -= Capacity.BulletsConsumed;
             bulletInChamber = true;
         }
+    }
+
+    public void SpawnShell()
+    {
+        if (Shells.ShellSpawn == null || Shells.Sprite == null)
+            return;
+
+        GameObject shell = ObjectPool.Instantiate(ShellPrefabs.Prefab, PoolType.BULLET_SHELL);
+        shell.transform.position = Shells.ShellSpawn.transform.position;
+        shell.transform.rotation = Shells.ShellSpawn.transform.rotation;
+
+        float m = GetComponentInParent<PlayerDirection>().Right ? 1 : -1;
+        Vector3 vel = new Vector2(Shells.Velocity.x * m, Shells.Velocity.y);
+        vel.x += (Random.Range(-vel.x * Shells.Random / 2f, vel.x * Shells.Random / 2f));
+        vel.y += (Random.Range(-vel.y * Shells.Random / 2f, vel.y * Shells.Random / 2f));
+        shell.GetComponent<GunShell>().Init(Shells.Sprite, vel, Shells.Gravity, Shells.Rotation * m + (Random.Range(-Shells.Rotation * Shells.Random / 2f, Shells.Rotation * Shells.Random / 2f)), Shells.Time, m != 1);
     }
 
     private void PlayLocalShot()
@@ -269,6 +311,11 @@ public class GunShooting : NetworkBehaviour
 
         // TODO improve me.
         bulletsInMagazine = Capacity.MagazineCapacity;
+    }
+
+    public void FromAnimSpawnShell()
+    {
+        SpawnShell();
     }
 
     public void ShootBullets()
@@ -417,7 +464,7 @@ public class GunShooting : NetworkBehaviour
             if (penetrationCount >= Damage.Penetration)
                 trailEnd.Set(hit.point.x, hit.point.y);
 
-            Debug.Log("Hit object, can penetrate :" + h.CanPenetrate);
+            //Debug.Log("Hit object, can penetrate :" + h.CanPenetrate);
 
             if (!h.CanPenetrate)
             {

@@ -6,5 +6,6 @@ using System.Text;
 public enum PoolType
 {
     MUZZLE_FLASH,
-    BULLET_PATH
+    BULLET_PATH,
+    BULLET_SHELL
 }

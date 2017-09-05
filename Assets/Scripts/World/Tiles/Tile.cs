@@ -25,19 +25,16 @@ public class Tile : MonoBehaviour
         mesh   = GetComponentInChildren<MeshRenderer>(true);
 
         transform.position = new Vector3(transform.position.x, transform.position.y, 2);
-
-        GetComponentsInChildren<Transform>()[1].transform.rotation = Quaternion.Euler(-90, 0, 0);     // TODO fixme!
+        transform.localScale = new Vector3(1, 1, 1);
         GetComponentsInChildren<Transform>()[1].transform.localPosition = new Vector3(0, 0, IsSolid ? -0.5f : 0);    // TODO fixme!
 
         if (IsSolid)
         {
-            transform.localScale = new Vector3(1, 1, 1);
             filter.mesh = TileMeshes.Instance.Cube;
         }
         else
         {
-            transform.localScale = new Vector3(0.1f, 0.1f, 1);
-            filter.mesh = TileMeshes.Instance.Plane;
+            filter.mesh = TileMeshes.Instance.Quad;
         }
 
         mesh.sharedMaterial.mainTexture = sprite.texture;

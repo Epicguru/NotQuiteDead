@@ -8,7 +8,7 @@ public class GunAnimationCallbacks : ItemAnimationCallback
 {
     private Gun gun;
 
-    public void Start()
+    private void Start()
     {
         gun = GetComponentInParent<Gun>();
     }
@@ -31,5 +31,10 @@ public class GunAnimationCallbacks : ItemAnimationCallback
     public void EquipEnd()
     {
         gun.Animation.CallbackEquipEnd();
+    }
+
+    public void SpawnShell()
+    {
+        gun.Animation.CallbackSpawnShell();
     }
 }

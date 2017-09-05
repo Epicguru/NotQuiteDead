@@ -59,7 +59,7 @@ public class PlayerHolding : NetworkBehaviour
 
         RpcSetItem(created.gameObject, localPlayer);
 
-        Debug.Log("Created item!");
+        //Debug.Log("Created item!");
     }
 
     [ClientRpc]

@@ -43,10 +43,13 @@ public class CommandInput : MonoBehaviour {
                 input.text = "";
                 EventSystem.current.SetSelectedGameObject(input.gameObject, null);
                 input.ActivateInputField();
+                InputManager.Active = false;
+            }
+            else
+            {
+                InputManager.Active = true;
             }
         }
-
-        InputManager.Active = !Open;
 
         float closedX = -Screen.width - 100;
 

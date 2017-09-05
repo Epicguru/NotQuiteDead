@@ -196,11 +196,11 @@ public class GunAnimation : NetworkBehaviour
             // Cause local animation.
             animator.SetTrigger(Reload);
 
-            Debug.Log("Triggered reload!");
+            //Debug.Log("Triggered reload!");
         }
         else
         {
-            Debug.Log("Doing a recursive reload!");
+            //Debug.Log("Doing a recursive reload!");
             AnimReload(true); // Set the recursive state.
             animator.SetBool(Reload, true); // Apply local state.
         }
@@ -243,6 +243,7 @@ public class GunAnimation : NetworkBehaviour
 
     public void CallbackChamberEnd()
     {
+        //Debug.Log("Chamberiung... " + hasAuthority);
         if (!hasAuthority)
             return;
 
@@ -265,5 +266,10 @@ public class GunAnimation : NetworkBehaviour
             return;
 
         IsEquipping = false;
+    }
+
+    public void CallbackSpawnShell()
+    {
+        gun.Shooting.FromAnimSpawnShell();
     }
 }

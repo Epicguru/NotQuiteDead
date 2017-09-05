@@ -27,4 +27,10 @@ public class PlayerNetUtils : NetworkBehaviour
     {
         gate.GetComponent<Gate>().IsOpen = open;
     }
+
+    [Command]
+    public void CmdToggleTorch(GameObject torch, bool active)
+    {
+        torch.GetComponent<Torch>().Active = active;
+    }
 }

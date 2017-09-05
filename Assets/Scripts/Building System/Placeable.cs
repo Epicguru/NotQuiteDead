@@ -28,6 +28,8 @@ public class Placeable : NetworkBehaviour
         Health = GetComponent<Health>();
         Preview = GetComponent<PlaceablePreview>();
 
+        Item.Lighting.Exceptions = Preview.Preview.transform.GetComponentsInChildren<SpriteRenderer>(true);
+
         if(isServer)
             Health.UponDeathServer += UponDeathServer;
     }

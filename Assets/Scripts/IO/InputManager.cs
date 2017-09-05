@@ -37,6 +37,7 @@ public static class InputManager
         defaultKeyBindings.Add("Shoot", KeyCode.Mouse0);
         defaultKeyBindings.Add("Aim", KeyCode.Mouse1);
         defaultKeyBindings.Add("Reload", KeyCode.R);
+        defaultKeyBindings.Add("Firing Mode", KeyCode.X);
 
         // Inventory
         defaultKeyBindings.Add("Inventory", KeyCode.Tab);
