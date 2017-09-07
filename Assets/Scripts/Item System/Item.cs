@@ -166,7 +166,7 @@ public class Item : NetworkBehaviour
                 this.equiped = true;
                 this.PlayerHolding = player;
 
-                Debug.Log("Item '" + Name + "' equipped to '" + player.name + "'");
+                //Debug.Log("Item '" + Name + "' equipped to '" + player.name + "'");
             }
         }
         else

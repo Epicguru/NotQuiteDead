@@ -13,7 +13,6 @@ public class TileMeshes : MonoBehaviour
 
     public void Awake()
     {
-        Debug.Log("Awake!");
         Instance = this;
     }
 }

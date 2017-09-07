@@ -48,12 +48,11 @@ public class PlayerHolding : NetworkBehaviour
         }
 
         Item created = Item.NewInstance(prefab);
-        created.Data = data; // This should sync.
         if(data == null)
         {
             data = new ItemData();
-            data.Flag = 1;
         }
+        created.Data = data; // This should sync.
         // Data is applied upon 'Start'
 
         // Assuming that this item has not been spawned...
@@ -72,19 +71,30 @@ public class PlayerHolding : NetworkBehaviour
     [ClientRpc]
     public void RpcSetItem(GameObject item, GameObject player)
     {
-        if(this.Item != null)
-        {
-            // Put in inventory.
-            CmdDrop(false, false, Player.Local.gameObject, this.Item.Data);
-            Debug.Log("Already holding item, put away...");
+        // Called on all clients.        
+       if(this.Item != null)
+       {
+            if (player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)
+            {
+                // Put in inventory
+                this.Item.RequestDataUpdate(); // Refresh data.
+                PlayerInventory.Add(this.Item);
+            }
+            Destroy(this.Item.gameObject); // Destroy on all clients...
         }
+
+        EquipItemLocal(item, player);
+    }
+
+    private void EquipItemLocal(GameObject item, GameObject player)
+    {
         this.Item = item.GetComponent<Item>();
         Debug.Log("Equipped item '" + this.Item.Name + "'");
 
         // Check if is gun and is local player
-        if(player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)
+        if (player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)
         {
-            if(item.GetComponent<Gun>() != null)
+            if (item.GetComponent<Gun>() != null)
             {
                 // Is gun!
                 GunHUD.Instance.SetHolding(item.GetComponent<Gun>());

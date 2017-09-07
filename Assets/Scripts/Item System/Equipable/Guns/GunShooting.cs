@@ -476,31 +476,30 @@ public class GunShooting : NetworkBehaviour
         GameObject GO = ObjectPool.Instantiate(GunEffects.Instance.BulletTrail.gameObject, PoolType.BULLET_PATH);
         GO.GetComponent<BulletPath>().Setup(GetBulletSpawn().position, trailEnd);
 
-        CmdSpawnVisual(GetBulletSpawn().position, trailEnd);
+        CmdSpawnBulletTrail(GetBulletSpawn().position, trailEnd);
 
         objects.Clear();
     }
 
     [Command]
-    private void CmdHitObject(GameObject obj, string dealer, float health)
+    public void CmdSpawnBulletTrail(Vector2 start, Vector2 end)
     {
-        obj.GetComponent<Health>().CmdDamage(health, dealer, false);
-    }
-
-    [Command]
-    private void CmdSpawnVisual(Vector2 start, Vector2 end)
-    {
-        RpcSpawnVisual(start, end);
+        RpcSpawnBulletTrail(start, end);
     }
 
     [ClientRpc]
-    private void RpcSpawnVisual(Vector2 start, Vector2 end)
+    private void RpcSpawnBulletTrail(Vector2 start, Vector2 end)
     {
-        if (!hasAuthority)
-        {
-            GameObject GO = Instantiate(GunEffects.Instance.BulletTrail.gameObject);
-            GO.GetComponent<BulletPath>().Setup(start, end);
-        }
+        if (hasAuthority)
+            return;
+        GameObject GO = Instantiate(GunEffects.Instance.BulletTrail.gameObject);
+        GO.GetComponent<BulletPath>().Setup(start, end);
+    }
+
+    [Command]
+    private void CmdHitObject(GameObject obj, string dealer, float health)
+    {
+        obj.GetComponent<Health>().ServerDamage(health, dealer, false);
     }
 
     private Vector2 myPos = new Vector2();

@@ -70,6 +70,12 @@ public class Health : NetworkBehaviour {
     [Command]
     public void CmdDamage(float damage, string dealer, bool isSecondary)
     {
+        ServerDamage(damage, dealer, isSecondary);
+    }
+
+    [Server]
+    public void ServerDamage(float damage, string dealer, bool isSecondary)
+    {
         if (!CanHit)
             return;
 

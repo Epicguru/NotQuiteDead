@@ -14,8 +14,12 @@ public class BoltActionShooting : GunShooting
         GetComponent<GunAnimation>().IsRecursive = true;
         gun2 = GetComponent<Gun>();
         Capacity.ChamberCountsAsMag = true; // No chambering.
-        bulletsInMagazine--; // Base script fills magazine
-        bulletInChamber = true; // Otherwise it will never start shooting...
+    }
+
+    public void SetDataDefaults(ItemData data)
+    {
+        data.GUN_BulletInChamber = true;
+        data.GUN_BulletsInMagazine--;
     }
 
     public override void FromAnimShoot()

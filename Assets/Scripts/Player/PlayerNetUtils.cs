@@ -34,4 +34,23 @@ public class PlayerNetUtils : NetworkBehaviour
     {
         torch.GetComponent<Torch>().Active = active;
     }
+
+    [Command]
+    public void CmdDamageHealth(GameObject target, float health, string dealer, bool isSecondary)
+    {
+        target.GetComponent<Health>().ServerDamage(health, dealer, isSecondary);
+    }
+
+    [Command]
+    public void CmdSpawnBulletTrail(Vector2 start, Vector2 end)
+    {
+        RpcSpawnBulletTrail(start, end);
+    }
+
+    [ClientRpc]
+    private void RpcSpawnBulletTrail(Vector2 start, Vector2 end)
+    {
+        GameObject GO = Instantiate(GunEffects.Instance.BulletTrail.gameObject);
+        GO.GetComponent<BulletPath>().Setup(start, end);
+    }
 }
