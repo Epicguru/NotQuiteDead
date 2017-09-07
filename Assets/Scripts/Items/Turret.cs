@@ -57,7 +57,7 @@ public class Turret : NetworkBehaviour {
         UpdateColour(aiming);
     }
 
-    public void OnDrawGizmos()
+    public void OnDrawGizmosSelected()
     {
         Gizmos.DrawWireSphere(transform.position, MaxRange);     
     }
