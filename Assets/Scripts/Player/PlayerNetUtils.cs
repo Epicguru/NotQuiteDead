@@ -12,6 +12,8 @@ public class PlayerNetUtils : NetworkBehaviour
     {
         Item newItem = Item.NewInstance(prefab);
         newItem.transform.position = position; // Set position.
+        if (data == null)
+            data = new ItemData();
         newItem.Data = data;
 
         NetworkServer.Spawn(newItem.gameObject);
@@ -52,5 +54,19 @@ public class PlayerNetUtils : NetworkBehaviour
     {
         GameObject GO = Instantiate(GunEffects.Instance.BulletTrail.gameObject);
         GO.GetComponent<BulletPath>().Setup(start, end);
+    }
+
+    [Command]
+    public void CmdSpawnExplosion(Vector2 position)
+    {
+        RpcSpawnExplosion(position);
+    }
+
+    [ClientRpc]
+    private void RpcSpawnExplosion(Vector2 position)
+    {
+        GameObject x = ObjectPool.Instantiate(ExplosionPrefab.Prefab, PoolType.EXPLOSION);
+
+        x.transform.position = position;
     }
 }
