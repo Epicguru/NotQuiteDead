@@ -89,7 +89,7 @@ public class PlayerHolding : NetworkBehaviour
     private void EquipItemLocal(GameObject item, GameObject player)
     {
         this.Item = item.GetComponent<Item>();
-        Debug.Log("Equipped item '" + this.Item.Name + "'");
+        //Debug.Log("Equipped item '" + this.Item.Name + "'");
 
         // Check if is gun and is local player
         if (player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)

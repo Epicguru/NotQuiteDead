@@ -9,6 +9,7 @@ public class ItemOptionsPanel : MonoBehaviour
 {
     public GameObject Prefab;
     public Transform Parent;
+    public float Width = 250f;
 
     private const float START_Y = -40f;
     private const float INCREMENT = -30f;
@@ -28,7 +29,7 @@ public class ItemOptionsPanel : MonoBehaviour
         if (last != null)
             return;
 
-        ItemOption[] options = item.Item.CreateOptions();
+        ItemOption[] options = item.Item.CreateOptions(item.Data);
 
         //Debug.Log(item.Item.Name + " has " + options.Length + " options.");
 
@@ -57,10 +58,10 @@ public class ItemOptionsPanel : MonoBehaviour
 
         (Parent.GetComponent<Transform>() as RectTransform).anchoredPosition = Input.mousePosition;
         float height = (START_Y + INCREMENT * options.Length) * -1f + 2.5f;
-        (Parent.GetComponent<Transform>() as RectTransform).sizeDelta = new Vector2(130, height);
+        (Parent.GetComponent<Transform>() as RectTransform).sizeDelta = new Vector2(Width, height);
         Vector2 pos = (Parent.GetComponent<Transform>() as RectTransform).anchoredPosition;
-        if (Input.mousePosition.x + 120 > Screen.width)
-            pos.x = Screen.width - 120;
+        if (Input.mousePosition.x + Width > Screen.width)
+            pos.x = Screen.width - Width;
         if (Input.mousePosition.y - height < 0)
             pos.y = height;
 

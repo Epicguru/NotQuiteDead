@@ -86,16 +86,33 @@ public class Item : NetworkBehaviour
         currentLayer = layer;
     }
 
-    public ItemOption[] CreateOptions()
+    public ItemOption[] CreateOptions(ItemData data)
     {
-        ItemOption[] Options = new ItemOption[]
+        List<ItemOption> options = new List<ItemOption>();
+        options.Add(new ItemOption() { OptionName = "Drop", OnSelected = Option_Drop });
+        if(Equipable)
+            options.Add(new ItemOption() { OptionName = "Equip", OnSelected = Option_Equip });
+        options.Add(new ItemOption() { OptionName = "Details", OnSelected = Option_Details });
+        if (GetComponent<Attachment>() != null && Player.Local.Holding.Item != null && Player.Local.Holding.Item.GetComponent<GunAttachments>() != null)
+            options.Add(new ItemOption() { OptionName = "Put On Current Weapon", OnSelected = Option_ApplyAttachment });
+        if (!string.IsNullOrEmpty(data.GUN_Magazine))
         {
-            new ItemOption() { OptionName = "Drop", OnSelected = Option_Drop},
-            new ItemOption() { OptionName = "Equip", OnSelected = Option_Equip},
-            new ItemOption() { OptionName = "Details", OnSelected = Option_Details}
-        };
+            options.Add(new ItemOption() { OptionName = "Detach " + data.GUN_Magazine, OnSelected = Option_RemoveMagazine });
+        }
+        if (!string.IsNullOrEmpty(data.GUN_Muzzle))
+        {
+            options.Add(new ItemOption() { OptionName = "Detach " + data.GUN_Muzzle, OnSelected = Option_RemoveMuzzle });
+        }
+        if (!string.IsNullOrEmpty(data.GUN_Sight))
+        {
+            options.Add(new ItemOption() { OptionName = "Detach " + data.GUN_Sight, OnSelected = Option_RemoveSight });
+        }
+        if (!string.IsNullOrEmpty(data.GUN_UnderBarrel))
+        {
+            options.Add(new ItemOption() { OptionName = "Detach " + data.GUN_UnderBarrel, OnSelected = Option_RemoveUnderBarrel });
+        }
 
-        return Options;
+        return options.ToArray();
     }
 
     public void Update()
@@ -207,6 +224,11 @@ public class Item : NetworkBehaviour
         {
             NetworkManager.singleton.spawnPrefabs.Add(i.gameObject);
         }
+
+        foreach (ThrowableInstance t in Resources.LoadAll<ThrowableInstance>("Items/"))
+        {
+            NetworkManager.singleton.spawnPrefabs.Add(t.gameObject);
+        }
     }
 
     /// <summary>
@@ -237,6 +259,11 @@ public class Item : NetworkBehaviour
     public static void Option_Equip(InventoryItem x)
     {
         ItemData d = x.Data;
+        if(d == null)
+        {
+            d = new ItemData();
+        }
+        x.Data = d;
         x.Inventory.RemoveItem(x, Vector2.zero, false); // Remove, do not drop.
         Player.Local.Holding.CmdEquip(x.Item.Prefab, Player.Local.gameObject, d);
     }
@@ -249,5 +276,54 @@ public class Item : NetworkBehaviour
     public static void Option_Details(InventoryItem x)
     {
         x.Inventory.DetailsView.Enter(x);
+    }
+
+    public static void Option_ApplyAttachment(InventoryItem x)
+    {
+        // Set attachment...
+        bool worked = Player.Local.Holding.Item.GetComponent<GunAttachments>().SetAttachment(x.Item.GetComponent<Attachment>().Type, x.Item);
+        // Remove from inventory
+        if(worked)
+            x.Inventory.RemoveItem(x, Vector2.zero, false, 1);
+    }
+
+    public static void Option_RemoveMagazine(InventoryItem x)
+    {
+        // Remove attachment...
+        string old = x.Data.GUN_Magazine;
+        x.Data.GUN_Magazine = null;
+
+        // Give item back to player!
+        x.Inventory.AddItem(Item.FindItem(old), 1);
+    }
+
+    public static void Option_RemoveMuzzle(InventoryItem x)
+    {
+        // Remove attachment...
+        string old = x.Data.GUN_Muzzle;
+        x.Data.GUN_Muzzle = null;
+
+        // Give item back to player!
+        x.Inventory.AddItem(Item.FindItem(old), 1);
+    }
+
+    public static void Option_RemoveSight(InventoryItem x)
+    {
+        // Remove attachment...
+        string old = x.Data.GUN_Sight;
+        x.Data.GUN_Sight = null;
+
+        // Give item back to player!
+        x.Inventory.AddItem(Item.FindItem(old), 1);
+    }
+
+    public static void Option_RemoveUnderBarrel(InventoryItem x)
+    {
+        // Remove attachment...
+        string old = x.Data.GUN_UnderBarrel;
+        x.Data.GUN_UnderBarrel = null;
+
+        // Give item back to player!
+        x.Inventory.AddItem(Item.FindItem(old), 1);
     }
 }

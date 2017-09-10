@@ -58,6 +58,15 @@ public class InventoryDetailsView : MonoBehaviour
             description += RichText.InBold("Damage Falloff - ") + (int)(damage.DamageFalloff * 100f) + "%\n";
         }
 
+        if(item.Item.GetComponent<Attachment>() != null)
+        {
+            description += RichText.InBold("Effects:") + "\n";
+            foreach(AttachmentTweak t in item.Item.GetComponents<AttachmentTweak>())
+            {
+                description += RichText.InBold(" -") + t.GetEffects() + "\n";
+            }
+        }
+
         description += "\n";
 
         description += RichText.InColour(RichText.InItalics(item.Item.Description.ShortDescription), Color.black) + "\n\n";

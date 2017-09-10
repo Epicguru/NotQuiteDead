@@ -203,6 +203,18 @@ public class GunShooting : NetworkBehaviour
     public Transform GetBulletSpawn()
     {
         // Default position.
+
+        // Check for bullet spawin in muzzle attachment.
+        if(gun.Attachments.MuzzleMount != null && gun.Attachments.MuzzleMount.childCount > 0)
+        {
+            Attachment a = gun.Attachments.MuzzleMount.GetChild(0).GetComponent<Attachment>();
+            if (a != null)
+            {
+                if (a.BulletSpawn != null)
+                    return a.BulletSpawn;
+            }
+        }
+
         return DefaultBulletSpawn;
     }
 

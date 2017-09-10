@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(GunAiming), typeof(GunAnimation), typeof(GunShooting))]
+[RequireComponent(typeof(GunAttachments))]
 public class Gun : Weapon
 {
     /*
@@ -18,6 +19,7 @@ public class Gun : Weapon
     [HideInInspector] public GunAnimation Animation;
     [HideInInspector] public GunShooting Shooting;
     [HideInInspector] public Item Item;
+    [HideInInspector] public GunAttachments Attachments;
 
     public void Start()
     {
@@ -27,6 +29,7 @@ public class Gun : Weapon
         Animation = GetComponent<GunAnimation>();
         Shooting = GetComponent<GunShooting>();
         Item = GetComponent<Item>();
+        Attachments = GetComponent<GunAttachments>();
 
         if(GetComponentInChildren<GunAnimationCallbacks>() == null)
         {
