@@ -124,6 +124,8 @@ public class GunAttachments : NetworkBehaviour
     {
         bool correctType = attachment.Type == type;
         bool hasMount = GetMountFor(type) != null;
+        if (type == AttachmentType.MAGAZINE && !AllowMagazine)
+            return false;
 
         return correctType && hasMount;
     }
