@@ -41,7 +41,7 @@ public class Gun : Weapon
     public void Update()
     {
         if(isClient && hasAuthority)
-            Animation.AnimRun(Item.IsEquipped() && InputManager.InputPressed("Sprint"));
+            Animation.AnimRun(Item.IsEquipped() && InputManager.InputPressed("Sprint") && Player.Local.GetComponent<Rigidbody2D>().velocity != Vector2.zero);
     }
 
     public void UpdateData(ItemData data)

@@ -44,7 +44,7 @@ public class InventoryDetailsView : MonoBehaviour
             description += RichText.InBold("Damage - ") + damage.Damage;
             if (damage.BulletsShareDamage && capacity.BulletsPerShot.y > 1)
             {
-                description += "total over " + capacity.BulletsPerShot.x + " to " + capacity.BulletsPerShot.y + " projectiles per shot";
+                description += " total over " + ((capacity.BulletsPerShot.x == capacity.BulletsPerShot.y) ? capacity.BulletsPerShot.x + "" : (capacity.BulletsPerShot.x + "-" + capacity.BulletsPerShot.y)) + " projectiles per shot";
             }
             description += "\n";
             description += RichText.InBold("Range - ") + damage.Range + "\n";

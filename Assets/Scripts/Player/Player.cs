@@ -12,10 +12,11 @@ public class Player : NetworkBehaviour
     public PlayerHolding Holding;
     public PlayerLooking Looking;
     public PlayerMovement Movement;
+    public PlayerEquipment Equipment;
+    public PlayerNetUtils NetUtils;
     public HandyRemoval HandyRemoval;
     public NetworkIdentity NetworkIdentity;
     public Health Health;
-    public PlayerNetUtils NetUtils;
     public SpriteLighting Lighting;
     public Player _Player;
 
@@ -23,7 +24,6 @@ public class Player : NetworkBehaviour
 
     public void Start()
     {
-
         if (isLocalPlayer)
         {
             Local = this;
@@ -51,7 +51,14 @@ public class Player : NetworkBehaviour
         Health.CmdHeal(Health.GetMaxHealth());
         transform.position = Vector3.zero;
         Debug.Log("Player died:");
-        Debug.Log("Local player was " + Health.GetDamageReport("killed"));
+        string report = Health.GetDamageReport("killed");
+        Debug.Log("Local player was " + report);
+
+        // TODO NETWORK ME!!!
+        //Player.Local.NetUtils.CmdAddToFeed("Player X was " + report);
+
+        // This needs fixing...
+        KillFeed.Instance.ServerAddText("You were " + report);
     }
 
     /// <summary>

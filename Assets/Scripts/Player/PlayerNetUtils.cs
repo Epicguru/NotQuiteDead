@@ -69,4 +69,16 @@ public class PlayerNetUtils : NetworkBehaviour
 
         x.transform.position = position;
     }
+
+    [Command]
+    public void CmdAddToFeed(string newText)
+    {
+        KillFeed.Instance.ServerAddText(newText);
+    }
+
+    [Command]
+    public void CmdClearFeed()
+    {
+        KillFeed.Instance.ServerClear();
+    }
 }

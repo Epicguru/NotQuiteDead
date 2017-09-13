@@ -44,6 +44,7 @@ public class Item : NetworkBehaviour
 
     [Tooltip("Current item data.")]
     [SyncVar]
+    [HideInInspector]
     public ItemData Data;
 
     [SyncVar]
@@ -253,6 +254,11 @@ public class Item : NetworkBehaviour
     {
         if (Items == null)
             LoadItems();
+        if (!Items.ContainsKey(prefab))
+        {
+            Debug.LogError("Item not found! '" + prefab + "'");
+            return null;
+        }
         return Items[prefab];
     }
 
