@@ -72,13 +72,13 @@ public class PlayerHolding : NetworkBehaviour
     public void RpcSetItem(GameObject item, GameObject player)
     {
         // Called on all clients.        
-       if(this.Item != null)
+       if(this.Item != null) // IF HOLDING ITEM!
        {
-            if (player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)
+            if (player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId) // IF IS LOCAL PLAYER
             {
                 // Put in inventory
                 this.Item.RequestDataUpdate(); // Refresh data.
-                PlayerInventory.Add(this.Item);
+                PlayerInventory.Add(this.Item.Prefab, this.Item.Data, 1);
             }
             Destroy(this.Item.gameObject); // Destroy on all clients...
         }
@@ -91,9 +91,12 @@ public class PlayerHolding : NetworkBehaviour
         this.Item = item.GetComponent<Item>();
         //Debug.Log("Equipped item '" + this.Item.Name + "'");
 
-        // Check if is gun and is local player
+        // Check if is local player
         if (player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)
         {
+            // Is local player!
+            // Set inventory state...
+            GearItem.GearItems["Hands"].SetItem(this.Item);
             if (item.GetComponent<Gun>() != null)
             {
                 // Is gun!
@@ -115,23 +118,44 @@ public class PlayerHolding : NetworkBehaviour
         {
             // Completely destroy.
             Destroy(this.Item.gameObject); // Does this work!?!?
+            RpcDrop(localPlayer);
             return;
         }
 
         if (!drop)
         {
             // Put in inventory.
-            this.Item.RequestDataUpdate(); // Refresh data.
-            PlayerInventory.Add(this.Item);
+            RpcGiveItem(localPlayer, this.Item.Prefab, data);
             Destroy(this.Item.gameObject); // Does this work!?!?
         }
         else
         {
             // Drop item
-            Player.Local.NetUtils.CmdSpawnDroppedItem(Item.Prefab, Player.Local.transform.position, data);
+            Player.Local.NetUtils.CmdSpawnDroppedItem(this.Item.Prefab, localPlayer.transform.position, data);
             Destroy(this.Item.gameObject); // Does this work!?!?
         }
+        RpcDrop(localPlayer);
+    }
 
+    [ClientRpc]
+    private void RpcGiveItem(GameObject player, string itemPrefab, ItemData data)
+    {
+        if(player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)
+        {
+            PlayerInventory.Add(itemPrefab, data, 1);
+        }
+    }
+
+    [ClientRpc]
+    private void RpcDrop(GameObject player)
+    {
+        // Called on all clients when any kind of drop command is called!
+
+        // Inventiory state!
+        if(player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)
+        {
+            GearItem.GearItems["Hands"].SetItem(null); // Set no item equipped.
+        }
     }
 
     public void Update()

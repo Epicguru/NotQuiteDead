@@ -27,7 +27,7 @@ public class GiveOneCommand : Command
         if (prefab == null)
             return "Could not find item: '" + itemName + "'";
 
-        PlayerInventory.Add(prefab, amount);
+        PlayerInventory.Add(prefab.Prefab, null, amount);
         CommandProcessing.Log("Gave local player '" + prefab.Name + "' x" + amount);
 
         return null;

@@ -14,6 +14,12 @@ public class TurretLaserLength : MonoBehaviour {
 
     public void Update()
     {
+        if (!Turret.Placeable.IsPlaced)
+        {
+            SetLength(0);
+            return;
+        }
+
         // Raycast...
         hits = Physics2D.RaycastAll(transform.position, transform.up, Turret.MaxRange);
         Debug.DrawRay(transform.position, transform.up * Turret.MaxRange, Color.red);

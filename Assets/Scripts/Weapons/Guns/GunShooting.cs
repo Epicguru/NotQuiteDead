@@ -192,7 +192,7 @@ public class GunShooting : NetworkBehaviour
 
         if (!CanChamber())
         {
-            Debug.LogError("Chamber animation played, but the gun cannot chamber!");
+            //Debug.LogError("Chamber animation played, but the gun cannot chamber!");
             return;
         }
 
@@ -451,6 +451,7 @@ public class GunShooting : NetworkBehaviour
                 break;
             }
 
+            // Do not allow to hit local player : Maybe some sort of team system???
             if(h.GetComponent<Player>() != null)
             {
                 if(h.GetComponent<Player>() == Player.Local._Player)

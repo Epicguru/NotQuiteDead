@@ -86,7 +86,7 @@ public class Placeable : NetworkBehaviour
             CmdPlace(Preview.GetPosition(), Preview.GetRotation());
 
             // Remove from hands
-            GetComponentInParent<PlayerHolding>().CmdDrop(false, true, Player.Local.gameObject, Item.Data);
+            GetComponentInParent<PlayerHolding>().CmdDrop(false, true, Player.Local.gameObject, null);
 
             // TODO : Look for new one in inventory and equip.
             InventoryItem i = PlayerInventory.inv.Inventory.GetOfType(Item.Prefab);

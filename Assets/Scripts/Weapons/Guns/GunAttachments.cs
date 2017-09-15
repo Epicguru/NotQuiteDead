@@ -226,8 +226,7 @@ public class GunAttachments : NetworkBehaviour
     [ClientRpc]
     private void RpcGiveAttachmentItem(GameObject player, string prefab, int amount)
     {
-        // TODO ITEM DATA DOES NOT WORK FOR ATTACHMENTS!!!!
         if(Player.Local.NetworkIdentity.netId == player.GetComponent<NetworkIdentity>().netId)
-            PlayerInventory.Add(Item.FindItem(prefab), amount); // Add to inventory...
+            PlayerInventory.Add(prefab, null, amount); // Add to inventory...
     }
 }

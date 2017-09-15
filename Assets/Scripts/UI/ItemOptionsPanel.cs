@@ -14,7 +14,7 @@ public class ItemOptionsPanel : MonoBehaviour
     private const float START_Y = -40f;
     private const float INCREMENT = -30f;
     private List<GameObject> spawns = new List<GameObject>();
-    private Item last;
+    private bool open;
 
     public void Update()
     {
@@ -26,19 +26,31 @@ public class ItemOptionsPanel : MonoBehaviour
 
     public void Open(InventoryItem item)
     {
-        if (last != null)
+        if (open)
             return;
 
         ItemOption[] options = item.Item.CreateOptions(item.Data);
+        SetOptions(options, item);
+    }
 
-        //Debug.Log(item.Item.Name + " has " + options.Length + " options.");
+    public void Open(GearItem item)
+    {
+        if (open)
+            return;
 
-        last = item.Item;
+        item.Item.RequestDataUpdate(); // Get new data.
+        ItemOption[] options = item.GetOptions(item.Item.Data);
+        SetOptions(options, new InventoryItem() { ItemPrefab = item.Item.Prefab, ItemCount = 1, Inventory = PlayerInventory.inv.Inventory, Resize = false, Item = Item.FindItem(item.Item.Prefab), Data = item.Item.Data});
+    }
+
+    private void SetOptions(ItemOption[] options, InventoryItem item)
+    {
+        open = true;
 
         GetComponentInChildren<Text>().text = item.Item.Name + "\nOptions";
 
         int index = 0;
-        foreach(ItemOption option in options)
+        foreach (ItemOption option in options)
         {
             float y = START_Y + INCREMENT * index;
 
@@ -72,7 +84,7 @@ public class ItemOptionsPanel : MonoBehaviour
 
     public void Close()
     {
-        if (last == null)
+        if (!open)
             return;
 
         foreach(GameObject GO in spawns)
@@ -83,6 +95,6 @@ public class ItemOptionsPanel : MonoBehaviour
 
         gameObject.SetActive(false);
 
-        last = null;
+        open = false;
     }
 }

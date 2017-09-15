@@ -42,6 +42,9 @@ public static class InputManager
         // Inventory
         defaultKeyBindings.Add("Inventory", KeyCode.Tab);
         defaultKeyBindings.Add("Return", KeyCode.Escape);
+        defaultKeyBindings.Add("Quick Equip", KeyCode.LeftShift);
+        defaultKeyBindings.Add("Quick Store", KeyCode.LeftShift);
+        defaultKeyBindings.Add("Quick Drop", KeyCode.LeftControl);
 
         // Control
         defaultKeyBindings.Add("Fullscreen", KeyCode.F11);

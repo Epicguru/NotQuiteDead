@@ -23,7 +23,7 @@ public class Turret : NetworkBehaviour {
 
     public Color AimingColour, IdleColour;
 
-    private Placeable placeable;
+    [HideInInspector] public Placeable Placeable;
     private float speed;
     private float targetAngle;
     private float timer;
@@ -33,12 +33,12 @@ public class Turret : NetworkBehaviour {
 
     public void Start()
     {
-        placeable = GetComponent<Placeable>();
+        Placeable = GetComponent<Placeable>();
     }
 
     public void Update()
     {
-        if (!placeable.IsPlaced)
+        if (!Placeable.IsPlaced)
             return;
 
         bool aiming = Target != null && InRange();
@@ -161,9 +161,9 @@ public class Turret : NetworkBehaviour {
 
             if (!h.CanHit)
             {
-                // Treat as solid.
+                // Treat as ghost.
                 Player.Local.NetUtils.CmdSpawnBulletTrail(BulletSpawn.position, hit.point);
-                return;
+                continue;
             }
             if (h.CannotHit.Contains(hit.collider))
             {

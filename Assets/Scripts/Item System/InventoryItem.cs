@@ -14,6 +14,7 @@ public class InventoryItem : MonoBehaviour
     public Text Text;
     public Image Image;
     public Text Details;
+    public bool Resize = true;
 
     [Tooltip("The path to the prefab of this inventory item.")]
     public string ItemPrefab; // Used to find the item.
@@ -43,8 +44,14 @@ public class InventoryItem : MonoBehaviour
 
         this.Data = data;
 
-        Image.rectTransform.sizeDelta = new Vector2(Item.ItemIcon.texture.width > 200 ? 200 : Item.ItemIcon.texture.width, 29);
+        if(Resize)
+            Image.rectTransform.sizeDelta = new Vector2(Item.ItemIcon.texture.width > 200 ? 200 : Item.ItemIcon.texture.width, 29);
+    }
 
+    public void Start()
+    {
+        if (Item == null)
+            Init(null);
     }
 
     public void SetItemCount(int items)
@@ -65,7 +72,8 @@ public class InventoryItem : MonoBehaviour
         string quantity = ItemCount > 1 ? " x" + ItemCount : "";
         Text.text = Item.Name + quantity;
         Text.color = ItemRarityUtils.GetColour(Item.Rarity);
-        Details.text = (Item.InventoryInfo.Weight * ItemCount) + "Kg";
+        if(Details != null)
+            Details.text = (Item.InventoryInfo.Weight * ItemCount) + "Kg";
     }
 
     public void Update()
@@ -77,7 +85,21 @@ public class InventoryItem : MonoBehaviour
 
     public void Clicked()
     {
-        //Debug.Log("Clicked!");
+        // Check quick options:
+        if(Item.Equipable && InputManager.InputPressed("Quick Equip", true))
+        {
+            // Wants to quick equip, do it!
+            Item.Option_Equip(this);
+            return;
+        }
+
+        if (InputManager.InputPressed("Quick Drop", true))
+        {
+            // Wants to quick drop, do it!
+            Item.Option_Drop(this);
+            return;
+        }
+
         Inventory.Options.Open(this);
     }
 }

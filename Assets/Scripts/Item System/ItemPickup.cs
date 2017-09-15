@@ -69,7 +69,7 @@ public class ItemPickup : NetworkBehaviour
 
                     // Pick up!
                     Item.RequestDataUpdate(); // Update data.
-                    PlayerInventory.Add(Item); // Give real version with data.
+                    PlayerInventory.Add(Item.Prefab, Item.Data, 1); // Give real version with data.
                     Player.Local.NetUtils.CmdDestroyItem(this.gameObject);
                 }
             }

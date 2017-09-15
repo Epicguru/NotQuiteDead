@@ -33,7 +33,8 @@ public class GiveCommand : Command
         {
             if (!PlayerInventory.inv.Inventory.CanAdd(prefab, 1))
                 break;
-            PlayerInventory.Add(prefab, 1);
+
+            PlayerInventory.Add(prefab.Prefab, null, 1);
             given++;
         }
 

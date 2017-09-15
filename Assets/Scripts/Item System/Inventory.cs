@@ -68,8 +68,9 @@ public class Inventory : MonoBehaviour
         ViewportContent.localPosition = Vector2.zero;
     }
 
-    public InventoryItem AddItem(Item item, int amount = 1)
+    public InventoryItem AddItem(string prefab, ItemData data, int amount = 1)
     {
+        Item item = Item.FindItem(prefab);
         if (CanAdd(item, amount))
         {
             // Add this item to the inventory.
@@ -94,7 +95,7 @@ public class Inventory : MonoBehaviour
                 // Place at bottom
                 rect.localPosition = new Vector2(0, -Contents.Count * 30);
 
-                i.Init(item.Data); // Data may be null, who knows!
+                i.Init(data); // Data may be null, who knows!
 
                 // Add item
                 Contents.Add(i);

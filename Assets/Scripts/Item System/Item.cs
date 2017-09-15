@@ -44,7 +44,6 @@ public class Item : NetworkBehaviour
 
     [Tooltip("Current item data.")]
     [SyncVar]
-    [HideInInspector]
     public ItemData Data;
 
     [SyncVar]
@@ -96,6 +95,10 @@ public class Item : NetworkBehaviour
         options.Add(new ItemOption() { OptionName = "Details", OnSelected = Option_Details });
         if (GetComponent<Attachment>() != null && Player.Local.Holding.Item != null && Player.Local.Holding.Item.GetComponent<GunAttachments>() != null)
             options.Add(new ItemOption() { OptionName = "Put On Current Weapon", OnSelected = Option_ApplyAttachment });
+
+        if (data == null)
+            return options.ToArray();
+
         if (!string.IsNullOrEmpty(data.GUN_Magazine))
         {
             options.Add(new ItemOption() { OptionName = "Detach " + data.GUN_Magazine, OnSelected = Option_RemoveMagazine });
@@ -239,7 +242,6 @@ public class Item : NetworkBehaviour
     {
         // Create new instance of item.
         Item x = FindItem(prefab);
-        // TODO DATA!
         Item newItem = Instantiate(x, Vector3.zero, Quaternion.identity);
 
         return newItem;
@@ -300,7 +302,7 @@ public class Item : NetworkBehaviour
         x.Data.GUN_Magazine = null;
 
         // Give item back to player!
-        x.Inventory.AddItem(Item.FindItem(old), 1);
+        x.Inventory.AddItem(old, null, 1);
     }
 
     public static void Option_RemoveMuzzle(InventoryItem x)
@@ -310,7 +312,7 @@ public class Item : NetworkBehaviour
         x.Data.GUN_Muzzle = null;
 
         // Give item back to player!
-        x.Inventory.AddItem(Item.FindItem(old), 1);
+        x.Inventory.AddItem(old, null, 1);
     }
 
     public static void Option_RemoveSight(InventoryItem x)
@@ -320,7 +322,7 @@ public class Item : NetworkBehaviour
         x.Data.GUN_Sight = null;
 
         // Give item back to player!
-        x.Inventory.AddItem(Item.FindItem(old), 1);
+        x.Inventory.AddItem(old, null, 1);
     }
 
     public static void Option_RemoveUnderBarrel(InventoryItem x)
@@ -330,6 +332,6 @@ public class Item : NetworkBehaviour
         x.Data.GUN_UnderBarrel = null;
 
         // Give item back to player!
-        x.Inventory.AddItem(Item.FindItem(old), 1);
+        x.Inventory.AddItem(old, null, 1);
     }
 }
