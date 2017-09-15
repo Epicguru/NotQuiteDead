@@ -53,11 +53,10 @@ public class MeleeWeapon : Weapon {
                 IsDropped = true;
             return;
         }
-        if (Player.Local.Holding.Item != this.Item)
+        if (!Item.IsEquipped() || !hasAuthority)
         {
             return;
         }
-
 
         UpdateSwinging();
         if (Input.GetKeyDown(KeyCode.R))

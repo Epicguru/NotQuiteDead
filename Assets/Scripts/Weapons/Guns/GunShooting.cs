@@ -468,6 +468,12 @@ public class GunShooting : NetworkBehaviour
             if (objects.Contains(h)) // Do not allow multiple hits to one object.
                 continue;
 
+            if(hit.collider.gameObject.GetComponentInParent<Item>() != null)
+            {
+                // Is item, may be held in hands. Ignore.
+                continue;
+            }
+
             objects.Add(h);
 
             float damage = GetDamage(startPos, hit.point, penetrationCount, bullets);

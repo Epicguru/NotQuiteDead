@@ -39,9 +39,14 @@ public class MeleeAttack : NetworkBehaviour {
             foreach(Collider2D c in GetComponentsInChildren<Collider2D>())
             {
                 if (c == Collider)
-                    continue;
+                {
+                    c.enabled = true;
+                }
+                else
+                {
+                    c.enabled = false;
+                }
 
-                c.enabled = false;
             }
         }
         else
@@ -58,13 +63,13 @@ public class MeleeAttack : NetworkBehaviour {
     
     public void OnTriggerEnter2D(Collider2D c)
     {
-        if(weapon.Item.IsEquipped() && hasAuthority)
+        if(weapon.Item.IsEquipped() && hasAuthority && c.GetComponentInParent<Player>() != Player.Local)
             touching.Add(c);
     }
 
     public void OnTriggerExit2D(Collider2D c)
     {
-        if (weapon.Item.IsEquipped() && hasAuthority)
+        if (touching.Contains(c))
             touching.Remove(c);
     }
 
@@ -85,6 +90,8 @@ public class MeleeAttack : NetworkBehaviour {
         // A local version that attacks all objects touching the attacking collider.
         hitCreatures.Clear();
 
+        Debug.Log("Attacking, there are " + GetContacts().Count + " colliders!");
+
         foreach(Collider2D coll in GetContacts())
         {
             if (coll == null)
@@ -101,8 +108,11 @@ public class MeleeAttack : NetworkBehaviour {
             if (!c.CanHit)
                 continue;
 
-            if (!Damage.AllowSelfDamage && c == Player.Local.Health)
+            if (coll.gameObject.GetComponentInParent<Item>() != null)
+            {
+                // Is item, may be held in hands. Ignore.
                 continue;
+            }
 
             // Prevent a creature from being hit more that once per swing, if it has multiple colliders.
             if (!hitCreatures.Contains(c))
@@ -121,6 +131,6 @@ public class MeleeAttack : NetworkBehaviour {
         // By using a command we do not require client authority over the creature.
         // Good for hacking prevention and that kind of stuff.
         string source = "A Player" + ':' + weapon.Item.Name;
-        creature.GetComponent<Health>().CmdDamage(damage, source, false);
+        creature.GetComponent<Health>().ServerDamage(damage, source, false);
     }
 }

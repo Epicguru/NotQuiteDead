@@ -171,6 +171,12 @@ public class Turret : NetworkBehaviour {
                 continue;
             }
 
+            if (hit.collider.gameObject.GetComponentInParent<Item>() != null)
+            {
+                // Is item, may be held in hands. Ignore.
+                continue;
+            }
+
             // If we get here, deal damage!
             Player.Local.NetUtils.CmdDamageHealth(h.gameObject, Damage, "Automated Turret", false);
             Player.Local.NetUtils.CmdSpawnBulletTrail(BulletSpawn.position, hit.point);
