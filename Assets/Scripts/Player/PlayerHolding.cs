@@ -116,9 +116,11 @@ public class PlayerHolding : NetworkBehaviour
 
         if (destroy)
         {
+            Debug.Log("Destroying on server...");
             // Completely destroy.
             Destroy(this.Item.gameObject); // Does this work!?!?
             RpcDrop(localPlayer);
+            Debug.Log("Done on server!");
             return;
         }
 
@@ -150,10 +152,11 @@ public class PlayerHolding : NetworkBehaviour
     private void RpcDrop(GameObject player)
     {
         // Called on all clients when any kind of drop command is called!
-
+        Debug.Log("Called rpc drop on client...");
         // Inventiory state!
         if(player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)
         {
+            Debug.Log("Removed gear from hands!");
             GearItem.GearItems["Hands"].SetItem(null); // Set no item equipped.
         }
     }

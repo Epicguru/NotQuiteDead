@@ -38,6 +38,12 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
+    public void CmdToggleFloodlight(GameObject light, bool active)
+    {
+       light.GetComponent<Floodlight>().Active = active;
+    }
+
+    [Command]
     public void CmdDamageHealth(GameObject target, float health, string dealer, bool isSecondary)
     {
         target.GetComponent<Health>().ServerDamage(health, dealer, isSecondary);

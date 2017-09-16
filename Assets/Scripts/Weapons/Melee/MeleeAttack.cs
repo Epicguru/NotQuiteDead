@@ -13,7 +13,7 @@ public class MeleeAttack : NetworkBehaviour {
     public MeleeDamage Damage;
 
     private MeleeWeapon weapon;
-    private List<Collider2D> touching = new List<Collider2D>();
+    public List<Collider2D> touching = new List<Collider2D>();
 
     public void Start()
     {
@@ -59,18 +59,18 @@ public class MeleeAttack : NetworkBehaviour {
                     c.enabled = true;
             }
         }
-    } 
-    
-    public void OnTriggerEnter2D(Collider2D c)
-    {
-        if(weapon.Item.IsEquipped() && hasAuthority && c.GetComponentInParent<Player>() != Player.Local)
-            touching.Add(c);
     }
 
-    public void OnTriggerExit2D(Collider2D c)
+    public void FixedUpdate()
     {
-        if (touching.Contains(c))
-            touching.Remove(c);
+        // Called before physics callbacks.
+        touching.Clear();
+    }
+
+    public void OnTriggerStay2D(Collider2D c)
+    {
+        if (weapon.Item.IsEquipped() && hasAuthority && c.GetComponentInParent<Player>() != Player.Local)
+            touching.Add(c);
     }
 
     public List<Collider2D> GetContacts()
@@ -108,7 +108,7 @@ public class MeleeAttack : NetworkBehaviour {
             if (!c.CanHit)
                 continue;
 
-            if (coll.gameObject.GetComponentInParent<Item>() != null)
+            if (coll.gameObject.GetComponentInParent<Item>() != null && coll.GetComponentInParent<Placeable>() == null)
             {
                 // Is item, may be held in hands. Ignore.
                 continue;

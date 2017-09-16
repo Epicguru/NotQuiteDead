@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -27,7 +28,7 @@ public class Player : NetworkBehaviour
 
     public void Start()
     {
-        AllPlayers.Add(this);
+        Debug.Log("PLAYER!");
         if (isLocalPlayer)
         {
             Local = this;

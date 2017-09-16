@@ -10,7 +10,7 @@ public class SpriteLighting : MonoBehaviour
 
     public void Start()
     {
-        foreach(SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>())
+        foreach(SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>(true))
         {
             if (Exceptions.Contains<SpriteRenderer>(r))
                 continue;
