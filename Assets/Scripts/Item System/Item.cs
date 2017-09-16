@@ -212,8 +212,10 @@ public class Item : NetworkBehaviour
         {
             Item x = (Item)o;
             Items.Add(x.Prefab, (Item)o);
-            Debug.Log("Loaded item '" + x.Prefab + "'");
+            //Debug.Log("Loaded item '" + x.Prefab + "'");
         }
+
+        Debug.Log("Loaded " + Items.Count + " items.");
     }
 
     public static void RegisterItems()
@@ -256,6 +258,10 @@ public class Item : NetworkBehaviour
     {
         if (Items == null)
             LoadItems();
+        if (string.IsNullOrEmpty(prefab))
+        {
+            return null;
+        }
         if (!Items.ContainsKey(prefab))
         {
             Debug.LogError("Item not found! '" + prefab + "'");

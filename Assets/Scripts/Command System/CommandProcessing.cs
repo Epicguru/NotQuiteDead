@@ -35,6 +35,8 @@ public static class CommandProcessing
         commands.Add(new InventoryCommands());
         commands.Add(new PoolCommand());
         commands.Add(new ItemsCommand());
+        commands.Add(new NameCommand());
+        commands.Add(new RemoteCommand());
     }
 
     // Returns true to clear the console.
@@ -198,10 +200,29 @@ public static class CommandProcessing
         tempParts.Clear();
 
         const char stringStart = '"';
+        const char escapeChar = '\\';
         const char space = ' ';
 
+        int index = -1;
         foreach(char c in command)
         {
+            index++;
+            if(c == escapeChar)
+            {
+                continue;
+            }
+            if (index >= 1 && command[index - 1] == escapeChar)
+            {
+                bool canEscape = (c == stringStart);
+                if (!canEscape)
+                {
+                    Error("Invalid character after escape: '" + c + "'!");
+                    return null;
+                }
+                // Ignore this current symbol, and add it to the pile:
+                builder.Append(c);
+                continue;
+            }
             if(c == stringStart)
             {
                 if (!inLiteral)
@@ -248,6 +269,11 @@ public static class CommandProcessing
         {
             // Cannot end command on literal!
             Error("Cannot end command on literal! Check the quotes!");
+            return null;
+        }
+        if(command[command.Length - 1] == escapeChar)
+        {
+            Error("Cannot end command on escape char!");
             return null;
         }
 

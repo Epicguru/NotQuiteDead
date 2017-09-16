@@ -120,17 +120,17 @@ public class MeleeAttack : NetworkBehaviour {
                 hitCreatures.Add(c);
 
                 // Deal damage
-                CmdHitCreature(c.gameObject, GetDamage());
+                CmdHitCreature(c.gameObject, Player.Local.Name, GetDamage());
             }
         }
     }
 
     [Command]
-    private void CmdHitCreature(GameObject creature, float damage)
+    private void CmdHitCreature(GameObject creature, string attacker, float damage)
     {
         // By using a command we do not require client authority over the creature.
         // Good for hacking prevention and that kind of stuff.
-        string source = "A Player" + ':' + weapon.Item.Name;
+        string source = attacker + ':' + weapon.Item.Prefab;
         creature.GetComponent<Health>().ServerDamage(damage, source, false);
     }
 }

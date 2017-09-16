@@ -191,6 +191,43 @@ public class Health : NetworkBehaviour {
         return GetHealth() / GetMaxHealth();
     }
 
+    public bool IsActiveKiller()
+    {
+        return string.IsNullOrEmpty(source) ? false : source.Contains(":");
+    }
+
+    public string GetKiller()
+    {
+        if (string.IsNullOrEmpty(source))
+        {
+            return null;
+        }
+        if (source.Contains(":"))
+        {
+            return source.Split(':')[0].Trim();
+        }
+        else
+        {
+            return source.Trim();
+        }
+    }
+
+    public string GetKillerItem()
+    {
+        if (string.IsNullOrEmpty(source))
+        {
+            return null;
+        }
+        if (source.Contains(":"))
+        {
+            return source.Split(':')[1].Trim();
+        }
+        else
+        {
+            return source.Trim();
+        }
+    }
+
     public string GetDamageReport(string status)
     {
         string s = "";

@@ -5,6 +5,8 @@ using UnityEngine.Networking;
 
 public class Player : NetworkBehaviour
 {
+    [SyncVar]
+    public string Name = "Player Name";
 
     public PlayerAnimation Animation;
     public PlayerDirection Direction;
@@ -21,28 +23,55 @@ public class Player : NetworkBehaviour
     public Player _Player;
 
     public static Player Local;
+    public List<Player> AllPlayers = new List<Player>();
 
     public void Start()
     {
+        AllPlayers.Add(this);
         if (isLocalPlayer)
         {
             Local = this;
             Local._Player = this;
-            gameObject.name = "Local Player";
-
             Camera.main.GetComponent<CameraFollow>().Target = transform;
 
             Health.UponDeath += UponDeath;
-        }
-        else
-        {
-            gameObject.name = "Other Player";
         }
 
         foreach(SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>())
         {
             r.sortingLayerName = "Player";
         }
+    }
+
+    public void OnDestroy()
+    {
+        AllPlayers.Remove(this);
+    }
+
+    public Player GetPlayer(string name)
+    {
+        foreach(Player p in AllPlayers)
+        {
+            if (p.Name.Trim().ToLower() == name.Trim().ToLower())
+                return p;
+        }
+
+        return null;
+    }
+
+    public bool PlayerHasName(string name)
+    {
+        foreach (Player p in AllPlayers)
+        {
+            if (p.Name.Trim().ToLower() == name.Trim().ToLower())
+                return true;
+        }
+        return false;
+    }
+
+    public void Update()
+    {
+        gameObject.name = Name;
     }
 
     private void UponDeath()
@@ -54,11 +83,8 @@ public class Player : NetworkBehaviour
         string report = Health.GetDamageReport("killed");
         Debug.Log("Local player was " + report);
 
-        // TODO NETWORK ME!!!
-        //Player.Local.NetUtils.CmdAddToFeed("Player X was " + report);
-
-        // This needs fixing...
-        KillFeed.Instance.ServerAddText("You were " + report);
+        // Add to kill feed.
+        Player.Local.NetUtils.CmdAddKill(Health.GetKiller(), this.Name, Health.IsActiveKiller() ? Health.GetKillerItem() : null);
     }
 
     /// <summary>

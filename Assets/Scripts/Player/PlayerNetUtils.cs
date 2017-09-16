@@ -71,14 +71,39 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
-    public void CmdAddToFeed(string newText)
+    public void CmdAddKill(string killer, string killed, string item)
     {
-        KillFeed.Instance.ServerAddText(newText);
+        RpcAddKill(killer, killed, item);
+    }
+
+    [ClientRpc]
+    public void RpcAddKill(string killer, string killed, string item)
+    {
+        KillFeed.Instance.AddKill(killer, killed, item);
     }
 
     [Command]
-    public void CmdClearFeed()
+    public void CmdSetName(string name)
     {
-        KillFeed.Instance.ServerClear();
+        if (!GetComponent<Player>().PlayerHasName(name))
+            GetComponent<Player>().Name = name;
+        else
+            Debug.LogError("Cannot set player name to " + name + " because another player already has that name (or very similar).");
+    }
+
+    [Command]
+    public void CmdRemoteCommand(GameObject player, string command)
+    {
+        RpcRemoteCommand(player, Player.Local.Name, command);
+    }
+
+    [ClientRpc]
+    public void RpcRemoteCommand(GameObject player, string sender, string command)
+    {
+        if(player.GetComponent<NetworkIdentity>().netId == Player.Local.netId)
+        {
+            CommandProcessing.Log("Remote command from '" + sender + "':");
+            CommandProcessing.Process(command);
+        }
     }
 }

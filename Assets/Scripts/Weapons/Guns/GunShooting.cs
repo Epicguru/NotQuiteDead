@@ -478,7 +478,7 @@ public class GunShooting : NetworkBehaviour
 
             float damage = GetDamage(startPos, hit.point, penetrationCount, bullets);
             if (damage != 0)
-                CmdHitObject(h.gameObject, "A Player:" + gun.Item.Name, damage);
+                CmdHitObject(h.gameObject, Player.Local.Name + ":" + gun.Item.Prefab, damage);
 
             penetrationCount++;
             if (penetrationCount >= Damage.Penetration)
