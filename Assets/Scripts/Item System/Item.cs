@@ -79,7 +79,7 @@ public class Item : NetworkBehaviour
     {
         if (currentLayer == layer)
             return;
-        foreach(SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>())
+        foreach(SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>(true))
         {
             r.sortingLayerName = layer;
         }
