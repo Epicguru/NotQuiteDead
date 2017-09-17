@@ -96,8 +96,11 @@ public class Attachment : NetworkBehaviour
         // TODO - If gun is being put away, we DO NOT CARE! Just do nothing and avoid errors.
         if (applied)
         {
+            Debug.Log(Item.Name + " is being removed!");
             if (GetGun() == null)
                 return; // If gun has been destroyed!
+            Debug.Log(Item.Name + " is removing effects.");
+
             foreach (AttachmentTweak tweak in GetComponents<AttachmentTweak>())
             {
                 tweak.Remove(this);

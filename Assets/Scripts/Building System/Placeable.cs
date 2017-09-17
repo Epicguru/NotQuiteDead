@@ -117,6 +117,10 @@ public class Placeable : NetworkBehaviour
         }
 
         SetCollidersAsTriggers(!IsPlaced);
+        if(IsPlaced)
+        {
+            GetComponent<NetworkTransform>().enabled = false; // TODO better solution?
+        }
         transform.localScale = IsPlaced ? PlacedScale : ItemScale;
 
         Rigidbody.bodyType = (IsPlaced && Static) ? RigidbodyType2D.Static : RigidbodyType2D.Dynamic;

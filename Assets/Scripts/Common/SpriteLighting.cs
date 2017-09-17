@@ -15,6 +15,7 @@ public class SpriteLighting : MonoBehaviour
             if (Exceptions.Contains<SpriteRenderer>(r))
                 continue;
             r.material = TileMeshes.Instance.LitSprite;
+            r.UpdateGIMaterials();
         }
     }
 }
