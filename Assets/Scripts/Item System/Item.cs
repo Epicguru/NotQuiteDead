@@ -47,6 +47,7 @@ public class Item : NetworkBehaviour
     public ItemData Data;
 
     [SyncVar]
+    [SerializeField]
     private bool equiped = false;
     private NetworkTransform netTransform;
     [SyncVar]
