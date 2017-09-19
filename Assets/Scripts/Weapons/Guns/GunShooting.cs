@@ -27,7 +27,7 @@ public class GunShooting : NetworkBehaviour
     private new GunAnimation animation;
     private int shotsFired; // Since equipping!
     private bool inBurstFire = false; // Are we in the middle of a burst fire?
-    private int burstFireStart;
+    private int burstFireRemaining;
     private float timer;
     [SerializeField]
     [Range(0f, 1f)]
@@ -75,7 +75,30 @@ public class GunShooting : NetworkBehaviour
 
         bool requestingShoot = ShootNow();
         bool ready = animation.IsAiming && bulletInChamber && !animation.IsDropped && !animation.IsChambering && !animation.IsReloading;
-        animation.AnimShoot(requestingShoot && ready); // Pew pew!
+
+        // Problem: We tell server to shoot more than once, beucase:
+        // 1. We request one shot, one frame.
+        // 2. Shoot bool reaches server.
+        // 3. Shoot bool reaches client again...
+        // 4. The user is not longer requesting a shot - but the server doesn't know that yet!
+        // 5. The client is not updated in time, and shoots too many times.
+
+        // Solution:
+        // If in single or burst fire modes, CMD and RPC are used?
+
+        //animation.AnimShoot(requestingShoot && ready); // Pew pew!
+        if((this.FiringMode == FiringMode.SEMI || this.FiringMode == FiringMode.BURST) && requestingShoot && ready)
+        {
+            animation.CmdAnimShootOnce(this.FiringMode == FiringMode.SEMI);
+        }
+        else if(requestingShoot && ready)
+        {
+            animation.AnimShoot(true);
+        }
+        else
+        {
+            animation.AnimShoot(false);
+        }
 
         bool requestingChamber = !bulletInChamber && CanChamber();
         ready = !animation.IsChambering && !animation.IsEquipping && !animation.IsAiming;
@@ -141,40 +164,31 @@ public class GunShooting : NetworkBehaviour
                     return true;
                 break;
             case FiringMode.BURST:
-                // Shoot a salvo of bullets. Does not affect firin rate or anything like that.
-                if (!inBurstFire)
+                // Shoot a salvo of bullets. Does not affect firing rate or anything like that.
+                if (!inBurstFire && animation.SingleShotsPending == 0)
                 {
                     if (InputManager.InputDown("Shoot"))
                     {
                         // Start salvo of bullets!
                         // Check if we can shoot...
-                        if (!bulletInChamber) // Not the best test...{
+                        if (!bulletInChamber) // Not the best test...
                             return false;
 
                         inBurstFire = true;
-                        burstFireStart = shotsFired;
+                        burstFireRemaining = Capacity.BurstShots - 1;
                         return true;
                     }
                 }
                 else
                 {
                     // Already in burst fire...
-                    int fired = shotsFired - burstFireStart;
-                    if(fired < Capacity.BurstShots)
+                    if(burstFireRemaining > 0)
                     {
-                        if (!bulletInChamber || !animation.IsAiming)
-                        {
-                            // Just stop here.
-                            inBurstFire = false;
-
-
-                            return false;
-                        }
+                        burstFireRemaining--; // This means max once every frame... Thats fine.
                         return true;
                     }
                     else
                     {
-                        // Stop burst fire...
                         inBurstFire = false;
                         return false;
                     }

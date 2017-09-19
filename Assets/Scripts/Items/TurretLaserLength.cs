@@ -14,7 +14,7 @@ public class TurretLaserLength : MonoBehaviour {
 
     public void Update()
     {
-        if (!Turret.Placeable.IsPlaced)
+        if (Turret.Placeable != null && !Turret.Placeable.IsPlaced)
         {
             SetLength(0);
             return;

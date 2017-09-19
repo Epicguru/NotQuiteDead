@@ -17,7 +17,7 @@ public class GearItem : MonoBehaviour {
     {
         SetItem(Item);
 
-        GearItems.Add(Title, this);
+        // Needs to be added to dictionary in a static script.
     }
 
     public void SetItem(Item item)

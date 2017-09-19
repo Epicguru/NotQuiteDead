@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[NetworkSettings(sendInterval = 0.05f)]
+[NetworkSettings(sendInterval = 0f)]
 public class GunAnimation : NetworkBehaviour
 {
     public string Shoot = "Shoot";
@@ -26,6 +26,8 @@ public class GunAnimation : NetworkBehaviour
     /*[HideInInspector]*/ public bool IsEquipping = true; // Only true when the object is created, then false forever more!
     /*[HideInInspector]*/ public bool IsReloading;
     /*[HideInInspector]*/ public bool IsChambering;
+
+    public int SingleShotsPending = 0;
 
     private Animator animator;
     private Gun gun;
@@ -50,7 +52,13 @@ public class GunAnimation : NetworkBehaviour
         animator.SetBool(Run, IsRunning);
         animator.SetBool(Dropped, IsDropped);
         animator.SetBool(Aim, IsAiming);
+
         animator.SetBool(Shoot, IsShooting);
+
+        if(SingleShotsPending > 0)
+        {
+            animator.SetBool(Shoot, true);
+        }
 
         if (IsRecursive)
         {
@@ -92,6 +100,22 @@ public class GunAnimation : NetworkBehaviour
         {
             CmdSetShoot(shooting);
         }
+    }
+
+    [Command]
+    public void CmdAnimShootOnce(bool allowOnlyOne)
+    {
+        // Shoot once using RPC.
+        RpcAnimShootOnce(allowOnlyOne);
+    }
+
+    [ClientRpc]
+    public void RpcAnimShootOnce(bool allowOnlyOne)
+    {
+        // Increment pending shots, to shoot once.
+        if (allowOnlyOne && SingleShotsPending > 0) // TODO FIXME - This still allows to shoot twice when firing shot weapons like Ol' Wooden. 
+            return;
+        SingleShotsPending++;
     }
 
     public void AnimAim(bool aim)
@@ -255,6 +279,8 @@ public class GunAnimation : NetworkBehaviour
     public void CallbackShoot()
     {
         // NOTE: We continue even with no authority!
+
+        SingleShotsPending = Mathf.Clamp(SingleShotsPending - 1, 0, Int32.MaxValue);
 
         // Pew pew!
         gun.Shooting.FromAnimShoot();

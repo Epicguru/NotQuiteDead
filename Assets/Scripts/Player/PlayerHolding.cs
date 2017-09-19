@@ -82,7 +82,6 @@ public class PlayerHolding : NetworkBehaviour
             }
             Destroy(this.Item.gameObject); // Destroy on all clients...
         }
-
         EquipItemLocal(item, player);
     }
 
@@ -157,6 +156,8 @@ public class PlayerHolding : NetworkBehaviour
         {
             GearItem.GearItems["Hands"].SetItem(null); // Set no item equipped.
         }
+
+        this.Item = null;
     }
 
     public void Update()

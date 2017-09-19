@@ -70,6 +70,7 @@ public class Inventory : MonoBehaviour
 
     public InventoryItem AddItem(string prefab, ItemData data, int amount = 1)
     {
+        Debug.LogError("HERE!");
         Item item = Item.FindItem(prefab);
         if (CanAdd(item, amount))
         {
@@ -136,7 +137,15 @@ public class Inventory : MonoBehaviour
     {
         int index = this.Contents.IndexOf(item);
 
+        Debug.Log("Removing item " + item.ItemPrefab + "!");
+
         bool lastItem = Contents[index].ItemCount <= amount;
+        Debug.Log("Index: " + index);
+        Debug.Log("Item: " + Contents[index].ItemPrefab);
+        Debug.Log("Item Count: " + Contents[index].ItemCount);
+        Debug.Log("Amount: " + amount);
+        Debug.Log("Last item: " + lastItem);
+        Debug.Log("Drop: " + drop);
 
         // Item count
         items -= amount;
@@ -158,15 +167,20 @@ public class Inventory : MonoBehaviour
         {
             // Create new instance...
             // No need to apply data, because it is up to date.
-            Player.Local.NetUtils.CmdSpawnDroppedItem(item.Item.Prefab, position, item.Data);
+            Player.Local.NetUtils.CmdSpawnDroppedItem(item.Item.Prefab, position, item.Data == null ? new ItemData() : item.Data);
         }
 
-        if(!lastItem)
+        if (!lastItem)
+        {
+            Debug.Log("Deducted " + amount + " item(s)!");
             Contents[index].SetItemCount(Contents[index].ItemCount - amount);
+        }
 
         if (!lastItem)
             return;
+
         Destroy(item.gameObject);
+        Debug.Log("Destroyed game object!");
 
         // Move everything below this upwards, and make viewport smaller.
         for(int i = index; i < Contents.Count; i++)
@@ -177,6 +191,7 @@ public class Inventory : MonoBehaviour
 
         // Viewport
         ViewportContent.sizeDelta = new Vector2(0, ViewportContent.sizeDelta.y - 30);
+        Debug.Log("Finished destroy!");
     }
 
     public InventoryItem GetOfType(string prefab)
