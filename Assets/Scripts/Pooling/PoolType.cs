@@ -8,5 +8,6 @@ public enum PoolType
     MUZZLE_FLASH,
     BULLET_PATH,
     BULLET_SHELL,
-    EXPLOSION
+    EXPLOSION,
+    FLYING_MAG
 }

@@ -10,5 +10,6 @@ public enum GunType
     SHOTGUN,
     SMG,
     LMG,
-    HANDGUN
+    HANDGUN,
+    DMR
 }

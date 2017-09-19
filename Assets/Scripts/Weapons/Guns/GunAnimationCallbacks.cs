@@ -37,4 +37,9 @@ public class GunAnimationCallbacks : ItemAnimationCallback
     {
         gun.Animation.CallbackSpawnShell();
     }
+
+    public void SpawnMag()
+    {
+        gun.Animation.CallbackSpawnMag();
+    }
 }

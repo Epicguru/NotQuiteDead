@@ -8,6 +8,8 @@ using UnityEngine.Networking;
 [NetworkSettings(sendInterval = 0f)]
 public class GunAnimation : NetworkBehaviour
 {
+    public FlyingMagData FlyingMagazine = new FlyingMagData();
+
     public string Shoot = "Shoot";
     public string Reload = "Reload";
     public string Chamber = "Chamber";
@@ -297,5 +299,15 @@ public class GunAnimation : NetworkBehaviour
     public void CallbackSpawnShell()
     {
         gun.Shooting.FromAnimSpawnShell();
+    }
+
+    public void CallbackSpawnMag()
+    {
+        // Determine if we can spawn...
+
+        if (FlyingMagazine.MagSprite == null || FlyingMagazine.RealMag == null)
+            return;
+
+        FlyingMag.Spawn(FlyingMagazine.RealMag.transform.position, FlyingMagazine.RealMag.transform.up * -1f * FlyingMagazine.Force, FlyingMagazine.RealMag.transform.rotation.eulerAngles.z, FlyingMagazine.Rotation * (!Player.Local.Direction.Right ? -1f : 1f), FlyingMagazine.MagSprite, !Player.Local.Direction.Right);
     }
 }
