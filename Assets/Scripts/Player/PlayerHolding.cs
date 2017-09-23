@@ -191,10 +191,10 @@ public class PlayerHolding : NetworkBehaviour
             return;
         }            
 
-        Gun g = Item.GetComponent<Gun>();
-        if (g == null)
+        RotatingWeapon r = Item.GetComponent<RotatingWeapon>();
+        if (r == null)
         {
-            // Is not gun, quit.
+            // Is not rotating weapon, quit.
             if (rotation != 0)
                 CmdSetAngle(0);
             timer = 0;
@@ -203,10 +203,10 @@ public class PlayerHolding : NetworkBehaviour
         }
         else
         {
-            // Is gun, activate.
+            // Is rotating weapon, activate.
 
             // Detect aiming...
-            if (InputManager.InputPressed("Aim") && !g.Animation.IsReloading && !g.Animation.IsChambering)
+            if (InputManager.InputPressed("Aim") && r.ShouldRotateNow())
             {
                 // Increate percentage and lerp.
                 timer += Time.deltaTime;                
@@ -218,14 +218,14 @@ public class PlayerHolding : NetworkBehaviour
                 looking.Looking = false;
             }
 
-            if (timer > g.Aiming.AimTime)
-                timer = g.Aiming.AimTime;
+            if (timer > r.GetAimTime())
+                timer = r.GetAimTime();
             if (timer < 0)
                 timer = 0;
 
-            float p = timer / g.Aiming.AimTime;
+            float p = timer / r.GetAimTime();
 
-            lerp = g.Aiming.Curve.Evaluate(p);
+            lerp = r.GetCurvedTime(p);
 
 
             // Finally send angle update call!

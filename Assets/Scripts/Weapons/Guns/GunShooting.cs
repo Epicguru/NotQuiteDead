@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 [RequireComponent(typeof(AudioSource))]
 [DisallowMultipleComponent]
-public class GunShooting : NetworkBehaviour
+public class GunShooting : RotatingWeapon
 {
     public FiringMode FiringMode = FiringMode.SEMI;
     public Transform DefaultBulletSpawn;
@@ -548,5 +548,20 @@ public class GunShooting : NetworkBehaviour
         float angle = Mathf.Atan2(dst.y, dst.x) * Mathf.Rad2Deg;
 
         return angle;
+    }
+
+    public override bool ShouldRotateNow()
+    {
+        return !animation.IsReloading && !animation.IsChambering;
+    }
+
+    public override float GetAimTime()
+    {
+        return gun.Aiming.AimTime;
+    }
+
+    public override float GetCurvedTime(float rawTime)
+    {
+        return gun.Aiming.Curve.Evaluate(rawTime);
     }
 }
