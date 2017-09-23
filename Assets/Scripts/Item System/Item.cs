@@ -229,7 +229,7 @@ public class Item : NetworkBehaviour
 
         foreach(Item i in Items.Values)
         {
-            NetworkManager.singleton.spawnPrefabs.Add(i.gameObject);
+            NetworkLobbyManager.singleton.spawnPrefabs.Add(i.gameObject);
         }
 
         foreach (ThrowableInstance t in Resources.LoadAll<ThrowableInstance>("Items/"))

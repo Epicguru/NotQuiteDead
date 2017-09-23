@@ -22,8 +22,6 @@ public class FlyingMag : MonoBehaviour {
         maxTime = Time;
         GetComponent<SpriteRenderer>().sprite = sprite;
         GetComponent<SpriteRenderer>().flipX = flip;
-
-        Debug.Log("Spawned with " + rotation);
     }
 
     public void Update()

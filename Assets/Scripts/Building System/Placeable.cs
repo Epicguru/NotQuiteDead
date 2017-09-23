@@ -18,6 +18,7 @@ public class Placeable : NetworkBehaviour
     [HideInInspector] public Health Health;
     [HideInInspector] public Rigidbody2D Rigidbody;
     [HideInInspector] public PlaceablePreview Preview;
+    [HideInInspector] public SpriteLighting Lighting;
 
     public Vector3 PlacedScale = Vector3.one, ItemScale = new Vector3(0.1f, 0.1f, 1);
 
@@ -27,6 +28,7 @@ public class Placeable : NetworkBehaviour
         Item = GetComponent<Item>();
         Health = GetComponent<Health>();
         Preview = GetComponent<PlaceablePreview>();
+        Lighting = GetComponent<SpriteLighting>();
 
         Item.Lighting.Exceptions = Preview.Preview.transform.GetComponentsInChildren<SpriteRenderer>(true);
 
@@ -119,6 +121,10 @@ public class Placeable : NetworkBehaviour
         }
 
         SetCollidersAsTriggers(!IsPlaced);
+
+        // Enable/disable shadows. Internally optimised, so call count does not matter.
+        Lighting.Shadows = IsPlaced;
+
         if(IsPlaced)
         {
             GetComponent<NetworkTransform>().enabled = false; // TODO better solution?

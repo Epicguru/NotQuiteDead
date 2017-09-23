@@ -6,8 +6,10 @@ using UnityEngine;
 
 public class ItemAnimationCallback : MonoBehaviour
 {
+    public bool Active = true;
     private AudioSource source;
 
+    [HideInInspector]
     public virtual AudioSource GetAudioSource()
     {
         AudioSource parent = GetComponentInParent<AudioSource>();

@@ -15,31 +15,37 @@ public class GunAnimationCallbacks : ItemAnimationCallback
 
     public void ReloadEnd()
     {
-        gun.Animation.CallbackReloadEnd();
+        if(Active)
+            gun.Animation.CallbackReloadEnd();
     }
 
     public void ChamberEnd()
     {
-        gun.Animation.CallbackChamberEnd();
+        if (Active)
+            gun.Animation.CallbackChamberEnd();
     }
 
     public void Shoot()
     {
-        gun.Animation.CallbackShoot();
+        if (Active)
+            gun.Animation.CallbackShoot();
     }
 
     public void EquipEnd()
     {
-        gun.Animation.CallbackEquipEnd();
+        if (Active)
+            gun.Animation.CallbackEquipEnd();
     }
 
     public void SpawnShell()
     {
-        gun.Animation.CallbackSpawnShell();
+        if (Active)
+            gun.Animation.CallbackSpawnShell();
     }
 
     public void SpawnMag()
     {
-        gun.Animation.CallbackSpawnMag();
+        if (Active)
+            gun.Animation.CallbackSpawnMag();
     }
 }
