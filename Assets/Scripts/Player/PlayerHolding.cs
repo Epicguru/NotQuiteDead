@@ -206,7 +206,7 @@ public class PlayerHolding : NetworkBehaviour
             // Is rotating weapon, activate.
 
             // Detect aiming...
-            if (InputManager.InputPressed("Aim") && r.ShouldRotateNow())
+            if ((InputManager.InputPressed("Aim") || r.ForceRotateNow()) && r.ShouldRotateNow())
             {
                 // Increate percentage and lerp.
                 timer += Time.deltaTime;                

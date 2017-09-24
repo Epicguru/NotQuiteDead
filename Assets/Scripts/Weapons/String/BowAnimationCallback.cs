@@ -11,16 +11,16 @@ public class BowAnimationCallback : ItemAnimationCallback
 
     public void Start()
     {
-        Bow = GetComponent<Bow>();
+        Bow = GetComponentInParent<Bow>();
     }
 
     public void FireArrow()
     {
-
+        Bow.CallbackArrowFire();
     }
 
     public void EndFire()
     {
-
+        Bow.CallbackFireEnd();
     }
 }

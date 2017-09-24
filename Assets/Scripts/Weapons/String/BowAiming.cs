@@ -17,6 +17,11 @@ public class BowAiming : RotatingWeapon
         return Bow.DrawCurve.Evaluate(rawTime);
     }
 
+    public override bool ForceRotateNow()
+    {
+        return Bow.InFire;
+    }
+
     public override bool ShouldRotateNow()
     {
         return true; // TODO FIXME

@@ -9,5 +9,6 @@ public enum PoolType
     BULLET_PATH,
     BULLET_SHELL,
     EXPLOSION,
-    FLYING_MAG
+    FLYING_MAG,
+    ARROW
 }
