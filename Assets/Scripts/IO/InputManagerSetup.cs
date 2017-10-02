@@ -11,7 +11,7 @@ public class InputManagerSetup : MonoBehaviour
         InputManager.LoadKeyBindings();
     }
 
-    public void FixedUpdate()
+    public void Update()
     {
         // Fullscreen
         if (InputManager.InputDown("Fullscreen"))

@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 public class Turret : NetworkBehaviour {
 
     public Transform Target;
+    public bool AutoTarget = true;
     public float MaxRange = 15f;
     public float MaxSpeed = 270f;
     public float ShootCone = 20f;
@@ -31,6 +32,9 @@ public class Turret : NetworkBehaviour {
     [SyncVar]
     private Quaternion currentAngle;
 
+    [SyncVar]
+    public string Team = "Team That Does Not Exist"; // TODO IMPLEMENT ME!!! This enables the turret to shoot anyone!
+
     public void Start()
     {
         Placeable = GetComponent<Placeable>();
@@ -40,6 +44,10 @@ public class Turret : NetworkBehaviour {
     {
         if (!Placeable.IsPlaced)
             return;
+
+        if (isServer)
+            if (AutoTarget)
+                UpdateTarget();
 
         bool aiming = Target != null && InRange();
         if (aiming)
@@ -55,6 +63,30 @@ public class Turret : NetworkBehaviour {
         UpdateSpinning(shooting);
         UpdateShooting(shooting);
         UpdateColour(aiming);
+    }
+
+    public void UpdateTarget()
+    {
+        Transform target = null;
+
+        float minDistance = float.MaxValue;
+        foreach(Enemy e in Enemy.Enemies)
+        {
+            float dst = Vector2.Distance(transform.position, e.transform.position);
+
+            if (dst > MaxRange)
+                continue;
+            if (e.GetComponent<EnemyDeath>().Dead)
+                continue;
+
+            if(dst < minDistance)
+            {
+                minDistance = dst;
+                target = e.transform;
+            }
+        }
+
+        Target = target;
     }
 
     public void OnDrawGizmosSelected()
@@ -135,6 +167,8 @@ public class Turret : NetworkBehaviour {
         MuzzleFlash.Place(MuzzleFlashSpawn.position, MuzzleFlashSpawn.rotation);
         SpawnShell();
 
+        // TODO USE THE HEALTH FUNCTION TO DETERMINE HIT!!!
+
         // Raycast
         Debug.DrawRay(BulletSpawn.transform.position, BulletSpawn.transform.forward * MaxRange, Color.green);
         RaycastHit2D[] hits = Physics2D.RaycastAll(BulletSpawn.transform.position, BulletSpawn.transform.forward, MaxRange);
@@ -159,10 +193,18 @@ public class Turret : NetworkBehaviour {
                 }
             }
 
+            Player p = hit.transform.GetComponent<Player>();
+            if (p != null)
+            {
+                if (Teams.I.PlayerInTeam(p.Name, Team)) // If the player is in the turret's team, don't allow to shoot them.
+                {
+                    continue;
+                }
+            }
+
             if (!h.CanHit)
             {
                 // Treat as ghost.
-                Player.Local.NetUtils.CmdSpawnBulletTrail(BulletSpawn.position, hit.point);
                 continue;
             }
             if (h.CannotHit.Contains(hit.collider))
@@ -171,7 +213,7 @@ public class Turret : NetworkBehaviour {
                 continue;
             }
 
-            if (hit.collider.gameObject.GetComponentInParent<Item>() != null)
+            if (hit.collider.gameObject.GetComponentInParent<Item>() != null && hit.collider.gameObject.GetComponentInParent<Placeable>() == null)
             {
                 // Is item, may be held in hands. Ignore.
                 continue;

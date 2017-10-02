@@ -33,7 +33,6 @@ public class Health : NetworkBehaviour {
     private bool hasBeenDead;
     // END SERVER ONLY
 
-    [HideInInspector]
     public List<Collider2D> CannotHit = new List<Collider2D>();
     public DED UponDeath;
     public DED UponDeathServer;
@@ -274,5 +273,53 @@ public class Health : NetworkBehaviour {
         }
 
         return s;
+    }
+
+    public static bool ShouldHit(Collider2D collider, string friendlyTeam)
+    {
+        Health h = collider.GetComponentInParent<Health>();
+
+        if (h != null)
+        {
+            if (!h.CanHit)
+                return false;
+            if (h.CannotHit.Contains(collider))
+            {
+                return false;
+            }
+            if (collider.gameObject.GetComponentInParent<Item>() != null && collider.GetComponentInParent<Placeable>() == null)
+            {
+                return false;
+            }
+            if (collider.GetComponent<NeverHitMe>() != null)
+            {
+                return false;
+            }
+            Player p = collider.GetComponent<Player>();
+            if (p != null)
+            {
+                if (p == Player.Local)
+                    return false;
+                if (Teams.I.PlayerInTeam(p.Name, friendlyTeam))
+                {
+                    return false; // DO NOT ALLOW TEAM DAMAGE. TODO IMPLEMENT GAME RULES!!!
+                }
+            }
+        }
+        else
+        {
+            if (collider.isTrigger)
+            {
+                // Is a trigger that does not have health, do not hit it.
+                return false;
+            }
+            else
+            {
+                // Solid collider...
+                return true;
+            }
+        }
+
+        return true;
     }
 }

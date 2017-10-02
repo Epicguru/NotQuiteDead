@@ -465,12 +465,17 @@ public class GunShooting : RotatingWeapon
                 break;
             }
 
-            // Do not allow to hit local player : Maybe some sort of team system???
-            if(h.GetComponent<Player>() != null)
+            // Do not allow to hit local player : Maybe some sort of team system??? EDIT - Done.
+            Player p = h.GetComponent<Player>();
+            if (p != null)
             {
-                if(h.GetComponent<Player>() == Player.Local._Player)
+                if(p == Player.Local._Player)
                 {
                     continue;
+                }
+                if (Teams.I.PlayersInSameTeam(Player.Local.Name, p.Name))
+                {
+                    continue; // Do not allow team damage from guns. TODO IMPLEMENT GAMES RULES.
                 }
             }
             if (!h.CanHit)
@@ -478,6 +483,10 @@ public class GunShooting : RotatingWeapon
 
             if (h.CannotHit.Contains(hit.collider))
                 continue;
+
+            if (hit.collider.gameObject.GetComponent<NeverHitMe>() != null)            
+                continue;
+            
 
             if (objects.Contains(h)) // Do not allow multiple hits to one object.
                 continue;

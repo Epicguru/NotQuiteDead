@@ -59,7 +59,14 @@ public class GunAnimation : NetworkBehaviour
 
         if(SingleShotsPending > 0)
         {
-            animator.SetBool(Shoot, true);
+            if(gun.Shooting.bulletInChamber == false)
+            {
+                SingleShotsPending = 0;
+            }
+            else
+            {
+                animator.SetBool(Shoot, true);
+            }
         }
 
         if (IsRecursive)

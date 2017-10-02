@@ -271,6 +271,11 @@ public class Item : NetworkBehaviour
         return Items[prefab];
     }
 
+    public static bool ItemExists(string prefab)
+    {
+        return Items.ContainsKey(prefab);
+    }
+
     public static void Option_Equip(InventoryItem x)
     {
         ItemData d = x.Data;

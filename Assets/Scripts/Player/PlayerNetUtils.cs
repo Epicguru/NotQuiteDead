@@ -8,6 +8,12 @@ using UnityEngine.Networking;
 public class PlayerNetUtils : NetworkBehaviour
 {
     [Command]
+    public void CmdSetPositionSync(GameObject obj, Vector3 position)
+    {
+        obj.GetComponent<NetPositionSync>().Position = position;
+    }
+
+    [Command]
     public void CmdSpawnDroppedItem(string prefab, Vector3 position, ItemData data)
     {
         Item newItem = Item.NewInstance(prefab);
@@ -17,6 +23,12 @@ public class PlayerNetUtils : NetworkBehaviour
         newItem.Data = data;
 
         NetworkServer.Spawn(newItem.gameObject);
+    }
+
+    [Command]
+    public void CmdReqAuth(GameObject obj)
+    {
+        obj.GetComponent<NetworkIdentity>().AssignClientAuthority(Player.Local.NetworkIdentity.connectionToClient);
     }
 
     [Command]
@@ -95,6 +107,11 @@ public class PlayerNetUtils : NetworkBehaviour
             GetComponent<Player>().Name = name;
         else
             Debug.LogError("Cannot set player name to " + name + " because another player already has that name (or very similar).");
+    }
+
+    public void CmdSetTeam(string newTeam)
+    {
+        GetComponent<Player>().Team = newTeam;
     }
 
     [Command]

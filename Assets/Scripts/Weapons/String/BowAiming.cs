@@ -19,7 +19,7 @@ public class BowAiming : RotatingWeapon
 
     public override bool ForceRotateNow()
     {
-        return Bow.InFire;
+        return Bow.Released || Bow.InFire;
     }
 
     public override bool ShouldRotateNow()

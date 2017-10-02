@@ -6,8 +6,13 @@ using UnityEngine.Networking;
 
 public class Player : NetworkBehaviour
 {
-    [SyncVar]
-    public string Name = "Player Name";
+    [SyncVar(hook = "NewName")]
+    public string Name = ERROR_NAME;
+    [SyncVar(hook = "NewTeam")]
+    public string Team = ERROR_TEAM;
+
+    public const string ERROR_NAME = "ERROR_NAME"; // We can safly assume notbody will ever have this name!
+    public const string ERROR_TEAM = "ERROR_TEAM"; // We can safly assume notbody will ever have this name!
 
     public PlayerAnimation Animation;
     public PlayerDirection Direction;
@@ -24,21 +29,108 @@ public class Player : NetworkBehaviour
     public Player _Player;
 
     public static Player Local;
-    public List<Player> AllPlayers = new List<Player>();
+    public static List<Player> AllPlayers = new List<Player>();
+
+    public void RegisterPlayer()
+    {
+        AllPlayers.Add(this);
+        if (isServer)
+        {
+            string name = NameGen.GenName();
+            while (PlayerHasName(name))
+            {
+                name = NameGen.GenName();
+            }
+            // Give name and team
+            Team = AllPlayers.Count % 2 == 0 ? "Blue" : "Red";
+            Name = name;
+
+        }
+        UpdateTeams(null, null); // New state
+    }
+
+    public void UpdateTeams(string oldName, string oldTeam)
+    {
+        if (Team == oldTeam && Name == oldName)
+            return;
+
+        //Debug.Log("Call; oldName: '" + oldName + "' Name: '" + Name + "' oldTeam: '" + oldTeam + "' Team: " + Team);
+
+        // Updates team and player data for the local Teams system.
+        Teams t = Teams.I;
+            
+        if(Name != oldName)
+        {
+            if (string.IsNullOrEmpty(oldName))
+            {
+                // We did not have an old name...
+                // Check to see if we are on the system (we should not be!) and add the player
+                if (!t.PlayerInSystem(Name))
+                {
+                    t.EnsureTeam(Team);
+                    t.AddPlayer(this, Team);
+                    Debug.Log("Added player to system. Name: " + Name + ", Team: " + Team);
+                }
+            }
+            else
+            {
+                // We have an old name, lets change names!
+                if (t.PlayerInSystem(oldName))
+                {
+                    t.ChangePlayerName(oldName, Name);
+                    Debug.Log("Changed player name from '" + oldName + "' to '" + Name + "'");
+                }
+                else
+                {
+                    t.EnsureTeam(Team);
+                    t.AddPlayer(this, Team);
+                }
+            }
+        }
+
+        if(Team != oldTeam)
+        {
+            if (string.IsNullOrEmpty(oldTeam))
+            {
+                // Means that this must be first time commit, meaning that we have already been added to team!
+            }
+            else
+            {
+                // Old team is not null, lets swap teams!
+                if (t.PlayerInSystem(Name))
+                {
+                    t.EnsureTeam(Team);
+                    t.ChangePlayerTeam(Name, Team);
+                    Debug.Log("Changed team of player '" + Name + "' from team '" + oldTeam + "' to '" + Team + "'");
+                }
+                else
+                {
+                    t.EnsureTeam(Team);
+                    t.AddPlayer(this, Team);
+                    Debug.Log("Added player WHILE changing team: '" + Name + "' from team '" + oldTeam + "' to '" + Team + "'");
+                }
+                
+            }
+        }
+    }
 
     public void Start()
     {
-        Debug.Log("PLAYER!");
+        RegisterPlayer();
         if (isLocalPlayer)
-        {
+        {            
             Local = this;
             Local._Player = this;
             Camera.main.GetComponent<CameraFollow>().Target = transform;
 
             Health.UponDeath += UponDeath;
         }
+        else
+        {
+            Debug.Log("Player '" + Name + "' of team '" + Team + "'");
+        }
 
-        foreach(SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>())
+        foreach (SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>())
         {
             r.sortingLayerName = "Player";
         }
@@ -47,11 +139,12 @@ public class Player : NetworkBehaviour
     public void OnDestroy()
     {
         AllPlayers.Remove(this);
+        Teams.I.RemovePlayer(this.Name);
     }
 
     public Player GetPlayer(string name)
     {
-        foreach(Player p in AllPlayers)
+        foreach (Player p in AllPlayers)
         {
             if (p.Name.Trim().ToLower() == name.Trim().ToLower())
                 return p;
@@ -99,12 +192,20 @@ public class Player : NetworkBehaviour
             return;
         }
         Debug.Log("Requesting authority for " + obj.name);
-        CmdReqAuth(obj);
+        NetUtils.CmdReqAuth(obj);
     }
 
-    [Command]
-    private void CmdReqAuth(GameObject obj)
+    public void NewName(string newName)
     {
-        obj.GetComponent<NetworkIdentity>().AssignClientAuthority(NetworkIdentity.connectionToClient);
+        string old = Name;
+        Name = newName;
+        UpdateTeams(old, Team);
+    }
+
+    public void NewTeam(string newTeam)
+    {
+        string old = Team;
+        Team = newTeam;
+        UpdateTeams(Name, old);
     }
 }

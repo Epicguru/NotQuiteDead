@@ -37,6 +37,12 @@ public static class CommandProcessing
         commands.Add(new ItemsCommand());
         commands.Add(new NameCommand());
         commands.Add(new RemoteCommand());
+        commands.Add(new TeamAdd());
+        commands.Add(new TeamRemove());
+        commands.Add(new TeamClean());
+        commands.Add(new TeamSwap());
+        commands.Add(new TeamTransfer());
+        commands.Add(new TeamData());
     }
 
     // Returns true to clear the console.
@@ -298,16 +304,19 @@ public static class CommandProcessing
 
     public static void Log(string line)
     {
-        input.Log.text = line + "\n" + input.Log.text;
+        if(input != null && input.Log != null)
+            input.Log.text = line + "\n" + input.Log.text;
     }
 
     public static void ClearLog()
     {
-        input.Log.text = "Cleared console.";
+        if (input != null && input.Log != null)
+            input.Log.text = "Cleared console.";
     }
 
     public static void Error(string message)
     {
-        input.Error.text = message;
+        if (input != null && input.Log != null)
+            input.Error.text = message;
     }
 }

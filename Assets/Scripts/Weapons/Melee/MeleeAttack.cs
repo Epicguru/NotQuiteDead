@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(MeleeWeapon))]
-public class MeleeAttack : NetworkBehaviour {
+public class MeleeAttack : NetworkBehaviour
+{
 
     [Tooltip("The collider that detects hits with the melee weapon.")]
     public Collider2D Collider;
@@ -19,7 +19,7 @@ public class MeleeAttack : NetworkBehaviour {
     {
         weapon = GetComponent<MeleeWeapon>();
 
-        if(Collider == null)
+        if (Collider == null)
         {
             Debug.LogError("Collider for attacking with " + weapon.Item.Name + " is null!");
             Debug.Break();
@@ -27,16 +27,16 @@ public class MeleeAttack : NetworkBehaviour {
         }
 
         // TODO add rigidbody to item for interpolation and physics.
-    }  
-    
+    }
+
     public void Update()
     {
-        if (weapon == null || weapon.Item == null)
+        if (!Ready())
             return;
 
-        if (weapon.Item.IsEquipped())
+        if (Active() && DoDisabling())
         {
-            foreach(Collider2D c in GetComponentsInChildren<Collider2D>())
+            foreach (Collider2D c in GetComponentsInChildren<Collider2D>())
             {
                 if (c == Collider)
                 {
@@ -49,7 +49,7 @@ public class MeleeAttack : NetworkBehaviour {
 
             }
         }
-        else
+        else if(DoDisabling())
         {
             foreach (Collider2D c in GetComponentsInChildren<Collider2D>())
             {
@@ -61,6 +61,21 @@ public class MeleeAttack : NetworkBehaviour {
         }
     }
 
+    public virtual bool DoDisabling()
+    {
+        return true;
+    }
+
+    public virtual bool Ready()
+    {
+        return !(weapon == null || weapon.Item == null);
+    }
+
+    public virtual bool Active()
+    {
+        return weapon.Item.IsEquipped();
+    }
+
     public void FixedUpdate()
     {
         // Called before physics callbacks.
@@ -69,7 +84,7 @@ public class MeleeAttack : NetworkBehaviour {
 
     public void OnTriggerStay2D(Collider2D c)
     {
-        if (weapon.Item.IsEquipped() && hasAuthority && c.GetComponentInParent<Player>() != Player.Local)
+        if (Ready() && c.GetComponentInParent<Health>() != GetComponentInParent<Health>())
             touching.Add(c);
     }
 
@@ -84,15 +99,35 @@ public class MeleeAttack : NetworkBehaviour {
         return Damage.Damage; // The damage value.
     }
 
+    public virtual string GetAttacker()
+    {
+        return Player.Local.Name;
+    }
+
+    public virtual bool TeamDamageSystemEnabled()
+    {
+        return true;
+    }
+
+    public virtual string GetWeaponID()
+    {
+        return weapon.Item.Prefab;
+    }
+
+    public virtual bool AsPlayer()
+    {
+        return true;
+    }
+
     private List<Health> hitCreatures = new List<Health>();
     public void Attack()
     {
         // A local version that attacks all objects touching the attacking collider.
         hitCreatures.Clear();
 
-        Debug.Log("Attacking, there are " + GetContacts().Count + " colliders!");
+        //Debug.Log("Attacking, there are " + GetContacts().Count + " colliders!");
 
-        foreach(Collider2D coll in GetContacts())
+        foreach (Collider2D coll in GetContacts())
         {
             if (coll == null)
                 continue; // Can happen when multi collider object is destroyed.
@@ -108,10 +143,27 @@ public class MeleeAttack : NetworkBehaviour {
             if (!c.CanHit)
                 continue;
 
+            if (c.GetComponent<NeverHitMe>() != null)
+                continue;
+
+            if (!AsPlayer() && c.GetComponent<Enemy>() != null)
+                continue;
+
             if (coll.gameObject.GetComponentInParent<Item>() != null && coll.GetComponentInParent<Placeable>() == null)
             {
                 // Is item, may be held in hands. Ignore.
                 continue;
+            }
+
+            Player p = coll.GetComponent<Player>();
+            if (p != null)
+            {
+                if (AsPlayer() && p == Player.Local)
+                    continue;
+                if(AsPlayer() && this.TeamDamageSystemEnabled() && Teams.I.PlayersInSameTeam(p.Name, Player.Local.Name))
+                {
+                    continue; // DO NOT ALLOW TEAM DAMAGE. TODO IMPLEMENT GAME RULES!!!
+                }
             }
 
             // Prevent a creature from being hit more that once per swing, if it has multiple colliders.
@@ -120,7 +172,7 @@ public class MeleeAttack : NetworkBehaviour {
                 hitCreatures.Add(c);
 
                 // Deal damage
-                CmdHitCreature(c.gameObject, Player.Local.Name, GetDamage());
+                CmdHitCreature(c.gameObject, GetAttacker(), GetDamage());
             }
         }
     }
@@ -130,7 +182,7 @@ public class MeleeAttack : NetworkBehaviour {
     {
         // By using a command we do not require client authority over the creature.
         // Good for hacking prevention and that kind of stuff.
-        string source = attacker + ':' + weapon.Item.Prefab;
+        string source = attacker + ':' + GetWeaponID();
         creature.GetComponent<Health>().ServerDamage(damage, source, false);
     }
 }

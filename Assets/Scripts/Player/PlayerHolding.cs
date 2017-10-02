@@ -115,11 +115,9 @@ public class PlayerHolding : NetworkBehaviour
 
         if (destroy)
         {
-            Debug.Log("Destroying on server...");
             // Completely destroy.
             Destroy(this.Item.gameObject); // Does this work!?!?
             RpcDrop(localPlayer);
-            Debug.Log("Done on server!");
             return;
         }
 
