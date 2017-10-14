@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 public class InventoryItem : MonoBehaviour
 {
+    public static SpriteAtlas Atlas;
     /*
     * Represents an item when it is inside an inventory. Simply has a reference to the item,
     * and some information about the item's location in the inventory.
@@ -74,13 +76,16 @@ public class InventoryItem : MonoBehaviour
         Text.color = ItemRarityUtils.GetColour(Item.Rarity);
         if(Details != null)
             Details.text = (Item.InventoryInfo.Weight * ItemCount) + "Kg";
+        if (Atlas == null)
+            Atlas = Resources.Load<SpriteAtlas>("Atlas/Game Point");
+        Sprite spr = Atlas.GetSprite(Item.ItemIcon.name);
+        Image.sprite = spr == null ? Item.ItemIcon : spr;
     }
 
     public void Update()
     {
         StaticPos.y = (transform as RectTransform).anchoredPosition.y;
         (transform as RectTransform).anchoredPosition = StaticPos;
-        Image.sprite = Item.ItemIcon;
     }
 
     public void Clicked()

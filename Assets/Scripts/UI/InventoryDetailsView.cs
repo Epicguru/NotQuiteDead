@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 public class InventoryDetailsView : MonoBehaviour
 {
+    public SpriteAtlas Atlas;
     public Image Image;
     public Text Title;
     public Text Text;
@@ -74,7 +76,9 @@ public class InventoryDetailsView : MonoBehaviour
 
         Text.text = description;
         Title.text = item.Item.Name;
-        Image.sprite = item.Item.ItemIcon;
+
+        Sprite spr = Atlas.GetSprite(item.Item.ItemIcon.name);
+        Image.sprite = spr == null ? item.Item.ItemIcon : spr;
     }
 
     public void Exit()
