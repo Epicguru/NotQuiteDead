@@ -34,7 +34,6 @@ public class Arrow : MonoBehaviour {
         start = position;
         HitObject = false;
         timer = 20f;
-        GetComponent<Rigidbody2D>().simulated = true;
         HitHealth = false;
     }
 
@@ -58,6 +57,8 @@ public class Arrow : MonoBehaviour {
         }
 
         if (!HitObject)
+            DetectCollision();
+        if (!HitObject)
             transform.Translate(Direction * Speed * Time.deltaTime, Space.World);
     }
 
@@ -75,22 +76,41 @@ public class Arrow : MonoBehaviour {
         return Health.ShouldHit(collider, this.Team);
     }
 
-    public void OnTriggerEnter2D(Collider2D collision)
+    public void DetectCollision()
+    {
+        // Cast a ray between the current point and the point where it will be next frame. Basically pixel perfect collision.
+
+        Vector2 currentPosition = transform.position;
+        Vector2 nextPosition = currentPosition + (Direction * Speed * Time.deltaTime);
+
+        Debug.DrawLine(currentPosition, nextPosition, Color.red);
+        RaycastHit2D[] hits = Physics2D.LinecastAll(currentPosition, nextPosition);
+        foreach(RaycastHit2D hit in hits)
+        {
+            bool collided = Hitting(hit.collider, hit.point);
+            if (collided)
+                break;
+        }
+    }
+
+    public bool Hitting(Collider2D collision, Vector2 hitPoint)
     {
         // Stick in the object?
 
         if (!CanHit(collision))
-            return;
+            return false;
 
         if(transform.parent == null)
+        {
+            transform.position = hitPoint;
             transform.SetParent(collision.transform);
+        }
 
         HitObject = true;
-        GetComponent<Rigidbody2D>().simulated = false;
 
         if(Damage <= 0f)
         {
-            return; // Does not deal damage.
+            return false; // Does not deal damage.
         }
 
         Health h = collision.GetComponentInParent<Health>();
@@ -103,5 +123,6 @@ public class Arrow : MonoBehaviour {
                 Player.Local.NetUtils.CmdDamageHealth(h.gameObject, Damage, DamageTag, false);
             }
         }
+        return true;
     }
 }

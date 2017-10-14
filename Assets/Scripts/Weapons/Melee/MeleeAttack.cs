@@ -15,9 +15,12 @@ public class MeleeAttack : NetworkBehaviour
     private MeleeWeapon weapon;
     public List<Collider2D> touching = new List<Collider2D>();
 
+    private Health Health;
+
     public void Start()
     {
         weapon = GetComponent<MeleeWeapon>();
+        Health = GetComponentInParent<Health>();
 
         if (Collider == null)
         {
@@ -84,7 +87,7 @@ public class MeleeAttack : NetworkBehaviour
 
     public void OnTriggerStay2D(Collider2D c)
     {
-        if (Ready() && c.GetComponentInParent<Health>() != GetComponentInParent<Health>())
+        if (Ready() && c.GetComponentInParent<Health>() != Health)
             touching.Add(c);
     }
 
