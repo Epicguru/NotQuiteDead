@@ -273,6 +273,8 @@ public class Item : NetworkBehaviour
 
     public static bool ItemExists(string prefab)
     {
+        if (Items == null)
+            LoadItems();
         return Items.ContainsKey(prefab);
     }
 

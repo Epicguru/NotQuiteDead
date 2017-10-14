@@ -1,0 +1,3 @@
+Wooden Barricade, 5
+:
+Plank, 10

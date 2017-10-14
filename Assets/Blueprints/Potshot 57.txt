@@ -1,0 +1,5 @@
+Potshot 57
+:
+Gun Components, 5;
+Short Barrel;
+Fibreglass;
