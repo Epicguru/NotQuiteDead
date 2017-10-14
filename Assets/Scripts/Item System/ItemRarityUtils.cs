@@ -16,12 +16,16 @@ public class ItemRarityUtils : MonoBehaviour
 
     private static ItemRarityUtils instance;
 
-    public void Start()
+    public void Awake()
     {
         // TODO WHY HERE :D
         Item.LoadItems();
-        Item.RegisterItems();
         instance = this;
+    }
+
+    public void Start()
+    {
+        Item.RegisterItems();        
     }
 
     public static string GetDescription(ItemRarity rarity)

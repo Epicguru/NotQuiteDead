@@ -9,7 +9,6 @@ public class BlueprintItem : MonoBehaviour
     public static SpriteAtlas Atlas;
 
     public BlueprintPreviewDisplay Preview;
-    public Item DEBUG_ITEM;
 
     public Item Item
     {
@@ -28,6 +27,8 @@ public class BlueprintItem : MonoBehaviour
 
     public Text Text;
     public Image Image;
+
+    public Blueprint Blueprint;
 
     private Item _Item;
 
@@ -48,13 +49,10 @@ public class BlueprintItem : MonoBehaviour
         }
     }
 
-    public void Update()
-    {
-        Item = DEBUG_ITEM;
-    }
-
     public void Clicked()
     {
+        if (Preview == null)
+            Preview = GetComponentInParent<Workbench>().Preview;
         Preview.Item = Item;
     }
 }
