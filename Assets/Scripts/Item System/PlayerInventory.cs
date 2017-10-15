@@ -16,7 +16,7 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
-    public void Start()
+    public void Awake()
     {
         inv = this;
     }
@@ -36,16 +36,43 @@ public class PlayerInventory : MonoBehaviour
                 Open();
             }
         }
+        if(InputManager.InputDown("Escape", true))
+        {
+            if (inv.Inventory.gameObject.activeSelf)
+            {
+                // Close
+                Close();
+            }
+        }
     }
 
-    public static void Add(string prefab, ItemData data, int amount = 1)
+    public static void Add(Item item, ItemData data, int amount)
     {
-        inv.Inventory.AddItem(prefab, data, amount);
+        inv.Inventory.AddItem(item.Prefab, data, amount);
     }
 
-    public static void Remove(InventoryItem item)
+    public static void Add(string item, ItemData data, int amount)
     {
-        inv.Inventory.RemoveItem(item, Player.Local.transform.position);
+        inv.Inventory.AddItem(item, data, amount);
+    }
+
+    public static void Remove(Item item, int amount, bool drop = false)
+    {
+        if (item.CanStack)
+        {
+            inv.Inventory.RemoveItem(inv.Inventory.GetOfType(item.Prefab), Vector2.zero, drop, amount);
+        }
+        else
+        {
+            for (int i = 0; i < amount; i++)
+            {
+                InventoryItem x = inv.Inventory.GetOfType(item.Prefab);
+                if (x != null)
+                    inv.Inventory.RemoveItem(x, Vector2.zero, drop, 1);
+                else
+                    break;
+            }
+        }
     }
 
     public static void Open()

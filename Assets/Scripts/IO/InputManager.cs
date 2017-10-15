@@ -40,6 +40,7 @@ public static class InputManager
         defaultKeyBindings.Add("Firing Mode", KeyCode.X);
 
         // Inventory
+        defaultKeyBindings.Add("Escape", KeyCode.Escape);
         defaultKeyBindings.Add("Inventory", KeyCode.Tab);
         defaultKeyBindings.Add("Return", KeyCode.Escape);
         defaultKeyBindings.Add("Quick Equip", KeyCode.LeftShift);

@@ -1,0 +1,6 @@
+OMB
+:
+Gun Components, 50;
+Long Barrel;
+Electronics, 5;
+Fibreglass, 10;

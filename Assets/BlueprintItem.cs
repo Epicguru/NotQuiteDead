@@ -8,7 +8,8 @@ public class BlueprintItem : MonoBehaviour
 {
     public static SpriteAtlas Atlas;
 
-    public BlueprintPreviewDisplay Preview;
+    public Workbench Workbench;
+    public bool CanCraft = true;
 
     public Item Item
     {
@@ -27,6 +28,7 @@ public class BlueprintItem : MonoBehaviour
 
     public Text Text;
     public Image Image;
+    public Image Redout;
 
     public Blueprint Blueprint;
 
@@ -49,10 +51,17 @@ public class BlueprintItem : MonoBehaviour
         }
     }
 
+    public void Update()
+    {
+        Redout.enabled = !CanCraft;
+    }
+
     public void Clicked()
     {
-        if (Preview == null)
-            Preview = GetComponentInParent<Workbench>().Preview;
-        Preview.Item = Item;
+        if (Workbench == null)
+            Workbench = GetComponentInParent<Workbench>();
+        Workbench.SetCurrentBlueprint(Blueprint);
+        Workbench.Preview.Item = Item;
+        Workbench.Requirements.CurrentBlueprint = Blueprint;
     }
 }

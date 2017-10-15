@@ -5,10 +5,28 @@ using UnityEngine.UI;
 
 public class Workbench : MonoBehaviour
 {
+    public static Workbench Bench;
+    public Button Craft;
+    public bool Open
+    {
+        get
+        {
+            return _Open;
+        }
+        set
+        {
+            if (value == _Open)
+                return;
+            _Open = value;
+            OpenChange();
+        }
+    }
+    private bool _Open;
     public Sprite[] Backgrounds;
     public Image Background;
     public Dropdown Tab;
 
+    public BlueprintRequirementDisplay Requirements;
     public BlueprintPreviewDisplay Preview;
     public Transform ItemParent;
     public BlueprintItem ItemPrefab;
@@ -16,15 +34,28 @@ public class Workbench : MonoBehaviour
     public List<Blueprint> Blueprints = new List<Blueprint>();
 
     private List<BlueprintItem> items = new List<BlueprintItem>();
+    public Blueprint CurrentBlueprint;
 
     public void Awake()
     {
+        Open = true;
+        Bench = this;
         List<string> files = new List<string>();
         LoadFiles(files);
         Blueprints = new List<Blueprint>();
         MakeBlueprints(files, Blueprints);
 
+        PlayerInventory.inv.Inventory.ContentsChange += RefreshInventory;
+
         PopulateAvailable();
+    }
+
+    public void Update()
+    {
+        if(InputManager.InputDown("Escape", true))
+        {
+            Open = false;
+        }
     }
 
     public void LoadFiles(List<string> files)
@@ -48,6 +79,35 @@ public class Workbench : MonoBehaviour
         }
     }
 
+    public void OpenChange()
+    {
+        gameObject.SetActive(Open);
+        InputManager.Active = !Open;
+        if (Open)
+        {
+            RefreshInventory();
+        }
+    }
+
+    public void RefreshInventory()
+    {
+        foreach(BlueprintItem i in items)
+        {
+            i.CanCraft = i.Blueprint.PlayerHasMaterials();
+        }
+        Requirements.Refresh();
+        if (CurrentBlueprint != null)
+            Craft.interactable = CurrentBlueprint.PlayerHasMaterials();
+        else
+            Craft.interactable = false;
+    }
+
+    public void SetCurrentBlueprint(Blueprint b)
+    {
+        CurrentBlueprint = b;
+        Craft.interactable = b.PlayerHasMaterials();
+    }
+
     public void PopulateAvailable()
     {
         int i = 0;
@@ -60,6 +120,8 @@ public class Workbench : MonoBehaviour
             items.Add(spawned);
             i++;
         }
+
+        RefreshInventory();
     }
 
     public void ClearOld()

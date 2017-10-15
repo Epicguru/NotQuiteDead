@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -46,6 +45,9 @@ public class Inventory : MonoBehaviour
     private float weight;
     private int items;
     [HideInInspector] public ItemOptionsPanel Options;
+
+    public delegate void OnContentsChange();
+    public event OnContentsChange ContentsChange;
 
     public void Start()
     {
@@ -109,6 +111,9 @@ public class Inventory : MonoBehaviour
                 // Add item count
                 items += amount;
 
+                if (ContentsChange != null)
+                    ContentsChange();
+
                 return i;
             }
             else
@@ -122,6 +127,9 @@ public class Inventory : MonoBehaviour
 
                 // Add item count
                 items += amount;
+
+                if (ContentsChange != null)
+                    ContentsChange();
 
                 return stack;
             }
@@ -158,13 +166,19 @@ public class Inventory : MonoBehaviour
         {
             // Create new instance...
             // No need to apply data, because it is up to date.
-            Player.Local.NetUtils.CmdSpawnDroppedItem(item.Item.Prefab, position, item.Data == null ? new ItemData() : item.Data);
+            for (int i = 0; i < amount; i++)
+            {
+                Player.Local.NetUtils.CmdSpawnDroppedItem(item.Item.Prefab, position + new Vector2(Random.Range(-0.05f * i, 0.05f * i), Random.Range(-0.05f * i, 0.05f * i)), item.Data == null ? new ItemData() : item.Data);
+            }
         }
 
         if (!lastItem)
         {
             Contents[index].SetItemCount(Contents[index].ItemCount - amount);
         }
+
+        if (ContentsChange != null)
+            ContentsChange();
 
         if (!lastItem)
             return;
@@ -190,6 +204,21 @@ public class Inventory : MonoBehaviour
                 return item;
         }
         return null;
+    }
+
+    public bool Contains(Item type, int amount)
+    {
+        int count = 0;
+        foreach (InventoryItem item in Contents)
+        {
+            if(item.ItemPrefab == type.Prefab)
+            {
+                count += item.ItemCount;
+            }
+            if (count >= amount)
+                return true;
+        }
+        return false;
     }
 
     public void Clear()
