@@ -1,6 +1,6 @@
 Potshot 57
 :
-LGC;
+SGC;
 Gun Components, 5;
 Short Barrel;
 Fibreglass;

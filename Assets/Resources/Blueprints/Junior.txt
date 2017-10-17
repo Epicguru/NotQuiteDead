@@ -1,6 +1,6 @@
 Junior
 :
-LGC;
+SGC;
 Electronics, 3;
 Short Barrel;
 Gun Components, 15;
