@@ -6,6 +6,8 @@ using UnityEngine.UI;
 public class Workbench : MonoBehaviour
 {
     public static Workbench Bench;
+    public Transform Container;
+    public RectTransform Contents;
     public Button Craft;
     public bool Open
     {
@@ -39,7 +41,6 @@ public class Workbench : MonoBehaviour
 
     public void Awake()
     {
-        Open = true;
         Bench = this;
         List<string> files = new List<string>();
         LoadFiles(files);
@@ -82,7 +83,7 @@ public class Workbench : MonoBehaviour
 
     public void OpenChange()
     {
-        gameObject.SetActive(Open);
+        Container.gameObject.SetActive(Open);
         InputManager.Active = !Open;
         if (Open)
         {
@@ -122,6 +123,9 @@ public class Workbench : MonoBehaviour
             items.Add(spawned);
             i++;
         }
+
+        Contents.anchoredPosition = new Vector2(0, 0);
+        Contents.sizeDelta = new Vector2(0, 50 * i);
 
         RefreshInventory();
     }

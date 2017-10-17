@@ -130,7 +130,7 @@ public static class BlueprintLoader
         bool itemExists = Item.ItemExists(itemString);
         if (!itemExists)
         {
-            Debug.LogError("Invalid blueprint: Item '" + itemString + "' does not exist! (Check spelling and capitalisation!)");
+            Debug.LogError("Invalid blueprint: Item '" + itemString + "' does not exist! (Check spelling and capitalisation!) (" + itemCountPair + ")");
             return null;
         }
         else

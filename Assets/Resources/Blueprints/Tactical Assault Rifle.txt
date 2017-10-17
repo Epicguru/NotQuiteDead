@@ -1,0 +1,6 @@
+TAR
+:
+Assault Rifle;
+Electronics, 10;
+Steel Plate, 10;
+Fibreglass, 5;

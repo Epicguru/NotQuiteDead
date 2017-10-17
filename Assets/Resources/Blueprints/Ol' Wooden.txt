@@ -1,0 +1,6 @@
+Ol Wooden, 1
+:
+Planks, 5;
+Long Barrel, 1;
+Gun Components, 10;
+Iron Plate, 20;

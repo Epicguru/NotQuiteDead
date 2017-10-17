@@ -1,0 +1,5 @@
+Assault Rifle, 1
+:
+LGC;
+Long Barrel;
+Gun Components, 10;

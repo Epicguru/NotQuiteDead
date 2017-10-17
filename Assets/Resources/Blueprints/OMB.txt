@@ -1,5 +1,6 @@
 OMB
 :
+LGC;
 Gun Components, 50;
 Long Barrel;
 Electronics, 5;

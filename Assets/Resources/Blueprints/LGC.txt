@@ -1,0 +1,5 @@
+LGC
+:
+Steel Plate, 10;
+Gun Components, 5;
+Iron Plate, 5;

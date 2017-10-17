@@ -1,0 +1,4 @@
+Extended Magazine
+:
+Iron Plate, 8;
+Fibreglass, 20;

@@ -2,3 +2,4 @@ HHC, 1
 :
 Hand Cannon, 1;
 Ol Wooden, 1;
+LGC;
