@@ -63,5 +63,6 @@ public class BlueprintItem : MonoBehaviour
         Workbench.SetCurrentBlueprint(Blueprint);
         Workbench.Preview.Item = Item;
         Workbench.Requirements.CurrentBlueprint = Blueprint;
+        Workbench.Results.CurrentBlueprint = Blueprint;
     }
 }

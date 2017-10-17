@@ -47,6 +47,10 @@ public class EnemyDeath : NetworkBehaviour
 
                 foreach(SpriteRenderer r in renderers)
                 {
+                    if (r == null)
+                        return;
+                    if (r.GetComponent<Arrow>() != null)
+                        continue;
                     colour.r = r.color.r;
                     colour.g = r.color.g;
                     colour.b = r.color.b;

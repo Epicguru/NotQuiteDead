@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BlueprintRequirementDisplay : MonoBehaviour
 {
     public BlueprintRequirement Prefab;
     public Transform Parent;
     public List<BlueprintRequirement> Spawned = new List<BlueprintRequirement>();
+    public Text Title;
 
     public Blueprint CurrentBlueprint
     {
@@ -29,7 +31,10 @@ public class BlueprintRequirementDisplay : MonoBehaviour
     {
         Clear();
         if (CurrentBlueprint == null)
+        {
+            Title.text = "---";
             return;
+        }
         for (int i = 0; i < CurrentBlueprint.Requirements.Length; i++)
         {
             BlueprintRequirement r = Instantiate(Prefab, Parent);
@@ -43,6 +48,7 @@ public class BlueprintRequirementDisplay : MonoBehaviour
         {
             r.InInventory = PlayerInventory.inv.Inventory.Contains(r.Item, r.Amount);
         }
+        Title.text = CurrentBlueprint.Products[0].Name;
     }
 
     public void Clear()

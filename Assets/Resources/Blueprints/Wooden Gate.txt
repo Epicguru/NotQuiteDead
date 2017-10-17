@@ -1,0 +1,3 @@
+Wooden Gate, 2
+:
+Planks, 20;

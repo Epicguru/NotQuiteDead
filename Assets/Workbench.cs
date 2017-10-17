@@ -27,6 +27,7 @@ public class Workbench : MonoBehaviour
     public Dropdown Tab;
 
     public BlueprintRequirementDisplay Requirements;
+    public BlueprintsResults Results;
     public BlueprintPreviewDisplay Preview;
     public Transform ItemParent;
     public BlueprintItem ItemPrefab;
@@ -96,6 +97,7 @@ public class Workbench : MonoBehaviour
             i.CanCraft = i.Blueprint.PlayerHasMaterials();
         }
         Requirements.Refresh();
+        Results.Refresh();
         if (CurrentBlueprint != null)
             Craft.interactable = CurrentBlueprint.PlayerHasMaterials();
         else
