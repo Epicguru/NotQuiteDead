@@ -34,6 +34,17 @@ public class Placeable : NetworkBehaviour
 
         if(isServer)
             Health.UponDeathServer += UponDeathServer;
+
+        if (IsPlaced)
+            Invoke("PlaceInForeground", 0.1f);
+    }
+
+    private void PlaceInForeground()
+    {
+        foreach (SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>())
+        {
+            r.sortingLayerName = "Placeables";
+        }
     }
 
     private void UponDeathServer()

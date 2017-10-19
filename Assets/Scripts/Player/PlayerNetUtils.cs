@@ -84,8 +84,8 @@ public class PlayerNetUtils : NetworkBehaviour
     private void RpcSpawnExplosion(Vector2 position)
     {
         GameObject x = ObjectPool.Instantiate(ExplosionPrefab.Prefab, PoolType.EXPLOSION);
-
         x.transform.position = position;
+        x.GetComponent<Explosion>().Init();
     }
 
     [Command]

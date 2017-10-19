@@ -44,7 +44,7 @@ public class PlaceablePreview : NetworkBehaviour
             Preview.SetActive(true);
 
             Preview.transform.SetParent(null);
-            Preview.transform.localScale = Vector3.one;
+            Preview.transform.localScale = placeable.PlacedScale;
             Preview.transform.position = InputManager.GetMousePos();
             Preview.transform.rotation = Quaternion.Euler(0, 0, rotation);
 
