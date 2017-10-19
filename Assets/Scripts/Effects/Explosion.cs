@@ -18,6 +18,8 @@ public class Explosion : MonoBehaviour {
             // TODO FIXME!
             ExplosionDamage(transform.position, 10, "Explosion", 20, 300, AnimationCurve.Linear(0, 1, 1, 0));
         }
+
+        Player.Local.ExplosionAt(transform.position);
     }
 
 	public void ExplosionEnded()
@@ -56,6 +58,8 @@ public class Explosion : MonoBehaviour {
             float damage = Mathf.LerpUnclamped(minDamage, maxDamage, Curve.Evaluate(normalized));
 
             h.ServerDamage(damage, killer, false);
+
+            //h.BroadcastMessage("ExplosionDamage", damage, SendMessageOptions.DontRequireReceiver);
 
             HitObjects.Add(h);
         }

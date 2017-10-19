@@ -208,4 +208,22 @@ public class Player : NetworkBehaviour
         Team = newTeam;
         UpdateTeams(Name, old);
     }
+
+    public void ExplosionAt(Vector2 position)
+    {
+        if (!isLocalPlayer)
+            return;
+
+        const float MAX_DISTANCE = 40f;
+        const float MAX_SHAKE = 4f;
+
+        float distance = Vector2.Distance(position, transform.position);
+
+        if (distance > MAX_DISTANCE)
+            return;
+
+        float nomalized = 1f - Mathf.Clamp(distance / MAX_DISTANCE, 0f, 1f);
+
+        Camera.main.GetComponent<CameraShake>().ShakeCamera(nomalized * MAX_SHAKE);
+    }
 }
