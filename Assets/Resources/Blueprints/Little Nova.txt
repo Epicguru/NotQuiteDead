@@ -1,0 +1,6 @@
+Little Nova, 1
+:
+LGC, 1;
+Long Barrel, 1;
+Iron, 10;
+Gun Components, 5;

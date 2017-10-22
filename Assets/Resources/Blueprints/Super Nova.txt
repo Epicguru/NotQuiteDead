@@ -1,0 +1,4 @@
+Super Nova, 1
+:
+Little Nova, 5;
+Electronics, 20;

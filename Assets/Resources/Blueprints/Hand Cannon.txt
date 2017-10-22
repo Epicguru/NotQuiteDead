@@ -1,0 +1,6 @@
+Hand Cannon, 1
+:
+SGC, 1;
+Short Barrel, 1;
+Gun Components, 15;
+Iron Plate, 5;
