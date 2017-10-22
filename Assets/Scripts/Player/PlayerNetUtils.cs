@@ -8,6 +8,12 @@ using UnityEngine.Networking;
 public class PlayerNetUtils : NetworkBehaviour
 {
     [Command]
+    public void CmdToggleMiningDrill(GameObject obj, bool active)
+    {
+        obj.GetComponent<MiningDrill>().Active = active;
+    }
+
+    [Command]
     public void CmdSetPositionSync(GameObject obj, Vector3 position)
     {
         obj.GetComponent<NetPositionSync>().Position = position;

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -8,6 +9,8 @@ public class MiningDrill : NetworkBehaviour
     [SyncVar]
     public bool Active;
     public Animator Animator;
+
+    public List<ItemQuantityPair> ProductionPerMinute = new List<ItemQuantityPair>();
 
     private ItemPickup Pickup;
 
@@ -29,8 +32,7 @@ public class MiningDrill : NetworkBehaviour
             ActionHUD.DisplayAction("Press " + InputManager.GetInput("Interact") + " to " + (Active ? "turn off" : "turn on") + " mining drill.");
             if (InputManager.InputDown("Interact"))
             {
-                // TODO Network!
-                Active = !Active;
+                Player.Local.NetUtils.CmdToggleMiningDrill(gameObject, !Active);
             }
         }
     }
@@ -39,4 +41,17 @@ public class MiningDrill : NetworkBehaviour
     {
         Animator.SetBool("Active", Active);
     }
+
+    [Server]
+    public void ProduceMaterials()
+    {
+
+    }
+}
+
+[Serializable]
+public struct ItemQuantityPair
+{
+    public string Prefab;
+    public int Count;
 }
