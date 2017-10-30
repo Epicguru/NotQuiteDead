@@ -87,15 +87,17 @@ public class Item : NetworkBehaviour
         currentLayer = layer;
     }
 
-    public ItemOption[] CreateOptions(ItemData data)
+    public ItemOption[] CreateOptions(Item item, ItemData data)
     {
         List<ItemOption> options = new List<ItemOption>();
         options.Add(new ItemOption() { OptionName = "Drop", OnSelected = Option_Drop });
         if(Equipable)
             options.Add(new ItemOption() { OptionName = "Equip", OnSelected = Option_Equip });
         options.Add(new ItemOption() { OptionName = "Details", OnSelected = Option_Details });
-        if (GetComponent<Attachment>() != null && Player.Local.Holding.Item != null && Player.Local.Holding.Item.GetComponent<GunAttachments>() != null)
+        if (GetComponent<Attachment>() != null && Player.Local.Holding.Item != null && Player.Local.Holding.Item.GetComponent<GunAttachments>() != null && Player.Local.Holding.Item.GetComponent<GunAttachments>().IsValid(item.GetComponent<Attachment>().Type, item.GetComponent<Attachment>()))
             options.Add(new ItemOption() { OptionName = "Put On Current Weapon", OnSelected = Option_ApplyAttachment });
+
+        options.Add(new ItemOption() { OptionName = "Quick Slot...", OnSelected = Option_QuickSlot });
 
         if (data == null)
             return options.ToArray();
@@ -298,6 +300,20 @@ public class Item : NetworkBehaviour
     public static void Option_Details(InventoryItem x)
     {
         x.Inventory.DetailsView.Enter(x);
+    }
+
+    public static void Option_QuickSlot(InventoryItem x)
+    {
+        PlayerInventory.inv.Inventory.QSI.SelectedEvent.AddListener(UponQuickSlotSelect);
+        PlayerInventory.inv.Inventory.QSI.Open = true;
+        tempSlotData = x.Data;        
+    }
+
+    private static ItemData tempSlotData;
+    private static void UponQuickSlotSelect(int number)
+    {
+        tempSlotData.QuickSlot = number;
+        tempSlotData = null;
     }
 
     public static void Option_ApplyAttachment(InventoryItem x)

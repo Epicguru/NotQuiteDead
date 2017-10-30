@@ -87,5 +87,6 @@ public class PlayerInventory : MonoBehaviour
         inv.Inventory.gameObject.SetActive(false);
         inv.Inventory.Options.Close();
         InputManager.Active = true;
+        inv.Inventory.QSI.Open = false;
     }
 }

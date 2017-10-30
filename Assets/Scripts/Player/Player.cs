@@ -25,6 +25,7 @@ public class Player : NetworkBehaviour
     public HandyRemoval HandyRemoval;
     public NetworkIdentity NetworkIdentity;
     public Health Health;
+    public QuickSlot QuickSlot;
     public SpriteLighting Lighting;
     public Player _Player;
 

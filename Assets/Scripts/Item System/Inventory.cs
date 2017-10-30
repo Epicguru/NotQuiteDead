@@ -25,6 +25,8 @@ public class Inventory : MonoBehaviour
     [Tooltip("The title of the inventory.")]
     public Text Title;
 
+    public QuickSlotInput QSI;
+
     [Tooltip("The details sub-screen.")]
     public InventoryDetailsView DetailsView;
 
@@ -168,6 +170,7 @@ public class Inventory : MonoBehaviour
             // No need to apply data, because it is up to date.
             for (int i = 0; i < amount; i++)
             {
+                item.Data.QuickSlot = 0;
                 Player.Local.NetUtils.CmdSpawnDroppedItem(item.Item.Prefab, position + new Vector2(Random.Range(-0.05f * i, 0.05f * i), Random.Range(-0.05f * i, 0.05f * i)), item.Data == null ? new ItemData() : item.Data);
             }
         }

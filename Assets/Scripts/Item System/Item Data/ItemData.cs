@@ -22,4 +22,7 @@ public class ItemData
     public string GUN_Magazine;
     public string GUN_UnderBarrel;
 
+    // Holding
+    public int QuickSlot = 0;
+
 }

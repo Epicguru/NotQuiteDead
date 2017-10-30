@@ -29,7 +29,7 @@ public class ItemOptionsPanel : MonoBehaviour
         if (open)
             return;
 
-        ItemOption[] options = item.Item.CreateOptions(item.Data);
+        ItemOption[] options = item.Item.CreateOptions(item.Item, item.Data);
         SetOptions(options, item);
     }
 

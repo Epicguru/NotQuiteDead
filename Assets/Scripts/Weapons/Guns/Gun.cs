@@ -74,13 +74,15 @@ public class Gun : Weapon
         {
             Debug.LogError("No gun animation callback object on children. It should be on the same object as the Animator.");
             Debug.Break();
-        }
+        }        
     }
 
     public void Update()
     {
         if(isClient && hasAuthority)
             Animation.AnimRun(Item.IsEquipped() && InputManager.InputPressed("Sprint") && Player.Local.GetComponent<Rigidbody2D>().velocity != Vector2.zero);
+
+        transform.localRotation = Quaternion.identity;
     }
 
     public void UpdateData(ItemData data)
