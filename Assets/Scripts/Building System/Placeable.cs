@@ -14,6 +14,9 @@ public class Placeable : NetworkBehaviour
     [Tooltip("Is this placeable static (not moving) when placed?")]
     public bool Static = true;
 
+    [Tooltip("Can the placeable be rotated?")]
+    public bool CanRotate = true;
+
     [HideInInspector] public Item Item;
     [HideInInspector] public Health Health;
     [HideInInspector] public Rigidbody2D Rigidbody;
@@ -52,6 +55,9 @@ public class Placeable : NetworkBehaviour
         // Die!
         Destroy(this.gameObject);
         //Debug.Log("Placeable destroyed!");
+
+        // TEST FOR FUN
+        Explosion.Spawn(transform.position);
     }
 
     private void SetCollidersAsTriggers(bool trigger)

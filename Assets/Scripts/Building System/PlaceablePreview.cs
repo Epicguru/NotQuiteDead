@@ -19,6 +19,8 @@ public class PlaceablePreview : NetworkBehaviour
         placeable = GetComponent<Placeable>();
 
         rotation = LastRotation;
+        if (!placeable.CanRotate)
+            rotation = 0;
 
         if(Preview == null)
         {
@@ -50,14 +52,17 @@ public class PlaceablePreview : NetworkBehaviour
 
             // Rotate...
             // TODO add inputs...
-            float speed = 120f;
-            if (Input.GetKey(KeyCode.E))
+            if (placeable.CanRotate)
             {
-                rotation -= speed * Time.deltaTime;
-            }
-            if (Input.GetKey(KeyCode.Q))
-            {
-                rotation += speed * Time.deltaTime;
+                float speed = 120f;
+                if (Input.GetKey(KeyCode.E))
+                {
+                    rotation -= speed * Time.deltaTime;
+                }
+                if (Input.GetKey(KeyCode.Q))
+                {
+                    rotation += speed * Time.deltaTime;
+                }
             }
         }
         else
