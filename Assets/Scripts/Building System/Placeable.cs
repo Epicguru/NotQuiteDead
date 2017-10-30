@@ -55,24 +55,19 @@ public class Placeable : NetworkBehaviour
         // Die!
         Destroy(this.gameObject);
         //Debug.Log("Placeable destroyed!");
-
-        // TEST FOR FUN
-        Explosion.Spawn(transform.position);
     }
 
-    private void SetCollidersAsTriggers(bool trigger)
+    private void SetCollidersEnabled(bool flag)
     {
         foreach(Collider2D c in GetComponentsInChildren<Collider2D>())
         {
-            c.isTrigger = trigger;
+            c.enabled = flag;
         }
-
-        if (!trigger)
-            SetItemPickupAsTrigger();
     }
 
     private void SetItemPickupAsTrigger()
     {
+        Item.pickup.collider.enabled = true;
         Item.pickup.collider.isTrigger = true;
     }
 
@@ -136,7 +131,9 @@ public class Placeable : NetworkBehaviour
             UpdatePlacing();
         }
 
-        SetCollidersAsTriggers(!IsPlaced);
+
+        SetCollidersEnabled(IsPlaced);
+        SetItemPickupAsTrigger();
 
         // Enable/disable shadows. Internally optimised, so call count does not matter.
         Lighting.Shadows = IsPlaced;
