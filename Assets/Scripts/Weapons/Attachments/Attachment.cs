@@ -18,6 +18,8 @@ public class Attachment : NetworkBehaviour
     private bool applied = false;
     private string layer = null;
     private Item Item;
+    private Gun PrefabGun;
+    private Gun CacheGun;
 
     public bool IsAttached
     {
@@ -112,8 +114,18 @@ public class Attachment : NetworkBehaviour
     {
         if (!IsAttached)
             return null;
+        if (CacheGun == null)
+            CacheGun = Gun.GetComponentInParent<Gun>();
 
-        return Gun.GetComponentInParent<Gun>();
+        return CacheGun;
+    }
+
+    public Gun GetPrefabGun()
+    {
+        if (PrefabGun == null)
+            PrefabGun = Item.FindItem(GetGun().Item.Prefab).GetComponent<Gun>();
+
+        return PrefabGun;
     }
 
     public void Effect_Accuracy(float percentage)
@@ -124,7 +136,7 @@ public class Attachment : NetworkBehaviour
 
     public void Reset_Accuracy()
     {
-        GetGun().Shooting.Damage.Inaccuracy = GetGun().Item.GetComponent<Gun>().Shooting.Damage.Inaccuracy;
+        GetGun().Shooting.Damage.Inaccuracy = GetPrefabGun().Shooting.Damage.Inaccuracy;
     }
 
     public void Effect_Magazine(float capacity)
@@ -134,7 +146,7 @@ public class Attachment : NetworkBehaviour
 
     public void Reset_Magazine()
     {
-        GetGun().Shooting.Capacity.MagazineCapacity = GetGun().Item.GetComponent<Gun>().Shooting.Capacity.MagazineCapacity;
+        GetGun().Shooting.Capacity.MagazineCapacity = GetPrefabGun().Shooting.Capacity.MagazineCapacity;
     }
 
     public void Effect_Range(float rangeMultiplier)
@@ -144,7 +156,7 @@ public class Attachment : NetworkBehaviour
 
     public void Reset_Range()
     {
-        GetGun().Shooting.Damage.Range = GetGun().Item.GetComponent<Gun>().Shooting.Damage.Range;
+        GetGun().Shooting.Damage.Range = GetPrefabGun().Shooting.Damage.Range;
     }
 
     public void Effect_Damage(float damageMultiplier)
@@ -154,7 +166,7 @@ public class Attachment : NetworkBehaviour
 
     public void Reset_Damage()
     {
-        GetGun().Shooting.Damage.Damage = GetGun().Item.GetComponent<Gun>().Shooting.Damage.Damage;
+        GetGun().Shooting.Damage.Damage = GetPrefabGun().Shooting.Damage.Damage;
     }
 
     public float Effect_DamageFalloff(float damageFalloffOffset)
@@ -167,7 +179,7 @@ public class Attachment : NetworkBehaviour
 
     public void Reset_DamageFalloff()
     {
-        GetGun().Shooting.Damage.DamageFalloff = GetGun().Item.GetComponent<Gun>().Shooting.Damage.DamageFalloff;
+        GetGun().Shooting.Damage.DamageFalloff = GetPrefabGun().Shooting.Damage.DamageFalloff;
     }
 
     public void Effect_ShotVolume(Vector2 change)
@@ -180,6 +192,6 @@ public class Attachment : NetworkBehaviour
 
     public void Reset_ShotVolume()
     {
-        GetGun().Shooting.Audio.Volume = GetGun().Item.GetComponent<Gun>().Shooting.Audio.Volume;
+        GetGun().Shooting.Audio.Volume = GetPrefabGun().Shooting.Audio.Volume;
     }
 }

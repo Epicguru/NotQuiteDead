@@ -15,21 +15,60 @@ public class Gun : Weapon
 
     public GunType GunType = GunType.RIFLE;
 
-    [HideInInspector] public GunAiming Aiming;
-    [HideInInspector] public GunAnimation Animation;
-    [HideInInspector] public GunShooting Shooting;
-    [HideInInspector] public Item Item;
-    [HideInInspector] public GunAttachments Attachments;
+    public GunAiming Aiming
+    {
+        get
+        {
+            if (_Aiming == null)
+                _Aiming = GetComponent<GunAiming>();
+            return _Aiming;
+        }
+    }
+    private GunAiming _Aiming;
+    public GunAnimation Animation
+    {
+        get
+        {
+            if (_Animation == null)
+                _Animation = GetComponent<GunAnimation>();
+            return _Animation;
+        }
+    }
+    private GunAnimation _Animation;
+    public GunShooting Shooting
+    {
+        get
+        {
+            if (_Shooting == null)
+                _Shooting = GetComponent<GunShooting>();
+            return _Shooting;
+        }
+    }
+    private GunShooting _Shooting;
+    public Item Item
+    {
+        get
+        {
+            if (_Item == null)
+                _Item= GetComponent<Item>();
+            return _Item;
+        }
+    }
+    private Item _Item;
+    public GunAttachments Attachments
+    {
+        get
+        {
+            if (_Attachments == null)
+                _Attachments = GetComponent<GunAttachments>();
+            return _Attachments;
+        }
+    }
+    private GunAttachments _Attachments;
 
     public void Start()
     {
         base.Type = WeaponType.RANGED;
-
-        Aiming = GetComponent<GunAiming>();
-        Animation = GetComponent<GunAnimation>();
-        Shooting = GetComponent<GunShooting>();
-        Item = GetComponent<Item>();
-        Attachments = GetComponent<GunAttachments>();
 
         if(GetComponentInChildren<GunAnimationCallbacks>() == null)
         {
@@ -46,7 +85,6 @@ public class Gun : Weapon
 
     public void UpdateData(ItemData data)
     {
-        Shooting = GetComponent<GunShooting>();
         data.GUN_BulletInChamber = Shooting.bulletInChamber;
         data.GUN_BulletsInMagazine = Shooting.bulletsInMagazine;
         data.GUN_FiringMode = Shooting.firingModeIndex;
@@ -54,7 +92,6 @@ public class Gun : Weapon
 
     public void ApplyData(ItemData data)
     {
-        Shooting = GetComponent<GunShooting>();
         Shooting.bulletInChamber = data.GUN_BulletInChamber;
         Shooting.bulletsInMagazine = data.GUN_BulletsInMagazine;
         Shooting.firingModeIndex = data.GUN_FiringMode;
@@ -63,7 +100,6 @@ public class Gun : Weapon
     public void SetDataDefaults(ItemData data)
     {
         // Set gun data.
-        Shooting = GetComponent<GunShooting>();
         data.GUN_BulletInChamber = false;
         data.GUN_BulletsInMagazine = Shooting.Capacity.MagazineCapacity;
         data.GUN_FiringMode = 0;
