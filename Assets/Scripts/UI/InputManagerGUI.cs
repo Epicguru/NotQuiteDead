@@ -36,6 +36,7 @@ public class InputManagerGUI : MonoBehaviour
 
         int y = 0;
         int i = 0;
+
         foreach(string s in InputManager.GetInputs())
         {
             string name = s;

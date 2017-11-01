@@ -33,6 +33,9 @@ public class Item : NetworkBehaviour
     [Tooltip("Whether the item can be equipped into the players hands.")]
     public bool Equipable = false;
 
+    [Tooltip("If true AND Equipable is true, the this item can be quick-slotted.")]
+    public bool CanQuickSlot = true;
+
     [Tooltip("Descriptions of the item.")]
     public ItemDescription Description;
 
@@ -97,7 +100,8 @@ public class Item : NetworkBehaviour
         if (GetComponent<Attachment>() != null && Player.Local.Holding.Item != null && Player.Local.Holding.Item.GetComponent<GunAttachments>() != null && Player.Local.Holding.Item.GetComponent<GunAttachments>().IsValid(item.GetComponent<Attachment>().Type, item.GetComponent<Attachment>()))
             options.Add(new ItemOption() { OptionName = "Put On Current Weapon", OnSelected = Option_ApplyAttachment });
 
-        options.Add(new ItemOption() { OptionName = "Quick Slot...", OnSelected = Option_QuickSlot });
+        if(item.Equipable)
+            options.Add(new ItemOption() { OptionName = "Quick Slot...", OnSelected = Option_QuickSlot });
 
         if (data == null)
             return options.ToArray();
