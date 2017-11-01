@@ -10,7 +10,8 @@ public class Grenade : NetworkBehaviour {
     public void Start()
     {
         ThrowableInstance = GetComponent<ThrowableInstance>();
-        ThrowableInstance.AuthorityHitTarget += DestroyAndExplode;
+        if (hasAuthority)
+            ThrowableInstance.AuthorityHitTarget += DestroyAndExplode;
     }
 
     public void DestroyAndExplode()

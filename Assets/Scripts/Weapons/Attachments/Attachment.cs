@@ -53,12 +53,7 @@ public class Attachment : NetworkBehaviour
 
             if (!applied && transform.parent.childCount == 1)
             {
-                //Debug.Log("Applying effects of " + Item.Name);
-                foreach (AttachmentTweak tweak in GetComponents<AttachmentTweak>())
-                {
-                    tweak.Apply(this);
-                }
-                applied = true;
+                ApplyEffects();
             }
 
             SetLayer("Equipped Items");
@@ -93,20 +88,63 @@ public class Attachment : NetworkBehaviour
         this.layer = layer;
     }
 
+    public void ApplyEffects()
+    {
+        if (applied)
+            return;
+
+        foreach (AttachmentTweak tweak in GetComponents<AttachmentTweak>())
+        {
+            tweak.Apply(this);
+        }
+        applied = true;
+    }
+
+    public void RemoveEffects()
+    {
+        if (!applied)
+            return;
+
+        if (GetGun() == null)
+            return; // If gun has been destroyed!
+
+        foreach (AttachmentTweak tweak in GetComponents<AttachmentTweak>())
+        {
+            tweak.Remove(this);
+        }
+
+        applied = false;
+    }
+
     public override void OnNetworkDestroy()
     {
         // TODO - If gun is being put away, we DO NOT CARE! Just do nothing and avoid errors.
-        if (applied)
-        {
-            Debug.Log(Item.Name + " is being removed!");
-            if (GetGun() == null)
-                return; // If gun has been destroyed!
-            Debug.Log(Item.Name + " is removing effects.");
 
-            foreach (AttachmentTweak tweak in GetComponents<AttachmentTweak>())
-            {
-                tweak.Remove(this);
-            }
+        if (transform.parent == null)
+            return;
+        Gun gun = GetGun();
+        if (gun == null)
+            return;
+
+        RemoveEffects();
+        Attachment[] attachments = gun.GetComponentsInChildren<Attachment>();
+
+        // Remove all effects from gun.
+        foreach (Attachment a in attachments)
+        {
+            if (a == this)
+                continue;
+
+            a.RemoveEffects();
+        }
+
+        // Apply all effects again.
+        foreach (Attachment a in attachments)
+        {
+            if (a == this)
+                continue;
+
+            a.ApplyEffects();
         }
     }
 

@@ -13,8 +13,6 @@ public class AdvancedAccuracyTweak : AttachmentTweak
     {
         a.GetGun().Shooting.Damage.Inaccuracy.x *= X;
         a.GetGun().Shooting.Damage.Inaccuracy.y *= Y;
-
-        Debug.Log("Applied!");
     }    
 
     public override void Remove(Attachment a)
