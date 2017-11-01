@@ -37,8 +37,16 @@ public class QuickSlotInput : MonoBehaviour
         {
             if (Input.GetKeyUp(KeyCode.Escape))
             {
-                Open = false;
                 SelectedEvent.RemoveAllListeners();
+                Open = false;
+                return;
+            }
+
+            if (Input.GetKeyUp(KeyCode.Space))
+            {
+                SelectedEvent.Invoke(0);
+                SelectedEvent.RemoveAllListeners();
+                Open = false;
                 return;
             }
 
@@ -46,9 +54,28 @@ public class QuickSlotInput : MonoBehaviour
             {
                 if (Input.GetKeyDown(Player.Local.QuickSlot.Slots[i]))
                 {
-                    SelectedEvent.Invoke(i);
-                    Open = false;
+                    InventoryItem item = null;
+
+                    foreach(InventoryItem x in PlayerInventory.inv.Inventory.Contents)
+                    {
+                        if (x.Data == null)
+                            continue;
+                        if(x.Data.QuickSlot == i + 1)
+                        {
+                            item = x;
+                            break;
+                        }
+                    }
+
+                    if (item != null)
+                    {
+                        item.Data.QuickSlot = 0;
+                        item.SetText();
+                    }
+
+                    SelectedEvent.Invoke(i + 1);
                     SelectedEvent.RemoveAllListeners();
+                    Open = false;
                     break;
                 }
             }

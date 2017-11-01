@@ -304,15 +304,16 @@ public class Item : NetworkBehaviour
 
     public static void Option_QuickSlot(InventoryItem x)
     {
-        PlayerInventory.inv.Inventory.QSI.SelectedEvent.AddListener(UponQuickSlotSelect);
         PlayerInventory.inv.Inventory.QSI.Open = true;
-        tempSlotData = x.Data;        
+        PlayerInventory.inv.Inventory.QSI.SelectedEvent.AddListener(UponQuickSlotSelect);
+        tempSlotData = x;        
     }
 
-    private static ItemData tempSlotData;
+    private static InventoryItem tempSlotData;
     private static void UponQuickSlotSelect(int number)
     {
-        tempSlotData.QuickSlot = number;
+        tempSlotData.Data.QuickSlot = number;
+        tempSlotData.SetText();
         tempSlotData = null;
     }
 

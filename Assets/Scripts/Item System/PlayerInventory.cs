@@ -36,7 +36,7 @@ public class PlayerInventory : MonoBehaviour
                 Open();
             }
         }
-        if(InputManager.InputDown("Escape", true))
+        if(!Inventory.QSI.Open && InputManager.InputDown("Escape", true))
         {
             if (inv.Inventory.gameObject.activeSelf)
             {

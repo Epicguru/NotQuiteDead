@@ -70,6 +70,11 @@ public class Inventory : MonoBehaviour
     public void ResetViewport()
     {
         ViewportContent.localPosition = Vector2.zero;
+
+        foreach(InventoryItem i in Contents)
+        {
+            i.SetText();
+        }
     }
 
     public InventoryItem AddItem(string prefab, ItemData data, int amount = 1)

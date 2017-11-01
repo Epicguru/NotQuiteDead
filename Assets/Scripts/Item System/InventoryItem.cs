@@ -30,8 +30,20 @@ public class InventoryItem : MonoBehaviour
     [Tooltip("The prefab version of this item. Not an instance.")]
     public Item Item; // The prefab version, not an instance!!!
 
-    [Tooltip("The data for an item. Only used if there is one item in the stack.")]
-    public ItemData Data;
+    public ItemData Data
+    {
+        get
+        {
+            return _Data;
+        }
+        set
+        {
+            _Data = value;
+            SetText();
+        }
+    }
+
+    private ItemData _Data;
 
     private static Vector2 StaticPos = new Vector2();
 
@@ -72,7 +84,10 @@ public class InventoryItem : MonoBehaviour
     public void SetText()
     {
         string quantity = ItemCount > 1 ? " x" + ItemCount : "";
-        Text.text = Item.Name + quantity;
+        string quickSlot = "";
+        if (Data != null && Data.QuickSlot != 0)
+            quickSlot = RichText.InColour(" (Slot #" + Data.QuickSlot + ")", Color.black);
+        Text.text = Item.Name + quantity + quickSlot;
         Text.color = ItemRarityUtils.GetColour(Item.Rarity);
         if(Details != null)
             Details.text = (Item.InventoryInfo.Weight * ItemCount) + "Kg";
