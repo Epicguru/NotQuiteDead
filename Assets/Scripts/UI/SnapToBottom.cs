@@ -17,6 +17,6 @@ public class SnapToBottom : MonoBehaviour
 
         temp.y -= Target.sizeDelta.y;
 
-        (transform as RectTransform).localPosition = temp;
+        (transform as RectTransform).anchoredPosition = temp;
     }
 }

@@ -42,7 +42,7 @@ public class InputManagerGUI : MonoBehaviour
             string name = s;
             GameObject instance = Instantiate(Container.gameObject, Parent);
             RectTransform t = instance.GetComponent<RectTransform>();
-            t.localPosition = new Vector2(0, y);
+            t.anchoredPosition = new Vector2(0, y);
             instance.GetComponentInChildren<InputContainer>().InputName = name;
             instance.GetComponentInChildren<InputContainer>().SetName();
             instance.GetComponentInChildren<Image>().color = ((i % 2) == 0 ? ColourA : ColourB);

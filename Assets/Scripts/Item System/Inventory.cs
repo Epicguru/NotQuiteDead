@@ -69,7 +69,7 @@ public class Inventory : MonoBehaviour
 
     public void ResetViewport()
     {
-        ViewportContent.localPosition = Vector2.zero;
+        ViewportContent.anchoredPosition = Vector2.zero;
 
         foreach(InventoryItem i in Contents)
         {
@@ -102,7 +102,7 @@ public class Inventory : MonoBehaviour
                 i.ItemCount = amount;
 
                 // Place at bottom
-                rect.localPosition = new Vector2(0, -Contents.Count * 30);
+                rect.anchoredPosition = new Vector2(0, -Contents.Count * 30);
 
                 i.Init(data); // Data may be null, who knows!
 
@@ -195,10 +195,11 @@ public class Inventory : MonoBehaviour
         Destroy(item.gameObject);
 
         // Move everything below this upwards, and make viewport smaller.
+        Debug.Log("Moving downwards..." + lastItem + ", " + Contents.Count + ", " + index);
         for(int i = index; i < Contents.Count; i++)
         {
             RectTransform x = Contents[i].GetComponent<RectTransform>();
-            x.localPosition = new Vector2(x.localPosition.x, x.localPosition.y + 30);
+            x.anchoredPosition = new Vector2(x.localPosition.x + 100, x.localPosition.y + 30);
         }
 
         // Viewport
