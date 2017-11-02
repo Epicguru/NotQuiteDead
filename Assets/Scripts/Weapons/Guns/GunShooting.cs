@@ -462,6 +462,8 @@ public class GunShooting : RotatingWeapon
                 }
 
                 trailEnd.Set(hit.point.x, hit.point.y);
+                float angle = Mathf.Atan2(hit.normal.y, hit.normal.x) * Mathf.Rad2Deg + 180;
+                HitEffect.Spawn(hit.point, angle, 15, Color.yellow, HitEffectPreset.Sparks);
                 break;
             }
 
@@ -501,7 +503,11 @@ public class GunShooting : RotatingWeapon
 
             float damage = GetDamage(startPos, hit.point, penetrationCount, bullets);
             if (damage != 0)
+            {
                 CmdHitObject(h.gameObject, Player.Local.Name + ":" + gun.Item.Prefab, damage);
+                float angle = Mathf.Atan2(hit.normal.y, hit.normal.x) * Mathf.Rad2Deg + 180;
+                HitEffect.Spawn(hit.point, angle, 15, Color.yellow, HitEffectPreset.Sparks);
+            }
 
             penetrationCount++;
             if (penetrationCount >= Damage.Penetration)

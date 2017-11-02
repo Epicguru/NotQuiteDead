@@ -18,6 +18,9 @@ public class Throwable : NetworkBehaviour
 
     public void Update()
     {
+        // TODO MAKE ME DECENT!
+        if (!hasAuthority)
+            return;
         if (!Item.IsEquipped())
             return;
 
