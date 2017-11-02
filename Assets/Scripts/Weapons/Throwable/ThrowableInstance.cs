@@ -32,7 +32,7 @@ public class ThrowableInstance : NetworkBehaviour {
         if(p >= 1f)
         {
             // Done!
-            if(hasAuthority)
+            if(isServer)
                 if (AuthorityHitTarget != null)
                     AuthorityHitTarget();
         }

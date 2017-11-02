@@ -10,7 +10,7 @@ public class Grenade : NetworkBehaviour {
     public void Start()
     {
         ThrowableInstance = GetComponent<ThrowableInstance>();
-        if (hasAuthority)
+        if (isServer)
             ThrowableInstance.AuthorityHitTarget += DestroyAndExplode;
     }
 
@@ -18,12 +18,6 @@ public class Grenade : NetworkBehaviour {
     {
         // Destroy and explode the grenade object.
         Explosion.Spawn(transform.position);
-        CmdDestroy();
-    }
-
-    [Command]
-    public void CmdDestroy()
-    {
         Destroy(this.gameObject);
     }
 }

@@ -46,6 +46,6 @@ public class Throwable : NetworkBehaviour
         x.GetComponent<ThrowableInstance>().Target = targetPos;
         x.GetComponent<ThrowableInstance>().StartPosition = position;
         x.transform.position = position;
-        NetworkServer.SpawnWithClientAuthority(x, player);
+        NetworkServer.Spawn(x);
     }
 }
