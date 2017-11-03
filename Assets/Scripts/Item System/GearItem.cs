@@ -76,6 +76,9 @@ public class GearItem : MonoBehaviour {
 
     public void Clicked()
     {
+        //if (Item == null)
+        //    return;
+
         // Quick Actions:
         if (InputManager.InputPressed("Quick Store", true))
         {
