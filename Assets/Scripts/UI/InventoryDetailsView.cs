@@ -15,7 +15,12 @@ public class InventoryDetailsView : MonoBehaviour
 
     public void Enter(InventoryItem item)
     {
-        Debug.Log("Opening details for : " + item.Item.Name);
+        this.Enter(item.Item);
+    }
+
+    public void Enter(Item item)
+    {
+        Debug.Log("Opening details for : " + item.Name);
         gameObject.SetActive(true);
         // Make description.
 
@@ -27,17 +32,17 @@ public class InventoryDetailsView : MonoBehaviour
         // ATM the inventory item can only read prefab data, and not real data such as durability
         // bullets in gun etc.
 
-        description += RichText.InBold("Rarity - ") + RichText.InColour(item.Item.Rarity.ToString(), ItemRarityUtils.GetColour(item.Item.Rarity)) + "\n";
-        description += RichText.InBold("Weight - ") + item.Item.InventoryInfo.Weight + "Kg\n";
-        if(item.Item.GetComponent<Weapon>() != null)
+        description += RichText.InBold("Rarity - ") + RichText.InColour(item.Rarity.ToString(), ItemRarityUtils.GetColour(item.Rarity)) + "\n";
+        description += RichText.InBold("Weight - ") + item.InventoryInfo.Weight + "Kg\n";
+        if(item.GetComponent<Weapon>() != null)
         {
-            description += RichText.InBold("Weapon Type - ") + item.Item.GetComponent<Weapon>().Type + "\n";
+            description += RichText.InBold("Weapon Type - ") + item.GetComponent<Weapon>().Type + "\n";
         }
-        if(item.Item.GetComponent<MeleeAttack>() != null)
+        if(item.GetComponent<MeleeAttack>() != null)
         {
-            description += RichText.InBold("Damage - ") + item.Item.GetComponent<MeleeAttack>().Damage.Damage + "\n";
+            description += RichText.InBold("Damage - ") + item.GetComponent<MeleeAttack>().Damage.Damage + "\n";
         }
-        Gun gun = item.Item.GetComponent<Gun>();
+        Gun gun = item.GetComponent<Gun>();
         if(gun != null)
         {
             GunDamage damage = gun.GetComponent<GunShooting>().Damage;
@@ -60,10 +65,10 @@ public class InventoryDetailsView : MonoBehaviour
             description += RichText.InBold("Damage Falloff - ") + (int)(damage.DamageFalloff * 100f) + "%\n";
         }
 
-        if(item.Item.GetComponent<Attachment>() != null)
+        if(item.GetComponent<Attachment>() != null)
         {
             description += RichText.InBold("Effects:") + "\n";
-            foreach(AttachmentTweak t in item.Item.GetComponents<AttachmentTweak>())
+            foreach(AttachmentTweak t in item.GetComponents<AttachmentTweak>())
             {
                 description += RichText.InBold(" -") + t.GetEffects() + "\n";
             }
@@ -71,14 +76,14 @@ public class InventoryDetailsView : MonoBehaviour
 
         description += "\n";
 
-        description += RichText.InColour(RichText.InItalics(item.Item.Description.ShortDescription), Color.black) + "\n\n";
-        description += RichText.InColour(item.Item.Description.LongDescription, Color.black) + "\n\n";
+        description += RichText.InColour(RichText.InItalics(item.Description.ShortDescription), Color.black) + "\n\n";
+        description += RichText.InColour(item.Description.LongDescription, Color.black) + "\n\n";
 
         Text.text = description;
-        Title.text = item.Item.Name;
+        Title.text = item.Name;
 
-        Sprite spr = Atlas.GetSprite(item.Item.ItemIcon.name);
-        Image.sprite = spr == null ? item.Item.ItemIcon : spr;
+        Sprite spr = Atlas.GetSprite(item.ItemIcon.name);
+        Image.sprite = spr == null ? item.ItemIcon : spr;
     }
 
     public void Exit()

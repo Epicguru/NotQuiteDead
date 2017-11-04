@@ -109,14 +109,14 @@ public class InventoryItem : MonoBehaviour
         if(Item.Equipable && InputManager.InputPressed("Quick Equip", true))
         {
             // Wants to quick equip, do it!
-            Item.Option_Equip(this);
+            Item.Option_Equip(this, ItemPrefab);
             return;
         }
 
         if (InputManager.InputPressed("Quick Drop", true))
         {
             // Wants to quick drop, do it!
-            Item.Option_Drop(this);
+            Item.Option_Drop(this, ItemPrefab);
             return;
         }
 

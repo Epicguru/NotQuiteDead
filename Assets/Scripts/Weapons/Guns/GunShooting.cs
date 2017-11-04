@@ -71,6 +71,9 @@ public class GunShooting : RotatingWeapon
             NextFiringMode();
         }
 
+        if (bulletsInMagazine > Capacity.MagazineCapacity)
+            bulletsInMagazine = Capacity.MagazineCapacity;
+
         FiringMode = AllowedModes[firingModeIndex];
 
         bool requestingShoot = ShootNow();

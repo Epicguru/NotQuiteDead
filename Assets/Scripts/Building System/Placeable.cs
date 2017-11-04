@@ -106,8 +106,7 @@ public class Placeable : NetworkBehaviour
             InventoryItem i = PlayerInventory.inv.Inventory.GetOfType(Item.Prefab);
             if (i != null)
             {
-                Debug.Log("Equipped new...");
-                Item.Option_Equip(i);
+                Item.Option_Equip(i, i.ItemPrefab);
                 PlaceablePreview.LastRotation = angle;
             }
         }

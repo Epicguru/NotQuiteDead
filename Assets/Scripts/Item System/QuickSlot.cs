@@ -40,7 +40,7 @@ public class QuickSlot : NetworkBehaviour
                 continue;
             if (i.Data.QuickSlot == number)
             {
-                Item.Option_Equip(i);
+                Item.Option_Equip(i, i.ItemPrefab);
                 break;
             }
         }

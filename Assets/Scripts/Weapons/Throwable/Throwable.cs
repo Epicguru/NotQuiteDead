@@ -37,7 +37,7 @@ public class Throwable : NetworkBehaviour
             if (i != null)
             {
                 // Equip it!
-                Item.Option_Equip(i);
+                Item.Option_Equip(i, i.ItemPrefab);
             }
         }
     }

@@ -284,7 +284,7 @@ public class Item : NetworkBehaviour
         return Items.ContainsKey(prefab);
     }
 
-    public static void Option_Equip(InventoryItem x)
+    public static void Option_Equip(InventoryItem x, string prefab)
     {
         ItemData d = x.Data;
         if(d == null)
@@ -296,17 +296,17 @@ public class Item : NetworkBehaviour
         Player.Local.Holding.CmdEquip(x.Item.Prefab, Player.Local.gameObject, d);
     }
 
-    public static void Option_Drop(InventoryItem x)
+    public static void Option_Drop(InventoryItem x, string prefab)
     {
         x.Inventory.RemoveItem(x, Player.Local.transform.position, true);
     }
 
-    public static void Option_Details(InventoryItem x)
+    public static void Option_Details(InventoryItem x, string prefab)
     {
         x.Inventory.DetailsView.Enter(x);
     }
 
-    public static void Option_QuickSlot(InventoryItem x)
+    public static void Option_QuickSlot(InventoryItem x, string prefab)
     {
         PlayerInventory.inv.Inventory.QSI.Open = true;
         PlayerInventory.inv.Inventory.QSI.SelectedEvent.AddListener(UponQuickSlotSelect);
@@ -321,7 +321,7 @@ public class Item : NetworkBehaviour
         tempSlotData = null;
     }
 
-    public static void Option_ApplyAttachment(InventoryItem x)
+    public static void Option_ApplyAttachment(InventoryItem x, string prefab)
     {
         // Set attachment...
         bool worked = Player.Local.Holding.Item.GetComponent<GunAttachments>().SetAttachment(x.Item.GetComponent<Attachment>().Type, x.Item);
@@ -330,7 +330,7 @@ public class Item : NetworkBehaviour
             x.Inventory.RemoveItem(x, Vector2.zero, false, 1);
     }
 
-    public static void Option_RemoveMagazine(InventoryItem x)
+    public static void Option_RemoveMagazine(InventoryItem x, string prefab)
     {
         // Remove attachment...
         string old = x.Data.GUN_Magazine;
@@ -340,7 +340,7 @@ public class Item : NetworkBehaviour
         x.Inventory.AddItem(old, null, 1);
     }
 
-    public static void Option_RemoveMuzzle(InventoryItem x)
+    public static void Option_RemoveMuzzle(InventoryItem x, string prefab)
     {
         // Remove attachment...
         string old = x.Data.GUN_Muzzle;
@@ -350,7 +350,7 @@ public class Item : NetworkBehaviour
         x.Inventory.AddItem(old, null, 1);
     }
 
-    public static void Option_RemoveSight(InventoryItem x)
+    public static void Option_RemoveSight(InventoryItem x, string prefab)
     {
         // Remove attachment...
         string old = x.Data.GUN_Sight;
@@ -360,7 +360,7 @@ public class Item : NetworkBehaviour
         x.Inventory.AddItem(old, null, 1);
     }
 
-    public static void Option_RemoveUnderBarrel(InventoryItem x)
+    public static void Option_RemoveUnderBarrel(InventoryItem x, string prefab)
     {
         // Remove attachment...
         string old = x.Data.GUN_UnderBarrel;

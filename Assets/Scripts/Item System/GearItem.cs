@@ -38,14 +38,14 @@ public class GearItem : MonoBehaviour {
         }
     }
 
-    public void Store(InventoryItem item)
+    public void Store(InventoryItem item, string prefab)
     {
         // Store the current item.
         Player.Local.Holding.Item.RequestDataUpdate();
         Player.Local.Holding.CmdDrop(false, false, Player.Local.gameObject, Player.Local.Holding.Item.Data);
     }
 
-    public void Drop(InventoryItem item)
+    public void Drop(InventoryItem item, string prefab)
     {
         // Drop the current item.
         Player.Local.Holding.Item.RequestDataUpdate();
@@ -53,10 +53,13 @@ public class GearItem : MonoBehaviour {
         Player.Local.Holding.CmdDrop(true, false, Player.Local.gameObject, Player.Local.Holding.Item.Data);
     }
 
-    public void Details(InventoryItem item)
+    public void Details(InventoryItem item, string prefab)
     {
         // Show the details view.
-        item.Inventory.DetailsView.Enter(item);
+        if (item != null)
+            item.Inventory.DetailsView.Enter(item);
+        else
+            PlayerInventory.inv.Inventory.DetailsView.Enter(Item.FindItem(prefab));
     }
 
     public ItemOption[] GetOptions(ItemData data)
@@ -76,21 +79,21 @@ public class GearItem : MonoBehaviour {
 
     public void Clicked()
     {
-        //if (Item == null)
-        //    return;
+        if (Item == null)
+            return;
 
         // Quick Actions:
         if (InputManager.InputPressed("Quick Store", true))
         {
             // Wants to quick store, do it!
-            Store(null);
+            Store(null, null);
             return;
         }
 
         if (InputManager.InputPressed("Quick Drop", true))
         {
             // Wants to quick drop, do it!
-            Drop(null);
+            Drop(null, null);
             return;
         }
 
