@@ -13,7 +13,7 @@ public class SnapToBottom : MonoBehaviour
 
     public void Update()
     {
-        temp.Set(Target.localPosition.x, Target.localPosition.y);
+        temp.Set(Target.anchoredPosition.x, Target.anchoredPosition.y);
 
         temp.y -= Target.sizeDelta.y;
 
