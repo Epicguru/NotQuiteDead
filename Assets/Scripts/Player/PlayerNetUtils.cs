@@ -7,6 +7,22 @@ using UnityEngine.Networking;
 
 public class PlayerNetUtils : NetworkBehaviour
 {
+    private Player player;
+
+    public Player GetPlayer()
+    {
+        if (player == null)
+            player = GetComponent<Player>();
+
+        return player;
+    }
+
+    [Command]
+    public void CmdSetGear(string name, string prefab, ItemData data)
+    {
+        GetPlayer().GearMap[name].SetItem(Item.FindItem(prefab), data);
+    }
+
     [Command]
     public void CmdToggleMiningDrill(GameObject obj, bool active)
     {
@@ -22,7 +38,7 @@ public class PlayerNetUtils : NetworkBehaviour
     [Command]
     public void CmdSpawnDroppedItem(string prefab, Vector3 position, ItemData data)
     {
-        Item newItem = Item.NewInstance(prefab);
+        Item newItem = Item.NewInstance(prefab, position);
         newItem.transform.position = position; // Set position.
         if (data == null)
             data = new ItemData();
@@ -109,15 +125,15 @@ public class PlayerNetUtils : NetworkBehaviour
     [Command]
     public void CmdSetName(string name)
     {
-        if (!GetComponent<Player>().PlayerHasName(name))
-            GetComponent<Player>().Name = name;
+        if (!GetPlayer().PlayerHasName(name))
+            GetPlayer().Name = name;
         else
             Debug.LogError("Cannot set player name to " + name + " because another player already has that name (or very similar).");
     }
 
     public void CmdSetTeam(string newTeam)
     {
-        GetComponent<Player>().Team = newTeam;
+        GetPlayer().Team = newTeam;
     }
 
     [Command]

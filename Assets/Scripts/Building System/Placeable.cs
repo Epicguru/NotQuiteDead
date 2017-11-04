@@ -74,7 +74,7 @@ public class Placeable : NetworkBehaviour
     [Command]
     public void CmdPlace(Vector2 position, Quaternion rotation)
     {
-        Item newItem = Item.NewInstance(Item.Prefab);
+        Item newItem = Item.NewInstance(Item.Prefab, position);
 
         //Debug.Log("Placing at : " + position);
 

@@ -27,6 +27,8 @@ public class Player : NetworkBehaviour
     public Health Health;
     public QuickSlot QuickSlot;
     public SpriteLighting Lighting;
+    public BodyGear[] BodyGear;
+    public Dictionary<string, BodyGear> GearMap;
     public Player _Player;
 
     public static Player Local;
@@ -118,6 +120,7 @@ public class Player : NetworkBehaviour
     public void Start()
     {
         RegisterPlayer();
+        RegisterGear();
         if (isLocalPlayer)
         {            
             Local = this;
@@ -162,6 +165,14 @@ public class Player : NetworkBehaviour
                 return true;
         }
         return false;
+    }
+
+    public void RegisterGear()
+    {
+        foreach(BodyGear gear in BodyGear)
+        {
+            GearMap.Add(gear.Name, gear);
+        }
     }
 
     public void Update()

@@ -247,11 +247,11 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// Creates a new instance of an object and spawns it into the world.
     /// </summary>
-    public static Item NewInstance(string prefab)
+    public static Item NewInstance(string prefab, Vector2 position)
     {
         // Create new instance of item.
         Item x = FindItem(prefab);
-        Item newItem = Instantiate(x, Vector3.zero, Quaternion.identity);
+        Item newItem = Instantiate(x, position, Quaternion.identity);
 
         return newItem;
     }

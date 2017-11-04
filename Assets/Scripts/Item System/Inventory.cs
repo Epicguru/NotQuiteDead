@@ -195,7 +195,6 @@ public class Inventory : MonoBehaviour
         Destroy(item.gameObject);
 
         // Move everything below this upwards, and make viewport smaller.
-        Debug.Log("Moving downwards..." + lastItem + ", " + Contents.Count + ", " + index);
         for(int i = index; i < Contents.Count; i++)
         {
             RectTransform x = Contents[i].GetComponent<RectTransform>();

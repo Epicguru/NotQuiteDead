@@ -18,7 +18,6 @@ public class QuickSlot : NetworkBehaviour
         {
             if (Input.GetKeyDown(Slots[i]))
             {
-                Debug.Log("Pressed " + Slots[i]);
                 QuickSelect(i + 1);
             }
         }

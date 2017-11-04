@@ -47,7 +47,7 @@ public class PlayerHolding : NetworkBehaviour
             return;
         }
 
-        Item created = Item.NewInstance(prefab);
+        Item created = Item.NewInstance(prefab, localPlayer.transform.position);
         if(data == null)
         {
             data = new ItemData();
@@ -149,7 +149,7 @@ public class PlayerHolding : NetworkBehaviour
     private void RpcDrop(GameObject player)
     {
         // Called on all clients when any kind of drop command is called!
-        // Inventiory state!
+        // Inventory state!
         if(player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)
         {
             GearItem.GearItems["Hands"].SetItem(null); // Set no item equipped.
