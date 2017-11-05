@@ -17,6 +17,21 @@ public class PlayerNetUtils : NetworkBehaviour
         return player;
     }
 
+    [Command]
+    public void CmdRequestGear(GameObject player)
+    {
+        // So this is called on a client.
+        // On another player's gameobject.
+        // In order to get an updated version of their gear.
+
+        Player p = player.GetComponent<Player>();
+
+        foreach(var v in p.BodyGear)
+        {
+            v.SendUpdatedGear();
+        }
+    }
+
     [ClientRpc]
     public void RpcSetIGO(string name, GameObject go)
     {

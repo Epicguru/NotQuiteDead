@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 
 public class Player : NetworkBehaviour
@@ -31,6 +32,8 @@ public class Player : NetworkBehaviour
     public BodyGear[] BodyGear;
     public Dictionary<string, BodyGear> GearMap = new Dictionary<string, BodyGear>();
     public Player _Player;
+
+    public bool RequestGear = true;
 
     public static Player Local;
     public static List<Player> AllPlayers = new List<Player>();
@@ -128,7 +131,6 @@ public class Player : NetworkBehaviour
             Local = this;
             Local._Player = this;
             Camera.main.GetComponent<CameraFollow>().Target = transform;
-
             Health.UponDeath += UponDeath;
         }
         else
@@ -141,8 +143,17 @@ public class Player : NetworkBehaviour
             r.sortingLayerName = "Player";
         }
 
-        NetUtils.CmdSetGear("Chest", "Space Suit", new ItemData());
-        NetUtils.CmdSetGear("Head", "SSH", new ItemData());
+        if (isLocalPlayer)
+        {
+            NetUtils.CmdSetGear("Chest", "Space Suit", new ItemData());
+            NetUtils.CmdSetGear("Head", "SSH", new ItemData());
+        }
+        else if(!isServer)
+        {
+            // Request updated gear
+            // TODO
+            Debug.Log(Local);
+        }
     }
 
     public void OnDestroy()
@@ -183,13 +194,24 @@ public class Player : NetworkBehaviour
 
     public void Update()
     {
+        if (RequestGear)
+        {
+            // Request the gear for this player.    
+            if(!isServer)
+                Player.Local.NetUtils.CmdRequestGear(this.gameObject);
+            RequestGear = false;
+        }
+
         gameObject.name = Name;
+
+        if (!isLocalPlayer)
+            return;
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if(GearMap["Chest"].GetGearItem() != null)
             {
-                NetUtils.CmdSetGear("Chest", null, null);
+                NetUtils.CmdSetGear("Chest", null, new ItemData());
             }
             else
             {
@@ -202,7 +224,7 @@ public class Player : NetworkBehaviour
     {
         // 'Respawn'
         Health.CmdHeal(Health.GetMaxHealth());
-        transform.position = Vector3.zero;
+        transform.position = Random.insideUnitCircle * 3f;
         Debug.Log("Player died:");
         string report = Health.GetDamageReport("killed");
         Debug.Log("Local player was " + report);

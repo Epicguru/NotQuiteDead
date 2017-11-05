@@ -67,6 +67,15 @@ public class BodyGear : NetworkBehaviour
     }
 
     [Server]
+    public void SendUpdatedGear()
+    {
+        // Sends the current gear of this player to all clients.
+        // For when the new player joins the game when people have gear on.
+
+        IGO = IGO; // Lol this is really it.
+    }
+
+    [Server]
     public void SetItem(Item item, ItemData data)
     {
         // Item is a PREFAB!
