@@ -94,12 +94,13 @@ public class Item : NetworkBehaviour
     {
         List<ItemOption> options = new List<ItemOption>();
         options.Add(new ItemOption() { OptionName = "Drop", OnSelected = Option_Drop });
-        if(Equipable)
+        if(Equipable && item.GetComponent<GearItem>() == null)
             options.Add(new ItemOption() { OptionName = "Equip", OnSelected = Option_Equip });
         options.Add(new ItemOption() { OptionName = "Details", OnSelected = Option_Details });
         if (GetComponent<Attachment>() != null && Player.Local.Holding.Item != null && Player.Local.Holding.Item.GetComponent<GunAttachments>() != null && Player.Local.Holding.Item.GetComponent<GunAttachments>().IsValid(item.GetComponent<Attachment>().Type, item.GetComponent<Attachment>()))
             options.Add(new ItemOption() { OptionName = "Put On Current Weapon", OnSelected = Option_ApplyAttachment });
-
+        if (item.GetComponent<GearItem>() != null)
+            options.Add(new ItemOption() { OptionName = "Equip", OnSelected = Option_EquipGear });
         if(item.Equipable)
             options.Add(new ItemOption() { OptionName = "Quick Slot...", OnSelected = Option_QuickSlot });
 
@@ -282,6 +283,18 @@ public class Item : NetworkBehaviour
         if (Items == null)
             LoadItems();
         return Items.ContainsKey(prefab);
+    }
+
+    public static void Option_EquipGear(InventoryItem x, string prefab)
+    {
+        ItemData d = x.Data;
+        if (d == null)
+        {
+            d = new ItemData();
+        }
+        x.Data = d;
+        x.Inventory.RemoveItem(x, Vector2.zero, false); // Remove, do not drop.
+        Player.Local.NetUtils.CmdSetGear(x.Item.GetComponent<GearItem>().Slot, prefab, d, true);
     }
 
     public static void Option_Equip(InventoryItem x, string prefab)

@@ -10,6 +10,7 @@ public class GearUI : MonoBehaviour {
     public string Title;
     public Text Text;
     public Image Image;
+    public bool Hands = false;
 
     public Item Item;
 
@@ -40,17 +41,44 @@ public class GearUI : MonoBehaviour {
 
     public void Store(InventoryItem item, string prefab)
     {
-        // Store the current item.
-        Player.Local.Holding.Item.RequestDataUpdate();
-        Player.Local.Holding.CmdDrop(false, false, Player.Local.gameObject, Player.Local.Holding.Item.Data);
+        if (Hands)
+        {
+            // Store the current item.
+            Player.Local.Holding.Item.RequestDataUpdate();
+            Player.Local.Holding.CmdDrop(false, false, Player.Local.gameObject, Player.Local.Holding.Item.Data);
+        }
+        else
+        {
+            // Remove from slot noramlly.
+            Player.Local.GearMap[Title].GetGearItem().Item.RequestDataUpdate();
+            Player.Local.NetUtils.CmdSetGear(Title, null, new ItemData(), true);
+        }
     }
 
     public void Drop(InventoryItem item, string prefab)
     {
-        // Drop the current item.
-        Player.Local.Holding.Item.RequestDataUpdate();
+        if (Hands)
+        {
+            // Drop the current item.
+            Player.Local.Holding.Item.RequestDataUpdate();
 
-        Player.Local.Holding.CmdDrop(true, false, Player.Local.gameObject, Player.Local.Holding.Item.Data);
+            Player.Local.Holding.CmdDrop(true, false, Player.Local.gameObject, Player.Local.Holding.Item.Data);
+        }
+        else
+        {
+            // Remove from slot and drop on ground.
+            BodyGear g = Player.Local.GearMap[Title];
+
+            if(g.GetGearItem() == null)
+            {
+                Debug.LogError("Cannot drop, looks like the UI and world are desynced!");
+                return;
+            }
+
+            g.GetGearItem().Item.RequestDataUpdate();
+            ItemData data = g.GetGearItem().Item.Data;
+            Player.Local.NetUtils.CmdDropGear(Title, data);
+        }
     }
 
     public void Details(InventoryItem item, string prefab)

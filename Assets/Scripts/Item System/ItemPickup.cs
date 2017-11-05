@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(PolygonCollider2D), typeof(Rigidbody2D))]
+[RequireComponent(typeof(Collider2D), typeof(Rigidbody2D))]
 public class ItemPickup : NetworkBehaviour
 {
     [SyncVar]
@@ -13,14 +13,14 @@ public class ItemPickup : NetworkBehaviour
     public bool MouseOver;
     [HideInInspector] public Item Item;
 
-    public new PolygonCollider2D collider;
+    public new Collider2D collider;
     private new Rigidbody2D rigidbody;
 
     public void Start()
     {
         Item = GetComponent<Item>();
         if(collider == null)
-            collider = GetComponent<PolygonCollider2D>();
+            collider = GetComponent<Collider2D>();
         rigidbody = GetComponent<Rigidbody2D>();
 
         rigidbody.drag = 3f;

@@ -106,10 +106,13 @@ public class InventoryItem : MonoBehaviour
     public void Clicked()
     {
         // Check quick options:
-        if(Item.Equipable && InputManager.InputPressed("Quick Equip", true))
+        if((Item.Equipable || Item.GetComponent<GearItem>() != null) && InputManager.InputPressed("Quick Equip", true))
         {
             // Wants to quick equip, do it!
-            Item.Option_Equip(this, ItemPrefab);
+            if (Item.GetComponent<GearItem>() != null)
+                Item.Option_EquipGear(this, Item.Prefab);
+            else
+                Item.Option_Equip(this, ItemPrefab);
             return;
         }
 

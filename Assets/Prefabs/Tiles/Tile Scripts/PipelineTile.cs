@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 [Serializable]
-public class PipelineTile : TileBase
+public class PipelineTile : GameTile
 {
     [SerializeField]
     public Sprite[] m_Sprites;
@@ -125,21 +125,6 @@ public class PipelineTile : TileBase
 		{
 			if (tile.m_Sprites == null || tile.m_Sprites.Length != 5)
 				tile.m_Sprites = new Sprite[5];
-		}
-
-		public override void OnInspectorGUI()
-		{
-			EditorGUILayout.LabelField("Place sprites shown based on the number of tiles bordering it.");
-			EditorGUILayout.Space();
-			
-			EditorGUI.BeginChangeCheck();
-			tile.m_Sprites[0] = (Sprite) EditorGUILayout.ObjectField("None", tile.m_Sprites[0], typeof(Sprite), false, null);
-			tile.m_Sprites[2] = (Sprite) EditorGUILayout.ObjectField("One", tile.m_Sprites[2], typeof(Sprite), false, null);
-			tile.m_Sprites[1] = (Sprite) EditorGUILayout.ObjectField("Two", tile.m_Sprites[1], typeof(Sprite), false, null);
-			tile.m_Sprites[3] = (Sprite) EditorGUILayout.ObjectField("Three", tile.m_Sprites[3], typeof(Sprite), false, null);
-			tile.m_Sprites[4] = (Sprite) EditorGUILayout.ObjectField("Four", tile.m_Sprites[4], typeof(Sprite), false, null);
-			if (EditorGUI.EndChangeCheck())
-				EditorUtility.SetDirty(tile);
 		}
 	}
 #endif

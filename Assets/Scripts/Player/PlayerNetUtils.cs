@@ -18,6 +18,23 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
+    public void CmdDropGear(string slot, ItemData data)
+    {
+        BodyGear g = GetPlayer().GearMap[slot];
+
+        if(g.GetGearItem() != null)
+        {
+            Item old = g.GetGearItem().Item;
+            g.SetItem(null, null, false);
+
+            Item instance = Item.NewInstance(old.Prefab, GetPlayer().transform.position);
+            instance.Data = data;
+
+            NetworkServer.Spawn(instance.gameObject);
+        }
+    }
+
+    [Command]
     public void CmdRequestGear(GameObject player)
     {
         // So this is called on a client.
@@ -39,9 +56,9 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
-    public void CmdSetGear(string name, string prefab, ItemData data)
+    public void CmdSetGear(string name, string prefab, ItemData data, bool returnOldItem)
     {
-        GetPlayer().GearMap[name].SetItem(prefab == null ? null : Item.FindItem(prefab), data);
+        GetPlayer().GearMap[name].SetItem(prefab == null ? null : Item.FindItem(prefab), data, returnOldItem);
     }
 
     [Command]

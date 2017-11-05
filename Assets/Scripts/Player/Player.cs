@@ -145,8 +145,8 @@ public class Player : NetworkBehaviour
 
         if (isLocalPlayer)
         {
-            NetUtils.CmdSetGear("Chest", "Space Suit", new ItemData());
-            NetUtils.CmdSetGear("Head", "SSH", new ItemData());
+            NetUtils.CmdSetGear("Chest", "Space Suit", new ItemData(), false);
+            NetUtils.CmdSetGear("Head", "SSH", new ItemData(), false);
         }
         else if(!isServer)
         {
@@ -211,11 +211,11 @@ public class Player : NetworkBehaviour
         {
             if(GearMap["Chest"].GetGearItem() != null)
             {
-                NetUtils.CmdSetGear("Chest", null, new ItemData());
+                NetUtils.CmdSetGear("Chest", null, new ItemData(), false);
             }
             else
             {
-                NetUtils.CmdSetGear("Chest", "Space Suit", new ItemData());
+                NetUtils.CmdSetGear("Chest", "Space Suit", new ItemData(), false);
             }
         }
     }

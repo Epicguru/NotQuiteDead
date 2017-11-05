@@ -76,13 +76,13 @@ public class BodyGear : NetworkBehaviour
     }
 
     [Server]
-    public void SetItem(Item item, ItemData data)
+    public void SetItem(Item item, ItemData data, bool returnItem)
     {
         // Item is a PREFAB!
 
         if(item == null)
         {
-            SetItem(null);            
+            SetItem(null, returnItem);            
             return;
         }
 
@@ -95,11 +95,11 @@ public class BodyGear : NetworkBehaviour
         instance.Data = data;
         NetworkServer.Spawn(instance.gameObject);
 
-        SetItem(instance);
+        SetItem(instance, returnItem);
     }
 
     [Server]
-    private void SetItem(Item item)
+    private void SetItem(Item item, bool returnOldItem)
     {
         // Item is an INSTANCE!
 
@@ -108,11 +108,11 @@ public class BodyGear : NetworkBehaviour
 
         if(item == null)
         {
-            DisposeOfOldItem();
+            DisposeOfOldItem(returnOldItem);
         }
         else
         {
-            ApplyNewItem(item);
+            ApplyNewItem(item, returnOldItem);
         }
 
         GearChangeEvent.Invoke();
@@ -140,13 +140,16 @@ public class BodyGear : NetworkBehaviour
     }
 
     [Server]
-    private void DisposeOfOldItem()
+    private void DisposeOfOldItem(bool returnToPlayer)
     {
         if (IGO == null)
             return;
 
-        // Give item back...
-        RpcReturnItem(GetGearItem().Item.Prefab, GetGearItem().Item.Data);
+        if (returnToPlayer)
+        {
+            // Give item back...
+            RpcReturnItem(GetGearItem().Item.Prefab, GetGearItem().Item.Data);
+        }
 
         // Destroy the old equipped item.
         Destroy(IGO);
@@ -155,9 +158,9 @@ public class BodyGear : NetworkBehaviour
     }
 
     [Server]
-    private void ApplyNewItem(Item item)
+    private void ApplyNewItem(Item item, bool returnOldItem)
     {
-        DisposeOfOldItem(); // Does not run if old was null.
+        DisposeOfOldItem(returnOldItem); // Does not run if old was null.
 
         // Set itemGO to this.
         this.IGO = item.gameObject;

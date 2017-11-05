@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 [System.Serializable]
-public class SimpleTile : Tile
+public class SimpleTile : GameTile
 {
     [SerializeField]
     public Sprite[] m_Sprites;
@@ -46,30 +46,5 @@ public class SimpleTile : Tile
 public class RandomTileEditor : Editor
 {
     private SimpleTile tile { get { return (target as SimpleTile); } }
-
-    public override void OnInspectorGUI()
-    {
-        EditorGUI.BeginChangeCheck();
-        int count = EditorGUILayout.DelayedIntField("Number of Sprites", tile.m_Sprites != null ? tile.m_Sprites.Length : 0);
-        if (count < 0)
-            count = 0;
-        if (tile.m_Sprites == null || tile.m_Sprites.Length != count)
-        {
-            System.Array.Resize<Sprite>(ref tile.m_Sprites, count);
-        }
-
-        if (count == 0)
-            return;
-
-        EditorGUILayout.LabelField("Place random sprites.");
-        EditorGUILayout.Space();
-
-        for (int i = 0; i < count; i++)
-        {
-            tile.m_Sprites[i] = (Sprite)EditorGUILayout.ObjectField("Sprite " + (i + 1), tile.m_Sprites[i], typeof(Sprite), false, null);
-        }
-        if (EditorGUI.EndChangeCheck())
-            EditorUtility.SetDirty(tile);
-    }
 }
 #endif

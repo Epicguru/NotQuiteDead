@@ -22,6 +22,9 @@ public class GearItem : NetworkBehaviour
     [Tooltip("A multiplier that affects total player health. The value is set as in:\n* 0.3 means the player has 30% more health,\n* -0.5 means the player has 50% less health.")]
     public float HealthChange;
 
+    [Tooltip("When this is equipped, should it hide the player's hair, using a Sprite Mask?\n(Only applies to head gear.)")]
+    public bool HidesHair = false;
+
     public Item Item
     {
         get
