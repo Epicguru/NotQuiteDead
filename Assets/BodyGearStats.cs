@@ -9,7 +9,10 @@ public class BodyGearStats : NetworkBehaviour
 
     public Player Player;
 
-    public void Start()
+    public float HealthMulti;
+    public float SpeedMulti;
+
+    public void Awake()
     {
         Player = GetComponent<Player>();
         BodyGear.GearChangeEvent.AddListener(GearChanged);
@@ -24,6 +27,22 @@ public class BodyGearStats : NetworkBehaviour
             return;
         }
 
+        Debug.Log("Gear changed!");
 
+        // Reset all stats.
+        HealthMulti = 1f;
+        SpeedMulti = 1f;
+
+        // Calculate all stats again.
+        foreach(BodyGear bg in Player.BodyGear)
+        {
+            if (bg.GetGearItem() != null)
+            {
+                float h = bg.GetGearItem().HealthChange;
+                float s = bg.GetGearItem().SpeedChange;
+                HealthMulti += h;
+                SpeedMulti += s;
+            }
+        }
     }
 }

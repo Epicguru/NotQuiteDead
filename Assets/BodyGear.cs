@@ -12,22 +12,58 @@ public class BodyGear : NetworkBehaviour
     public string Name;
     public Transform GearParent;
 
-    // Currently equipped, is an instance.
-    [SyncVar]
-    private GameObject ItemGO;
+    // Currently equipped, is an instance. This only works on server when setting.
+    private GameObject IGO
+    {
+        get
+        {
+            return Sync;
+        }
+        set
+        {
+            if (isServer)
+            {
+                Sync = value;
+                if (netUtils == null)
+                    netUtils = GetComponent<PlayerNetUtils>();
+                netUtils.RpcSetIGO(Name, value);
+            }
+            else
+            {
+                // Just set value normally
+                Sync = value;
+            }
+        }
+    }
+    private GameObject Sync;
+    private PlayerNetUtils netUtils;
 
     // The item of the ItemGO, always in sync.
-    private Item Item;
+    private GearItem _Item;
 
-    public Item GetItem()
+    public GearItem GetGearItem()
     {
-        if (Item == null && ItemGO != null)
+        if (IGO == null)
         {
-            this.Item = ItemGO.GetComponent<Item>();
+            _Item = null;
+            return null;
         }
-        if (ItemGO == null)
-            Item = null;
-        return this.Item;
+
+        if(_Item == null)
+        {
+            _Item = IGO.GetComponent<GearItem>();
+            return _Item;
+        }
+
+        return this._Item;
+    }
+
+    public void RemoteSetIGO(GameObject go)
+    {
+        // Avoid an infinite loop on host.
+        this.Sync = go;
+
+        OnItemChange(go);
     }
 
     [Server]
@@ -37,7 +73,7 @@ public class BodyGear : NetworkBehaviour
 
         if(item == null)
         {
-            Debug.LogError("Null prefab!");
+            SetItem(null);            
             return;
         }
 
@@ -58,7 +94,7 @@ public class BodyGear : NetworkBehaviour
     {
         // Item is an INSTANCE!
 
-        if (item == GetItem())
+        if (item == GetGearItem())
             return;
 
         if(item == null)
@@ -73,28 +109,40 @@ public class BodyGear : NetworkBehaviour
         GearChangeEvent.Invoke();
     }
 
+    private void OnItemChange(GameObject i)
+    {
+        this._Item = null;
+
+        if (isLocalPlayer)
+        {
+            Item item = GetGearItem() == null ? null : GetGearItem().Item;
+            GearUI.GearItems[Name].SetItem(item);
+        }
+    }
+
     private void SetupItem()
     {
-        if (ItemGO == null)
+        if (IGO == null)
             return;
 
-        ItemGO.transform.SetParent(GearParent);
-        ItemGO.transform.localPosition = Vector2.zero;
+        IGO.transform.SetParent(GearParent);
+        IGO.transform.localPosition = Vector2.zero;
+        IGO.transform.localRotation = Quaternion.identity;
     }
 
     [Server]
     private void DisposeOfOldItem()
     {
-        if (ItemGO == null)
+        if (IGO == null)
             return;
 
         // Give item back...
-        RpcReturnItem(GetItem().Prefab, GetItem().Data);
+        RpcReturnItem(GetGearItem().Item.Prefab, GetGearItem().Item.Data);
 
         // Destroy the old equipped item.
-        Destroy(ItemGO);
+        Destroy(IGO);
 
-        ItemGO = null;
+        IGO = null;
     }
 
     [Server]
@@ -103,7 +151,7 @@ public class BodyGear : NetworkBehaviour
         DisposeOfOldItem(); // Does not run if old was null.
 
         // Set itemGO to this.
-        this.ItemGO = item.gameObject;
+        this.IGO = item.gameObject;
     }
 
     [ClientRpc]
@@ -117,7 +165,7 @@ public class BodyGear : NetworkBehaviour
 
     public void Update()
     {
-        if (ItemGO != null)
+        if (IGO != null)
             SetupItem();
     }
 }

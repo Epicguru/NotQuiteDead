@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GearItem : MonoBehaviour {
+public class GearUI : MonoBehaviour {
 
-    public static Dictionary<string, GearItem> GearItems = new Dictionary<string, GearItem>();
+    public static Dictionary<string, GearUI> GearItems = new Dictionary<string, GearUI>();
 
     public string Title;
     public Text Text;

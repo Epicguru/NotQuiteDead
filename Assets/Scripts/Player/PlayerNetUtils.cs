@@ -17,10 +17,16 @@ public class PlayerNetUtils : NetworkBehaviour
         return player;
     }
 
+    [ClientRpc]
+    public void RpcSetIGO(string name, GameObject go)
+    {
+        GetPlayer().GearMap[name].RemoteSetIGO(go);
+    }
+
     [Command]
     public void CmdSetGear(string name, string prefab, ItemData data)
     {
-        GetPlayer().GearMap[name].SetItem(Item.FindItem(prefab), data);
+        GetPlayer().GearMap[name].SetItem(prefab == null ? null : Item.FindItem(prefab), data);
     }
 
     [Command]

@@ -27,8 +27,9 @@ public class Player : NetworkBehaviour
     public Health Health;
     public QuickSlot QuickSlot;
     public SpriteLighting Lighting;
+    public BodyGearStats GearStats;
     public BodyGear[] BodyGear;
-    public Dictionary<string, BodyGear> GearMap;
+    public Dictionary<string, BodyGear> GearMap = new Dictionary<string, BodyGear>();
     public Player _Player;
 
     public static Player Local;
@@ -121,6 +122,7 @@ public class Player : NetworkBehaviour
     {
         RegisterPlayer();
         RegisterGear();
+
         if (isLocalPlayer)
         {            
             Local = this;
@@ -138,6 +140,9 @@ public class Player : NetworkBehaviour
         {
             r.sortingLayerName = "Player";
         }
+
+        NetUtils.CmdSetGear("Chest", "Space Suit", new ItemData());
+        NetUtils.CmdSetGear("Head", "SSH", new ItemData());
     }
 
     public void OnDestroy()
@@ -171,6 +176,7 @@ public class Player : NetworkBehaviour
     {
         foreach(BodyGear gear in BodyGear)
         {
+            Debug.Log("Mapped gear slot: " + gear.Name);
             GearMap.Add(gear.Name, gear);
         }
     }
@@ -178,6 +184,18 @@ public class Player : NetworkBehaviour
     public void Update()
     {
         gameObject.name = Name;
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if(GearMap["Chest"].GetGearItem() != null)
+            {
+                NetUtils.CmdSetGear("Chest", null, null);
+            }
+            else
+            {
+                NetUtils.CmdSetGear("Chest", "Space Suit", new ItemData());
+            }
+        }
     }
 
     private void UponDeath()

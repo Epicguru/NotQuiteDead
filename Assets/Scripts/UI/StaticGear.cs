@@ -6,10 +6,19 @@ using UnityEngine;
 
 public class StaticGear : MonoBehaviour
 {
-    public GearItem Hands;
+    public GearUI Hands;
+    public GearUI Head;
+    public GearUI Chest;
 
     public void Awake()
     {
-        GearItem.GearItems.Add(Hands.Title, Hands);
+        Register(Hands);
+        Register(Head);
+        Register(Chest);
+    }
+
+    public static void Register(GearUI gear)
+    {
+        GearUI.GearItems.Add(gear.Title, gear);
     }
 }

@@ -95,7 +95,7 @@ public class PlayerHolding : NetworkBehaviour
         {
             // Is local player!
             // Set inventory state...
-            GearItem.GearItems["Hands"].SetItem(this.Item);
+            GearUI.GearItems["Hands"].SetItem(this.Item);
             if (item.GetComponent<Gun>() != null)
             {
                 // Is gun!
@@ -152,7 +152,7 @@ public class PlayerHolding : NetworkBehaviour
         // Inventory state!
         if(player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)
         {
-            GearItem.GearItems["Hands"].SetItem(null); // Set no item equipped.
+            GearUI.GearItems["Hands"].SetItem(null); // Set no item equipped.
         }
 
         this.Item = null;

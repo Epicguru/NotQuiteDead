@@ -33,7 +33,7 @@ public class ItemOptionsPanel : MonoBehaviour
         SetOptions(options, item);
     }
 
-    public void Open(GearItem item)
+    public void Open(GearUI item)
     {
         if (open)
             return;
