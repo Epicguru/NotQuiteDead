@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(Collider2D), typeof(Rigidbody2D))]
+[RequireComponent(typeof(Collider2D))]
 public class ItemPickup : NetworkBehaviour
 {
     [SyncVar]
@@ -14,18 +14,12 @@ public class ItemPickup : NetworkBehaviour
     [HideInInspector] public Item Item;
 
     public new Collider2D collider;
-    private new Rigidbody2D rigidbody;
 
     public void Start()
     {
         Item = GetComponent<Item>();
         if(collider == null)
             collider = GetComponent<Collider2D>();
-        rigidbody = GetComponent<Rigidbody2D>();
-
-        rigidbody.drag = 3f;
-        rigidbody.angularDrag = 2f;
-        rigidbody.useAutoMass = true; // Meh.
 
         GetComponent<NetworkTransform>().transformSyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody2D;
 
@@ -40,18 +34,6 @@ public class ItemPickup : NetworkBehaviour
     public void Update()
     {
         // This is an item, on the floor, that has a collider. Yep.
-
-        // Set values for rigidbody.
-        rigidbody.gravityScale = 0; // Float, because we are a top down map.
-        if (!Item.IsEquipped())
-        {
-            // Activate rigidbody.
-            rigidbody.isKinematic = false;
-        }
-        else
-        {
-            rigidbody.isKinematic = true;
-        }
 
         if (MouseOver)
         {

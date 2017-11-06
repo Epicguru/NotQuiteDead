@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(ItemPickup), typeof(NetworkTransform), typeof(SpriteLighting))]
+[RequireComponent(typeof(ItemPickup), typeof(NetPositionSync), typeof(SpriteLighting))]
 public class Item : NetworkBehaviour
 {
 
@@ -49,10 +49,12 @@ public class Item : NetworkBehaviour
     [SyncVar]
     public ItemData Data;
 
+    [HideInInspector]
+    public NetPositionSync NetPosSync;
+
     [SyncVar]
     [SerializeField]
     private bool equiped = false;
-    private NetworkTransform netTransform;
     [SyncVar]
     private GameObject PlayerHolding;
     [HideInInspector] public ItemPickup pickup;
@@ -61,7 +63,7 @@ public class Item : NetworkBehaviour
 
     public void Start()
     {
-        netTransform = GetComponent<NetworkTransform>();
+        NetPosSync = GetComponent<NetPositionSync>();
         pickup = GetComponent<ItemPickup>();
         Lighting = GetComponent<SpriteLighting>();
 
@@ -130,7 +132,7 @@ public class Item : NetworkBehaviour
     public void Update()
     {
         // Does not matter where this is running...
-        netTransform.enabled = (transform.parent == null);
+        NetPosSync.enabled = (transform.parent == null);
 
         // Layer
         SetLayer(IsEquipped() ? "Equipped Items" : "Dropped Items");

@@ -14,6 +14,8 @@ public class NetPositionSync : NetworkBehaviour {
     public Vector3 OldPosition;
     [HideInInspector]
     public Vector3 Velocity;
+    [HideInInspector]
+    public Vector3 LastSentPosition;
 
     private float timer;
     private float timeSinceReceived;
@@ -31,6 +33,12 @@ public class NetPositionSync : NetworkBehaviour {
         if (timer >= GetNetworkSendInterval())
         {
             timer -= GetNetworkSendInterval();
+
+            // Make sure not to send the same position.
+            if (transform.position == LastSentPosition)
+                return;
+            LastSentPosition = transform.position;
+
             if (isServer)
             {
                 // Just set the variable
@@ -42,6 +50,7 @@ public class NetPositionSync : NetworkBehaviour {
             {
                 // Need to send a CMD. Use the local player to set.
                 Player.Local.NetUtils.CmdSetPositionSync(gameObject, transform.position);
+
             }
         }
     }
