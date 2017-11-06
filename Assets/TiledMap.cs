@@ -51,6 +51,15 @@ public class TiledMap : MonoBehaviour
             }
         }
     }
+
+    public void Update()
+    {
+        Vector3Int pos = Foreground.WorldToCell(InputManager.GetMousePos());
+        DebugText.Log("Mouse Tile Position: " + pos);
+        TileBase t = Foreground.GetTile(pos);
+        DebugText.Log("Tile Under Mouse: " + (t == null ? "null" : t.name));
+        DebugText.Log("Foreground Bounds: " + Foreground.cellBounds);
+    }
 }
 
 public enum TileMapLayer : byte
