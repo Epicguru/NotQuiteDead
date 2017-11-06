@@ -57,6 +57,7 @@ public static class InputManager
 
         // Debug
         defaultKeyBindings.Add("Console", KeyCode.KeypadMinus);
+        defaultKeyBindings.Add("Debug View", KeyCode.F2);
     }
 
     public static void MergeKeyBindings()

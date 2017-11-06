@@ -20,9 +20,14 @@ public class NetPositionSync : NetworkBehaviour {
     private float timer;
     private float timeSinceReceived;
 
+    public void Start()
+    {
+        OldPosition = Position;
+    }
+
     public void Update()
     {
-        if (hasAuthority)
+        if (isServer)
             UpdateSending();
         UpdatePosition();
     }
@@ -57,14 +62,14 @@ public class NetPositionSync : NetworkBehaviour {
 
     public void UpdatePosition()
     {
-        if (!hasAuthority)
+        if (!isServer)
         {
             timeSinceReceived += Time.deltaTime;
-            transform.position = GetExtrapolatedPosition(false);
+            transform.position = GetInterpolatedPosition(!Extrapolate);
         }
     }
 
-    public Vector3 GetExtrapolatedPosition(bool clamp)
+    public Vector3 GetInterpolatedPosition(bool clamp)
     {
         float p = GetLerpPercentage(clamp);
 
@@ -85,7 +90,7 @@ public class NetPositionSync : NetworkBehaviour {
 
     public void NewPosition(Vector3 pos)
     {
-        if (hasAuthority)
+        if (isServer)
             return; // Dont care about this.
 
         this.OldPosition = Position;

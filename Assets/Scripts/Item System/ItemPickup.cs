@@ -21,6 +21,8 @@ public class ItemPickup : NetworkBehaviour
         if(collider == null)
             collider = GetComponent<Collider2D>();
 
+        GetComponent<NetPositionSync>().Extrapolate = false;
+
         collider.isTrigger = true;
 
         if(GetComponent<Health>() != null)
