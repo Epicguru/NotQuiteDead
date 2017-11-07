@@ -61,6 +61,8 @@ public class GearUI : MonoBehaviour {
         {
             // Drop the current item.
             Player.Local.Holding.Item.RequestDataUpdate();
+            if (Player.Local.Holding.Item.Data != null)
+                Player.Local.Holding.Item.Data.QuickSlot = 0;
 
             Player.Local.Holding.CmdDrop(true, false, Player.Local.gameObject, Player.Local.Holding.Item.Data);
         }

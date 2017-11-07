@@ -29,6 +29,8 @@ public class ItemPickup : NetworkBehaviour
         {
             GetComponent<Health>().CannotHit.Add(collider);
         }
+
+        Debug.Log("On ground (" + Item.Name + "), data muzzle: " + (Item.Data == null ? "null data" : Item.Data.GUN_Muzzle));
     }
 
     public void Update()
@@ -52,6 +54,7 @@ public class ItemPickup : NetworkBehaviour
                     // Pick up!
                     Item.RequestDataUpdate(); // Update data.
                     PlayerInventory.Add(Item.Prefab, Item.Data, 1); // Give real version with data.
+                    Debug.Log("Pick up, muzzle is " + Item.Data.GUN_Muzzle);
                     Player.Local.NetUtils.CmdDestroyItem(this.gameObject);
                 }
             }
