@@ -52,8 +52,16 @@ public class GunAttachments : NetworkBehaviour
     {
         Debug.Log("Updating, current muzzle: " + data.GUN_Muzzle);
         Debug.Log("Allow muzzle: " + AllowMuzzle);
+        Debug.Log("Muzzle name: " + MuzzleMount.name);
         Debug.Log("Muzzle child count: " + MuzzleMount.childCount);
-        Debug.Log("Item PRefab: " + MuzzleMount.GetChild(0).GetComponent<Item>().Prefab);
+        //Debug.Log("Item PRefab: " + MuzzleMount.GetChild(0).GetComponent<Item>().Prefab);
+        try
+        {
+            Debug.Log("Parent of thingy: " + GameObject.Find("Extended Barrel(Clone)").transform.parent);
+        }catch(Exception e)
+        {
+            Debug.LogError("Error: " + e.Message);
+        }
 
         data.GUN_Magazine = AllowMagazine ? MagazineMount.childCount > 0 ? MagazineMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
         data.GUN_Muzzle = AllowMuzzle ? MuzzleMount.childCount > 0 ? MuzzleMount.GetChild(0).GetComponent<Item>().Prefab : null : null;

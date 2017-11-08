@@ -61,6 +61,11 @@ public class Item : NetworkBehaviour
     [HideInInspector] public SpriteLighting Lighting;
     private string currentLayer;
 
+    public void OnDestroy()
+    {
+        Debug.Log("Destroyed " + name + "!");
+    }
+
     public void Start()
     {
         NetPosSync = GetComponent<NetPositionSync>();
