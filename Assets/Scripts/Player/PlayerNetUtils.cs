@@ -18,13 +18,6 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
-    public void CmdPlaceTile(string tile, int x, int y, TileMapLayer layer)
-    {
-        // TODO NETWORK ME!!!
-        TiledMap._Instance.GetLayer(layer).SetTile(new Vector3Int(x, y, 0), TiledMap._Instance.GetTile(tile));
-    }
-
-    [Command]
     public void CmdDropGear(string slot, ItemData data)
     {
         BodyGear g = GetPlayer().GearMap[slot];
