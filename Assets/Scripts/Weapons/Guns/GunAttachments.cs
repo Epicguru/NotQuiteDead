@@ -50,7 +50,6 @@ public class GunAttachments : NetworkBehaviour
 
     public void UpdateData(ItemData data)
     {
-        Debug.Log(MuzzleMount.childCount);
         data.GUN_Magazine = AllowMagazine ? MagazineMount.childCount > 0 ? MagazineMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
         data.GUN_Muzzle = AllowMuzzle ? MuzzleMount.childCount > 0 ? MuzzleMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
         data.GUN_Sight = AllowSight ? SightMount.childCount > 0 ? SightMount.GetChild(0).GetComponent<Item>().Prefab : null : null;

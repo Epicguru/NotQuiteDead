@@ -56,14 +56,15 @@ public class Attachment : NetworkBehaviour
                 ApplyEffects();
             }
 
-            SetLayer("Equipped Items");
+            if(GetGun().Item.IsEquipped())
+                SetLayer("Equipped Items");
+            else
+                SetLayer("Dropped Items");
         }
         else
         {
             // Means we are dropped. Ensure that we have no parent.
             this.transform.SetParent(null);
-            if(name == "Extended Barrel(Clone)")
-                Debug.Log("Dropped");
             SetLayer("Dropped Items");
         }
 
