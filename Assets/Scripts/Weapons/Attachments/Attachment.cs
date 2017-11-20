@@ -44,7 +44,7 @@ public class Attachment : NetworkBehaviour
             // Set the parent of this attachment.
             this.transform.SetParent(this.GetGun().GetComponent<GunAttachments>().GetMountFor(this.Type));
 
-            // Reset rotation
+            // Reset rotation and scale
             this.transform.localRotation = Quaternion.identity;
             this.transform.localScale = Vector3.one;
 
@@ -62,6 +62,9 @@ public class Attachment : NetworkBehaviour
         {
             // Means we are dropped. Ensure that we have no parent.
             this.transform.SetParent(null);
+            if(name == "Extended Barrel(Clone)")
+                Debug.Log("Dropped");
+            SetLayer("Dropped Items");
         }
 
         if (Hidden)

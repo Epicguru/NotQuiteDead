@@ -50,19 +50,7 @@ public class GunAttachments : NetworkBehaviour
 
     public void UpdateData(ItemData data)
     {
-        Debug.Log("Updating, current muzzle: " + data.GUN_Muzzle);
-        Debug.Log("Allow muzzle: " + AllowMuzzle);
-        Debug.Log("Muzzle name: " + MuzzleMount.name);
-        Debug.Log("Muzzle child count: " + MuzzleMount.childCount);
-        //Debug.Log("Item PRefab: " + MuzzleMount.GetChild(0).GetComponent<Item>().Prefab);
-        try
-        {
-            Debug.Log("Parent of thingy: " + GameObject.Find("Extended Barrel(Clone)").transform.parent);
-        }catch(Exception e)
-        {
-            Debug.LogError("Error: " + e.Message);
-        }
-
+        Debug.Log(MuzzleMount.childCount);
         data.GUN_Magazine = AllowMagazine ? MagazineMount.childCount > 0 ? MagazineMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
         data.GUN_Muzzle = AllowMuzzle ? MuzzleMount.childCount > 0 ? MuzzleMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
         data.GUN_Sight = AllowSight ? SightMount.childCount > 0 ? SightMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
@@ -71,7 +59,6 @@ public class GunAttachments : NetworkBehaviour
 
     public void ApplyData(ItemData data)
     {
-        Debug.Log("Applying " + data.GUN_Muzzle);
         if (!isServer)
             return;
         if (!string.IsNullOrEmpty(data.GUN_Muzzle))
