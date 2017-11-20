@@ -27,7 +27,7 @@ public class BodyGearStats : NetworkBehaviour
             return;
         }
 
-        Debug.Log("Gear changed!");
+        //Debug.Log("Gear changed!");
 
         // Reset all stats.
         HealthMulti = 1f;

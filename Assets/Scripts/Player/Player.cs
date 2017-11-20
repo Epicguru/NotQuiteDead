@@ -203,21 +203,6 @@ public class Player : NetworkBehaviour
         }
 
         gameObject.name = Name;
-
-        if (!isLocalPlayer)
-            return;
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if(GearMap["Chest"].GetGearItem() != null)
-            {
-                NetUtils.CmdSetGear("Chest", null, new ItemData(), false);
-            }
-            else
-            {
-                NetUtils.CmdSetGear("Chest", "Space Suit", new ItemData(), false);
-            }
-        }
     }
 
     private void UponDeath()

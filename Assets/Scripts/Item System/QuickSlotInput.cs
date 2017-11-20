@@ -42,13 +42,13 @@ public class QuickSlotInput : MonoBehaviour
                 return;
             }
 
-            if (Input.GetKeyUp(KeyCode.Space))
-            {
-                SelectedEvent.Invoke(0);
-                SelectedEvent.RemoveAllListeners();
-                Open = false;
-                return;
-            }
+            //if (Input.GetKeyUp(KeyCode.Space))
+            //{
+            //    SelectedEvent.Invoke(0);
+            //    SelectedEvent.RemoveAllListeners();
+            //    Open = false;
+            //    return;
+            //}
 
             for (int i = 0; i < Player.Local.QuickSlot.Slots.Length; i++)
             {
