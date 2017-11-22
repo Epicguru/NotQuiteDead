@@ -26,6 +26,7 @@ public class ItemAnimationCallback : MonoBehaviour
             {
                 source = GetAudioSource();
             }
+            source.pitch = Time.timeScale;
             source.PlayOneShot(c);
         }
     }

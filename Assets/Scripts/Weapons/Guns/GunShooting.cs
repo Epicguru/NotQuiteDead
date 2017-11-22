@@ -302,7 +302,7 @@ public class GunShooting : RotatingWeapon
         // Plays the local version of the shot
 
         float volume = Audio.GetRandomVolume();
-        float pitch = Audio.GetRandomPitch();
+        float pitch = Audio.GetRandomPitch() * Time.timeScale;
 
         AudioClip clip = Audio.GetRandomClip();
 
