@@ -13,7 +13,11 @@ public class Chunk : MonoBehaviour
 
     public void Awake()
     {
+        // Add one to instance count, debugging only.
         InstanceCount++;
+
+        // Setup chunk.
+        Init();
     }
 
     public void OnDestroy()

@@ -1,4 +1,5 @@
 ﻿
+using System;
 using UnityEngine;
 
 public class MeshTexture : MonoBehaviour
@@ -8,9 +9,13 @@ public class MeshTexture : MonoBehaviour
 
     public bool EnforceResolution;
 
+    public static Color[] Transparent;
+    private static Color TransparentPixel = new Color(0, 0, 0, 0);
 
     public MeshRenderer Renderer;
     public Chunk Chunk;
+
+    public bool Mipmaps, Linear;
 
     public bool Dirty { get; set; }
 
@@ -18,7 +23,18 @@ public class MeshTexture : MonoBehaviour
 
     public void BuildTexture()
     {
-        Texture2D texture = new Texture2D(TileResolution, TileResolution);
+        Texture2D texture = new Texture2D(TileResolution * Chunk.Width, TileResolution * Chunk.Height, TextureFormat.ARGB32, Mipmaps, Linear);
+
+        if(Transparent == null || Transparent.Length != (Chunk.Width * Chunk.Height * TileResolution * TileResolution))
+        {
+            Transparent = new Color[Chunk.Width * Chunk.Height * TileResolution * TileResolution];
+            for (int i = 0; i < Transparent.Length; i++)
+            {
+                Transparent[i] = TransparentPixel;
+            }
+        }
+
+        texture.SetPixels(Transparent);
 
         texture.filterMode = FilterMode.Point;
         texture.wrapMode = TextureWrapMode.Clamp;
@@ -40,7 +56,15 @@ public class MeshTexture : MonoBehaviour
         if (packSafe)
         {
             Rect r = sprite.textureRect;
-            return sprite.texture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height);
+            try
+            {
+                return sprite.texture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Failed to get colours from sprite. Exception: " + e.Message + ", Sprite: " + sprite.name);
+                return null;
+            }
         }
         else
         {
@@ -90,7 +114,7 @@ public class MeshTexture : MonoBehaviour
             return;
         }
 
-        Texture.SetPixels(x * TileResolution, y * TileResolution, TileResolution, TileResolution, colours);
+        Texture.SetPixels(x * TileResolution, (Chunk.Height - 1 - y) * TileResolution, TileResolution, TileResolution, colours);
         Dirty = true;
     }
 
@@ -135,11 +159,6 @@ public class MeshTexture : MonoBehaviour
 
     public void SetPixel(Color colour, int x, int y)
     {
-        if(colour == null)
-        {
-            Debug.LogError("Null colour when blitting pixel! (" + x + ", " + y + ")");
-        }
-
         if(Texture == null)
         {
             Debug.LogError("Texture is null! Cannot write anything until texture has been built!");
