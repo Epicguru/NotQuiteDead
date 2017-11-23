@@ -4,13 +4,12 @@ using UnityEngine;
 
 public class MeshGen : MonoBehaviour
 {
-    [Tooltip("Mesh size, in tiles.")]
-    public Vector2Int MeshSize;
-
     [Tooltip("Tile Size, in Units.")]
     public float TileSize = 1f;
 
     public MeshFilter Filter;
+
+    public Chunk Chunk;
 
     public void Start()
     {
@@ -19,11 +18,11 @@ public class MeshGen : MonoBehaviour
 
     public void GenMesh()
     {
-        int numTiles = MeshSize.x * MeshSize.y;
+        int numTiles = Chunk.Width * Chunk.Height;
         int numTris = numTiles * 2;
 
-        int vsize_x = MeshSize.x + 1;
-        int vsize_z = MeshSize.y + 1;
+        int vsize_x = Chunk.Width + 1;
+        int vsize_z = Chunk.Height + 1;
         int numVerts = vsize_x * vsize_z;
 
         // Generate the mesh data
@@ -40,15 +39,15 @@ public class MeshGen : MonoBehaviour
             {
                 vertices[y * vsize_x + x] = new Vector3(x * TileSize, y * TileSize, 0);
                 normals[y * vsize_x + x] = -Vector3.forward;
-                uv[y * vsize_x + x] = new Vector2((float)x / MeshSize.x, 1f - (float)y / MeshSize.y);
+                uv[y * vsize_x + x] = new Vector2((float)x / Chunk.Width, 1f - (float)y / Chunk.Height);
             }
         }
 
-        for (y = 0; y < MeshSize.y; y++)
+        for (y = 0; y < Chunk.Height; y++)
         {
-            for (x = 0; x < MeshSize.x; x++)
+            for (x = 0; x < Chunk.Width; x++)
             {
-                int squareIndex = y * MeshSize.x + x;
+                int squareIndex = y * Chunk.Width + x;
                 int triOffset = squareIndex * 6;
                 triangles[triOffset + 1] = y * vsize_x + x + 0;
                 triangles[triOffset + 2] = y * vsize_x + x + vsize_x + 0;

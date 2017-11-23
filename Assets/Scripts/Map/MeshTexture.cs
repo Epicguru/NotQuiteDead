@@ -3,12 +3,16 @@ using UnityEngine;
 
 public class MeshTexture : MonoBehaviour
 {
+    [Tooltip("The resolution of pixels of each tile on this chunk.")]
     public int TileResolution = 32;
+
+    public bool EnforceResolution;
+
+
     public MeshRenderer Renderer;
     public Chunk Chunk;
 
-    public bool EnforceResolution;
-    public bool Dirty;
+    public bool Dirty { get; set; }
 
     private Texture2D Texture;
 
@@ -148,6 +152,11 @@ public class MeshTexture : MonoBehaviour
 
     public void Apply()
     {
+        if (Texture != Renderer.sharedMaterials[0].mainTexture)
+        {
+            Texture = Renderer.sharedMaterials[0].mainTexture as Texture2D;
+        }
+
         if(Texture == null)
         {
             Debug.LogError("Chunk texture is null, cannot apply! Must build texture so that there is something to apply!");
