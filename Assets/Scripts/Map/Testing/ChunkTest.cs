@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ChunkTest : MonoBehaviour {
 
+    public BoxCollider2D ColliderPrefab;
+
     public Sprite[] Sprites;
 
     public void Start()
@@ -13,5 +15,9 @@ public class ChunkTest : MonoBehaviour {
         {
             chunk.Texture.SetTile(Sprites[i], i, i);
         }
+
+        chunk.Physics.AssignCollider(ColliderPrefab, 1, 1);
+        chunk.Physics.AssignCollider(ColliderPrefab, 0, 0);
+        chunk.Physics.AssignCollider(ColliderPrefab, 4, 0);
     }
 }

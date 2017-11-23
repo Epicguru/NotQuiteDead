@@ -10,6 +10,7 @@ public class Chunk : MonoBehaviour
 
     public MeshTexture Texture;
     public MeshGen Mesh;
+    public ChunkPhysics Physics;
 
     public void Awake()
     {
@@ -27,9 +28,10 @@ public class Chunk : MonoBehaviour
 
     public void Init()
     {
-        // Gen mesh, then build a texture.
+        // Gen mesh, then build a texture, then finally init the physics class.
         Mesh.GenMesh();
         Texture.BuildTexture();
+        Physics.BuildMap();
     }
 
     public void LateUpdate()
@@ -37,6 +39,10 @@ public class Chunk : MonoBehaviour
         // Firstly, if the texture is dirty then apply it.
         if (Texture.Dirty)
             Texture.Apply();
+
+        // Next refresh physics geometry when required.
+        if (Physics.Dirty)
+            Physics.Apply();
     }
 
     public bool InBounds(int x, int y)
