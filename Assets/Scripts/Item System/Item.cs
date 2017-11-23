@@ -61,12 +61,15 @@ public class Item : NetworkBehaviour
     [HideInInspector] public SpriteLighting Lighting;
     private string currentLayer;
 
-    public void Start()
+    public void Awake()
     {
         NetPosSync = GetComponent<NetPositionSync>();
         pickup = GetComponent<ItemPickup>();
         Lighting = GetComponent<SpriteLighting>();
+    }
 
+    public void Start()
+    {
         if (Data == null || Data.Created == false)
         {
             if (Data == null)
