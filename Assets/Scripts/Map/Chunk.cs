@@ -6,16 +6,28 @@ public class Chunk : MonoBehaviour
 {
     public static int InstanceCount;
 
-    public int Width, Height;
+    public int X { get; private set; }
+    public int Y { get; private set; }
+    public int Width { get; private set; }
+    public int Height { get; private set; }
+
+    public int Index { get; private set; }
 
     public MeshTexture Texture;
     public MeshGen Mesh;
     public ChunkPhysics Physics;
 
-    public void Awake()
+    public void Create(int x, int y, int width, int height, int index)
     {
         // Add one to instance count, debugging only.
         InstanceCount++;
+
+        X = x;
+        Y = y;
+        Width = width;
+        Height = height;
+
+        Index = index;
 
         // Setup chunk.
         Init();
@@ -32,6 +44,9 @@ public class Chunk : MonoBehaviour
         Mesh.GenMesh();
         Texture.BuildTexture();
         Physics.BuildMap();
+
+        // Set position
+        transform.localPosition = new Vector3(X * Width * Mesh.TileSize, Y * Height * Mesh.TileSize, 0);
     }
 
     public void LateUpdate()
