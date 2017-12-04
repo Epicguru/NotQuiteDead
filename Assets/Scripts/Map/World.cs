@@ -9,13 +9,15 @@ public class World : NetworkBehaviour
 {
     public string Name;
 
-    public MapLayer Map;
+    public int Width, Height;
+
+    [HideInInspector]
+    public TileMap TileMap;
 
     public void Start()
     {
-        Map.Create(100, 100);
+        TileMap = GetComponent<TileMap>();
 
-        Map.LoadChunk(0, 0);
-        Map.LoadChunk(1, 1);
+        TileMap.Create(Width, Height);
     }
 }
