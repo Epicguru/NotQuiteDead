@@ -9,8 +9,6 @@ public class World : NetworkBehaviour
 {
     public string Name;
 
-    public int Width, Height;
-
     [HideInInspector]
     public TileMap TileMap;
 
@@ -18,6 +16,6 @@ public class World : NetworkBehaviour
     {
         TileMap = GetComponent<TileMap>();
 
-        TileMap.Create(Width, Height);
+        TileMap.Create();
     }
 }
