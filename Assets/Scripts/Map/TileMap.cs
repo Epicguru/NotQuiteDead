@@ -99,12 +99,12 @@ public class TileMap : NetworkBehaviour
 
         float z = 10;
 
-        for (int x = 0; x < WidthInChunks; x++)
+        for (int x = 0; x <= WidthInChunks; x++)
         {
             Gizmos.DrawLine(new Vector3(x * ChunkSize, 0, z), new Vector3(x * ChunkSize, Height, z));
         }
 
-        for (int y = 0; y < HeightInChunks; y++)
+        for (int y = 0; y <= HeightInChunks; y++)
         {
             Gizmos.DrawLine(new Vector3(0, y * ChunkSize, z), new Vector3(Width, y * ChunkSize, z));
         }
