@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
+[RequireComponent(typeof(TileMap))]
 public class World : NetworkBehaviour
 {
     public string Name;

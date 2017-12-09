@@ -45,19 +45,17 @@ public class Chunk : MonoBehaviour
         Texture.BuildTexture();
         Physics.BuildMap();
 
+        gameObject.name = "Chunk (" + X + ", " + Y + ")";
+
         // Set position
         transform.localPosition = new Vector3(X * Width * Mesh.TileSize, Y * Height * Mesh.TileSize, 0);
     }
 
     public void LateUpdate()
     {
-        // Firstly, if the texture is dirty then apply it.
+        // If the texture is dirty then apply it.
         if (Texture.Dirty)
             Texture.Apply();
-
-        // Next refresh physics geometry when required.
-        if (Physics.Dirty)
-            Physics.Apply();
     }
 
     public bool InBounds(int x, int y)

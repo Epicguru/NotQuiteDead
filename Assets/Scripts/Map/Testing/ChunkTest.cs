@@ -15,7 +15,5 @@ public class ChunkTest : MonoBehaviour {
         chunk.Texture.SetTiles(Sprites[Random.Range(0, Sprites.Length)], 0, 0, chunk.Width, chunk.Height);
 
         chunk.Physics.AssignCollider(ColliderPrefab, 1, 1);
-        chunk.Physics.AssignCollider(ColliderPrefab, 0, 0);
-        chunk.Physics.AssignCollider(ColliderPrefab, 4, 0);
     }
 }

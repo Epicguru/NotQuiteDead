@@ -9,8 +9,6 @@ public class ChunkPhysics : MonoBehaviour {
 
     public Collider2D[][] Colliders;
 
-    public bool Dirty { get; set; }
-
     public void BuildMap()
     {
         Colliders = new Collider2D[Chunk.Width][];
@@ -33,6 +31,12 @@ public class ChunkPhysics : MonoBehaviour {
             Destroy(Colliders[x][y].gameObject);
         }
 
+        if(prefab == null)
+        {
+            Colliders[x][y] = null;
+            return;
+        }
+
         GameObject instance = Instantiate(prefab.gameObject, transform);
         Collider2D colliderInstance = instance.GetComponent<Collider2D>();
 
@@ -48,20 +52,5 @@ public class ChunkPhysics : MonoBehaviour {
         }
 
         Colliders[x][y] = colliderInstance;
-
-        Dirty = true;
-    }
-
-    public void Apply()
-    {
-        if (!Dirty)
-        {
-            Debug.LogError("Cannot apply anything, not dirty!");
-            return;
-        }
-
-        Dirty = false;
-
-        Composite.GenerateGeometry();
     }
 }
