@@ -8,28 +8,47 @@ public abstract class TileBackend : NetworkBehaviour
     // Not much apart from networking.
 
     private int x, y;
+    private bool placed;
 
-    public abstract void ServerUpdate();
-    public abstract void ClientUpdate();
+    // SERIOUSLY, CALL base.Update()!
+    public virtual void Update()
+    {
+        // Call the other methods.
+        if (placed)
+        {
+            if (isServer)
+            {
+                UpdateServer();
+                UpdateClient();
+            }
+            else
+            {
+                UpdateClient();
+            }
+        }
+    }
+
+    public abstract void UpdateServer();
+    public abstract void UpdateClient();
 
     public virtual void PlacedClient()
     {
-
+        placed = true;
     }
 
     public virtual void RemovedClient()
     {
-
+        placed = false;
     }
 
     public virtual void PlacedServer()
     {
-
+        placed = true;
     }
 
     public virtual void RemovedServer()
     {
-
+        placed = false;
     }
 
     public int GetX()
@@ -37,7 +56,7 @@ public abstract class TileBackend : NetworkBehaviour
         return this.x;
     }
 
-    public void GetY()
+    public int GetY()
     {
         return this.y;
     }
