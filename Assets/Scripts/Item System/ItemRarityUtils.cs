@@ -20,6 +20,8 @@ public class ItemRarityUtils : MonoBehaviour
     {
         // TODO WHY HERE :D
         Item.LoadItems();
+        // TODO move both things to a better place.
+        BaseTile.LoadPrefabs();
         instance = this;
     }
 

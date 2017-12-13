@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class TileLayer : MonoBehaviour
+public class TileLayer : NetworkBehaviour
 {
     public Chunk ChunkPrefab;
     public int ChunkSize = 16;
@@ -41,9 +42,17 @@ public class TileLayer : MonoBehaviour
         Debug.Log("Real size " + ChunkSize * WidthInChunks * HeightInChunks + " tiles, " + ChunkSize * WidthInChunks + "x" + ChunkSize * HeightInChunks + ".");
     }
 
+    [Server]
     public BaseTile SetTile(BaseTile tile, int x, int y)
     {
+        if(!CanPlaceTile(x, y))
+        {
+            Debug.LogError("Cannot place tile at " + x + ", " + y + " in layer '" + Name + "'.");
+            return null;
+        }
 
+        // Networking here!
+        if()
     }
 
     public bool CanPlaceTile(int x, int y)

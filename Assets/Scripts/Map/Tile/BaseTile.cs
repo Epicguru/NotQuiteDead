@@ -1,8 +1,12 @@
 ﻿
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class BaseTile : TileBackend
 {
+    // Static stuff.
+    private static Dictionary<string, BaseTile> tiles = new Dictionary<string, BaseTile>();
+
     [Tooltip("The constant prefab name. Can be anything, as long as it never changes and is unique.")]
     public string Prefab;
 
@@ -19,6 +23,41 @@ public abstract class BaseTile : TileBackend
     public Sprite Texture;
 
     private TileLayer layer;
+
+    public static BaseTile GetTile(string prefab)
+    {
+        if (!tiles.ContainsKey(prefab))
+        {
+            Debug.LogError("No tile prefab found for '" + prefab + "'");
+            return null;
+        }
+
+        return tiles[prefab];
+    }
+
+    public static Dictionary<string, BaseTile> GetTileDictionary()
+    {
+        return tiles;
+    }
+
+    public static void LoadPrefabs()
+    {
+        tiles.Clear();
+
+        BaseTile[] t =  Resources.LoadAll<BaseTile>("Tiles");
+
+        foreach(BaseTile tile in t)
+        {
+            tiles.Add(tile.Prefab, tile);
+        }
+
+        Debug.Log("Loaded " + tiles.Count + " tiles from resources.");
+    }
+
+    public bool SameTypeAs(BaseTile other)
+    {
+        return other == null ? false : other.Prefab == this.Prefab;
+    }
 
     public Chunk GetChunk()
     {
