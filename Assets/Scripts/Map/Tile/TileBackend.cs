@@ -7,8 +7,17 @@ public abstract class TileBackend : NetworkBehaviour
     // The network aware part of a tile.
     // Not much apart from networking.
 
+    public bool IsReference
+    {
+        get
+        {
+            return realTile != null;
+        }
+    }
+
     private int x, y;
     private bool placed;
+    private TileBackend realTile;
 
     // SERIOUSLY, CALL base.Update()!
     public virtual void Update()
@@ -30,6 +39,11 @@ public abstract class TileBackend : NetworkBehaviour
 
     public abstract void UpdateServer();
     public abstract void UpdateClient();
+
+    public void SetRealTile(TileBackend realTile)
+    {
+        this.realTile = realTile;
+    }
 
     public virtual void PlacedClient()
     {

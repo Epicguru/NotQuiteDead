@@ -19,6 +19,8 @@ public class TileLayer : MonoBehaviour
     // Map of chunks, where key is the index. (The calculated index, x * height + y).
     public Dictionary<int, Chunk> Chunks = new Dictionary<int, Chunk>();
 
+    private BaseTile[][] Tiles;
+
     public void Create(int width, int height)
     {
         Debug.Log("Creating map layer '" + name + "', size in tiles: " + width + "x" + height);
@@ -37,6 +39,52 @@ public class TileLayer : MonoBehaviour
 
         Debug.Log("Using a chunk size of " + ChunkSize + ", there are " + WidthInChunks + " horizontal chunks and " + HeightInChunks + " vertical chunks.");
         Debug.Log("Real size " + ChunkSize * WidthInChunks * HeightInChunks + " tiles, " + ChunkSize * WidthInChunks + "x" + ChunkSize * HeightInChunks + ".");
+    }
+
+    public BaseTile SetTile(BaseTile tile, int x, int y)
+    {
+
+    }
+
+    public bool CanPlaceTile(int x, int y)
+    {
+        if(InChunkBounds(x, y))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Is the position within layer bounds AND within a LOADED chunk?
+    /// </summary>
+    /// <param name="x">Tile X position.</param>
+    /// <param name="y">Tile Y position.</param>
+    /// <returns>True if within layer bounds and also within a currently loaded chunk.</returns>
+    public bool InChunkBounds(int x, int y)
+    {
+        if (!InLayerBounds(x, y))
+            return false;
+
+        if(IsChunkLoaded(GetChunkIndexFromTileCoords(x, y)))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public bool InLayerBounds(int x, int y)
+    {
+        if (x < 0 || x >= Width)
+            return false;
+        if (y < 0 || y >= Height)
+            return false;
+
+        return true;
     }
 
     public void LoadChunk(int x, int y)
@@ -97,6 +145,20 @@ public class TileLayer : MonoBehaviour
         Chunk chunk = Chunks[index];
         Chunks.Remove(index);
         Destroy(chunk.gameObject);
+    }
+
+    public int GetChunkIndexFromTileCoords(int x, int y)
+    {
+        if(!InLayerBounds(x, y))
+        {
+            Debug.LogError("Outside of layer bounds! " + x + ", " + y);
+            return -1;
+        }
+
+        int chunkX = (int)(x / ChunkSize);
+        int chunkY = (int)(y / ChunkSize);
+
+        return GetChunkIndex(chunkX, chunkY);
     }
 
     public Chunk GetChunkFromChunkCoords(int chunkX, int chunkY)

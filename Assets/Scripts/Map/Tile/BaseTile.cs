@@ -15,6 +15,9 @@ public abstract class BaseTile : TileBackend
     [Tooltip("A reference to the physics body.")]
     public Collider2D Physics;
 
+    [Tooltip("TODO Add different textures.")]
+    public Sprite Texture;
+
     private TileLayer layer;
 
     public Chunk GetChunk()
