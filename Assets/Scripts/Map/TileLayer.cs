@@ -67,6 +67,17 @@ public class TileLayer : NetworkBehaviour
         }
     }
 
+    public BaseTile GetTile(int x, int y)
+    {
+        if (!InLayerBounds(x, y))
+            return null;
+
+        if (!IsChunkLoaded(GetChunkIndexFromTileCoords(x, y)))
+            return null;
+
+        return Tiles[x][y];
+    }
+
     /// <summary>
     /// Places a tile, can be called from the server only. Places a tile on the server and on all clients.
     /// </summary>
@@ -140,7 +151,7 @@ public class TileLayer : NetworkBehaviour
 
     public bool CanPlaceTile(int x, int y)
     {
-        if(InChunkBounds(x, y))
+        if(!InChunkBounds(x, y))
         {
             return false;
         }
@@ -158,7 +169,6 @@ public class TileLayer : NetworkBehaviour
     {
         if (!InLayerBounds(x, y))
         {
-            Debug.LogError("Not in layer bounds: " + x + ", " + y);
             return false;
         }
 
@@ -237,9 +247,28 @@ public class TileLayer : NetworkBehaviour
             Debug.LogError("The chunk for index " + index + " is not loaded or is out of bounds.");
             return;
         }
+
         Chunk chunk = Chunks[index];
+
+        int startX = chunk.X * ChunkSize;
+        int startY = chunk.Y * ChunkSize;
+
+        ClearTilesFrom(startX, startY, ChunkSize, ChunkSize);
+
         Chunks.Remove(index);
+
         Destroy(chunk.gameObject);
+    }
+
+    private void ClearTilesFrom(int startX, int startY, int sizeX, int sizeY)
+    {
+        for (int x = startX; x < startX + sizeX; x++)
+        {
+            for (int y = startY; y < startY + sizeY; y++)
+            {
+                Tiles[x][y] = null;
+            }
+        }
     }
 
     public Chunk GetChunkFromIndex(int index)

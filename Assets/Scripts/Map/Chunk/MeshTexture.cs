@@ -42,7 +42,7 @@ public class MeshTexture : MonoBehaviour
 
         this.Texture = texture;
 
-        Renderer.sharedMaterials[0].mainTexture = texture;
+        Renderer.material.mainTexture = texture;
     }
 
     public Color[] GetColours(Sprite sprite, bool packSafe = true)
