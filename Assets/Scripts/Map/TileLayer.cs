@@ -7,10 +7,10 @@ using UnityEngine.Networking;
 
 public class TileLayer : NetworkBehaviour
 {
+    public string Name;
+
     public Chunk ChunkPrefab;
     public int ChunkSize = 16;
-
-    public string Name { get; private set; }
 
     public int Width { get; private set; }
     public int Height { get; private set; }
@@ -21,6 +21,20 @@ public class TileLayer : NetworkBehaviour
     public Dictionary<int, Chunk> Chunks = new Dictionary<int, Chunk>();
 
     private BaseTile[][] Tiles;
+
+    public void Update()
+    {
+        int x = (int)InputManager.GetMousePos().x;
+        int y = (int)InputManager.GetMousePos().y;
+
+        if(InLayerBounds(x, y))
+        {
+            if (InputManager.InputDown("Shoot"))
+            {
+                SetTile(BaseTile.GetTile("Dirt"), x, y);
+            }
+        }
+    }
 
     public void Create(int width, int height)
     {
@@ -35,6 +49,8 @@ public class TileLayer : NetworkBehaviour
         this.Width = width;
         this.Height = height;
 
+        CreateTileArray();
+
         this.WidthInChunks = CalculateChunksFromTiles(Width, ChunkSize);
         this.HeightInChunks = CalculateChunksFromTiles(Height, ChunkSize);
 
@@ -42,17 +58,84 @@ public class TileLayer : NetworkBehaviour
         Debug.Log("Real size " + ChunkSize * WidthInChunks * HeightInChunks + " tiles, " + ChunkSize * WidthInChunks + "x" + ChunkSize * HeightInChunks + ".");
     }
 
+    private void CreateTileArray()
+    {
+        this.Tiles = new BaseTile[Width][];
+        for (int i = 0; i < Width; i++)
+        {
+            Tiles[i] = new BaseTile[Height];
+        }
+    }
+
+    /// <summary>
+    /// Places a tile, can be called from the server only. Places a tile on the server and on all clients.
+    /// </summary>
+    /// <param name="tile">The tile PREFAB.</param>
+    /// <param name="x">The x position, in tiles.</param>
+    /// <param name="y">The y position, in tiles.</param>
+    /// <returns>True if the operation was successful.</returns>
     [Server]
-    public BaseTile SetTile(BaseTile tile, int x, int y)
+    public bool SetTile(BaseTile tile, int x, int y)
     {
         if(!CanPlaceTile(x, y))
         {
             Debug.LogError("Cannot place tile at " + x + ", " + y + " in layer '" + Name + "'.");
-            return null;
+            return false;
         }
 
         // Networking here!
-        if()
+        // TODO
+
+        // For now, just place tile in position.
+        BaseTile oldTile = Tiles[x][y];
+
+        if(oldTile != null)
+        {
+            TileRemoved(x, y, oldTile);
+        }
+
+        Tiles[x][y] = tile;
+
+        TilePlaced(x, y, tile);
+
+        return true;
+    }
+
+    public void TilePlaced(int x, int y, BaseTile newTile)
+    {
+        if (newTile == null)
+        {
+            Debug.LogError("Cannot place null tile! FOR NOW TODO ADDME!");
+            return;
+        }
+
+        int chunkIndex = GetChunkIndexFromTileCoords(x, y);
+
+        if (!IsChunkLoaded(chunkIndex))
+        {
+            Debug.LogError("TilePlaced called in unloaded chunk!");
+            return;
+        }
+
+        Chunk chunk = GetChunkFromIndex(chunkIndex);
+
+        int localX = x - (ChunkSize * chunk.X);
+        int localY = y - (ChunkSize * chunk.Y);
+
+        if (newTile.Physics)
+        {
+            chunk.Physics.AssignCollider(newTile.Physics, localX, localY);
+        }
+
+        if (newTile.Texture)
+        {
+            chunk.Texture.SetTile(newTile.Texture, localX, localY);
+        }
+    }
+
+    public void TileRemoved(int x, int y, BaseTile oldTile)
+    {
+
     }
 
     public bool CanPlaceTile(int x, int y)
@@ -74,7 +157,10 @@ public class TileLayer : NetworkBehaviour
     public bool InChunkBounds(int x, int y)
     {
         if (!InLayerBounds(x, y))
+        {
+            Debug.LogError("Not in layer bounds: " + x + ", " + y);
             return false;
+        }
 
         if(IsChunkLoaded(GetChunkIndexFromTileCoords(x, y)))
         {
@@ -154,6 +240,14 @@ public class TileLayer : NetworkBehaviour
         Chunk chunk = Chunks[index];
         Chunks.Remove(index);
         Destroy(chunk.gameObject);
+    }
+
+    public Chunk GetChunkFromIndex(int index)
+    {
+        if (!IsChunkLoaded(index))
+            return null;
+
+        return Chunks[index];
     }
 
     public int GetChunkIndexFromTileCoords(int x, int y)

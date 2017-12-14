@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseTile : TileBackend
+[CreateAssetMenu(fileName = "TileName", menuName = "Tiles/Base Tile", order = 1)]
+public class BaseTile : ScriptableObject
 {
     // Static stuff.
     private static Dictionary<string, BaseTile> tiles = new Dictionary<string, BaseTile>();
@@ -35,6 +36,11 @@ public abstract class BaseTile : TileBackend
         return tiles[prefab];
     }
 
+    public static bool ContainsTile(string prefab)
+    {
+        return tiles.ContainsKey(prefab);
+    }
+
     public static Dictionary<string, BaseTile> GetTileDictionary()
     {
         return tiles;
@@ -52,35 +58,5 @@ public abstract class BaseTile : TileBackend
         }
 
         Debug.Log("Loaded " + tiles.Count + " tiles from resources.");
-    }
-
-    public bool SameTypeAs(BaseTile other)
-    {
-        return other == null ? false : other.Prefab == this.Prefab;
-    }
-
-    public Chunk GetChunk()
-    {
-        return this.layer.GetChunkFromChunkCoords(GetChunkX(), GetChunkY());
-    }
-
-    public int GetChunkIndex()
-    {
-        return this.layer.GetChunkIndex(GetChunkX(), GetChunkY());
-    }
-
-    public int GetChunkX()
-    {
-        return this.GetX() / layer.ChunkSize;
-    }
-
-    public int GetChunkY()
-    {
-        return this.GetY() / layer.ChunkSize;
-    }
-
-    public TileLayer GetLayer()
-    {
-        return this.layer;
     }
 }
