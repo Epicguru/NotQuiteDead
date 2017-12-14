@@ -40,7 +40,7 @@ public static class ChunkIO
     }
 
     private static BaseTile[][] chunk;
-    public static BaseTile[][] MakeChunk(string str, int chunkSize, UnityEvent error = null)
+    public static BaseTile[][] MakeChunk(string str, int chunkSize, UnityEvent<string> error = null)
     {
         if(chunk == null || chunk.Length != chunkSize)
         {
@@ -67,11 +67,12 @@ public static class ChunkIO
 
                 if (BaseTile.ContainsTile(prefab))
                 {
-
+                    chunk[x][y] = BaseTile.GetTile(prefab);
                 }
                 else
                 {
-
+                    if(error != null)
+                        error.Invoke("Tile '" + prefab + "' not found @ chunk " + x + ", " + y + ".");
                 }
             }
         }

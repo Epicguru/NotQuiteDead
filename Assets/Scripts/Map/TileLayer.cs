@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -252,6 +253,15 @@ public class TileLayer : NetworkBehaviour
 
         int startX = chunk.X * ChunkSize;
         int startY = chunk.Y * ChunkSize;
+
+        string s = ChunkIO.MakeString(Tiles, chunk.X, chunk.Y, ChunkSize);
+
+        // TESTING
+        string directory = Application.persistentDataPath + "/Chunks/";
+        string path = directory + chunk.X + ", " + chunk.Y + ".chunk";
+        Debug.Log(path);
+        Directory.CreateDirectory(directory);
+        File.WriteAllText(path, s);
 
         ClearTilesFrom(startX, startY, ChunkSize, ChunkSize);
 
