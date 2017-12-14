@@ -27,18 +27,18 @@ public class BaseTile : ScriptableObject
 
     public static BaseTile GetTile(string prefab)
     {
-        if (!tiles.ContainsKey(prefab))
+        if (!ContainsTile(prefab))
         {
             Debug.LogError("No tile prefab found for '" + prefab + "'");
             return null;
         }
 
-        return tiles[prefab];
+        return tiles[prefab.Trim()];
     }
 
     public static bool ContainsTile(string prefab)
     {
-        return tiles.ContainsKey(prefab);
+        return tiles.ContainsKey(prefab.Trim());
     }
 
     public static Dictionary<string, BaseTile> GetTileDictionary()
@@ -54,7 +54,7 @@ public class BaseTile : ScriptableObject
 
         foreach(BaseTile tile in t)
         {
-            tiles.Add(tile.Prefab, tile);
+            tiles.Add(tile.Prefab.Trim(), tile);
         }
 
         Debug.Log("Loaded " + tiles.Count + " tiles from resources.");
