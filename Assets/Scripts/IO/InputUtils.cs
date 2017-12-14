@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,7 +10,7 @@ public static class InputUtils
 {
     private static readonly bool LOG_ERROR = false;
 
-    public static string FileToJson(string path)
+    public static string FileToText(string path)
     {
         if (!File.Exists(path))
         {
@@ -28,12 +29,16 @@ public static class InputUtils
             return default(T);
         }
 
-        return JsonUtility.FromJson<T>(json);
+        return JsonConvert.DeserializeObject<T>(json);
     }
 
     public static T FileToObject<T>(string path)
     {
-        string file = FileToJson(path);
+        string file = FileToText(path);
+
+        if (file == null)
+            return default(T);
+
         return JsonToObject<T>(file);
     }
 }

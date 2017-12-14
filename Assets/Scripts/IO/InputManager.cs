@@ -103,11 +103,11 @@ public static class InputManager
         Debug.Log("Loading key bindings from '" + path + "'...");
 
         // Load from file, may return null!
-        SerializableDictionary<string, KeyCode> x = InputUtils.FileToObject<SerializableDictionary<string, KeyCode>>(path);
-        if(x == null)
+        Dictionary<string, KeyCode> x = InputUtils.FileToObject<Dictionary<string, KeyCode>>(path);
+        if (x == null)
             Debug.Log("File was not found or parsing error occured. (Pre conversion, file)");
         else
-            keyBindings = x.ToDictionary();
+            keyBindings = x;
         // At this point, key bindings object may be null becuase it was not found on file.
         // Merging the default values will create the object if it is null.
         // When we merge the default values will replace an missing ones.
@@ -124,7 +124,7 @@ public static class InputManager
     {
         string path = OutputUtils.InputSaveKeyBindings;
         Debug.Log("Saving key bindings to '" + path + "'...");
-        OutputUtils.ObjectToFile(new SerializableDictionary<string, KeyCode>(keyBindings), path); // Will be auto
+        OutputUtils.ObjectToFile(keyBindings, path); // Will be auto
     }
 
     public static bool InputPressed(string input, bool bypass = false)

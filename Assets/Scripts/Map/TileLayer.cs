@@ -254,14 +254,8 @@ public class TileLayer : NetworkBehaviour
         int startX = chunk.X * ChunkSize;
         int startY = chunk.Y * ChunkSize;
 
-        string s = ChunkIO.MakeString(Tiles, chunk.X, chunk.Y, ChunkSize);
-
-        // TESTING
-        string directory = Application.persistentDataPath + "/Chunks/";
-        string path = directory + chunk.X + ", " + chunk.Y + ".chunk";
-        Debug.Log(path);
-        Directory.CreateDirectory(directory);
-        File.WriteAllText(path, s);
+        // TEST IO TODO FIXME
+        ChunkIO.SaveChunk("Jame's Reality", Name, Tiles, chunk.X, chunk.Y, ChunkSize);
 
         ClearTilesFrom(startX, startY, ChunkSize, ChunkSize);
 

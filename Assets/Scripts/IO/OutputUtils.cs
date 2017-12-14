@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,7 +17,7 @@ public static class OutputUtils
     {
         get
         {
-            return Application.persistentDataPath; // Change me whenever!
+            return Application.persistentDataPath + S; // Change me whenever!
         }
     }
 
@@ -24,7 +25,7 @@ public static class OutputUtils
     {
         get
         {
-            return SaveDirectory + S + "Input";
+            return SaveDirectory + "Input" + S;
         }
     }
 
@@ -32,17 +33,65 @@ public static class OutputUtils
     {
         get
         {
-            return InputSaveDirectory + S + "Key Bindings.txt";
+            return InputSaveDirectory + "Key Bindings.txt";
+        }
+    }
+
+    public static string RealitySaveDirectory
+    {
+        get
+        {
+            return SaveDirectory + "Realities" + S;
+        }
+    }
+
+    public static string RealityMapDirectory
+    {
+        get
+        {
+            return S + "Map" + S;
+        }
+    }
+
+    public static string RealityLayersDirectory
+    {
+        get
+        {
+            return RealityMapDirectory + "Layers" + S;
+        }
+    }
+
+    public static string RealityChunksDirectory
+    {
+        get
+        {
+            return S + "Chunks" + S;
         }
     }
 
     // METHODS
 
-    public static string ObjectToJson(object obj, bool prettyPrint = true)
+    private static JsonSerializerSettings jsonSettings;
+
+    public static JsonSerializerSettings GetJsonSettings()
+    {
+        if (jsonSettings == null)
+            CreateDefaultSettings();
+
+        return jsonSettings;
+    }
+
+    public static void CreateDefaultSettings()
+    {
+        jsonSettings = new JsonSerializerSettings();
+        jsonSettings.Formatting = Formatting.Indented;
+    }
+
+    public static string ObjectToJson(object obj, JsonSerializerSettings settings = null)
     {
         if (obj == null)
             return string.Empty;
-        return JsonUtility.ToJson(obj, prettyPrint);
+        return JsonConvert.SerializeObject(obj, settings == null ? GetJsonSettings() : settings);
     }
 
     public static void JsonToFile(string json, string path)
@@ -71,48 +120,8 @@ public static class OutputUtils
         if (File.Exists(path))
             return false;
         EnsureDirectoryExists(Path.GetDirectoryName(path));
-        File.Create(path);
+        FileStream f = File.Create(path);
+        f.Close();
         return true;
-    }
-}
-
-public class SerializableDictionary<K, V>
-{
-    public K[] Keys;
-    public V[] Values;
-
-    public SerializableDictionary() { }
-    public SerializableDictionary(Dictionary<K, V> data)
-    {
-        this.Set(data);
-    }
-
-    public void Set(Dictionary<K, V> data)
-    {
-        Keys = new K[data.Count];
-        Values = new V[data.Count];
-
-        int i = 0;
-        foreach(K key in data.Keys)
-        {
-            Keys[i] = key;
-            Values[i] = data[key];
-            i++;
-        }
-    }
-
-    public Dictionary<K, V> ToDictionary()
-    {
-        if (Keys == null || Values == null)
-            return null;
-
-        Dictionary<K, V> d = new Dictionary<K, V>();
-        int i = 0;
-        foreach(K key in Keys)
-        {
-            d.Add(key, Values[i++]);
-        }
-
-        return d;
     }
 }

@@ -3,12 +3,38 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Events;
 
 public static class ChunkIO
 {
-    public const string NULL_ERROR = "NULL,";
+    public const string NULL_ERROR = "?,";
+
+    public static string GetFileName(int chunkX, int chunkY)
+    {
+        return chunkX + ", " + chunkY + ".chunk";
+    }
+
+    public static void SaveChunk(string reality, string layer, BaseTile[][] tiles, int chunkX, int chunkY, int chunkSize)
+    {
+        string path = OutputUtils.RealitySaveDirectory + reality + OutputUtils.RealityLayersDirectory + layer + OutputUtils.RealityChunksDirectory + GetFileName(chunkX, chunkY);
+
+        Thread thread = new Thread(() => 
+        {
+            string toSave = MakeString(tiles, chunkX, chunkY, chunkSize);
+
+            string dir = Path.GetDirectoryName(path);
+
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
+            File.WriteAllText(path, toSave);
+        });
+
+        thread.Start();
+        // TODO add a unity event system, with params, that executes in main thread.
+    }
 
     public static string MakeString(BaseTile[][] tiles, int chunkX, int chunkY, int chunkSize)
     {
