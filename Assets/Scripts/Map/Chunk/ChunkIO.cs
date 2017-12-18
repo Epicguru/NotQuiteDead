@@ -30,6 +30,9 @@ public static class ChunkIO
                 Directory.CreateDirectory(dir);
 
             File.WriteAllText(path, toSave);
+
+            Thread.Sleep(2000);
+
             Debug.Log("Saved chunk @ " + chunkX + ", " + chunkY);
 
             Threader.Instance.PostAction(done, chunkX, chunkY, layer, reality, path);                

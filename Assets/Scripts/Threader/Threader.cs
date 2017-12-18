@@ -16,17 +16,25 @@ public class Threader : MonoBehaviour
 {
     public static Threader Instance;
 
+    [ReadOnly]
     public int PendingOperations;
-    public int ExecutedOperations10Seconds;
-    public int SleepTime10Seconds;
-
-    public int MaxEventsPerFrame = 100;
+    [ReadOnly]
+    public int ExecutedOperationsOver10Seconds;
+    [ReadOnly]
+    public int SleepTimeOver10Seconds;
+    [Range(0f, 120f)]
+    public float UpdatesPerSecond = 60f;
+    public int MaxActionsPerUpdate = 100;
+    [Range(0, 1000)]
     public int ThreadWaitTime = 10;
+    public bool AllowFrameStacking = false;
 
     private List<UnityAction<object[]>> actions = new List<UnityAction<object[]>>();
     private List<object[]> objects = new List<object[]>();
     private bool processing = false;
     private float timer;
+    private float statsTimer;
+    private System.Object myLock = new System.Object();
 
     public void Awake()
     {
@@ -40,31 +48,60 @@ public class Threader : MonoBehaviour
 
     public void Update()
     {
-        ProcessEvents(MaxEventsPerFrame);
+        float deltaTime = Time.unscaledDeltaTime;
 
-        timer += Time.unscaledDeltaTime;
-        if(timer >= 10f)
+        UpdateTimer(deltaTime);
+        UpdateStats(deltaTime);
+    }
+
+    public void UpdateStats(float deltaTime)
+    {
+        statsTimer += deltaTime;
+        if (statsTimer >= 10f)
         {
-            timer -= 10f;
-            SleepTime10Seconds = 0;
-            ExecutedOperations10Seconds = 0;
+            statsTimer -= 10f;
+            SleepTimeOver10Seconds = 0;
+            ExecutedOperationsOver10Seconds = 0;
         }
+    }
+
+    public void UpdateTimer(float deltaTime)
+    {
+        timer += deltaTime;
+        float interval = GetInterval();
+
+        while(timer >= interval)
+        {
+            timer -= interval;
+            ProcessEvents(MaxActionsPerUpdate);
+
+            if (!AllowFrameStacking)
+                break;
+        }
+    }
+
+    public float GetInterval()
+    {
+        return 1f / UpdatesPerSecond;
     }
 
     public void PostAction(UnityAction<object[]> action, params object[] objects)
     {
-        if (action == null)
-            return;
-
-        while (processing)
+        lock (myLock)
         {
-            Thread.Sleep(ThreadWaitTime);
-            SleepTime10Seconds += ThreadWaitTime;
-        }
+            if (action == null)
+                return;
 
-        this.actions.Add(action);
-        this.objects.Add(objects);
-        PendingOperations++;
+            while (processing)
+            {
+                Thread.Sleep(ThreadWaitTime);
+                SleepTimeOver10Seconds += ThreadWaitTime;
+            }
+
+            this.actions.Add(action);
+            this.objects.Add(objects);
+            PendingOperations++;
+        }        
     }
 
     public void ProcessEvents(int max)
@@ -76,13 +113,17 @@ public class Threader : MonoBehaviour
                 break;
 
             UnityAction<object[]> action = actions[0];
-            actions.RemoveAt(0);
+
             object[] objs = objects[0];
-            objects.RemoveAt(0);
 
             action.Invoke(objs);
+
+            actions.RemoveAt(0);
+            objects.RemoveAt(0);
+
+            ExecutedOperationsOver10Seconds++;
+
             PendingOperations--;
-            ExecutedOperations10Seconds++;
             if (PendingOperations < 0)
                 PendingOperations = 0;
         }

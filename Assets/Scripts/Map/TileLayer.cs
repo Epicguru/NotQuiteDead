@@ -20,7 +20,7 @@ public class TileLayer : NetworkBehaviour
 
     // Map of chunks, where key is the index. (The calculated index, x * height + y).
     public Dictionary<int, Chunk> Chunks = new Dictionary<int, Chunk>();
-
+    private List<int> unloading = new List<int>();
     private BaseTile[][] Tiles;
 
     public void Update()
@@ -30,7 +30,7 @@ public class TileLayer : NetworkBehaviour
 
         if(InLayerBounds(x, y))
         {
-            if (InputManager.InputDown("Shoot"))
+            if (InputManager.InputPressed("Shoot"))
             {
                 SetTile(BaseTile.GetTile("Dirt"), x, y);
             }
@@ -100,6 +100,12 @@ public class TileLayer : NetworkBehaviour
 
         // For now, just place tile in position.
         BaseTile oldTile = Tiles[x][y];
+
+        if(oldTile == tile)
+        {
+            // No need to change anything, already set that tile there!
+            return false;
+        }
 
         if(oldTile != null)
         {
@@ -249,13 +255,23 @@ public class TileLayer : NetworkBehaviour
             return;
         }
 
+        if (IsUnloading(index))
+        {
+            Debug.LogError("Chunk at index " + index + " is already unloading! Check for curret unloading with Layer.IsUnloading(index).");
+            return;
+        }
+
         Chunk chunk = Chunks[index];
 
-        int startX = chunk.X * ChunkSize;
-        int startY = chunk.Y * ChunkSize;
+        unloading.Add(index);
 
         // TEST IO TODO FIXME
         ChunkIO.SaveChunk("James' Reality", Name, Tiles, chunk.X, chunk.Y, ChunkSize, ChunkSaved);        
+    }
+
+    public bool IsUnloading(int index)
+    {
+        return unloading.Contains(index);
     }
 
     private void ChunkSaved(object[] args)
@@ -457,8 +473,9 @@ public class TileLayer : NetworkBehaviour
 
         foreach(int index in toUnload)
         {
-            // Unload these ones.
-            UnloadChunk(index);
+            // Unload these ones, if they are not already being unloaded.
+            if(!IsUnloading(index))
+                UnloadChunk(index);
         }
 
         // Clean up.
