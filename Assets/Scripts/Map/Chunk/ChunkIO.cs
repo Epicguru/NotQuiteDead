@@ -71,6 +71,44 @@ public static class ChunkIO
         return str.ToString();
     }
 
+    public static bool IsChunkSaved(string reality, string layer, int chunkX, int chunkY)
+    {
+        string path = GetPathForChunk(reality, layer, chunkX, chunkY);
+
+        return IsChunkSaved(path);
+    }
+
+    public static bool IsChunkSaved(string path)
+    {
+        return File.Exists(path);
+    }
+
+    public static string GetPathForChunk(string reality, string layer, int chunkX, int chunkY)
+    {
+        return OutputUtils.RealitySaveDirectory + reality + OutputUtils.RealityLayersDirectory + layer + OutputUtils.RealityChunksDirectory + GetFileName(chunkX, chunkY); ;
+    }
+
+    public static void MakeChunk(string reality, string layer, int chunkX, int chunkY, int chunkSize, UnityAction<object[]> done, UnityAction<string> error = null)
+    {
+        Thread thread = new Thread(() => 
+        {
+            string path = GetPathForChunk(reality, layer, chunkX, chunkY);
+
+            if (!IsChunkSaved(path))
+            {
+                if (error != null)
+                    error.Invoke("A file for that chunk could not be found! (" + GetPathForChunk(reality, layer, chunkX, chunkY));
+                return;
+            }
+
+            // Read all data
+            File.ReadAllText(path);
+
+            // TODO left off here...
+        });
+        thread.Start();
+    }
+
     private static BaseTile[][] chunk;
     public static BaseTile[][] MakeChunk(string str, int chunkSize, UnityAction<string> error = null)
     {

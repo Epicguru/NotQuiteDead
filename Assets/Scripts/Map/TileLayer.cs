@@ -301,6 +301,8 @@ public class TileLayer : NetworkBehaviour
         ClearTilesFrom(startX, startY, ChunkSize, ChunkSize);
         Chunks.Remove(index);
         Destroy(chunk.gameObject);
+
+        unloading.Remove(index);
     }
 
     private void ClearTilesFrom(int startX, int startY, int sizeX, int sizeY)
