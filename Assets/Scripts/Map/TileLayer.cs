@@ -255,12 +255,35 @@ public class TileLayer : NetworkBehaviour
         int startY = chunk.Y * ChunkSize;
 
         // TEST IO TODO FIXME
-        ChunkIO.SaveChunk("Jame's Reality", Name, Tiles, chunk.X, chunk.Y, ChunkSize);
+        ChunkIO.SaveChunk("James' Reality", Name, Tiles, chunk.X, chunk.Y, ChunkSize, ChunkSaved);        
+    }
+
+    private void ChunkSaved(object[] args)
+    {
+        // Remove chunk from world.
+
+        // Get chunk position.
+        int chunkX = (int)args[0];
+        int chunkY = (int)args[1];
+
+        // There are some more args that I don't really need for this.
+        // Such as layer name (I already know!) and save path (I don't care -_-).
+
+        int index = GetChunkIndex(chunkX, chunkY);
+
+        if (!IsChunkLoaded(index))
+        {
+            Debug.LogError("Chunk was saved to memory, but physical copy could not be destroyed: it is not loaded!");
+            return;
+        }
+
+        Chunk chunk = Chunks[index];
+
+        int startX = chunk.X * ChunkSize;
+        int startY = chunk.Y * ChunkSize;
 
         ClearTilesFrom(startX, startY, ChunkSize, ChunkSize);
-
         Chunks.Remove(index);
-
         Destroy(chunk.gameObject);
     }
 

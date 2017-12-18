@@ -16,7 +16,7 @@ public static class ChunkIO
         return chunkX + ", " + chunkY + ".chunk";
     }
 
-    public static void SaveChunk(string reality, string layer, BaseTile[][] tiles, int chunkX, int chunkY, int chunkSize)
+    public static void SaveChunk(string reality, string layer, BaseTile[][] tiles, int chunkX, int chunkY, int chunkSize, UnityAction<object[]> done)
     {
         string path = OutputUtils.RealitySaveDirectory + reality + OutputUtils.RealityLayersDirectory + layer + OutputUtils.RealityChunksDirectory + GetFileName(chunkX, chunkY);
 
@@ -30,6 +30,9 @@ public static class ChunkIO
                 Directory.CreateDirectory(dir);
 
             File.WriteAllText(path, toSave);
+            Debug.Log("Saved chunk @ " + chunkX + ", " + chunkY);
+
+            Threader.Instance.PostAction(done, chunkX, chunkY, layer, reality, path);                
         });
 
         thread.Start();
@@ -66,7 +69,7 @@ public static class ChunkIO
     }
 
     private static BaseTile[][] chunk;
-    public static BaseTile[][] MakeChunk(string str, int chunkSize, UnityEvent<string> error = null)
+    public static BaseTile[][] MakeChunk(string str, int chunkSize, UnityAction<string> error = null)
     {
         if(chunk == null || chunk.Length != chunkSize)
         {
