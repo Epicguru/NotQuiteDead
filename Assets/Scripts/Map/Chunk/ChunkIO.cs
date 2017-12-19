@@ -102,9 +102,17 @@ public static class ChunkIO
             }
 
             // Read all data
-            File.ReadAllText(path);
+            string text = File.ReadAllText(path);
+            text = text.Trim();
 
-            // TODO left off here...
+            if (string.IsNullOrEmpty(text))
+            {
+                if (error != null)
+                    error.Invoke("File existed, but text was null or empty!");
+                return;
+            }
+
+            
         });
         thread.Start();
     }
@@ -118,6 +126,13 @@ public static class ChunkIO
         }
 
         string[] parts = str.Split(',');
+
+        if(parts.Length != chunkSize * chunkSize)
+        {
+            if (error != null)
+                error.Invoke("Incorrect number of tiles for chunk: found " + parts.Length + " when " + chunkSize * chunkSize + " were expected.");
+            return null;
+        }
 
         for (int x = 0; x < chunkSize; x++)
         {
@@ -142,7 +157,7 @@ public static class ChunkIO
                 else
                 {
                     if(error != null)
-                        error.Invoke("Tile '" + prefab + "' not found @ chunk " + x + ", " + y + ".");
+                        error.Invoke("Tile '" + prefab + "' not found @ local position " + x + ", " + y + ".");
                 }
             }
         }
