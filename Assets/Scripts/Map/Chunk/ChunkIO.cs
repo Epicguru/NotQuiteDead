@@ -51,9 +51,9 @@ public static class ChunkIO
 
         StringBuilder str = new StringBuilder();
 
-        for (int x = chunkX * chunkSize; x < chunkX * chunkSize + chunkSize; x++)
+        for (int y = chunkY * chunkSize; y < chunkY * chunkSize + chunkSize; y++)
         {
-            for (int y = chunkY * chunkSize; y < chunkY * chunkSize + chunkSize; y++)
+            for (int x = chunkX * chunkSize; x < chunkX * chunkSize + chunkSize; x++)
             {
                 BaseTile tile = tiles[x][y];
                 if(tile == null)
@@ -157,11 +157,11 @@ public static class ChunkIO
 
         for (int x = 0; x < chunkSize; x++)
         {
+            chunk[x] = new BaseTile[chunkSize];
             for (int y = 0; y < chunkSize; y++)
             {
-                chunk[x] = new BaseTile[chunkSize];
 
-                int index = y + chunkSize * x;
+                int index = x + chunkSize * y;
 
                 string prefab = parts[index].Trim();
 
@@ -171,6 +171,7 @@ public static class ChunkIO
                 if (BaseTile.ContainsTile(prefab))
                 {
                     chunk[x][y] = BaseTile.GetTile(prefab);
+                    Debug.Log(prefab + " @ " + x + ", " + y + " (" + index + ")");
                 }
                 else
                 {
