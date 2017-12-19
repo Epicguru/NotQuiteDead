@@ -9,7 +9,8 @@ using UnityEngine.Events;
 
 public static class ChunkIO
 {
-    public const string NULL_ERROR = "?,";
+    public const char COMMA = ',';
+    public const char NULL_ERROR = '?';
 
     public static string GetFileName(int chunkX, int chunkY)
     {
@@ -58,10 +59,16 @@ public static class ChunkIO
                 if(tile == null)
                 {
                     str.Append(NULL_ERROR);
+                    bool last = (x == (chunkX * chunkSize + chunkSize) - 1) && (y == (chunkY * chunkSize + chunkSize) - 1);
+                    if (!last)
+                        str.Append(COMMA);
                 }
                 else
                 {
-                    str.Append(tiles[x][y].Prefab.Trim() + ",");
+                    str.Append(tiles[x][y].Prefab.Trim());
+                    bool last = (x == (chunkX * chunkSize + chunkSize) - 1) && (y == (chunkY * chunkSize + chunkSize) - 1);
+                    if (!last)
+                        str.Append(COMMA);
                 }
             }
         }
@@ -107,6 +114,9 @@ public static class ChunkIO
             {
                 if (error != null)
                     error.Invoke("File existed, but text was null or empty!");
+
+                Threader.Instance.PostAction(done, false, chunkX, chunkY, null, layer, reality);
+
                 return;
             }
 
@@ -122,9 +132,12 @@ public static class ChunkIO
                     error.Invoke("Tile 2D array creation failed.");
                     return;
                 }
+
+                Threader.Instance.PostAction(done, false, chunkX, chunkY, null, layer, reality);
+
             }
 
-            Threader.Instance.PostAction(done, chunkX, chunkY, tiles, layer, reality);
+            Threader.Instance.PostAction(done, true, chunkX, chunkY, tiles, layer, reality);
         });
         thread.Start();
     }
@@ -159,7 +172,7 @@ public static class ChunkIO
 
                 string prefab = parts[index].Trim();
 
-                if (prefab == NULL_ERROR)
+                if (prefab == NULL_ERROR.ToString())
                     continue;
 
                 if (BaseTile.ContainsTile(prefab))

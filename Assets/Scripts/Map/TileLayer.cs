@@ -126,13 +126,11 @@ public class TileLayer : NetworkBehaviour
         if (tiles == null)
             return;
 
-        Debug.Log("Setting tiles from tile " + x + " to " + x + tiles.Length);
-
         for (int X = x; X < x + tiles.Length; X++)
         {
             BaseTile[] yArray = tiles[X - x];
 
-            for (int Y = 0; Y < y + yArray.Length; Y++)
+            for (int Y = y; Y < y + yArray.Length; Y++)
             {
                 if(CanPlaceTile(X, Y))
                     SetTile(yArray[Y - y], X, Y);
@@ -264,7 +262,7 @@ public class TileLayer : NetworkBehaviour
         if(ChunkIO.IsChunkSaved("James' Reality", Name, x, y))
         {
             // Load from disk.
-            ChunkIO.LoadChunk("James' Reality", Name, x, y, ChunkSize, ChunkLoaded);
+            ChunkIO.LoadChunk("James' Reality", Name, x, y, ChunkSize, ChunkLoaded, ChunkLoadError);
         }
         else
         {
@@ -277,16 +275,28 @@ public class TileLayer : NetworkBehaviour
     private void ChunkLoaded(object[] args)
     {
         // Get values.
-        int chunkX = (int)args[0];
-        int chunkY = (int)args[1];
-        BaseTile[][] tiles = (BaseTile[][])args[2];
+        bool worked = (bool)args[0];
+        int chunkX = (int)args[1];
+        int chunkY = (int)args[2];
 
         int index = GetChunkIndex(chunkX, chunkY);
+
+        if (!worked)
+        {
+            loading.Remove(index);
+        }
+
+        BaseTile[][] tiles = (BaseTile[][])args[3];
 
         // TODO LEFT HERE
         SetTiles(tiles, chunkX * ChunkSize, chunkY * ChunkSize);
 
         loading.Remove(index);
+    }
+
+    private void ChunkLoadError(string error)
+    {
+        Debug.LogError("[CHUNK LOAD] " + error);
     }
 
     public void UnloadChunk(int x, int y)
