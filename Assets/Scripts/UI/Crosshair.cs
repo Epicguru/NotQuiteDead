@@ -36,10 +36,11 @@ public class Crosshair : MonoBehaviour {
             return;
 
         (transform as RectTransform).anchoredPosition = Input.mousePosition;
+        float dst = Curve.Evaluate(Distance) * MaxDistance + MinDistance;
 
-        foreach(CrosshairPart part in parts)
+        foreach (CrosshairPart part in parts)
         {
-            part.distance = Curve.Evaluate(Distance) * MaxDistance + MinDistance;
+            part.distance = dst;
         }
     }
 }
