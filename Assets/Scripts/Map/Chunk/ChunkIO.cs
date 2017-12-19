@@ -31,8 +31,6 @@ public static class ChunkIO
 
             File.WriteAllText(path, toSave);
 
-            Thread.Sleep(2000);
-
             Debug.Log("Saved chunk @ " + chunkX + ", " + chunkY);
 
             Threader.Instance.PostAction(done, chunkX, chunkY, layer, reality, path);                
@@ -88,7 +86,7 @@ public static class ChunkIO
         return OutputUtils.RealitySaveDirectory + reality + OutputUtils.RealityLayersDirectory + layer + OutputUtils.RealityChunksDirectory + GetFileName(chunkX, chunkY); ;
     }
 
-    public static void MakeChunk(string reality, string layer, int chunkX, int chunkY, int chunkSize, UnityAction<object[]> done, UnityAction<string> error = null)
+    public static void LoadChunk(string reality, string layer, int chunkX, int chunkY, int chunkSize, UnityAction<object[]> done, UnityAction<string> error = null)
     {
         Thread thread = new Thread(() => 
         {
@@ -112,7 +110,21 @@ public static class ChunkIO
                 return;
             }
 
-            
+            Debug.Log("Loaded chunk @ " + chunkX + ", " + chunkY);
+
+
+            BaseTile[][] tiles = MakeChunk(text, chunkSize, error);
+
+            if (tiles == null)
+            {
+                if (error != null)
+                {
+                    error.Invoke("Tile 2D array creation failed.");
+                    return;
+                }
+            }
+
+            Threader.Instance.PostAction(done, chunkX, chunkY, tiles, layer, reality);
         });
         thread.Start();
     }

@@ -21,6 +21,7 @@ public class TileLayer : NetworkBehaviour
     // Map of chunks, where key is the index. (The calculated index, x * height + y).
     public Dictionary<int, Chunk> Chunks = new Dictionary<int, Chunk>();
     private List<int> unloading = new List<int>();
+    private List<int> loading = new List<int>();
     private BaseTile[][] Tiles;
 
     public void Update()
@@ -117,6 +118,26 @@ public class TileLayer : NetworkBehaviour
         TilePlaced(x, y, tile);
 
         return true;
+    }
+
+    [Server]
+    public void SetTiles(BaseTile[][] tiles, int x, int y)
+    {
+        if (tiles == null)
+            return;
+
+        Debug.Log("Setting tiles from tile " + x + " to " + x + tiles.Length);
+
+        for (int X = x; X < x + tiles.Length; X++)
+        {
+            BaseTile[] yArray = tiles[X - x];
+
+            for (int Y = 0; Y < y + yArray.Length; Y++)
+            {
+                if(CanPlaceTile(X, Y))
+                    SetTile(yArray[Y - y], X, Y);
+            }
+        }
     }
 
     public void TilePlaced(int x, int y, BaseTile newTile)
@@ -217,12 +238,55 @@ public class TileLayer : NetworkBehaviour
             return;
         }
 
-        Chunk newChunk = Instantiate(ChunkPrefab.gameObject, transform).GetComponent<Chunk>();
         int index = GetChunkIndex(x, y);
 
+        if (IsChunkLoading(index))
+        {
+            Debug.LogError("Chunk at " + x + ", " + y + " is already loading.");
+            return;
+        }
+
+        // Flag as loading...
+        loading.Add(index);
+
+        // Instantiate object, TODO pool me.
+        Chunk newChunk = Instantiate(ChunkPrefab.gameObject, transform).GetComponent<Chunk>();
+
+        // Create the chunk object.
         newChunk.Create(x, y, ChunkSize, ChunkSize, index);
 
+        // Add to the chunks list.
         Chunks.Add(index, newChunk);
+
+        Debug.Log("Added chunk.");
+
+        // Check if is saved data...
+        if(ChunkIO.IsChunkSaved("James' Reality", Name, x, y))
+        {
+            // Load from disk.
+            ChunkIO.LoadChunk("James' Reality", Name, x, y, ChunkSize, ChunkLoaded);
+        }
+        else
+        {
+            // TODO add something, like generating this chunk.
+            // Just leave a blank chunk, lol.
+            loading.Remove(index);
+        }
+    }
+
+    private void ChunkLoaded(object[] args)
+    {
+        // Get values.
+        int chunkX = (int)args[0];
+        int chunkY = (int)args[1];
+        BaseTile[][] tiles = (BaseTile[][])args[2];
+
+        int index = GetChunkIndex(chunkX, chunkY);
+
+        // TODO LEFT HERE
+        SetTiles(tiles, chunkX * ChunkSize, chunkY * ChunkSize);
+
+        loading.Remove(index);
     }
 
     public void UnloadChunk(int x, int y)
@@ -255,7 +319,7 @@ public class TileLayer : NetworkBehaviour
             return;
         }
 
-        if (IsUnloading(index))
+        if (IsChunkUnloading(index))
         {
             Debug.LogError("Chunk at index " + index + " is already unloading! Check for curret unloading with Layer.IsUnloading(index).");
             return;
@@ -269,9 +333,14 @@ public class TileLayer : NetworkBehaviour
         ChunkIO.SaveChunk("James' Reality", Name, Tiles, chunk.X, chunk.Y, ChunkSize, ChunkSaved);        
     }
 
-    public bool IsUnloading(int index)
+    public bool IsChunkUnloading(int index)
     {
         return unloading.Contains(index);
+    }
+
+    public bool IsChunkLoading(int index)
+    {
+        return loading.Contains(index);
     }
 
     private void ChunkSaved(object[] args)
@@ -470,13 +539,14 @@ public class TileLayer : NetworkBehaviour
         {
             // Load all of these.
             Vector2Int coordinates = GetChunkCoordsFromIndex(index);
-            LoadChunk(coordinates.x, coordinates.y);
+            if(!IsChunkLoading(index))
+                LoadChunk(coordinates.x, coordinates.y);
         }
 
         foreach(int index in toUnload)
         {
             // Unload these ones, if they are not already being unloaded.
-            if(!IsUnloading(index))
+            if(!IsChunkUnloading(index))
                 UnloadChunk(index);
         }
 

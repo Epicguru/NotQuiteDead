@@ -10,6 +10,7 @@ public static class OutputUtils
 {
     private const char S = '/';
     private const bool LOG_ERROR = false;
+    private static string PersistentDataPath = Application.persistentDataPath;
 
     // FILE PATHS
 
@@ -17,7 +18,7 @@ public static class OutputUtils
     {
         get
         {
-            return Application.persistentDataPath + S; // Change me whenever!
+            return PersistentDataPath + S; // Change me whenever!
         }
     }
 
