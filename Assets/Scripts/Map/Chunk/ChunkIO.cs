@@ -142,13 +142,9 @@ public static class ChunkIO
         thread.Start();
     }
 
-    private static BaseTile[][] chunk;
     public static BaseTile[][] MakeChunk(string str, int chunkSize, UnityAction<string> error = null)
     {
-        if(chunk == null || chunk.Length != chunkSize)
-        {
-            chunk = new BaseTile[chunkSize][];
-        }
+        BaseTile[][] chunk = new BaseTile[chunkSize][];
 
         string[] parts = str.Split(',');
 
@@ -157,18 +153,15 @@ public static class ChunkIO
             if (error != null)
                 error.Invoke("Incorrect number of tiles for chunk: found " + parts.Length + " when " + chunkSize * chunkSize + " were expected.");
             return null;
-        }
+        }        
 
         for (int x = 0; x < chunkSize; x++)
         {
             for (int y = 0; y < chunkSize; y++)
             {
-                if(chunk[x] == null || chunk[x].Length != chunkSize)
-                {
-                    chunk[x] = new BaseTile[chunkSize];
-                }
+                chunk[x] = new BaseTile[chunkSize];
 
-                int index = x + chunkSize * y;
+                int index = y + chunkSize * x;
 
                 string prefab = parts[index].Trim();
 
