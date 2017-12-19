@@ -171,7 +171,6 @@ public static class ChunkIO
                 if (BaseTile.ContainsTile(prefab))
                 {
                     chunk[x][y] = BaseTile.GetTile(prefab);
-                    Debug.Log(prefab + " @ " + x + ", " + y + " (" + index + ")");
                 }
                 else
                 {
