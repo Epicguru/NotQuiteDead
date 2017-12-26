@@ -29,7 +29,7 @@ public class TileLayer : NetworkBehaviour
         int x = (int)InputManager.GetMousePos().x;
         int y = (int)InputManager.GetMousePos().y;
 
-        if(InLayerBounds(x, y))
+        if(CanPlaceTile(x, y))
         {
             if (InputManager.InputPressed("Shoot"))
             {
@@ -142,7 +142,6 @@ public class TileLayer : NetworkBehaviour
     {
         if (newTile == null)
         {
-            Debug.LogError("Cannot place null tile! TODO implement me!");
             return;
         }
 

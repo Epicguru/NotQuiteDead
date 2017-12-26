@@ -38,7 +38,7 @@ public static class ChunkIO
 
             File.WriteAllText(path, toSave);
 
-            Debug.Log("Saved chunk @ " + chunkX + ", " + chunkY);
+            //Debug.Log("Saved chunk @ " + chunkX + ", " + chunkY);
 
             Threader.Instance.PostAction(done, chunkX, chunkY, layer, reality, path);                
         });
@@ -129,7 +129,7 @@ public static class ChunkIO
             // Un-RLE this, to return it to its former inefficient glory!
             text = UnRLE(text);
 
-            Debug.Log("Loaded chunk @ " + chunkX + ", " + chunkY);
+            //Debug.Log("Loaded chunk @ " + chunkX + ", " + chunkY);
 
             BaseTile[][] tiles = MakeChunk(text, chunkSize, error);
 
@@ -150,9 +150,9 @@ public static class ChunkIO
         thread.Start();
     }
 
-    private static StringBuilder builder = new StringBuilder();
     public static string RLE(string original, out float efficiency, char separator = ',', char join = '|', bool trim = true)
     {
+        StringBuilder builder = new StringBuilder();
         // Uses Run Length Encoding to compress long repetitive strings.
         // Efficiency is expressed as follows: A value of 1 means a 100% reduction in string size, and a value of zero means a 0% reduction.
         string[] split = original.Split(separator);
@@ -175,18 +175,43 @@ public static class ChunkIO
             if(index == split.Length - 1)
             {
                 if (s == last)
+                {
+                    // Just add one to the run count.
                     run++;
 
-                if(last != null)
-                {
-                    if(run > 1)
+                    if (last != null)
                     {
-                        builder.Append(run);
-                        builder.Append(join);
+                        if (run > 1)
+                        {
+                            builder.Append(run);
+                            builder.Append(join);
+                        }
+                        builder.Append(Format(last, trim));
                     }
-                    builder.Append(Format(last, trim));
+                    break;
                 }
-                break;
+                else
+                {
+                    // Last one is different from the previous ones, save the previous ones and then save the last one.
+
+                    if (last != null)
+                    {
+                        if (run > 1)
+                        {
+                            builder.Append(run);
+                            builder.Append(join);
+                        }
+                        builder.Append(Format(last, trim));
+                        builder.Append(separator);
+                    }
+
+                    // Now save the last item.
+
+                    // We know that it is only one because it is the last item and it is different from the previous item, may that be null or not.
+                    builder.Append(Format(s, trim));
+
+                    break;
+                }            
             }
 
             if(s == last)
@@ -224,11 +249,20 @@ public static class ChunkIO
 
         efficiency = 1f - fraction;
 
+        string debug = UnRLE(str, separator, join, trim);
+
+        if(debug != original)
+        {
+            Debug.LogError("RLE check failed!\nORIGINAL:\n" + original + "\nUN_RLE:\n" + debug + "\nRLE:\n" + str);
+        }
+
         return str;
     }
 
     public static string UnRLE(string rle, char separator = ',', char join = '|', bool trim = true)
     {
+        StringBuilder builder = new StringBuilder();
+
         string[] split = rle.Split(separator);
 
         if (split == null || split.Length == 0)
@@ -249,7 +283,7 @@ public static class ChunkIO
 
                 if(subSplit.Length != 2)
                 {
-                    Debug.LogError("RLE parsing error at segment '" + s + "', incorrect format: Wrong number of joined parts. Expected 2 got " + subSplit.Length + ".");
+                    Debug.LogError("RLE parsing error at segment '" + s + "' @ " + index + "/" + split.Length + ", incorrect format: Wrong number of joined parts. Expected 2 got " + subSplit.Length + ".");
                     return null;
                 }
 
