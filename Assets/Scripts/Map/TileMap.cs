@@ -55,6 +55,8 @@ public class TileMap : NetworkBehaviour
         {
             layer.SelectiveLoad(bounds.xMin / ChunkSize, bounds.yMin / ChunkSize, bounds.xMax / ChunkSize, bounds.yMax / ChunkSize);
         }
+
+        DebugText.Log(Chunk.InstanceCount + " chunks instantiated.");
     }
 
     public RectInt GetCameraChunkBounds()

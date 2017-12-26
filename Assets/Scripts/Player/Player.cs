@@ -203,6 +203,8 @@ public class Player : NetworkBehaviour
         }
 
         gameObject.name = Name;
+
+        DebugText.Log("[" + Name + " - " + Team + "] @ " + transform.position.ToString("F0"), Color.cyan);
     }
 
     private void UponDeath()

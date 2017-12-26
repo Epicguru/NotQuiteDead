@@ -256,8 +256,6 @@ public class TileLayer : NetworkBehaviour
         // Add to the chunks list.
         Chunks.Add(index, newChunk);
 
-        Debug.Log("Added chunk.");
-
         // Check if is saved data...
         if(ChunkIO.IsChunkSaved("James' Reality", Name, x, y))
         {
