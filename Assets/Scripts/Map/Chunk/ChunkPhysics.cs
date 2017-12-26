@@ -53,4 +53,14 @@ public class ChunkPhysics : MonoBehaviour {
 
         Colliders[x][y] = colliderInstance;
     }
+
+    public void DeactivateComposite()
+    {
+        Composite.enabled = false;
+    }
+
+    public void ActivateComposite()
+    {
+        Composite.enabled = true;
+    }
 }

@@ -171,9 +171,15 @@ public class MeshTexture : MonoBehaviour
 
     public void Apply()
     {
-        if (Texture != Renderer.sharedMaterials[0].mainTexture)
+        if (!Chunk.Loaded)
         {
-            Texture = Renderer.sharedMaterials[0].mainTexture as Texture2D;
+            // Do not apply the texture when loading the chunk, does not make sense.
+            return;
+        }
+
+        if (Texture != Renderer.material.mainTexture)
+        {
+            Texture = Renderer.material.mainTexture as Texture2D;
         }
 
         if(Texture == null)

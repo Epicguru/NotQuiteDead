@@ -142,7 +142,7 @@ public class TileLayer : NetworkBehaviour
     {
         if (newTile == null)
         {
-            Debug.LogError("Cannot place null tile! FOR NOW TODO ADDME!");
+            Debug.LogError("Cannot place null tile! TODO implement me!");
             return;
         }
 
@@ -220,9 +220,8 @@ public class TileLayer : NetworkBehaviour
 
     public void LoadChunk(int x, int y)
     {
-        // TODO, fixme.
-        // TODO, pool chunks.
-        // This would load from file.
+        // TODO, pool chunks. EDIT - Wait for unity job system.
+        // This would load from file. EDIT - Done
 
         if (!IsChunkInBounds(x, y))
         {
@@ -266,6 +265,9 @@ public class TileLayer : NetworkBehaviour
         {
             // TODO add something, like generating this chunk.
             // Just leave a blank chunk, lol.
+
+            // Mark as loaded, after 'generation'.
+            Chunks[index].DoneLoading();
             loading.Remove(index);
         }
     }
@@ -288,6 +290,9 @@ public class TileLayer : NetworkBehaviour
 
         // TODO LEFT HERE
         SetTiles(tiles, chunkX * ChunkSize, chunkY * ChunkSize);
+
+        Chunk c = Chunks[index];
+        c.DoneLoading();
 
         loading.Remove(index);
     }

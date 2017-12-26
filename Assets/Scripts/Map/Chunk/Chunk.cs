@@ -17,10 +17,16 @@ public class Chunk : MonoBehaviour
     public MeshGen Mesh;
     public ChunkPhysics Physics;
 
+    public bool Loaded { get; private set; }
+
     public void Create(int x, int y, int width, int height, int index)
     {
         // Add one to instance count, debugging only.
         InstanceCount++;
+
+        // Deactivate composite to avoid unecessary geometry generation when loading.
+        Loaded = false;
+        Physics.DeactivateComposite();
 
         X = x;
         Y = y;
@@ -49,6 +55,15 @@ public class Chunk : MonoBehaviour
 
         // Set position
         transform.localPosition = new Vector3(X * Width * Mesh.TileSize, Y * Height * Mesh.TileSize, 0);
+    }
+
+    public void DoneLoading()
+    {
+        // Called when the chunk is done loading, or generating. See property Loaded.
+        Loaded = true;
+
+        // Enable physics collision generation again.
+        Physics.ActivateComposite();
     }
 
     public void LateUpdate()
