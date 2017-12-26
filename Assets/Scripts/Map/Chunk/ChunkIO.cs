@@ -25,6 +25,12 @@ public static class ChunkIO
         {
             string toSave = MakeString(tiles, chunkX, chunkY, chunkSize);
 
+            // Run RLE
+            float efficiency;
+            toSave = RLE(toSave, out efficiency);
+
+            Debug.Log("Chunk RLE efficiency: " + (int)(efficiency * 100f) + "%");
+
             string dir = Path.GetDirectoryName(path);
 
             if (!Directory.Exists(dir))
@@ -120,8 +126,10 @@ public static class ChunkIO
                 return;
             }
 
-            Debug.Log("Loaded chunk @ " + chunkX + ", " + chunkY);
+            // Un-RLE this, to return it to its former inefficient glory!
+            text = UnRLE(text);
 
+            Debug.Log("Loaded chunk @ " + chunkX + ", " + chunkY);
 
             BaseTile[][] tiles = MakeChunk(text, chunkSize, error);
 
@@ -140,6 +148,155 @@ public static class ChunkIO
             Threader.Instance.PostAction(done, true, chunkX, chunkY, tiles, layer, reality);
         });
         thread.Start();
+    }
+
+    private static StringBuilder builder = new StringBuilder();
+    public static string RLE(string original, out float efficiency, char separator = ',', char join = '|', bool trim = true)
+    {
+        // Uses Run Length Encoding to compress long repetitive strings.
+        // Efficiency is expressed as follows: A value of 1 means a 100% reduction in string size, and a value of zero means a 0% reduction.
+        string[] split = original.Split(separator);
+
+        if(split == null || split.Length == 0)
+        {
+            Debug.LogError("The original string to RLE (below) did not contain the following separator char '" + separator + "'. It must contain at least one.\n" + original);
+            efficiency = 0;
+            return null;
+        }
+
+        builder.Length = 0;
+
+        string last = null;
+        int index = 0;
+        int run = 1;
+        
+        foreach(string s in split)
+        {
+            if(index == split.Length - 1)
+            {
+                if (s == last)
+                    run++;
+
+                if(last != null)
+                {
+                    if(run > 1)
+                    {
+                        builder.Append(run);
+                        builder.Append(join);
+                    }
+                    builder.Append(Format(last, trim));
+                }
+                break;
+            }
+
+            if(s == last)
+            {
+                run++;
+            }
+            else
+            {
+                if(last == null)
+                {
+                    run = 1;
+                }
+                else
+                {
+                    if(run > 1)
+                    {
+                        builder.Append(run);
+                        builder.Append(join);
+                    }
+                    builder.Append(Format(last, trim));
+                    builder.Append(separator);
+                    run = 1;
+                }
+            }
+            last = s;
+            index++;
+        }
+
+        string str = builder.ToString();
+        builder.Length = 0;
+
+        int oldSize = original.Length;
+        int newSize = str.Length;
+        float fraction = newSize / (float)oldSize;
+
+        efficiency = 1f - fraction;
+
+        return str;
+    }
+
+    public static string UnRLE(string rle, char separator = ',', char join = '|', bool trim = true)
+    {
+        string[] split = rle.Split(separator);
+
+        if (split == null || split.Length == 0)
+        {
+            Debug.LogError("The original string to RLE (below) did not contain the following separator char '" + separator + "'. It must contain at least one.\n" + rle);
+            return null;
+        }
+
+        builder.Length = 0;
+        int index = 0;
+
+        foreach(string s in split)
+        {
+            bool last = index == split.Length - 1;
+            if (s.Contains(join))
+            {
+                string[] subSplit = s.Split(join);
+
+                if(subSplit.Length != 2)
+                {
+                    Debug.LogError("RLE parsing error at segment '" + s + "', incorrect format: Wrong number of joined parts. Expected 2 got " + subSplit.Length + ".");
+                    return null;
+                }
+
+                string countString = subSplit[0];
+
+                int count;
+                bool worked = int.TryParse(countString, out count);
+
+                if (!worked)
+                {
+                    Debug.LogError("RLE parsing error at segment '" + s + "', invalid input: '" + countString + "' is not a number, expect count value.");
+                    return null;
+                }
+
+                string value = Format(subSplit[1], trim);
+
+                for (int i = 0; i < count; i++)
+                {
+                    builder.Append(value);
+
+                    bool veryLast = last && i == count - 1;
+                    if(!veryLast)
+                        builder.Append(separator);
+                }
+            }
+            else
+            {
+                builder.Append(Format(s, trim));
+                if(!last)
+                    builder.Append(separator);
+            }
+
+            index++;
+        }
+
+        string str = builder.ToString();
+        builder.Length = 0;
+
+        return str;
+    }
+
+    private static string Format(string s, bool trim)
+    {
+        if (s != null && trim)
+            return s.Trim();
+
+        return s;
     }
 
     public static BaseTile[][] MakeChunk(string str, int chunkSize, UnityAction<string> error = null)
