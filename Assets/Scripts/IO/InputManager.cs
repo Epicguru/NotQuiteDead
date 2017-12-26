@@ -94,6 +94,24 @@ public static class InputManager
         }
     }
 
+    public static void SetDefaultKeyBindings()
+    {
+        if(defaultKeyBindings == null)
+        {
+            Debug.LogError("Default key bindings is null, cannot apply default keys!");
+            return;
+        }
+
+        keyBindings = new Dictionary<string, KeyCode>();
+
+        foreach(string s in defaultKeyBindings.Keys)
+        {
+            keyBindings.Add(s, defaultKeyBindings[s]);           
+        }
+
+        Debug.Log("Applied all " + keyBindings.Count + " default key bindings.");
+    }
+
     public static void LoadKeyBindings()
     {
         // Creates the default key bindings, which never changes.
@@ -105,16 +123,25 @@ public static class InputManager
         // Load from file, may return null!
         Dictionary<string, KeyCode> x = InputUtils.FileToObject<Dictionary<string, KeyCode>>(path);
         if (x == null)
-            Debug.Log("File was not found or parsing error occured. (Pre conversion, file)");
+        {
+            Debug.LogWarning("File was not found or parsing error occured. (Pre conversion, file)");
+            Debug.Log("Saving default key bindings...");
+
+            // Set the default key bindings and save, because no file exists.
+            SetDefaultKeyBindings();
+            SaveKeyBindings();
+
+            return;
+        }
         else
+        {
             keyBindings = x;
+        }
         // At this point, key bindings object may be null becuase it was not found on file.
         // Merging the default values will create the object if it is null.
         // When we merge the default values will replace an missing ones.
         if (keyBindings != null)
             Debug.Log("Done! Loaded " + keyBindings.Count + " key bindings!");
-        else
-            Debug.Log("File was not found or parsing error occured. (Post conversion)");
 
         // Merge key bindings.
         MergeKeyBindings();
