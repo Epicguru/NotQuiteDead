@@ -20,8 +20,6 @@ public class ChunkPhysics : MonoBehaviour {
 
     public void AssignCollider(Collider2D prefab, int x, int y)
     {
-        return;
-
         if(!Chunk.InBounds(x, y))
         {
             Debug.LogError("Tile outside of chunk bounds! Cannot set physics body.");
