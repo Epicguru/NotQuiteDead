@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -33,7 +32,8 @@ public class TileLayer : NetworkBehaviour
         {
             if (InputManager.InputPressed("Shoot"))
             {
-                SetTile(BaseTile.GetTile("Dirt"), x, y);
+                string place = "Dirt";
+                SetTile(BaseTile.GetTile(place), x, y);
             }
         }
     }
@@ -163,9 +163,57 @@ public class TileLayer : NetworkBehaviour
             chunk.Physics.AssignCollider(newTile.Physics, localX, localY);
         }
 
-        if (newTile.Texture)
+        chunk.Texture.SetTile(newTile.GetSprite(this, x, y), localX, localY);
+
+        UpdateSurroundingTextures(x, y);
+    }
+
+    private void UpdateSurroundingTextures(int x, int y)
+    {
+        // Update the textures of the surrounding tiles now that a new tile has been set.
+
+        int X = 0;
+        int Y = 0;
+        BaseTile tile = null;
+
+        // Left
+        X = x + -1;
+        Y = y + 0;
+        tile = GetTile(X, Y);
+        if (tile != null)
         {
-            chunk.Texture.SetTile(newTile.Texture, localX, localY);
+            Chunk chunk = GetChunkFromIndex(GetChunkIndexFromTileCoords(X, Y));
+            chunk.Texture.SetTile(tile.GetSprite(this, X, Y), X - (ChunkSize * chunk.X), Y - (ChunkSize * chunk.Y));
+        }
+
+        // Top
+        X = x + 0;
+        Y = y + 1;
+        tile = GetTile(X, Y);
+        if (tile != null)
+        {
+            Chunk chunk = GetChunkFromIndex(GetChunkIndexFromTileCoords(X, Y));
+            chunk.Texture.SetTile(tile.GetSprite(this, X, Y), X - (ChunkSize * chunk.X), Y - (ChunkSize * chunk.Y));
+        }
+
+        // Right
+        X = x + 1;
+        Y = y + 0;
+        tile = GetTile(X, Y);
+        if (tile != null)
+        {
+            Chunk chunk = GetChunkFromIndex(GetChunkIndexFromTileCoords(X, Y));
+            chunk.Texture.SetTile(tile.GetSprite(this, X, Y), X - (ChunkSize * chunk.X), Y - (ChunkSize * chunk.Y));
+        }
+
+        // Bottom
+        X = x + 0;
+        Y = y + -1;
+        tile = GetTile(X, Y);
+        if (tile != null)
+        {
+            Chunk chunk = GetChunkFromIndex(GetChunkIndexFromTileCoords(X, Y));
+            chunk.Texture.SetTile(tile.GetSprite(this, X, Y), X - (ChunkSize * chunk.X), Y - (ChunkSize * chunk.Y));
         }
     }
 

@@ -6,6 +6,7 @@ public class ChunkPhysics : MonoBehaviour {
 
     public Chunk Chunk;
     public CompositeCollider2D Composite;
+    public bool Enabled = true;
 
     public Collider2D[][] Colliders;
 
@@ -20,6 +21,10 @@ public class ChunkPhysics : MonoBehaviour {
 
     public void AssignCollider(Collider2D prefab, int x, int y)
     {
+        if (!Enabled)
+            return;
+
+
         if(!Chunk.InBounds(x, y))
         {
             Debug.LogError("Tile outside of chunk bounds! Cannot set physics body.");

@@ -1,9 +1,13 @@
 ﻿
 using System;
+using System.Linq;
 using UnityEngine;
 
 public class MeshTexture : MonoBehaviour
 {
+    // IMPORTANT TODO: Use Color32.
+    // IMPORTANT TODO: Cache flipped colour data, probably in the BaseTile itself.
+
     [Tooltip("The resolution of pixels of each tile on this chunk.")]
     public int TileResolution = 32;
 
@@ -45,7 +49,7 @@ public class MeshTexture : MonoBehaviour
         Renderer.material.mainTexture = texture;
     }
 
-    public Color[] GetColours(Sprite sprite, bool packSafe = true)
+    public Color[] GetColours(Sprite sprite, bool packSafe = true, bool flipY = true)
     {
         if(sprite == null)
         {
@@ -53,30 +57,47 @@ public class MeshTexture : MonoBehaviour
             return null;
         }
 
+        Color[] pixels;
+
         if (packSafe)
         {
             Rect r = sprite.textureRect;
             try
             {
-                return sprite.texture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height);
+                pixels = sprite.texture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height);
             }
             catch (Exception e)
             {
-                Debug.LogError("Failed to get colours from sprite. Exception: " + e.Message + ", Sprite: " + sprite.name);
+                Debug.LogError("Failed to get colours from sprite. (Packing safe) Exception: " + e.Message + ", Sprite: " + sprite.name);
                 return null;
             }
         }
         else
         {
-            return sprite.texture.GetPixels();
+            try
+            {
+                pixels = sprite.texture.GetPixels();
+
+            } catch (Exception e)
+            {
+                Debug.LogError("Failed to get colours from sprite. (NOT packing safe) Exception: " + e.Message + ", Sprite: " + sprite.name);
+                return null;
+            }
         }
+
+        if (flipY)
+        {
+            Rect r = sprite.textureRect;
+            pixels = FlipPixels(pixels, (int)r.width, (int)r.height, false, true);
+        }
+
+        return pixels;
     }
 
     public void SetTile(Sprite tile, int x, int y)
     {
         if(tile == null)
         {
-            Debug.LogError("Null sprite input when blitting tile.");
             return;
         }
 
@@ -104,7 +125,7 @@ public class MeshTexture : MonoBehaviour
 
         if(EnforceResolution && colours.Length != TileResolution * TileResolution)
         {
-            Debug.LogError("Too many pixels when blitting tile. There were " + colours.Length + " but there should have been " + TileResolution * TileResolution + ". Tile resolution should be " + TileResolution + "x" + TileResolution + ".");
+            Debug.LogError("Incorrect number of pixels when blitting tile. There were " + colours.Length + " but there should have been " + TileResolution * TileResolution + ". Tile resolution should be " + TileResolution + "x" + TileResolution + ".");
             return;
         }
 
@@ -167,6 +188,24 @@ public class MeshTexture : MonoBehaviour
 
         Texture.SetPixel(x, y, colour);
         Dirty = true;
+    }
+
+    public static Color[] FlipPixels(Color[] pixels, int width, int height, bool flipX, bool flipY)
+    {
+        var flippedPixels =
+            Enumerable.Range(0, width * height)
+            .Select(index => {
+                int x = index % width;
+                int y = index / width;
+                if (flipX)
+                    x = width - 1 - x;
+                if (flipY)
+                    y = height - 1 - y;
+                return pixels[y * width + x];
+            }
+        );
+
+        return flippedPixels.ToArray();
     }
 
     public void Apply()

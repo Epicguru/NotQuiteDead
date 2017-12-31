@@ -20,10 +20,8 @@ public class BaseTile : ScriptableObject
     [Tooltip("A reference to the physics body.")]
     public Collider2D Physics;
 
-    [Tooltip("TODO Add different textures.")]
-    public Sprite Texture;
-
-    private TileLayer layer;
+    [Tooltip("The Render Data that is used to get sprites from.")]
+    public TileRenderData RenderData;
 
     public static BaseTile GetTile(string prefab)
     {
@@ -44,6 +42,34 @@ public class BaseTile : ScriptableObject
     public static Dictionary<string, BaseTile> GetTileDictionary()
     {
         return tiles;
+    }
+
+    public virtual Sprite GetSprite(TileLayer layer, int x, int y)
+    {
+        return GetSprite(GetTileValue(layer, x, y, -1, 0), GetTileValue(layer, x, y, 0, 1), GetTileValue(layer, x, y, 1, 0), GetTileValue(layer, x, y, 0, -1));
+    }
+
+    public virtual Sprite GetSprite(int index)
+    {
+        return this.RenderData == null ? null : this.RenderData.GetSprite(index);
+    }
+
+    public virtual Sprite GetSprite(int left, int top, int right, int bottom)
+    {
+        return this.GetSprite(GetSpriteIndex(left, top, right, bottom));
+    }
+
+    public virtual int GetSpriteIndex(int left, int top, int right, int bottom)
+    {
+        return (left * 8) + (top * 4) + (right * 2) + bottom;
+    }
+
+    public virtual int GetTileValue(TileLayer layer, int x, int y, int offsetX, int offsetY)
+    {
+        if (layer == null)
+            return 0;
+
+        return layer.GetTile(x + offsetX, y + offsetY) == null ? 0 : 1;
     }
 
     public static void LoadPrefabs()
