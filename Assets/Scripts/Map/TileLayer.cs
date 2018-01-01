@@ -16,6 +16,7 @@ public class TileLayer : NetworkBehaviour
     public int Height { get; private set; }
     public int WidthInChunks { get; private set; }
     public int HeightInChunks { get; private set; }
+    public bool Use_RLE_In_Net = true;
 
     // Map of chunks, where key is the index. (The calculated index, x * height + y).
     public Dictionary<int, Chunk> Chunks = new Dictionary<int, Chunk>();
@@ -87,7 +88,6 @@ public class TileLayer : NetworkBehaviour
     /// <param name="x">The x position, in tiles.</param>
     /// <param name="y">The y position, in tiles.</param>
     /// <returns>True if the operation was successful.</returns>
-    [Server]
     public bool SetTile(BaseTile tile, int x, int y)
     {
         if(!CanPlaceTile(x, y))
@@ -122,7 +122,6 @@ public class TileLayer : NetworkBehaviour
         return true;
     }
 
-    [Server]
     public void SetTiles(BaseTile[][] tiles, int x, int y)
     {
         if (tiles == null)
@@ -279,6 +278,19 @@ public class TileLayer : NetworkBehaviour
         // TODO, pool chunks. EDIT - Wait for unity job system.
         // This would load from file. EDIT - Done
 
+        if (isServer)
+        {
+            LoadChunk_Server(x, y);
+        }
+        else
+        {
+            LoadChunk_Client(x, y);
+        }        
+    }
+
+    [Server]
+    private void LoadChunk_Server(int x, int y)
+    {
         if (!IsChunkInBounds(x, y))
         {
             Debug.LogError("Chunk coordinate " + x + ", " + y + " (chunk space) is not in bounds.");
@@ -312,7 +324,7 @@ public class TileLayer : NetworkBehaviour
         Chunks.Add(index, newChunk);
 
         // Check if is saved data...
-        if(ChunkIO.IsChunkSaved("James' Reality", Name, x, y))
+        if (ChunkIO.IsChunkSaved("James' Reality", Name, x, y))
         {
             // Load from disk.
             ChunkIO.LoadChunk("James' Reality", Name, x, y, ChunkSize, ChunkLoaded, ChunkLoadError);
@@ -326,6 +338,123 @@ public class TileLayer : NetworkBehaviour
             Chunks[index].DoneLoading();
             loading.Remove(index);
         }
+    }
+
+    [Client]
+    private void LoadChunk_Client(int x, int y)
+    {
+        RequestChunkFromServer(x, y);
+    }
+
+    [Client]
+    public void RequestChunkFromServer(int x, int y)
+    {
+        if (!IsChunkInBounds(x, y))
+        {
+            Debug.LogError("Chunk coordinate " + x + ", " + y + " (chunk space) is not in bounds.");
+            return;
+        }
+
+        if (IsChunkLoaded(x, y))
+        {
+            Debug.LogError("Chunk at " + x + ", " + y + " (chunk space) is already loaded, cannot load again!");
+            return;
+        }
+
+        int index = GetChunkIndex(x, y);
+
+        if (IsChunkLoading(index))
+        {
+            Debug.LogError("Chunk at " + x + ", " + y + " is already loading (request from server).");
+            return;
+        }
+
+        // Flag as loading, even though it is really being sent from the server.
+        loading.Add(index);
+
+        Chunk newChunk = Instantiate(ChunkPrefab.gameObject, transform).GetComponent<Chunk>();
+
+        // Create the chunk object.
+        newChunk.Create(x, y, ChunkSize, ChunkSize, index);
+
+        // Add to the chunks list.
+        Chunks.Add(index, newChunk);
+
+        // Now request from the server...
+        Player.Local.NetUtils.CmdRequestChunk(Player.Local.gameObject, x, y);
+    }
+
+    [Server] // Intentional, called from Player.NetUtils.
+    public void CmdRequestChunk(int x, int y, GameObject player)
+    {
+        // Called when a player requests a chunk from this server.
+        // We need to make a compressed representation of the tiles and send it.
+
+        // First, validation.
+        if (player == null)
+            return;
+
+        if (!IsChunkInBounds(x, y))
+            return;
+
+        // FOR NOW:
+
+        // 1. See if chunk is loaded.
+        if(IsChunkLoaded(x, y))
+        {
+            // Great, send a copy of this.
+            ChunkIO.GetChunkForNet(player, Tiles, x, y, ChunkSize, NetChunkMade, Use_RLE_In_Net);
+        }
+        else
+        {
+            // Chunk is not loaded, what do I do?
+            // Load a copy and send it?
+            // But then how does the client make persistent changes to it?
+            // Load it permamently in the server while the client is in it?
+            // Allow the client to send a copy back once it is unloaded?
+            // ---> Allow the client to make changes, record them on the server, and once the chunk is loaded, apply those changes. Also save those changes when X?
+        }
+    }
+
+    [Server]
+    private void NetChunkMade(object[] args)
+    {
+        // Called when a player requests a chunk from the server, then the server posts an event that leads here.
+        bool worked = (bool)args[0];
+
+        if (!worked)
+        {
+            Debug.LogError("Net chunk creation failed, unknown error.");
+            return;
+        }
+
+        string data = (string)args[1];
+        int chunkX = (int)args[2];
+        int chunkY = (int)args[3];
+        GameObject player = (GameObject)args[4];
+
+        Msg_SendChunk msg = new Msg_SendChunk() { Data = data, ChunkX = chunkX, ChunkY = chunkY };
+
+        // Send the data to the client using the server.
+        NetworkServer.SendToClientOfPlayer(player, (short)MessageTypes.SEND_CHUNK_DATA, msg);
+    }
+
+    [Client]
+    public void RecievedNetChunk(string data, int chunkX, int chunkY)
+    {
+        // Called on only clients, when the network message for an incomming chunk has been recieved.
+
+        // First get a list of tiles, based on the data.
+        BaseTile[][] tiles = ChunkIO.MakeChunk(data, ChunkSize, null, Use_RLE_In_Net);
+
+        SetTiles(tiles, chunkX * ChunkSize, chunkY * ChunkSize);
+
+        int index = GetChunkIndex(chunkX, chunkY);
+
+        Chunk c = Chunks[index];
+        c.DoneLoading();
+
+        loading.Remove(index);
     }
 
     private void ChunkLoaded(object[] args)

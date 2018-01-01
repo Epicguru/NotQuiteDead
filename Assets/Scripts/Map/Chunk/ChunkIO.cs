@@ -47,7 +47,7 @@ public static class ChunkIO
         // TODO add a unity event system, with params, that executes in main thread.
     }
 
-    public static void GetChunkForNet(BaseTile[][] tiles, int chunkX, int chunkY, int chunkSize, UnityAction<object[]> done, bool rle = true)
+    public static void GetChunkForNet(GameObject targetPlayer, BaseTile[][] tiles, int chunkX, int chunkY, int chunkSize, UnityAction<object[]> done, bool rle = true)
     {
         Thread thread = new Thread(() => 
         {
@@ -72,7 +72,7 @@ public static class ChunkIO
                 final = basic;
             }
 
-            Threader.Instance.PostAction(done, true, final);
+            Threader.Instance.PostAction(done, true, final, chunkX, chunkY, targetPlayer);
         });
 
         thread.Start();
@@ -130,7 +130,7 @@ public static class ChunkIO
         return OutputUtils.RealitySaveDirectory + reality + OutputUtils.RealityLayersDirectory + layer + OutputUtils.RealityChunksDirectory + GetFileName(chunkX, chunkY); ;
     }
 
-    public static void LoadChunk(string reality, string layer, int chunkX, int chunkY, int chunkSize, UnityAction<object[]> done, UnityAction<string> error = null)
+    public static void LoadChunk(string reality, string layer, int chunkX, int chunkY, int chunkSize, UnityAction<object[]> done, UnityAction<string> error = null, bool rle = true)
     {
         Thread thread = new Thread(() => 
         {
@@ -157,12 +157,15 @@ public static class ChunkIO
                 return;
             }
 
-            // Un-RLE this, to return it to its former inefficient glory!
-            text = UnRLE(text);
+            if (rle)
+            {
+                // Un-RLE this, to return it to its former inefficient glory!
+                text = UnRLE(text);
+            }
 
             //Debug.Log("Loaded chunk @ " + chunkX + ", " + chunkY);
 
-            BaseTile[][] tiles = MakeChunk(text, chunkSize, error);
+            BaseTile[][] tiles = MakeChunk(text, chunkSize, error, false); // Already done in previous step.
 
             if (tiles == null)
             {
@@ -364,9 +367,14 @@ public static class ChunkIO
         return s;
     }
 
-    public static BaseTile[][] MakeChunk(string str, int chunkSize, UnityAction<string> error = null)
+    public static BaseTile[][] MakeChunk(string str, int chunkSize, UnityAction<string> error = null, bool rle = true)
     {
         BaseTile[][] chunk = new BaseTile[chunkSize][];
+
+        if(rle && str != null)
+        {
+            str = UnRLE(str);
+        }
 
         string[] parts = str.Split(',');
 

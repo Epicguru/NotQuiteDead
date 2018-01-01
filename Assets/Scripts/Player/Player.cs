@@ -54,6 +54,20 @@ public class Player : NetworkBehaviour
 
         }
         UpdateTeams(null, null); // New state
+
+        if (isLocalPlayer)
+        {
+            NetworkManager.singleton.client.RegisterHandler((short)MessageTypes.SEND_CHUNK_DATA, RecievedChunkData);
+        }
+    }
+
+    [Client]
+    private void RecievedChunkData(NetworkMessage message)
+    {
+        // Called when receiving a chunk from the server.
+        Msg_SendChunk msg = message.ReadMessage<Msg_SendChunk>();
+
+        World.Instance.TileMap.Layers[0].RecievedNetChunk(msg.Data, msg.ChunkX, msg.ChunkY);
     }
 
     public void UpdateTeams(string oldName, string oldTeam)

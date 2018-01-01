@@ -8,6 +8,8 @@ using UnityEngine.Networking;
 [RequireComponent(typeof(TileMap))]
 public class World : NetworkBehaviour
 {
+    public static World Instance { get; private set; }
+
     public string Name;
 
     [HideInInspector]
@@ -18,5 +20,12 @@ public class World : NetworkBehaviour
         TileMap = GetComponent<TileMap>();
 
         TileMap.Create();
+
+        Instance = this;
+    }
+
+    public void OnDestroy()
+    {
+        Instance = null;
     }
 }

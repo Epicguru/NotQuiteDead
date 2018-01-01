@@ -18,6 +18,13 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
+    public void CmdRequestChunk(GameObject player, int x, int y)
+    {
+        // TODO NOT 0!
+        World.Instance.TileMap.Layers[0].CmdRequestChunk(x, y, player);
+    }
+
+    [Command]
     public void CmdDropGear(string slot, ItemData data)
     {
         BodyGear g = GetPlayer().GearMap[slot];
@@ -25,7 +32,7 @@ public class PlayerNetUtils : NetworkBehaviour
         if(g.GetGearItem() != null)
         {
             Item old = g.GetGearItem().Item;
-            g.SetItem(player.gameObject, null, null, false);
+            g.SetItem(GetPlayer().gameObject, null, null, false);
 
             Item instance = Item.NewInstance(old.Prefab, GetPlayer().transform.position);
             instance.Data = data;
