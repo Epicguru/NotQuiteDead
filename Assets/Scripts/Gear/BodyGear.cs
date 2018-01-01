@@ -76,13 +76,13 @@ public class BodyGear : NetworkBehaviour
     }
 
     [Server]
-    public void SetItem(Item item, ItemData data, bool returnItem)
+    public void SetItem(GameObject player, Item item, ItemData data, bool returnItem)
     {
         // Item is a PREFAB!
 
         if(item == null)
         {
-            SetItem(null, returnItem);            
+            SetItem(player, null, returnItem);            
             return;
         }
 
@@ -95,11 +95,11 @@ public class BodyGear : NetworkBehaviour
         instance.Data = data;
         NetworkServer.Spawn(instance.gameObject);
 
-        SetItem(instance, returnItem);
+        SetItem(player, instance, returnItem);
     }
 
     [Server]
-    private void SetItem(Item item, bool returnOldItem)
+    private void SetItem(GameObject player, Item item, bool returnOldItem)
     {
         // Item is an INSTANCE!
 
@@ -108,11 +108,11 @@ public class BodyGear : NetworkBehaviour
 
         if(item == null)
         {
-            DisposeOfOldItem(returnOldItem);
+            DisposeOfOldItem(player, returnOldItem);
         }
         else
         {
-            ApplyNewItem(item, returnOldItem);
+            ApplyNewItem(item, player, returnOldItem);
         }
 
         GearChangeEvent.Invoke();
@@ -140,7 +140,7 @@ public class BodyGear : NetworkBehaviour
     }
 
     [Server]
-    private void DisposeOfOldItem(bool returnToPlayer)
+    private void DisposeOfOldItem(GameObject owner, bool returnToPlayer)
     {
         if (IGO == null)
             return;
@@ -148,7 +148,7 @@ public class BodyGear : NetworkBehaviour
         if (returnToPlayer)
         {
             // Give item back...
-            RpcReturnItem(GetGearItem().Item.Prefab, GetGearItem().Item.Data);
+            RpcReturnItem(GetGearItem().Item.Prefab, GetGearItem().Item.Data, owner);
         }
 
         // Destroy the old equipped item.
@@ -158,19 +158,22 @@ public class BodyGear : NetworkBehaviour
     }
 
     [Server]
-    private void ApplyNewItem(Item item, bool returnOldItem)
+    private void ApplyNewItem(Item item, GameObject owner, bool returnOldItem)
     {
-        DisposeOfOldItem(returnOldItem); // Does not run if old was null.
+        DisposeOfOldItem(owner, returnOldItem); // Does not run if old was null.
 
         // Set itemGO to this.
         this.IGO = item.gameObject;
     }
 
     [ClientRpc]
-    public void RpcReturnItem(string itemPrefab, ItemData data)
+    public void RpcReturnItem(string itemPrefab, ItemData data, GameObject owner)
     {
         if (data == null)
             data = new ItemData(); // Should not happen.
+
+        if (Player.Local.netId != owner.GetComponent<Player>().netId)
+            return;
 
         PlayerInventory.Add(itemPrefab, data, 1);
     }

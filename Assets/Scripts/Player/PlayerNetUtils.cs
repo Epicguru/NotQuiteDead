@@ -25,7 +25,7 @@ public class PlayerNetUtils : NetworkBehaviour
         if(g.GetGearItem() != null)
         {
             Item old = g.GetGearItem().Item;
-            g.SetItem(null, null, false);
+            g.SetItem(player.gameObject, null, null, false);
 
             Item instance = Item.NewInstance(old.Prefab, GetPlayer().transform.position);
             instance.Data = data;
@@ -58,7 +58,7 @@ public class PlayerNetUtils : NetworkBehaviour
     [Command]
     public void CmdSetGear(string name, string prefab, ItemData data, bool returnOldItem)
     {
-        GetPlayer().GearMap[name].SetItem(prefab == null ? null : Item.FindItem(prefab), data, returnOldItem);
+        GetPlayer().GearMap[name].SetItem(player.gameObject, prefab == null ? null : Item.FindItem(prefab), data, returnOldItem);
     }
 
     [Command]
