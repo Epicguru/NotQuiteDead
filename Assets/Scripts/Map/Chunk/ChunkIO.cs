@@ -29,7 +29,7 @@ public static class ChunkIO
             float efficiency;
             toSave = RLE(toSave, out efficiency);
 
-            Debug.Log("Chunk RLE efficiency: " + (int)(efficiency * 100f) + "%");
+            //Debug.Log("Chunk RLE efficiency: " + (int)(efficiency * 100f) + "%");
 
             string dir = Path.GetDirectoryName(path);
 
@@ -45,6 +45,37 @@ public static class ChunkIO
 
         thread.Start();
         // TODO add a unity event system, with params, that executes in main thread.
+    }
+
+    public static void GetChunkForNet(BaseTile[][] tiles, int chunkX, int chunkY, int chunkSize, UnityAction<object[]> done, bool rle = true)
+    {
+        Thread thread = new Thread(() => 
+        {
+            string basic = MakeString(tiles, chunkX, chunkY, chunkSize);
+
+            if (basic == null)
+            {
+                Debug.LogError("Chunk string could not be made when requested for Net!");
+                Threader.Instance.PostAction(done, false, null, chunkX, chunkY);
+                return;
+            }
+
+            string final;
+
+            if (rle)
+            {
+                float eff;
+                final = RLE(basic, out eff);
+            }
+            else
+            {
+                final = basic;
+            }
+
+            Threader.Instance.PostAction(done, true, final);
+        });
+
+        thread.Start();
     }
 
     public static string MakeString(BaseTile[][] tiles, int chunkX, int chunkY, int chunkSize)
