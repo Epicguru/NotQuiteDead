@@ -145,13 +145,12 @@ public class Player : NetworkBehaviour
 
         if (isLocalPlayer)
         {
-            NetUtils.CmdSetGear("Chest", "Space Suit", new ItemData(), false);
-            NetUtils.CmdSetGear("Head", "SSH", new ItemData(), false);
+            // Apply no gear, TODO load from file if necessary.
         }
         else if(!isServer)
         {
             // Request updated gear
-            // TODO
+            RequestGear = true;
             Debug.Log(Local);
         }
     }
