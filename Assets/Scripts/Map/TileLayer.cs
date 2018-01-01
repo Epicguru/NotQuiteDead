@@ -32,8 +32,8 @@ public class TileLayer : NetworkBehaviour
         {
             if (InputManager.InputPressed("Shoot"))
             {
-                string place = "Dirt";
-                SetTile(BaseTile.GetTile(place), x, y);
+                BaseTile place = InputManager.InputPressed("Sprint") ? null : BaseTile.GetTile("Dirt");
+                SetTile(place, x, y);
             }
         }
     }
@@ -108,14 +108,16 @@ public class TileLayer : NetworkBehaviour
             return false;
         }
 
+        Chunk c = GetChunkFromIndex(GetChunkIndexFromTileCoords(x, y));
+
         if(oldTile != null)
         {
-            TileRemoved(x, y, oldTile);
+            TileRemoved(x, y, oldTile, c);
         }
 
         Tiles[x][y] = tile;
 
-        TilePlaced(x, y, tile);
+        TilePlaced(x, y, tile, c);
 
         return true;
     }
@@ -138,32 +140,25 @@ public class TileLayer : NetworkBehaviour
         }
     }
 
-    public void TilePlaced(int x, int y, BaseTile newTile)
+    private void TilePlaced(int x, int y, BaseTile newTile, Chunk chunk)
     {
-        if (newTile == null)
-        {
-            return;
-        }
-
-        int chunkIndex = GetChunkIndexFromTileCoords(x, y);
-
-        if (!IsChunkLoaded(chunkIndex))
+        if (chunk == null)
         {
             Debug.LogError("TilePlaced called in unloaded chunk!");
             return;
         }
 
-        Chunk chunk = GetChunkFromIndex(chunkIndex);
-
         int localX = x - (ChunkSize * chunk.X);
         int localY = y - (ChunkSize * chunk.Y);
 
-        if (newTile.Physics)
+        // Set physics if the tile is not null.
+        if (newTile != null && newTile.Physics)
         {
             chunk.Physics.AssignCollider(newTile.Physics, localX, localY);
         }
 
-        chunk.Texture.SetTile(newTile.GetSprite(this, x, y), localX, localY);
+        // Works if it is null or not.
+        chunk.Texture.SetTile(newTile, this, x, y, localX, localY);
 
         UpdateSurroundingTextures(x, y);
     }
@@ -183,7 +178,7 @@ public class TileLayer : NetworkBehaviour
         if (tile != null)
         {
             Chunk chunk = GetChunkFromIndex(GetChunkIndexFromTileCoords(X, Y));
-            chunk.Texture.SetTile(tile.GetSprite(this, X, Y), X - (ChunkSize * chunk.X), Y - (ChunkSize * chunk.Y));
+            chunk.Texture.SetTile(tile, this, X, Y, X - (ChunkSize * chunk.X), Y - (ChunkSize * chunk.Y));
         }
 
         // Top
@@ -193,7 +188,7 @@ public class TileLayer : NetworkBehaviour
         if (tile != null)
         {
             Chunk chunk = GetChunkFromIndex(GetChunkIndexFromTileCoords(X, Y));
-            chunk.Texture.SetTile(tile.GetSprite(this, X, Y), X - (ChunkSize * chunk.X), Y - (ChunkSize * chunk.Y));
+            chunk.Texture.SetTile(tile, this, X, Y, X - (ChunkSize * chunk.X), Y - (ChunkSize * chunk.Y));
         }
 
         // Right
@@ -203,7 +198,7 @@ public class TileLayer : NetworkBehaviour
         if (tile != null)
         {
             Chunk chunk = GetChunkFromIndex(GetChunkIndexFromTileCoords(X, Y));
-            chunk.Texture.SetTile(tile.GetSprite(this, X, Y), X - (ChunkSize * chunk.X), Y - (ChunkSize * chunk.Y));
+            chunk.Texture.SetTile(tile, this, X, Y, X - (ChunkSize * chunk.X), Y - (ChunkSize * chunk.Y));
         }
 
         // Bottom
@@ -213,13 +208,27 @@ public class TileLayer : NetworkBehaviour
         if (tile != null)
         {
             Chunk chunk = GetChunkFromIndex(GetChunkIndexFromTileCoords(X, Y));
-            chunk.Texture.SetTile(tile.GetSprite(this, X, Y), X - (ChunkSize * chunk.X), Y - (ChunkSize * chunk.Y));
+            chunk.Texture.SetTile(tile, this, X, Y, X - (ChunkSize * chunk.X), Y - (ChunkSize * chunk.Y));
         }
     }
 
-    public void TileRemoved(int x, int y, BaseTile oldTile)
+    public void TileRemoved(int x, int y, BaseTile oldTile, Chunk chunk)
     {
+        if(chunk == null)
+        {
+            Debug.LogError("TileRemoved called in unloaded chunk!");
+            return;
+        }
 
+        // Remove physics collider if it had one.
+        if(oldTile != null)
+        {
+            int localX = x - chunk.X * ChunkSize;
+            int localY = y - chunk.Y * ChunkSize;
+
+            // Null-safe.
+            chunk.Physics.RemoveCollider(localX, localY);
+        }
     }
 
     public bool CanPlaceTile(int x, int y)

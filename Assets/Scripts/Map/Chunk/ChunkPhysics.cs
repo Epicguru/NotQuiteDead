@@ -59,6 +59,25 @@ public class ChunkPhysics : MonoBehaviour {
         Colliders[x][y] = colliderInstance;
     }
 
+    public void RemoveCollider(int x, int y)
+    {
+        if (!Enabled)
+            return;
+
+        if (!ColliderExists(x, y))
+            return;
+
+        Collider2D c = Colliders[x][y];
+        Colliders[x][y] = null;
+
+        Destroy(c.gameObject);
+    }
+
+    public bool ColliderExists(int x, int y)
+    {
+        return Colliders[x][y] != null;
+    }
+
     public void DeactivateComposite()
     {
         Composite.enabled = false;

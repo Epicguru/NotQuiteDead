@@ -46,7 +46,12 @@ public class BaseTile : ScriptableObject
 
     public virtual Sprite GetSprite(TileLayer layer, int x, int y)
     {
-        return GetSprite(GetTileValue(layer, x, y, -1, 0), GetTileValue(layer, x, y, 0, 1), GetTileValue(layer, x, y, 1, 0), GetTileValue(layer, x, y, 0, -1));
+        return GetSprite(GetAutoIndex(layer, x, y));
+    }
+
+    public int GetAutoIndex(TileLayer layer, int x, int y)
+    {
+        return GetSpriteIndex(GetTileValue(layer, x, y, -1, 0), GetTileValue(layer, x, y, 0, 1), GetTileValue(layer, x, y, 1, 0), GetTileValue(layer, x, y, 0, -1));
     }
 
     public virtual Sprite GetSprite(int index)

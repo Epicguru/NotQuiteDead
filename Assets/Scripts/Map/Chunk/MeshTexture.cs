@@ -23,6 +23,7 @@ public class MeshTexture : MonoBehaviour
 
     public bool Dirty { get; set; }
 
+    private static Color[] TransparentTile;
     private Texture2D Texture;
 
     public void BuildTexture()
@@ -49,6 +50,21 @@ public class MeshTexture : MonoBehaviour
         Renderer.material.mainTexture = texture;
     }
 
+    public Color[] GetTransparentTile()
+    {
+        if(TransparentTile == null)
+        {
+            TransparentTile = new Color[TileResolution * TileResolution];
+            Color transparent = new Color(0, 0, 0, 0);
+            for (int i = 0; i < TransparentTile.Length; i++)
+            {
+                TransparentTile[i] = transparent;
+            }
+        }
+
+        return TransparentTile;
+    }
+
     public Color[] GetColours(Sprite sprite, bool packSafe = true, bool flipY = true)
     {
         if(sprite == null)
@@ -63,7 +79,7 @@ public class MeshTexture : MonoBehaviour
         {
             Rect r = sprite.textureRect;
             try
-            {
+            {           
                 pixels = sprite.texture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height);
             }
             catch (Exception e)
@@ -94,19 +110,59 @@ public class MeshTexture : MonoBehaviour
         return pixels;
     }
 
+    /// <summary>
+    /// Sets the pixels of this sprite to the specified position. Does not cache the operation result and therefore is very inefficient.
+    /// </summary>
+    /// <param name="tile">The sprite to use.</param>
+    /// <param name="x">The local X position.</param>
+    /// <param name="y">The local Y position.</param>
     public void SetTile(Sprite tile, int x, int y)
     {
-        if(tile == null)
-        {
-            return;
-        }
+        Color[] colours;
 
-        Color[] colours = GetColours(tile);
+        if (tile == null)
+        {
+            colours = GetTransparentTile();
+        }
+        else
+        {
+            colours = GetColours(tile);
+        }
 
         if (colours == null)
             return;
 
         SetTile(colours , x, y);
+    }
+
+    /// <summary>
+    /// Sets the pixels corresponding to the tile in its current surroundings. None of the parameters can be null apart from 'tile'.
+    /// Caches the operation so future calls with the same BaseTile will be very quick.
+    /// </summary>
+    public void SetTile(BaseTile tile, TileLayer layer, int globalX, int globalY, int x, int y)
+    {
+        if(tile == null)
+        {
+            SetTile(GetTransparentTile(), x, y);
+        }
+        else
+        {
+            int index = tile.GetAutoIndex(layer, globalX, globalY);
+
+            if (tile.RenderData.IsCached(index))
+            {
+                // Already cached, just paint.
+                SetTile(tile.RenderData.GetCachedPixels(index), x, y);
+            }
+            else
+            {
+                // Need to grab and flip the pixels, the store them again.
+                tile.RenderData.SetCachedPixels(index, GetColours(tile.RenderData.GetSprite(index), true, true));
+
+                // Now paint the tile.
+                SetTile(tile.RenderData.GetCachedPixels(index), x, y);
+            }
+        }
     }
 
     public void SetTile(Color[] colours, int x, int y)
@@ -165,15 +221,19 @@ public class MeshTexture : MonoBehaviour
 
     public void SetTiles(Sprite tile, int x, int y, int width, int height)
     {
-        if(tile == null)
+        Color[] colours;
+
+        if (tile == null)
         {
-            Debug.LogError("Null sprite when blitting tiles (multiple) !");
-            return;
+            colours = GetTransparentTile();
+        }
+        else
+        {
+            colours = GetColours(tile);
         }
 
-        Color[] colours = GetColours(tile);
-
-        // We know that colours is not null because the sprite is not null!
+        if (colours == null)
+            return;
 
         SetTiles(colours, x, y, width, height);
     }
