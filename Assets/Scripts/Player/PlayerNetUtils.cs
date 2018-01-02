@@ -20,15 +20,14 @@ public class PlayerNetUtils : NetworkBehaviour
     [Command]
     public void CmdRequestTileChange(string prefab, int x, int y, string layer)
     {
-        BaseTile tile = prefab == null ? null : BaseTile.GetTile(prefab);
-        World.Instance.TileMap.Layers[layer].ClientRequestingTileChange(tile, x, y);
+        BaseTile tile = (prefab == null ? null : BaseTile.GetTile(prefab));
+        World.Instance.TileMap.GetLayer(layer).ClientRequestingTileChange(tile, x, y);
     }
 
     [Command]
     public void CmdRequestChunk(GameObject player, int x, int y, string layer)
     {
-        // TODO NOT 0!
-        World.Instance.TileMap.Layers[layer].CmdRequestChunk(x, y, player);
+        World.Instance.TileMap.GetLayer(layer).CmdRequestChunk(x, y, player);
     }
 
     [Command]

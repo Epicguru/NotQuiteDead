@@ -29,11 +29,20 @@ public class TileMap : NetworkBehaviour
     public int WidthInChunks;
     public int HeightInChunks;
 
-    public Dictionary<string, TileLayer> Layers;
+    public TileLayer[] LayersInit;
+    private Dictionary<string, TileLayer> Layers;
 
     public void Create()
     {
         // Sets size and initializes all layers.
+
+        Layers = new Dictionary<string, TileLayer>();
+        foreach(TileLayer layer in LayersInit)
+        {
+            if(layer != null)
+                Layers.Add(layer.Name, layer);
+        }
+        LayersInit = null;
 
         if (WidthInChunks <= 0 || HeightInChunks <= 0)
         {
@@ -45,6 +54,19 @@ public class TileMap : NetworkBehaviour
         {
             layer.ChunkSize = ChunkSize;
             layer.Create(Width, Height);
+        }
+    }
+
+    public TileLayer GetLayer(string name)
+    {
+        if (Layers.ContainsKey(name))
+        {
+            return Layers[name];
+        }
+        else
+        {
+            Debug.LogError("No layer found for name '" + name + "'.");
+            return null;
         }
     }
 

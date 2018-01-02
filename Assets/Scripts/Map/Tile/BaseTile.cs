@@ -27,7 +27,7 @@ public class BaseTile : ScriptableObject
     {
         if (!ContainsTile(prefab))
         {
-            Debug.LogError("No tile prefab found for '" + prefab + "'");
+            Debug.LogError("No tile prefab found for '" + (prefab == null ? "<null>" : prefab) + "'");
             return null;
         }
 

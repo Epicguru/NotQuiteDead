@@ -250,10 +250,13 @@ public class TileLayer : NetworkBehaviour
         }
     }
 
-    private void SetTiles(BaseTile[][] tiles, int x, int y)
+    private void SetChunkTiles(BaseTile[][] tiles, int x, int y)
     {
         if (tiles == null)
             return;
+
+        // Intended for use when loading chunks, and nothing else.
+        // Not networked at all.
 
         for (int X = x; X < x + tiles.Length; X++)
         {
@@ -262,7 +265,25 @@ public class TileLayer : NetworkBehaviour
             for (int Y = y; Y < y + yArray.Length; Y++)
             {
                 if(CanPlaceTile(X, Y))
-                    SetTile(yArray[Y - y], X, Y);
+                {
+                    BaseTile tile = yArray[Y - y];
+
+                    // For now, just place tile in position.
+                    BaseTile oldTile = Tiles[X][Y];
+
+                    Chunk c = GetChunkFromIndex(GetChunkIndexFromTileCoords(X, Y));
+
+                    if (oldTile != null)
+                    {
+                        TileRemoved(X, Y, oldTile, c);
+                    }
+
+                    // Apply tile.
+                    Tiles[X][Y] = tile;
+
+                    // Update tiles sourrounding and update physics bodies.
+                    TilePlaced(X, Y, tile, c);
+                }
             }
         }
     }
@@ -561,7 +582,7 @@ public class TileLayer : NetworkBehaviour
 
     private void NetChunkLoadedForClient(object[] args)
     {
-        // Called when finished loading a chunk from file, to send to a player.
+        // Called on server when finished loading a chunk from file, to send to a player.
         string data = (string)args[0];
         int chunkX = (int)args[1];
         int chunkY = (int)args[2];
@@ -599,7 +620,7 @@ public class TileLayer : NetworkBehaviour
         int chunkY = (int)args[3];
         GameObject player = (GameObject)args[4];
 
-        Msg_SendChunk msg = new Msg_SendChunk() { Data = data, ChunkX = chunkX, ChunkY = chunkY };
+        Msg_SendChunk msg = new Msg_SendChunk() { Data = data, ChunkX = chunkX, ChunkY = chunkY, Layer = Name };
 
         // Send the data to the client using the server.
         NetworkServer.SendToClientOfPlayer(player, (short)MessageTypes.SEND_CHUNK_DATA, msg);
@@ -613,7 +634,7 @@ public class TileLayer : NetworkBehaviour
         // First get a list of tiles, based on the data.
         BaseTile[][] tiles = ChunkIO.MakeChunk(data, ChunkSize, null, Use_RLE_In_Net);
 
-        SetTiles(tiles, chunkX * ChunkSize, chunkY * ChunkSize);
+        SetChunkTiles(tiles, chunkX * ChunkSize, chunkY * ChunkSize);
 
         int index = GetChunkIndex(chunkX, chunkY);
 
@@ -625,6 +646,8 @@ public class TileLayer : NetworkBehaviour
 
     private void ChunkLoaded(object[] args)
     {
+        // Called on server when the chunk has been loaded from file.
+
         // Get values.
         bool worked = (bool)args[0];
         int chunkX = (int)args[1];
@@ -639,8 +662,7 @@ public class TileLayer : NetworkBehaviour
 
         BaseTile[][] tiles = (BaseTile[][])args[3];
 
-        // TODO LEFT HERE
-        SetTiles(tiles, chunkX * ChunkSize, chunkY * ChunkSize);
+        SetChunkTiles(tiles, chunkX * ChunkSize, chunkY * ChunkSize);
 
         Chunk c = Chunks[index];
         c.DoneLoading();

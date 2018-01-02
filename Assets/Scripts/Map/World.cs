@@ -15,7 +15,7 @@ public class World : NetworkBehaviour
     [HideInInspector]
     public TileMap TileMap;
 
-    public void Start()
+    public void Awake()
     {
         TileMap = GetComponent<TileMap>();
 

@@ -57,18 +57,18 @@ public class Player : NetworkBehaviour
 
         if (isLocalPlayer)
         {
-            NetworkManager.singleton.client.RegisterHandler((short)MessageTypes.SEND_CHUNK_DATA, RecievedChunkData);
-            NetworkManager.singleton.client.RegisterHandler((short)MessageTypes.SEND_TILE_CHANGE, RecievedChunkData);
+            NetworkManager.singleton.client.RegisterHandler((short)MessageTypes.SEND_CHUNK_DATA, ReceivedChunkData);
+            NetworkManager.singleton.client.RegisterHandler((short)MessageTypes.SEND_TILE_CHANGE, ReceivedTileChange);
         }
     }
 
     [Client]
-    private void RecievedChunkData(NetworkMessage message)
+    private void ReceivedChunkData(NetworkMessage message)
     {
         // Called when receiving a chunk from the server.
         Msg_SendChunk msg = message.ReadMessage<Msg_SendChunk>();
 
-        World.Instance.TileMap.Layers[msg.Layer].RecievedNetChunk(msg.Data, msg.ChunkX, msg.ChunkY);
+        World.Instance.TileMap.GetLayer(msg.Layer).RecievedNetChunk(msg.Data, msg.ChunkX, msg.ChunkY);
     }
 
     [Client]
@@ -77,7 +77,7 @@ public class Player : NetworkBehaviour
         // Called when a tile has changed in the world.
         Msg_SendTile data = message.ReadMessage<Msg_SendTile>();
 
-        World.Instance.TileMap.Layers[data.Layer].RecievedTileChange(data);
+        World.Instance.TileMap.GetLayer(data.Layer).RecievedTileChange(data);
     }
 
     public void UpdateTeams(string oldName, string oldTeam)
@@ -175,7 +175,6 @@ public class Player : NetworkBehaviour
         {
             // Request updated gear
             RequestGear = true;
-            Debug.Log(Local);
         }
     }
 
