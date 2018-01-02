@@ -403,7 +403,7 @@ public class TileLayer : NetworkBehaviour
         if(IsChunkLoaded(x, y))
         {
             // Great, send a copy of this.
-            ChunkIO.GetChunkForNet(player, Tiles, x, y, ChunkSize, NetChunkMade, Use_RLE_In_Net);
+            ChunkIO.GetChunkForNet_Loaded(player, Tiles, x, y, ChunkSize, NetChunkMade, Use_RLE_In_Net);
         }
         else
         {
@@ -413,7 +413,45 @@ public class TileLayer : NetworkBehaviour
             // Load it permamently in the server while the client is in it?
             // Allow the client to send a copy back once it is unloaded?
             // ---> Allow the client to make changes, record them on the server, and once the chunk is loaded, apply those changes. Also save those changes when X?
+
+            // Decided solution:
+            // Load from file.
+            // Apply any 'changes' (explained later).
+            // Send to client.
+            // Client can then make any changes to that chunk, which are sent to the server, and stored as 'changes'.
+            // Once the server really loads the chunk, the 'changes' are applied for real.
+            // When a chunk is saved to file, all pending changes to that chunk are removed.
+
+            // 1. Ensure it is saved to file...
+            if(ChunkIO.IsChunkSaved("James' Reality", Name, x, y))
+            {
+                // 2. Load from file.
+                ChunkIO.GetChunkForNet_Unloaded(player, "James' Reality", Name, x, y, ChunkSize, NetChunkLoadedForClient, NetChunkLoadError);
+            }
         }
+    }
+
+    private void NetChunkLoadedForClient(object[] args)
+    {
+        // Called when finished loading a chunk from file, to send to a player.
+        string data = (string)args[0];
+        int chunkX = (int)args[1];
+        int chunkY = (int)args[2];
+        GameObject player = (GameObject)args[3];
+
+        // TODO Decompress, Apply Changes, Compress, and finally send to client.
+
+        // Send to client.
+        Msg_SendChunk msg = new Msg_SendChunk() { Data = data, ChunkX = chunkX, ChunkY = chunkY };
+
+        // Send the data to the client using the server.
+        NetworkServer.SendToClientOfPlayer(player, (short)MessageTypes.SEND_CHUNK_DATA, msg);
+    }
+
+    private void NetChunkLoadError(string error)
+    {
+        // There has been an error when loading a chunk from file for a client.
+        Debug.LogError("[NET CHUNK LOAD] " + error);
     }
 
     [Server]
@@ -525,10 +563,29 @@ public class TileLayer : NetworkBehaviour
 
         Chunk chunk = Chunks[index];
 
-        unloading.Add(index);
+        if (isServer)
+        {
+            UnloadChunk_Server(index, chunk);
+        }
+        else
+        {
+            UnloadChunk_Client(index, chunk);
+        }
+    }
 
-        // TEST IO TODO FIXME
-        ChunkIO.SaveChunk("James' Reality", Name, Tiles, chunk.X, chunk.Y, ChunkSize, ChunkSaved);        
+    [Server]
+    private void UnloadChunk_Server(int index, Chunk chunk)
+    {
+        unloading.Add(index);
+        ChunkIO.SaveChunk("James' Reality", Name, Tiles, chunk.X, chunk.Y, ChunkSize, ChunkSaved);
+    }
+
+    [Client]
+    private void UnloadChunk_Client(int index, Chunk chunk)
+    {
+        unloading.Add(index);
+        // Don't save to file, just destroy using the callback function.
+        ChunkSaved(new object[] { chunk.X, chunk.Y });
     }
 
     public bool IsChunkUnloading(int index)
@@ -663,7 +720,6 @@ public class TileLayer : NetworkBehaviour
             Debug.LogError("Chunk not in bounds, cannot get index!");
             return -1;
         }
-
         return x + (y * WidthInChunks);
     }
 

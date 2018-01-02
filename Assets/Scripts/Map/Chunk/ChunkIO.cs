@@ -47,7 +47,7 @@ public static class ChunkIO
         // TODO add a unity event system, with params, that executes in main thread.
     }
 
-    public static void GetChunkForNet(GameObject targetPlayer, BaseTile[][] tiles, int chunkX, int chunkY, int chunkSize, UnityAction<object[]> done, bool rle = true)
+    public static void GetChunkForNet_Loaded(GameObject targetPlayer, BaseTile[][] tiles, int chunkX, int chunkY, int chunkSize, UnityAction<object[]> done, bool rle = true)
     {
         Thread thread = new Thread(() => 
         {
@@ -73,6 +73,39 @@ public static class ChunkIO
             }
 
             Threader.Instance.PostAction(done, true, final, chunkX, chunkY, targetPlayer);
+        });
+
+        thread.Start();
+    }
+
+    public static void GetChunkForNet_Unloaded(GameObject target, string reality, string layer, int chunkX, int chunkY, int chunkSize, UnityAction<object[]> done, UnityAction<string> error = null)
+    {
+        Thread thread = new Thread(() => 
+        {
+            string path = GetPathForChunk(reality, layer, chunkX, chunkY);
+
+            if (!IsChunkSaved(path))
+            {
+                if (error != null)
+                    error.Invoke("A file for that chunk could not be found! (" + GetPathForChunk(reality, layer, chunkX, chunkY));
+                return;
+            }
+
+            // Read all data
+            string text = File.ReadAllText(path);
+            text = text.Trim();
+
+            if (string.IsNullOrEmpty(text))
+            {
+                if (error != null)
+                    error.Invoke("File existed, but text was null or empty!");
+                return;
+            }
+
+            // RLE:
+            // If the chunk is saved using rle, it is sent using rle, and if it is not, then it isn't.
+
+            Threader.Instance.PostAction(done, text, chunkX, chunkY, target);
         });
 
         thread.Start();
@@ -151,9 +184,6 @@ public static class ChunkIO
             {
                 if (error != null)
                     error.Invoke("File existed, but text was null or empty!");
-
-                Threader.Instance.PostAction(done, false, chunkX, chunkY, null, layer, reality);
-
                 return;
             }
 
