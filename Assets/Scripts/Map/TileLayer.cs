@@ -20,6 +20,7 @@ public class TileLayer : NetworkBehaviour
 
     // Map of chunks, where key is the index. (The calculated index, x * height + y).
     public Dictionary<int, Chunk> Chunks = new Dictionary<int, Chunk>();
+    public Dictionary<int, List<NetPendingTile>> PendingOperations = new Dictionary<int, List<NetPendingTile>>();
     private List<int> unloading = new List<int>();
     private List<int> loading = new List<int>();
     private BaseTile[][] Tiles;
@@ -107,7 +108,7 @@ public class TileLayer : NetworkBehaviour
     }
 
     [Server]
-    private bool SetTile_Server(BaseTile tile, int x, int y)
+    private bool SetTile_Server(BaseTile tile, int x, int y, bool network = true)
     {
         if (!CanPlaceTile(x, y))
         {
@@ -138,7 +139,8 @@ public class TileLayer : NetworkBehaviour
         TilePlaced(x, y, tile, c);
 
         // Send to clients.
-        NetworkServer.SendToAll((short)MessageTypes.SEND_TILE_CHANGE, new Msg_SendTile() { Prefab = (tile == null ? null : tile.Prefab), X = x, Y = y, Layer = Name });
+        if(network)
+            NetworkServer.SendToAll((short)MessageTypes.SEND_TILE_CHANGE, new Msg_SendTile() { Prefab = (tile == null ? null : tile.Prefab), X = x, Y = y, Layer = Name });
 
         return true;
     }
@@ -194,7 +196,7 @@ public class TileLayer : NetworkBehaviour
         else
         {
             // Chunk is not loaded! Save the changes and send to clients.
-            // TODO
+            // TODO LEFT OFF HERE!
         }
     }
 
@@ -945,5 +947,98 @@ public class TileLayer : NetworkBehaviour
         toUnload.Clear();
         toLoad.Clear();
         indices.Clear();
+    }
+
+    [Server]
+    public bool AnyPendingOperationsFor(int index)
+    {
+        return PendingOperations.ContainsKey(index) ? PendingOperations[index] != null && PendingOperations[index].Count > 0 : false;
+    }
+
+    [Server]
+    public void AddPendingTileOperation(string prefab, int x, int y)
+    {
+        // Add a pending operation. If there is already one in existence, it will overwrite the last one. Does not replace it.
+
+        int index = GetChunkIndexFromTileCoords(x, y);
+        Chunk c = GetChunkFromIndex(index);
+
+        if (PendingOperations.ContainsKey(index))
+        {
+            if(PendingOperations[index] == null)
+            {
+                // Should not be, but might as well check.
+                PendingOperations[index] = new List<NetPendingTile>();
+            }
+        }
+        else
+        {
+            PendingOperations.Add(index, new List<NetPendingTile>());
+        }
+
+        PendingOperations[index].Add(new NetPendingTile() { Prefab = prefab, X = x - c.X * ChunkSize, Y = y - c.Y * ChunkSize });
+    }
+
+    [Server]
+    public void ResolveAllPendingOperations()
+    {
+        // Saves all pending operations to file and clears the pending array.
+        ChunkIO.MergeAllToFile("James' Reality", Name, ChunkSize, WidthInChunks, PendingOperations, OperationsResolved);
+
+        // Now clear the pending operations.
+        PendingOperations.Clear();
+    }
+
+    [Server]
+    private void OperationsResolved(object[] args)
+    {
+        Debug.Log("All pending tile operations merged to file.");
+    }
+
+    [Server]
+    public void ApplyPendingOperationsToChunk(int index, bool destroyList = false)
+    {
+        // Applies pending tile operations from clients to a loaded chunk on the server.
+        if (AnyPendingOperationsFor(index))
+        {
+            if (!IsChunkLoaded(index))
+            {
+                if (!IsChunkLoading(index))
+                {
+                    Debug.LogError("The chunk for index " + index + " is not loaded or loading, cannot apply pending operations.");
+                }
+            }
+
+            Chunk chunk = GetChunkFromIndex(index);
+
+            // Set tiles based on the pending tile operations.
+            foreach(NetPendingTile op in PendingOperations[index])
+            {
+                bool empty = op.PrefabIsNull();
+                BaseTile tile = null;
+                if (!empty)
+                {
+                    if (!BaseTile.ContainsTile(op.Prefab))
+                    {
+                        Debug.LogError("Pending operation requested tile '" + op.Prefab + "', but the server could not find it.");
+                        continue;
+                    }
+
+                    tile = BaseTile.GetTile(op.Prefab);
+                }
+
+                int globalX = op.X + chunk.X * ChunkSize;
+                int globalY = op.Y + chunk.Y * ChunkSize;
+
+                // Set the tile, locally on the server, without networking.
+                SetTile_Server(tile, globalX, globalY, false);
+            }
+
+            // Clear those pending operations, they are no longer pending!
+            if (!destroyList)
+                PendingOperations[index].Clear();
+            else
+                PendingOperations.Remove(index);
+        }
     }
 }

@@ -214,6 +214,89 @@ public static class ChunkIO
         thread.Start();
     }
 
+    public static void MergeAllToFile(string reality, string layer, int chunkSize, int widthInChunks, Dictionary<int, List<NetPendingTile>> operations, UnityAction<object[]> done, bool rle = true)
+    {
+        // Merges all pending operations to file, saving them forever.
+        Thread thread = new Thread(() => 
+        {
+            foreach (int index in operations.Keys)
+            {
+                int chunkX = index % widthInChunks;
+                int chunkY = index / widthInChunks;
+
+                MergeToFile(reality, layer, chunkX, chunkY, chunkSize, operations[index], rle);
+            }
+
+            Threader.Instance.PostAction(done);
+        });
+
+        thread.Start();
+    }
+
+    public static void MergeToFile(string reality, string layer, int chunkX, int chunkY, int chunkSize, List<NetPendingTile> operations, bool rle = true, char sep = ',', char join = '|')
+    {
+        // Synchronous. Threaded done in different method.
+
+        // Validate.
+        if(!IsChunkSaved(reality, layer, chunkX, chunkY))
+        {
+            Debug.LogError("Could not merge to file, chunk is not saved! " + reality + ", " + layer + ", (" + chunkX + ", " + chunkY + ")");
+            return;
+        }
+
+        // Get path.
+        string path = GetPathForChunk(reality, layer, chunkX, chunkY);
+
+        // Read from file.
+        string text = File.ReadAllText(path);
+
+        // Merge the file with the pending operations.
+        string merged = Merge(text, operations, chunkSize, rle);
+
+        // Write back to file.
+        File.WriteAllText(path, merged);
+    }
+
+    public static string Merge(string data, List<NetPendingTile> operations, int chunkSize, bool rle = true, char separator = ',', char join = '|')
+    {
+        // Data is a string that is an array that is either plain text or compressed using rle.
+
+        if (rle)
+        {
+            data = UnRLE(data, separator, join);
+        }
+
+        // Split into parts.
+        string[] split = data.Split(separator);
+
+        foreach(NetPendingTile op in operations)
+        {
+            int index = op.X + chunkSize * op.Y;
+
+            split[index] = op.PrefabIsNull() ? NULL_ERROR.ToString() : op.Prefab.Trim();
+        }
+
+        // Make back into stirng.
+        StringBuilder str = new StringBuilder();
+        for(int i = 0; i < split.Length; i++)
+        {
+            str.Append(split[i]);
+            if(i != split.Length - 1)
+                str.Append(separator);
+        }
+
+        string final = str.ToString();
+
+        // RLE again if necessary.
+        if (rle)
+        {
+            float eff;
+            final = RLE(final, out eff, separator, join);
+        }
+
+        return final;
+    }
+
     public static string RLE(string original, out float efficiency, char separator = ',', char join = '|', bool trim = true)
     {
         StringBuilder builder = new StringBuilder();
