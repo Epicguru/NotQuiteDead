@@ -16,6 +16,9 @@ public class TileLayer : NetworkBehaviour
     public int Height { get; private set; }
     public int WidthInChunks { get; private set; }
     public int HeightInChunks { get; private set; }
+    public bool Saving { get; private set; }
+    public int ChunksLeftToSave { get; private set; }
+    public int OperationsPendingInSave { get; private set; }
     public bool Use_RLE_In_Net = true;
 
     // Map of chunks, where key is the index. (The calculated index, x * height + y).
@@ -24,6 +27,7 @@ public class TileLayer : NetworkBehaviour
     private List<int> unloading = new List<int>();
     private List<int> loading = new List<int>();
     private BaseTile[][] Tiles;
+    private float saveStartTime;
 
     public void Update()
     {
@@ -37,6 +41,95 @@ public class TileLayer : NetworkBehaviour
                 BaseTile place = InputManager.InputPressed("Sprint") ? null : BaseTile.GetTile("Dirt");
                 SetTile(place, x, y);
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Y))
+        {
+            SaveAll();
+        }
+
+        if (!DebugText._Instance.Active)
+            return;
+
+        if (isServer)
+        {
+            int chunks = 0;
+            int count = 0;
+            foreach(int index in PendingOperations.Keys)
+            {
+                if (AnyPendingOperationsFor(index))
+                    chunks++;
+                else
+                    continue;
+
+                count += PendingOperations[index].Count;
+            }
+            DebugText.Log(count + " pending tile operations over " + chunks + " chunks.");
+
+            if (Saving)
+            {
+                DebugText.Log("Saving '" + Name + "' ... ", Color.green);
+                DebugText.Log("Chunks Pending: " + ChunksLeftToSave, Color.green);
+                DebugText.Log("Tile Ops Pending: " + OperationsPendingInSave, Color.green);
+            }
+        }
+
+        DebugText.Log(loading.Count + " chunks are loading.");
+        DebugText.Log(unloading.Count + " chunks are unloading.");
+    }
+
+    [Server]
+    public void SaveAll()
+    {
+        // Saves everything about this layer to file, ready to shut down.
+        // Async, for now. You could block until Saving == false to have sync behaviour.
+
+        if (Saving)
+        {
+            Debug.LogError("Already saving! " + ChunksLeftToSave + " chunks to go!");
+            return;
+        }
+
+        Debug.Log("Saving layer '" + Name + "'");
+
+        Saving = true;
+        saveStartTime = Time.time;
+
+        // Debug.
+        int count = 0;
+        foreach (int index in PendingOperations.Keys)
+        {
+            if (!AnyPendingOperationsFor(index))
+                continue;
+
+            count += PendingOperations[index].Count;
+        }
+
+        ChunksLeftToSave = 0;
+        OperationsPendingInSave = count;
+
+        // First save all loaded chunks.
+        foreach(int index in Chunks.Keys)
+        {
+            Vector2Int pos = GetChunkCoordsFromIndex(index);
+            ChunksLeftToSave++;
+            ChunkIO.SaveChunk("James' Reality", Name, Tiles, pos.x, pos.y, ChunkSize, ChunkSavedEmpty);
+        }
+
+        // Tile operation merging will be done once all loaded chunks have been saved to file.
+
+        // Done!
+    }
+
+    [Server]
+    private void ChunkSavedEmpty(object[] args)
+    {
+        // Detects when all chunks have been saved.
+        ChunksLeftToSave--;
+        if(ChunksLeftToSave == 0)
+        {
+            // Then merge all pending operation to file.
+            ResolveAllPendingOperations();
         }
     }
 
@@ -150,7 +243,8 @@ public class TileLayer : NetworkBehaviour
     {
         // On a client, we need to request that the tile is placed on the server. How long it will take until the tile is placed it unknown.
 
-        Player.Local.NetUtils.CmdRequestTileChange(tile == null ? null : tile.Prefab, x, y, Name);
+        if(GetTile(x, y) != tile)
+            Player.Local.NetUtils.CmdRequestTileChange(tile == null ? null : tile.Prefab, x, y, Name);
 
         return false;
     }
@@ -196,7 +290,12 @@ public class TileLayer : NetworkBehaviour
         else
         {
             // Chunk is not loaded! Save the changes and send to clients.
-            // TODO LEFT OFF HERE!
+
+            // Add a pending tile operation.
+            AddPendingTileOperation(tile == null ? null : tile.Prefab, x, y);
+
+            // Send to any clients that are in that chunk, including the one that requested this change.
+            NetworkServer.SendToAll((short)MessageTypes.SEND_TILE_CHANGE, new Msg_SendTile() { Prefab = (tile == null ? null : tile.Prefab), X = x, Y = y, Layer = Name });
         }
     }
 
@@ -413,8 +512,7 @@ public class TileLayer : NetworkBehaviour
 
     public void LoadChunk(int x, int y)
     {
-        // TODO, pool chunks. EDIT - Wait for unity job system.
-        // This would load from file. EDIT - Done
+        // TODO, pool chunks.
 
         if (isServer)
         {
@@ -566,9 +664,20 @@ public class TileLayer : NetworkBehaviour
                 // 2. Load from file.
                 ChunkIO.GetChunkForNet_Unloaded(player, "James' Reality", Name, x, y, ChunkSize, NetChunkLoadedForClient, NetChunkLoadError);
             }
+            else
+            {
+                // 3. 'Generate' and save to file, then send normally.
+                string contents = (16 * 16) + "|?";
+                string path = ChunkIO.GetPathForChunk("James' Reality", Name, x, y);
+                File.WriteAllText(path, contents);
+
+                // 4. Send it.
+                ChunkIO.GetChunkForNet_Unloaded(player, "James' Reality", Name, x, y, ChunkSize, NetChunkLoadedForClient, NetChunkLoadError);
+            }
         }
     }
 
+    [Server]
     private void NetChunkLoadedForClient(object[] args)
     {
         // Called on server when finished loading a chunk from file, to send to a player.
@@ -577,7 +686,19 @@ public class TileLayer : NetworkBehaviour
         int chunkY = (int)args[2];
         GameObject player = (GameObject)args[3];
 
-        // TODO Decompress, Apply Changes, Compress, and finally send to client.
+        int index = GetChunkIndex(chunkX, chunkY);
+        if (AnyPendingOperationsFor(index))
+        {
+            // Merge the loaded data with any pending operations.
+            string merged = ChunkIO.Merge(data, PendingOperations[index], ChunkSize, true);
+
+            // Compress again using RLE.
+            float eff;
+            string compressed = ChunkIO.RLE(merged, out eff);
+
+            // Apply back to the data.
+            data = compressed;
+        }
 
         // Send to client.
         Msg_SendChunk msg = new Msg_SendChunk() { Data = data, ChunkX = chunkX, ChunkY = chunkY, Layer = Name };
@@ -586,6 +707,7 @@ public class TileLayer : NetworkBehaviour
         NetworkServer.SendToClientOfPlayer(player, (short)MessageTypes.SEND_CHUNK_DATA, msg);
     }
 
+    [Server]
     private void NetChunkLoadError(string error)
     {
         // There has been an error when loading a chunk from file for a client.
@@ -627,12 +749,14 @@ public class TileLayer : NetworkBehaviour
 
         int index = GetChunkIndex(chunkX, chunkY);
 
+        // Mark as done loading.
         Chunk c = Chunks[index];
         c.DoneLoading();
 
         loading.Remove(index);
     }
 
+    [Server]
     private void ChunkLoaded(object[] args)
     {
         // Called on server when the chunk has been loaded from file.
@@ -653,12 +777,16 @@ public class TileLayer : NetworkBehaviour
 
         SetChunkTiles(tiles, chunkX * ChunkSize, chunkY * ChunkSize);
 
+        // Apply pending operations, if there are any.
+        ApplyPendingOperationsToChunk(index);
+
         Chunk c = Chunks[index];
         c.DoneLoading();
 
         loading.Remove(index);
     }
 
+    [Server]
     private void ChunkLoadError(string error)
     {
         Debug.LogError("[CHUNK LOAD] " + error);
@@ -666,7 +794,6 @@ public class TileLayer : NetworkBehaviour
 
     public void UnloadChunk(int x, int y)
     {
-        // TODO, fixme.
         // TODO, pool chunks.
 
         // This would save to file.
@@ -958,10 +1085,11 @@ public class TileLayer : NetworkBehaviour
     [Server]
     public void AddPendingTileOperation(string prefab, int x, int y)
     {
+        // X and Y are in global space.
         // Add a pending operation. If there is already one in existence, it will overwrite the last one. Does not replace it.
 
         int index = GetChunkIndexFromTileCoords(x, y);
-        Chunk c = GetChunkFromIndex(index);
+        Vector2Int chunkPos = GetChunkCoordsFromIndex(index);
 
         if (PendingOperations.ContainsKey(index))
         {
@@ -976,7 +1104,7 @@ public class TileLayer : NetworkBehaviour
             PendingOperations.Add(index, new List<NetPendingTile>());
         }
 
-        PendingOperations[index].Add(new NetPendingTile() { Prefab = prefab, X = x - c.X * ChunkSize, Y = y - c.Y * ChunkSize });
+        PendingOperations[index].Add(new NetPendingTile() { Prefab = prefab, X = x - chunkPos.x * ChunkSize, Y = y - chunkPos.y * ChunkSize });
     }
 
     [Server]
@@ -985,14 +1113,23 @@ public class TileLayer : NetworkBehaviour
         // Saves all pending operations to file and clears the pending array.
         ChunkIO.MergeAllToFile("James' Reality", Name, ChunkSize, WidthInChunks, PendingOperations, OperationsResolved);
 
-        // Now clear the pending operations.
-        PendingOperations.Clear();
+        // The operations will be cleared once they have been saved.
     }
 
     [Server]
     private void OperationsResolved(object[] args)
     {
-        Debug.Log("All pending tile operations merged to file.");
+        //Debug.Log("All pending tile operations merged to file.");
+
+        // Now clear the pending operations.
+        PendingOperations.Clear();
+
+        if (Saving)
+        {
+            OperationsPendingInSave = 0;
+            Saving = false;
+            Debug.Log("Finished saving '" + Name + "'. Took " + (Time.time - saveStartTime) + " seconds.");
+        }
     }
 
     [Server]

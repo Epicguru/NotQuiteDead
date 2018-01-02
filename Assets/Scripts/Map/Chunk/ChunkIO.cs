@@ -396,12 +396,12 @@ public static class ChunkIO
 
         efficiency = 1f - fraction;
 
-        string debug = UnRLE(str, separator, join, trim);
+        //string debug = UnRLE(str, separator, join, trim);
 
-        if(debug != original)
-        {
-            Debug.LogError("RLE check failed!\nORIGINAL:\n" + original + "\nUN_RLE:\n" + debug + "\nRLE:\n" + str);
-        }
+        //if(debug != original)
+        //{
+        //    Debug.LogError("RLE check failed!\nORIGINAL:\n" + original + "\nUN_RLE:\n" + debug + "\nRLE:\n" + str);
+        //}
 
         return str;
     }
