@@ -138,7 +138,7 @@ public class TileLayer : NetworkBehaviour
         TilePlaced(x, y, tile, c);
 
         // Send to clients.
-        NetworkServer.SendToAll((short)MessageTypes.SEND_TILE_CHANGE, new Msg_SendTile() { Prefab = tile == null ? null : tile.Prefab, X = x, Y = y, Layer = Name });
+        NetworkServer.SendToAll((short)MessageTypes.SEND_TILE_CHANGE, new Msg_SendTile() { Prefab = (tile == null ? null : tile.Prefab), X = x, Y = y, Layer = Name });
 
         return true;
     }
@@ -189,7 +189,7 @@ public class TileLayer : NetworkBehaviour
             TilePlaced(x, y, tile, c);
 
             // Send to clients.
-            NetworkServer.SendToAll((short)MessageTypes.SEND_TILE_CHANGE, new Msg_SendTile() { Prefab = tile == null ? null : tile.Prefab, X = x, Y = y, Layer = Name });
+            NetworkServer.SendToAll((short)MessageTypes.SEND_TILE_CHANGE, new Msg_SendTile() { Prefab = (tile == null ? null : tile.Prefab), X = x, Y = y, Layer = Name });
         }
         else
         {
@@ -220,20 +220,7 @@ public class TileLayer : NetworkBehaviour
             // Place tile in position.
             BaseTile oldTile = Tiles[data.X][data.Y];
 
-            BaseTile tile = BaseTile.GetTile(data.Prefab);
-
-            if(tile == null)
-            {
-                Debug.LogError("Tile could not be found, sent from server: '" + tile.Prefab + "'.");
-                return;
-            }
-
-            if (oldTile == tile)
-            {
-                // No need to change anything, already set that tile there!
-                Debug.LogError("Why did the server send a tile that was already placed? '" + tile.Prefab + "' placed at " + data.X + ", " + data.Y);
-                return;
-            }
+            BaseTile tile = data.Prefab == null ? null : BaseTile.GetTile(data.Prefab);
 
             Chunk c = GetChunkFromIndex(GetChunkIndexFromTileCoords(data.X, data.Y));
 
@@ -243,7 +230,7 @@ public class TileLayer : NetworkBehaviour
             }
 
             // Apply tile.
-            Tiles[data.Y][data.Y] = tile;
+            Tiles[data.X][data.Y] = tile;
 
             // Update tiles sourrounding and update physics bodies.
             TilePlaced(data.X, data.Y, tile, c);

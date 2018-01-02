@@ -77,6 +77,12 @@ public class Player : NetworkBehaviour
         // Called when a tile has changed in the world.
         Msg_SendTile data = message.ReadMessage<Msg_SendTile>();
 
+        if (string.IsNullOrEmpty(data.Prefab))
+        {
+            data.Prefab = null;
+            // Seems pointless, but unet refuses to have null strings! Really annoying when null is a perfectly valid value!
+        }
+
         World.Instance.TileMap.GetLayer(data.Layer).RecievedTileChange(data);
     }
 

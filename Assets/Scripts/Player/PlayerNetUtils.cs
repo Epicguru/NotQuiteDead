@@ -20,7 +20,7 @@ public class PlayerNetUtils : NetworkBehaviour
     [Command]
     public void CmdRequestTileChange(string prefab, int x, int y, string layer)
     {
-        BaseTile tile = (prefab == null ? null : BaseTile.GetTile(prefab));
+        BaseTile tile = (string.IsNullOrEmpty(prefab) ? null : BaseTile.GetTile(prefab));
         World.Instance.TileMap.GetLayer(layer).ClientRequestingTileChange(tile, x, y);
     }
 
