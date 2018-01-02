@@ -82,27 +82,43 @@ public class TileLayer : NetworkBehaviour
     }
 
     /// <summary>
-    /// Places a tile, can be called from the server only. Places a tile on the server and on all clients.
+    /// Places a tile, can be called on client or server from the main thread.
+    /// Has widely varying implementation depending on the situation and server status.
+    /// However, the goal is always the same: place a tile at that position as soon as possible. It may be a few frames later though!
+    /// 
+    /// Note that:
+    ///  -If called on client, the chunk must be loaded for this to succeed.
+    ///  -If called on server, the chunk must be loaded for this to succeed.
     /// </summary>
-    /// <param name="tile">The tile PREFAB.</param>
+    /// <param name="tile">The tile prefab. See BaseTile.Get().</param>
     /// <param name="x">The x position, in tiles.</param>
     /// <param name="y">The y position, in tiles.</param>
-    /// <returns>True if the operation was successful.</returns>
+    /// <returns>True if the operation was successful, but keep in mind that the tile may not be placed instantly if called from the client.</returns>
     public bool SetTile(BaseTile tile, int x, int y)
     {
-        if(!CanPlaceTile(x, y))
+        if (isServer)
         {
-            Debug.LogError("Cannot place tile at " + x + ", " + y + " in layer '" + Name + "'.");
+            return SetTile_Server(tile, x, y);
+        }
+        else
+        {
+            return SetTile_Client(tile, x, y);
+        }
+    }
+
+    [Server]
+    private bool SetTile_Server(BaseTile tile, int x, int y)
+    {
+        if (!CanPlaceTile(x, y))
+        {
+            Debug.LogError("Cannot place tile at " + x + ", " + y + " in layer '" + Name + "'. (SERVER). Must be loaded, in bounds.");
             return false;
         }
-
-        // Networking here!
-        // TODO
 
         // For now, just place tile in position.
         BaseTile oldTile = Tiles[x][y];
 
-        if(oldTile == tile)
+        if (oldTile == tile)
         {
             // No need to change anything, already set that tile there!
             return false;
@@ -110,19 +126,131 @@ public class TileLayer : NetworkBehaviour
 
         Chunk c = GetChunkFromIndex(GetChunkIndexFromTileCoords(x, y));
 
-        if(oldTile != null)
+        if (oldTile != null)
         {
             TileRemoved(x, y, oldTile, c);
         }
 
+        // Apply tile.
         Tiles[x][y] = tile;
 
+        // Update tiles sourrounding and update physics bodies.
         TilePlaced(x, y, tile, c);
+
+        // Send to clients.
+        NetworkServer.SendToAll((short)MessageTypes.SEND_TILE_CHANGE, new Msg_SendTile() { Prefab = tile == null ? null : tile.Prefab, X = x, Y = y, Layer = Name });
 
         return true;
     }
 
-    public void SetTiles(BaseTile[][] tiles, int x, int y)
+    [Client]
+    private bool SetTile_Client(BaseTile tile, int x, int y)
+    {
+        // On a client, we need to request that the tile is placed on the server. How long it will take until the tile is placed it unknown.
+
+        Player.Local.NetUtils.CmdRequestTileChange(tile == null ? null : tile.Prefab, x, y, Name);
+
+        return false;
+    }
+
+    [Server]
+    public void ClientRequestingTileChange(BaseTile tile, int x, int y)
+    {
+        // Called on the server when a client has requested to change a tile.
+
+        // No validation in terms of bounds, would be too slow.
+        
+        // 1. Is chunk loaded?
+        if(IsChunkLoaded(GetChunkIndexFromTileCoords(x, y)))
+        {
+            // Apply tile and then send changes to clients.
+
+            // Normal tile setting.
+            BaseTile oldTile = Tiles[x][y];
+
+            if (oldTile == tile)
+            {
+                // No need to change anything, already set that tile there!
+                // Silly client!
+                return;
+            }
+
+            Chunk c = GetChunkFromIndex(GetChunkIndexFromTileCoords(x, y));
+
+            if (oldTile != null)
+            {
+                TileRemoved(x, y, oldTile, c);
+            }
+
+            // Apply tile.
+            Tiles[x][y] = tile;
+
+            // Update tiles sourrounding and update physics bodies.
+            TilePlaced(x, y, tile, c);
+
+            // Send to clients.
+            NetworkServer.SendToAll((short)MessageTypes.SEND_TILE_CHANGE, new Msg_SendTile() { Prefab = tile == null ? null : tile.Prefab, X = x, Y = y, Layer = Name });
+        }
+        else
+        {
+            // Chunk is not loaded! Save the changes and send to clients.
+            // TODO
+        }
+    }
+
+    [Client]
+    public void RecievedTileChange(Msg_SendTile data)
+    {
+        // Called on clients when a tile has been set.
+
+        // If we are a host, just stop. Tile has already been set.
+        if (isServer) 
+            return;
+
+        // Check if is in bounds.
+        if(!InLayerBounds(data.X, data.Y))
+        {
+            Debug.LogError("Why did the server send me coordinates out of bounds?!?! (" + data.X + ", " + data.Y + ")");
+            return;
+        }
+
+        // Check if it is loaded. If it is not ignore this. TODO if it is loading, make it be applied once loaded.
+        if(IsChunkLoaded(GetChunkIndexFromTileCoords(data.X, data.Y)))
+        {
+            // Place tile in position.
+            BaseTile oldTile = Tiles[data.X][data.Y];
+
+            BaseTile tile = BaseTile.GetTile(data.Prefab);
+
+            if(tile == null)
+            {
+                Debug.LogError("Tile could not be found, sent from server: '" + tile.Prefab + "'.");
+                return;
+            }
+
+            if (oldTile == tile)
+            {
+                // No need to change anything, already set that tile there!
+                Debug.LogError("Why did the server send a tile that was already placed? '" + tile.Prefab + "' placed at " + data.X + ", " + data.Y);
+                return;
+            }
+
+            Chunk c = GetChunkFromIndex(GetChunkIndexFromTileCoords(data.X, data.Y));
+
+            if (oldTile != null)
+            {
+                TileRemoved(data.X, data.Y, oldTile, c);
+            }
+
+            // Apply tile.
+            Tiles[data.Y][data.Y] = tile;
+
+            // Update tiles sourrounding and update physics bodies.
+            TilePlaced(data.X, data.Y, tile, c);
+        }
+    }
+
+    private void SetTiles(BaseTile[][] tiles, int x, int y)
     {
         if (tiles == null)
             return;
@@ -381,7 +509,7 @@ public class TileLayer : NetworkBehaviour
         Chunks.Add(index, newChunk);
 
         // Now request from the server...
-        Player.Local.NetUtils.CmdRequestChunk(Player.Local.gameObject, x, y);
+        Player.Local.NetUtils.CmdRequestChunk(Player.Local.gameObject, x, y, Name);
     }
 
     [Server] // Intentional, called from Player.NetUtils.
@@ -442,7 +570,7 @@ public class TileLayer : NetworkBehaviour
         // TODO Decompress, Apply Changes, Compress, and finally send to client.
 
         // Send to client.
-        Msg_SendChunk msg = new Msg_SendChunk() { Data = data, ChunkX = chunkX, ChunkY = chunkY };
+        Msg_SendChunk msg = new Msg_SendChunk() { Data = data, ChunkX = chunkX, ChunkY = chunkY, Layer = Name };
 
         // Send the data to the client using the server.
         NetworkServer.SendToClientOfPlayer(player, (short)MessageTypes.SEND_CHUNK_DATA, msg);

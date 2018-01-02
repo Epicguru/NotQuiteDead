@@ -29,7 +29,7 @@ public class TileMap : NetworkBehaviour
     public int WidthInChunks;
     public int HeightInChunks;
 
-    public TileLayer[] Layers;
+    public Dictionary<string, TileLayer> Layers;
 
     public void Create()
     {
@@ -41,7 +41,7 @@ public class TileMap : NetworkBehaviour
             return;
         }
 
-        foreach(TileLayer layer in Layers)
+        foreach(TileLayer layer in Layers.Values)
         {
             layer.ChunkSize = ChunkSize;
             layer.Create(Width, Height);
@@ -51,7 +51,7 @@ public class TileMap : NetworkBehaviour
     public void Update()
     {
         RectInt bounds = GetCameraChunkBounds();
-        foreach(TileLayer layer in Layers)
+        foreach(TileLayer layer in Layers.Values)
         {
             layer.SelectiveLoad(bounds.xMin / ChunkSize, bounds.yMin / ChunkSize, bounds.xMax / ChunkSize, bounds.yMax / ChunkSize);
         }
