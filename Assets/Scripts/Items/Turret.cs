@@ -68,23 +68,8 @@ public class Turret : NetworkBehaviour {
     public void UpdateTarget()
     {
         Transform target = null;
-
-        float minDistance = float.MaxValue;
-        foreach(Enemy e in Enemy.Enemies)
-        {
-            float dst = Vector2.Distance(transform.position, e.transform.position);
-
-            if (dst > MaxRange)
-                continue;
-            if (e.GetComponent<EnemyDeath>().Dead)
-                continue;
-
-            if(dst < minDistance)
-            {
-                minDistance = dst;
-                target = e.transform;
-            }
-        }
+        
+        // TODO FIX THIS WHOLE SCRIPT!
 
         Target = target;
     }

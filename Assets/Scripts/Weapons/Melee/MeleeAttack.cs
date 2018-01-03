@@ -149,9 +149,6 @@ public class MeleeAttack : NetworkBehaviour
             if (c.GetComponent<NeverHitMe>() != null)
                 continue;
 
-            if (!AsPlayer() && c.GetComponent<Enemy>() != null)
-                continue;
-
             if (coll.gameObject.GetComponentInParent<Item>() != null && coll.GetComponentInParent<Placeable>() == null)
             {
                 // Is item, may be held in hands. Ignore.
