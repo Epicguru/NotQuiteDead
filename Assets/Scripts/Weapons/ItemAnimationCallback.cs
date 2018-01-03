@@ -7,14 +7,6 @@ using UnityEngine;
 public class ItemAnimationCallback : MonoBehaviour
 {
     public bool Active = true;
-    private AudioSource source;
-
-    [HideInInspector]
-    public virtual AudioSource GetAudioSource()
-    {
-        AudioSource parent = GetComponentInParent<AudioSource>();
-        return parent;
-    }
 
     public void PlaySound(string sound)
     {
@@ -22,12 +14,7 @@ public class ItemAnimationCallback : MonoBehaviour
 
         if (c != null)
         {
-            if (source == null)
-            {
-                source = GetAudioSource();
-            }
-            source.pitch = Time.timeScale;
-            source.PlayOneShot(c);
+            AudioSource.PlayClipAtPoint(c, transform.position, 1f);
         }
     }
 }

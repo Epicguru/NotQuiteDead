@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(GunAiming), typeof(GunAnimation), typeof(GunShooting))]
@@ -14,6 +15,8 @@ public class Gun : Weapon
     */
 
     public GunType GunType = GunType.RIFLE;
+
+    public UnityEvent OnShoot = new UnityEvent();
 
     public GunAiming Aiming
     {

@@ -279,6 +279,10 @@ public class GunShooting : RotatingWeapon
             bulletsInMagazine -= Capacity.BulletsConsumed;
             bulletInChamber = true;
         }
+
+        // Callback, all clients.
+        if(gun.OnShoot != null)
+            gun.OnShoot.Invoke();
     }
 
     public void SpawnShell()

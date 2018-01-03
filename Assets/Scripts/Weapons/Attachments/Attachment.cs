@@ -15,6 +15,10 @@ public class Attachment : NetworkBehaviour
     public bool Hidden = false;
     public Transform BulletSpawn;
 
+    public AudioClip CustomShotSound;
+    [Range(0f, 1f)]
+    public float ShotVolume = 1f, ShotPitch = 1f;
+
     private bool applied = false;
     private string layer = null;
     private Item Item;
@@ -64,7 +68,8 @@ public class Attachment : NetworkBehaviour
         else
         {
             // Means we are dropped. Ensure that we have no parent.
-            this.transform.SetParent(null);
+            if(this.transform.parent != null)
+                this.transform.SetParent(null);
             SetLayer("Dropped Items");
         }
 
@@ -102,12 +107,20 @@ public class Attachment : NetworkBehaviour
             tweak.Apply(this);
         }
         applied = true;
+
+        if(GetGun() != null)
+        {
+            GetGun().OnShoot.AddListener(OnShoot);
+        }
     }
 
     public void RemoveEffects()
     {
         if (!applied)
             return;
+
+        if (GetGun() != null)
+            GetGun().OnShoot.RemoveListener(OnShoot);
 
         if (GetGun() == null)
             return; // If gun has been destroyed!
@@ -168,6 +181,19 @@ public class Attachment : NetworkBehaviour
             PrefabGun = Item.FindItem(GetGun().Item.Prefab).GetComponent<Gun>();
 
         return PrefabGun;
+    }
+
+    public virtual void OnShoot()
+    {
+        if(Type == AttachmentType.MUZZLE)
+        {
+            // Play suppressed sound, if necessary.
+            if (CustomShotSound != null)
+            {
+                GetGun().Shooting.AudioSource.pitch = ShotPitch * Time.timeScale;
+                GetGun().Shooting.AudioSource.PlayOneShot(CustomShotSound, ShotVolume);
+            }
+        }
     }
 
     public void Effect_Accuracy(float percentage)
