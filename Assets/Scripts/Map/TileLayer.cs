@@ -742,12 +742,18 @@ public class TileLayer : NetworkBehaviour
     {
         // Called on only clients, when the network message for an incomming chunk has been recieved.
 
+        // Make sure that the chunk is created first!
+        int index = GetChunkIndex(chunkX, chunkY);
+        if (!IsChunkLoading(index))
+        {
+            return;
+        }
+
         // First get a list of tiles, based on the data.
         BaseTile[][] tiles = ChunkIO.MakeChunk(data, ChunkSize, null, Use_RLE_In_Net);
 
         SetChunkTiles(tiles, chunkX * ChunkSize, chunkY * ChunkSize);
 
-        int index = GetChunkIndex(chunkX, chunkY);
 
         // Mark as done loading.
         Chunk c = Chunks[index];
