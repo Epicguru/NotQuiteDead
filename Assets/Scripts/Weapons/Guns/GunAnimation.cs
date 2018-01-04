@@ -16,18 +16,21 @@ public class GunAnimation : NetworkBehaviour
     public string Aim = "Aim";
     public string Run = "Run";
     public string Dropped = "Dropped";
+    public string Blocked = "Blocked";
 
     [Tooltip("Is this on a gun that has a repeated reload action, such as a shotgun or bolt action rifle?")]
     public bool IsRecursive = false;
 
-    /*[HideInInspector]*/ [SyncVar] public bool IsDropped;
-    /*[HideInInspector]*/ [SyncVar] public bool IsAiming;
-    /*[HideInInspector]*/ [SyncVar] public bool IsRunning;
-    /*[HideInInspector]*/ [SyncVar] public bool IsShooting;
-    /*[HideInInspector]*/ [SyncVar] public bool IsRecursiveReload;
-    /*[HideInInspector]*/ public bool IsEquipping = true; // Only true when the object is created, then false forever more!
-    /*[HideInInspector]*/ public bool IsReloading;
-    /*[HideInInspector]*/ public bool IsChambering;
+    [SyncVar] public bool IsBlocked;
+
+    [HideInInspector] [SyncVar] public bool IsDropped;
+    [HideInInspector] [SyncVar] public bool IsAiming;
+    [HideInInspector] [SyncVar] public bool IsRunning;
+    [HideInInspector] [SyncVar] public bool IsShooting;
+    [HideInInspector] [SyncVar] public bool IsRecursiveReload;
+    [HideInInspector] public bool IsEquipping = true; // Only true when the object is created, then false forever more!
+    [HideInInspector] public bool IsReloading;
+    [HideInInspector] public bool IsChambering;
 
     public int SingleShotsPending = 0;
 
@@ -54,6 +57,7 @@ public class GunAnimation : NetworkBehaviour
         animator.SetBool(Run, IsRunning);
         animator.SetBool(Dropped, IsDropped);
         animator.SetBool(Aim, IsAiming);
+        animator.SetBool(Blocked, IsBlocked);
 
         animator.SetBool(Shoot, IsShooting);
 
@@ -80,6 +84,40 @@ public class GunAnimation : NetworkBehaviour
             return;
 
         AnimDropped(!item.IsEquipped());
+
+        DetectBlocked();
+    }
+
+    private void DetectBlocked()
+    {
+        // Check if the gun is blocked by a wall directly in fron of it.
+
+        bool blocked = false;
+        float dst = gun.Shooting.GunBlockedDistance;
+
+        Vector3 dir = transform.right;
+        if (!Player.Local.Direction.Right)
+        {
+            dir *= -1f;
+        }
+        dir *= gun.Shooting.GunBlockedDistance;
+
+        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, dir, dst);
+
+        foreach(RaycastHit2D hit in hits)
+        {
+            if(hit.collider.isTrigger == false)
+            {
+                if(hit.collider.gameObject.GetComponentInParent<Health>() == null)
+                {
+                    blocked = true;
+                    break;
+                }
+            }
+        }
+
+        if(IsBlocked != blocked)
+            this.IsBlocked = blocked;
     }
 
     public void CancelAnimation(string trigger)
@@ -316,5 +354,24 @@ public class GunAnimation : NetworkBehaviour
             return;
 
         FlyingMag.Spawn(FlyingMagazine.RealMag.transform.position, FlyingMagazine.RealMag.transform.up * -1f * FlyingMagazine.Force, FlyingMagazine.RealMag.transform.rotation.eulerAngles.z, FlyingMagazine.Rotation * (!Player.Local.Direction.Right ? -1f : 1f), FlyingMagazine.MagSprite, !Player.Local.Direction.Right);
+    }
+
+    public void OnDrawGizmosSelected()
+    {
+        if (!Application.isPlaying)
+            return;
+
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere(transform.position, gun.Shooting.GunBlockedDistance);
+        Gizmos.color = Color.green;
+
+        Vector3 dir = transform.right;
+        if (!Player.Local.Direction.Right)
+        {
+            dir *= -1f;
+        }
+        dir *= gun.Shooting.GunBlockedDistance;
+
+        Gizmos.DrawLine(transform.position, transform.position + dir);
     }
 }

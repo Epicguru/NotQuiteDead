@@ -98,6 +98,9 @@ public class TileMap : NetworkBehaviour
     public RectInt GetCameraChunkBounds()
     {
         float chunkSize = ChunkSize;
+        int increment = 1;
+
+        increment *= ChunkSize;
 
         float tileStartX = CameraBounds.Instance.Bounds.xMin;
         float tileStartY = CameraBounds.Instance.Bounds.yMin;
@@ -123,7 +126,7 @@ public class TileMap : NetworkBehaviour
         int chunkEndX = (int)(Mathf.Ceil(tileEndX / chunkSize) * chunkSize);
         int chunkEndY = (int)(Mathf.Ceil(tileEndY / chunkSize) * chunkSize);
 
-        return new RectInt(chunkStartX, chunkStartY, chunkEndX - chunkStartX, chunkEndY - chunkStartY);
+        return new RectInt(chunkStartX - increment, chunkStartY - increment, (chunkEndX - chunkStartX) + increment * 2, (chunkEndY - chunkStartY) + increment * 2);
     }
 
     public void OnDrawGizmos()
@@ -147,7 +150,7 @@ public class TileMap : NetworkBehaviour
             Gizmos.DrawLine(new Vector3(0, y * ChunkSize, z), new Vector3(Width, y * ChunkSize, z));
         }
 
-        Gizmos.color = Color.black;
+        Gizmos.color = Color.magenta;
 
         RectInt bounds = GetCameraChunkBounds();
 

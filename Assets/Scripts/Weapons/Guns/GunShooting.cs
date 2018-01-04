@@ -15,6 +15,7 @@ public class GunShooting : RotatingWeapon
     public ShellData Shells;
     public GunAudio Audio;
     public FiringMode[] AllowedModes = new FiringMode[] { FiringMode.SEMI };
+    public float GunBlockedDistance = 1.2f;
     [HideInInspector] public AudioSource AudioSource;
 
     //[HideInInspector]
@@ -90,7 +91,7 @@ public class GunShooting : RotatingWeapon
         // If in single or burst fire modes, CMD and RPC are used?
 
         //animation.AnimShoot(requestingShoot && ready); // Pew pew!
-        if((this.FiringMode == FiringMode.SEMI || this.FiringMode == FiringMode.BURST) && requestingShoot && ready)
+        if((this.FiringMode == FiringMode.SEMI || this.FiringMode == FiringMode.BURST) && requestingShoot && ready && !animation.IsBlocked)
         {
             animation.CmdAnimShootOnce(this.FiringMode == FiringMode.SEMI);
         }

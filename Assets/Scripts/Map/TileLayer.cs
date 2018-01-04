@@ -36,10 +36,13 @@ public class TileLayer : NetworkBehaviour
 
         if(CanPlaceTile(x, y))
         {
-            if (InputManager.InputPressed("Shoot"))
+            if (Input.GetKey(KeyCode.Q))
             {
-                BaseTile place = InputManager.InputPressed("Sprint") ? null : BaseTile.GetTile("Dirt");
-                SetTile(place, x, y);
+                SetTile(BaseTile.GetTile("Dirt"), x, y);
+            }
+            if (Input.GetKey(KeyCode.E))
+            {
+                SetTile(null, x, y);
             }
         }
 
