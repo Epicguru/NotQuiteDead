@@ -501,7 +501,7 @@ public class GunShooting : RotatingWeapon
             if (objects.Contains(h)) // Do not allow multiple hits to one object.
                 continue;
 
-            if(hit.collider.gameObject.GetComponentInParent<Item>() != null && hit.collider.GetComponentInParent<Placeable>() == null)
+            if(hit.collider.gameObject.GetComponentInParent<Item>() != null)
             {
                 // Is item, may be held in hands. Ignore.
                 continue;

@@ -287,7 +287,7 @@ public class Health : NetworkBehaviour {
             {
                 return false;
             }
-            if (collider.gameObject.GetComponentInParent<Item>() != null && collider.GetComponentInParent<Placeable>() == null)
+            if (collider.gameObject.GetComponentInParent<Item>() != null)
             {
                 return false;
             }

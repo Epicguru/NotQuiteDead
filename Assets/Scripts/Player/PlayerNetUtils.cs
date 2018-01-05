@@ -75,12 +75,6 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
-    public void CmdToggleMiningDrill(GameObject obj, bool active)
-    {
-        obj.GetComponent<MiningDrill>().Active = active;
-    }
-
-    [Command]
     public void CmdSetPositionSync(GameObject obj, Vector3 position)
     {
         obj.GetComponent<NetPositionSync>().Position = position;
@@ -108,24 +102,6 @@ public class PlayerNetUtils : NetworkBehaviour
     public void CmdDestroyItem(GameObject obj)
     {
         Destroy(obj);
-    }
-
-    [Command]
-    public void CmdOpenGate(GameObject gate, bool open)
-    {
-        gate.GetComponent<Gate>().IsOpen = open;
-    }
-
-    [Command]
-    public void CmdToggleTorch(GameObject torch, bool active)
-    {
-        torch.GetComponent<Torch>().Active = active;
-    }
-
-    [Command]
-    public void CmdToggleFloodlight(GameObject light, bool active)
-    {
-       light.GetComponent<Floodlight>().Active = active;
     }
 
     [Command]
