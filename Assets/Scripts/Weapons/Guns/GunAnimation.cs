@@ -38,12 +38,6 @@ public class GunAnimation : NetworkBehaviour
     private Gun gun;
     private Item item;
 
-    public override void PreStartClient()
-    {
-        base.PreStartClient();
-        Start();
-    }
-
     public void Start()
     {
         animator = GetComponentInChildren<Animator>();

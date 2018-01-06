@@ -4,6 +4,8 @@ using UnityEngine.Networking;
 [RequireComponent(typeof(Health))]
 public class Pawn : NetworkBehaviour
 {
+    // Represents something that can move around the world map, using AI and pathfinding.
+
     public string Prefab;
     public string Name;
 

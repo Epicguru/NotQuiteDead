@@ -1025,66 +1025,6 @@ public class TileLayer : NetworkBehaviour
         return wholeTimes;
     }
 
-    private List<int> indices = new List<int>();
-    private List<int> toLoad = new List<int>();
-    private List<int> toUnload = new List<int>();
-    public void SelectiveLoad(int x, int y, int endX, int endY)
-    {
-        indices.Clear();
-        toLoad.Clear();
-        toUnload.Clear();
-
-        for (int X = x; X < endX; X++)
-        {
-            for (int Y = y; Y < endY; Y++)
-            {
-                if (IsChunkInBounds(X, Y))
-                {
-                    indices.Add(GetChunkIndex(X, Y));
-                }
-            }
-        }
-
-        foreach(int index in Chunks.Keys)
-        {
-            // All currently loaded chunks, if NOT in list unload.
-            if (!indices.Contains(index))
-            {
-                // Unload.
-                toUnload.Add(index);
-            }
-        }
-
-        foreach(int index in indices)
-        {
-            // if it loaded, do nothing.
-            // If it is not loaded, load it.
-
-            if(!IsChunkLoaded(index))
-                toLoad.Add(index);
-        }
-
-        foreach(int index in toLoad)
-        {
-            // Load all of these.
-            Vector2Int coordinates = GetChunkCoordsFromIndex(index);
-            if(!IsChunkLoading(index))
-                LoadChunk(coordinates.x, coordinates.y);
-        }
-
-        foreach(int index in toUnload)
-        {
-            // Unload these ones, if they are not already being unloaded.
-            if(!IsChunkUnloading(index))
-                UnloadChunk(index);
-        }
-
-        // Clean up.
-        toUnload.Clear();
-        toLoad.Clear();
-        indices.Clear();
-    }
-
     [Server]
     public bool AnyPendingOperationsFor(int index)
     {

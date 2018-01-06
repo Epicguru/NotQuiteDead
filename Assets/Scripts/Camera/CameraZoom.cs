@@ -23,18 +23,24 @@ public class CameraZoom : MonoBehaviour {
 
     private float _Size = 5;
     private Camera cam;
+    private float timer;
 
     public void Start()
     {
         I = this;
         cam = GetComponent<Camera>();
-
-        InvokeRepeating("Tick", 0, 1f / 60f);
     }
 
     public void Update()
     {
         Size -= (Input.mouseScrollDelta).y * (Size / 10f);
+
+        timer += Time.unscaledDeltaTime;
+        while(timer >= 1f / 60f)
+        {
+            timer -= 1f / 60f;
+            Tick();
+        }
     }
 
     public void Tick()

@@ -84,14 +84,13 @@ public class TileMap : NetworkBehaviour
         }
     }
 
+    public Dictionary<string, TileLayer>.ValueCollection GetAllLayers()
+    {
+        return Layers.Values;
+    }
+
     public void Update()
     {
-        RectInt bounds = GetCameraChunkBounds();
-        foreach(TileLayer layer in Layers.Values)
-        {
-            layer.SelectiveLoad(bounds.xMin / ChunkSize, bounds.yMin / ChunkSize, bounds.xMax / ChunkSize, bounds.yMax / ChunkSize);
-        }
-
         DebugText.Log(Chunk.InstanceCount + " chunks instantiated.");
     }
 

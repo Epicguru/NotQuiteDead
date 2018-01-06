@@ -1,4 +1,0 @@
-Wooden Gate, 2
-:
-Planks, 20;
-Iron Plate, 10;

@@ -29,6 +29,7 @@ public class Player : NetworkBehaviour
     public QuickSlot QuickSlot;
     public SpriteLighting Lighting;
     public BodyGearStats GearStats;
+    public ActiveObject AO;
     public BodyGear[] BodyGear;
     public Dictionary<string, BodyGear> GearMap = new Dictionary<string, BodyGear>();
     public Player _Player;
@@ -157,7 +158,7 @@ public class Player : NetworkBehaviour
         RegisterGear();
 
         if (isLocalPlayer)
-        {            
+        {
             Local = this;
             Local._Player = this;
             Camera.main.GetComponent<CameraFollow>().Target = transform;
@@ -233,6 +234,27 @@ public class Player : NetworkBehaviour
         gameObject.name = Name;
 
         DebugText.Log("[" + Name + " - " + Team + "] @ " + transform.position.ToString("F0"), Color.cyan);
+
+        // If this is the local player, load the chunks around them.
+        if (isLocalPlayer)
+        {
+            RectInt bounds = World.Instance.TileMap.GetCameraChunkBounds();
+            int chunkSize = World.Instance.TileMap.ChunkSize;
+            int x = bounds.xMin / chunkSize;
+            int y = bounds.yMin / chunkSize;
+            int endX = bounds.xMax / chunkSize;
+            int endY = bounds.yMax / chunkSize;
+
+            AO.CancelAllRequests();
+
+            for (int X = x; X < endX; X++)
+            {
+                for (int Y = y; Y < endY; Y++)
+                {
+                    AO.RequestChunk(X, Y);                    
+                }
+            }
+        }
     }
 
     private void UponDeath()
