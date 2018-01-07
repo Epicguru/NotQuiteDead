@@ -22,11 +22,14 @@ public class ActiveObjectManager : MonoBehaviour
 
     public void OnDestroy()
     {
-        Instance = null;
+        //Instance = null;
     }
 
     public void Update()
     {
+        if (World.Instance == null)
+            return;
+
         CompileChunks();
         UpdateAndRemoveChunks();
         LoadChunks();

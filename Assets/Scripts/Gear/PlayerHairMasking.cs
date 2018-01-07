@@ -11,7 +11,7 @@ public class PlayerHairMasking : MonoBehaviour
     {
         if(HeadGear.GetGearItem() != null)
         {
-            Renderer.maskInteraction = HeadGear.GetGearItem().HidesHair ? SpriteMaskInteraction.VisibleInsideMask : SpriteMaskInteraction.VisibleOutsideMask;
+            Renderer.maskInteraction = HeadGear.GetGearItem().HidesHair ? SpriteMaskInteraction.VisibleInsideMask : SpriteMaskInteraction.None;
         }
         else
         {

@@ -18,6 +18,12 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
+    public void CmdPlaceFurniture(string prefab, bool isNull, int x, int y)
+    {
+        World.Instance.Furniture.RequestingPlace(isNull ? null : prefab, x, y);
+    }
+
+    [Command]
     public void CmdRequestTileChange(string prefab, int x, int y, string layer)
     {
         BaseTile tile = (string.IsNullOrEmpty(prefab) ? null : BaseTile.GetTile(prefab));

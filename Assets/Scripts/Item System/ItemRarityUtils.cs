@@ -20,6 +20,7 @@ public class ItemRarityUtils : MonoBehaviour
     {
         // TODO WHY HERE :D
         Item.LoadItems();
+        Furniture.LoadAllFurniture();
         // TODO move both things to a better place.
         BaseTile.LoadPrefabs();
         instance = this;
@@ -27,7 +28,8 @@ public class ItemRarityUtils : MonoBehaviour
 
     public void Start()
     {
-        Item.RegisterItems();        
+        Item.RegisterItems();
+        Furniture.RegisterAll();
     }
 
     public static string GetDescription(ItemRarity rarity)

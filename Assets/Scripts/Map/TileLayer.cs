@@ -44,6 +44,10 @@ public class TileLayer : NetworkBehaviour
             {
                 SetTile(null, x, y);
             }
+            if (Input.GetKey(KeyCode.F))
+            {
+                World.Instance.Furniture.PlaceFurniture("Torch", x, y);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Y))
@@ -477,7 +481,17 @@ public class TileLayer : NetworkBehaviour
             return false;
         }
 
+        if(FurnitureAt(x, y))
+        {
+            return false;
+        }
+
         return true;
+    }
+
+    public bool FurnitureAt(int x, int y)
+    {
+        return World.Instance.Furniture.IsFurnitureAt(x, y);
     }
 
     /// <summary>

@@ -15,9 +15,13 @@ public class World : NetworkBehaviour
     [HideInInspector]
     public TileMap TileMap;
 
+    [HideInInspector]
+    public FurnitureManager Furniture;
+
     public void Awake()
     {
         TileMap = GetComponent<TileMap>();
+        Furniture = GetComponent<FurnitureManager>();
 
         TileMap.Create();
 
@@ -26,6 +30,6 @@ public class World : NetworkBehaviour
 
     public void OnDestroy()
     {
-        Instance = null;
+        //Instance = null;
     }
 }
