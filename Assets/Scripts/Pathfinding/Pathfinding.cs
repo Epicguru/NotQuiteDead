@@ -1,165 +1,194 @@
 ﻿
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class Pathfinding
 {
     private static List<Node> open = new List<Node>();
     private static List<Node> closed = new List<Node>();
-    private static Dictionary<int, Node> cameFrom = new Dictionary<int, Node>();
-    private static Dictionary<int, float> gScores = new Dictionary<int, float>();
-    private static Dictionary<int, float> fScores = new Dictionary<int, float>();
-    private static Node[] neighbours = new Node[4];
-    private static Node empty = new Node(false);
+    private static List<Node> near = new List<Node>();
 
-    public static void Find(int startX, int startY, int endX, int endY, TileLayer layer)
+    public static List<Node> Find(int startX, int startY, int endX, int endY, TileLayer layer)
     {
         open.Clear();
         closed.Clear();
-        cameFrom.Clear();
-        gScores.Clear();
-        fScores.Clear();
 
-        Node start = new Node(startX, startY, layer.Width);
-        Node end = new Node(endX, endY, layer.Width);
+        if (startX < 0 || startY < 0 || endX < 0 || endY < 0)
+            return null;
 
+        float g = 0;
+        Node start = new Node() { X = startX, Y = startY };
+        Node end = new Node() { X = endX, Y = endY };
+        Node previous = null;
         open.Add(start);
 
-        gScores[start.Index] = 0f;
-        fScores[start.Index] = HeuristicCost(start, end);
-
-        while(open.Count != 0)
+        int itter = 0;
+        while(open.Count > 0)
         {
-            Node current = LowestFscore();
-            if(current.SameAs(end))
+            Node current = null;
+            float lowest = float.MaxValue;
+            for (int i = 0; i < open.Count; i++)
             {
-                // DONE!
-                // TODO reconstruct path
-                Debug.Log("Found path!");
+                Node n = open[i];
+                if(n.F < lowest)
+                {
+                    lowest = n.F;
+                    current = n;
+                }
             }
 
-            open.Remove(current);
             closed.Add(current);
+            open.Remove(current);
 
-            // Get the neighbours
-            GetNeighbours(current, layer);
-
-            for (int i = 0; i < 4; i++)
+            if(current.Equals(end))
             {
-                Node n = neighbours[i];
-                if (n.SameAs(empty))
-                    continue;
+                // Done!
+                //Debug.Log("Done!");
+                Cleanup();
+                return TracePath(current);
+            }
 
+            // Get neighbours.
+            List<Node> near = GetNear(current, layer);
+            if(previous != null)
+                g += DistanceBetween(current, previous);
+
+            foreach(Node n in near)
+            {
                 if (closed.Contains(n))
                 {
                     continue;
                 }
 
+                // Not touched before.
                 if (!open.Contains(n))
                 {
-                    open.Add(n);
+                    // Calculate score.
+                    n.G = g + DistanceBetween(current, n);
+                    n.H = ComputeH(n, end);
+                    n.F = n.G + n.H;
+                    n.Parent = current;
+                    open.Insert(0, n);
                 }
-
-                float gscore = gScores[current.Index] + DistanceBetween(current, n);
-                if (gscore >= gScores[n.Index])
+                else
                 {
-                    continue;
+                    // Possible new path.
+                    if(g + n.H < n.F)
+                    {
+                        n.G = g + DistanceBetween(current, n);
+                        n.F = n.G + n.H;
+                        n.Parent = current;
+                    }
                 }
-
-                cameFrom[n.Index] = current;
-                gScores[n.Index] = gscore;
-                fScores[n.Index] = gscore + HeuristicCost(n, end);
             }
+            itter++;
+            if(itter >= 10000)
+            {
+                break;
+            }
+            previous = current;
         }
+
+        // No path!
+        Cleanup();
+        return null;
     }
 
-    private static float HeuristicCost(Node a, Node b)
+    private static void Cleanup()
     {
-        // TODO.
-        return 1f;
+        open.Clear();
+        closed.Clear();
+        near.Clear();
     }
 
     private static float DistanceBetween(Node a, Node b)
     {
-        // TODO.
-        return 1f;
-    }
+        // Only made to handle adjacent tiles.
 
-    private static void GetNeighbours(Node center, TileLayer layer)
-    {
-        // Left
-        BaseTile tile = layer.GetTile(center.X - 1, center.Y);
-        neighbours[0] = tile == null ? empty : new Node(center.X - 1, center.Y, layer.Width);
-
-        // Top
-        tile = layer.GetTile(center.X, center.Y + 1);
-        neighbours[1] = tile == null ? empty : new Node(center.X, center.Y + 1, layer.Width);
-
-        // Right
-        tile = layer.GetTile(center.X + 1, center.Y);
-        neighbours[2] = tile == null ? empty : new Node(center.X + 1, center.Y, layer.Width);
-
-        // Bottom
-        tile = layer.GetTile(center.X, center.Y - 1);
-        neighbours[3] = tile == null ? empty : new Node(center.X, center.Y - 1, layer.Width);
-    }
-
-    private static Node LowestFscore()
-    {
-        // Maybe optimise? Score of 0 automatically wins?
-
-        float lowest = float.MaxValue;
-        Node lowestNode = open[0];
-
-        foreach (Node n in open)
+        // Directly left or right.
+        if(a.X == b.X - 1 || a.X == b.X + 1)
         {
-            if (fScores.ContainsKey(n.Index))
+            return 1f;
+        }
+
+        // Directly above or below.
+        if(a.Y == b.Y - 1 || a.Y == b.Y + 1)
+        {
+            return 1f;
+        }
+
+        // Assume diagonal.
+        // Sqrt(horizontal distance squared + diagonal distance squared)
+        return 1.41421356f;
+    }
+
+    private static List<Node> GetNear(Node spot, TileLayer layer)
+    {
+        near.Clear();
+
+        for (int x = 0; x < 3; x++)
+        {
+            for (int y = 0; y < 3; y++)
             {
-                float score = fScores[n.Index];
-                if (score < lowest)
-                {
-                    lowest = score;
-                    lowestNode = n;
-                }
+                if (x == 1 && y == 1)
+                    continue;
+
+                int X = spot.X - 1 + x;
+                int Y = spot.Y - 1 + y;
+
+                if (X < 0 || Y < 0)
+                    continue;
+
+                BaseTile tile = layer.GetTile(X, Y);
+                if(tile == null) // TODO change this with IF NOT SOLID!
+                    near.Add(new Node() { X = X, Y = Y });
             }
         }
 
-        return lowestNode;
+        return near;
+    }
+
+    private static List<Node> TracePath(Node current)
+    {
+        List<Node> path = new List<Node>();
+
+        Node c = current;
+        while(c != null)
+        {
+            path.Add(c);
+            c = c.Parent;
+        }
+
+        return path;
+    }
+
+    private static int ComputeH(Node current, Node target)
+    {
+        return Mathf.Abs(target.X - current.X) - Mathf.Abs(target.Y - current.Y);
     }
 }
 
-internal struct Node
+public class Node
 {
-    public Node(int x, int y, int width)
-    {
-        X = x;
-        Y = y;
-        Index = X + Y * width;
-    }
+    public int X;
+    public int Y;
 
-    public Node(bool n)
-    {
-        X = -1;
-        Y = -1;
-        Index = -1;
-    }
+    // G + H
+    public float F;
+
+    public float G;
+    public float H;
+    public Node Parent;
 
     public override bool Equals(object obj)
     {
-        return SameAs((Node)obj);
+        Node other = (Node)obj;
+        return other.X == X && other.Y == Y;
     }
 
     public override int GetHashCode()
     {
-        return Index;
+        return X + Y * 7;
     }
-
-    public bool SameAs(Node other)
-    {
-        return other.Index == this.Index;
-    }
-
-    public int X;
-    public int Y;
-    public int Index;
 }
