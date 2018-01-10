@@ -1,132 +1,133 @@
 ﻿
+using Priority_Queue;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public static class Pathfinding
 {
-    private static List<Node> open = new List<Node>();
-    private static List<Node> closed = new List<Node>();
+    public const int MAX = 1000;
+    private static FastPriorityQueue<Node> open = new FastPriorityQueue<Node>(MAX);
+    private static Dictionary<Node, Node> cameFrom = new Dictionary<Node, Node>();
+    private static Dictionary<Node, float> costSoFar = new Dictionary<Node, float>();
     private static List<Node> near = new List<Node>();
 
-    public static List<Node> Find(int startX, int startY, int endX, int endY, TileLayer layer)
+    public static List<Node> Find(int startX, int startY, int endX, int endY, TileLayer layer, bool clean = false)
     {
         open.Clear();
-        closed.Clear();
+        cameFrom.Clear();
+        costSoFar.Clear();
 
-        if (startX < 0 || startY < 0 || endX < 0 || endY < 0)
-            return null;
-
-        float g = 0;
         Node start = new Node() { X = startX, Y = startY };
         Node end = new Node() { X = endX, Y = endY };
-        Node previous = null;
-        open.Add(start);
 
-        int itter = 0;
-        while(open.Count > 0)
+        open.Enqueue(start, 0);
+        cameFrom[start] = start;
+        costSoFar[start] = 0;
+
+        int count = 1;
+        while((count = open.Count) > 0)
         {
-            Node current = null;
-            float lowest = float.MaxValue;
-            for (int i = 0; i < open.Count; i++)
+            if(count > MAX - 9)
             {
-                Node n = open[i];
-                if(n.F < lowest)
+                Debug.Log("Too many open nodes!");
+                if (clean)
                 {
-                    lowest = n.F;
-                    current = n;
+                    Clean();
                 }
+                return null;
             }
 
-            closed.Add(current);
-            open.Remove(current);
+            Node current = open.Dequeue();
 
-            if(current.Equals(end))
+            if (current.Equals(end))
             {
                 // Done!
-                //Debug.Log("Done!");
-                Cleanup();
-                return TracePath(current);
+                List<Node> path = TracePath(end);
+                if (clean)
+                {
+                    Clean();
+                }
+                return path;
             }
 
-            // Get neighbours.
-            List<Node> near = GetNear(current, layer);
-            if(previous != null)
-                g += DistanceBetween(current, previous);
-
-            foreach(Node n in near)
+            List<Node> neighbours = GetNear(current, layer);
+            foreach (Node n in neighbours)
             {
-                if (closed.Contains(n))
+                float newCost = costSoFar[current] + GetCost(current, n); // This is the cost of the tile! Could be the weight depending on terrain!
+                if(!costSoFar.ContainsKey(n) || newCost < costSoFar[n]) // (effectiveCost ? GetCost(current, n) : 0)
                 {
-                    continue;
-                }
-
-                // Not touched before.
-                if (!open.Contains(n))
-                {
-                    // Calculate score.
-                    n.G = g + DistanceBetween(current, n);
-                    n.H = ComputeH(n, end);
-                    n.F = n.G + n.H;
-                    n.Parent = current;
-                    open.Insert(0, n);
-                }
-                else
-                {
-                    // Possible new path.
-                    if(g + n.H < n.F)
-                    {
-                        n.G = g + DistanceBetween(current, n);
-                        n.F = n.G + n.H;
-                        n.Parent = current;
-                    }
+                    costSoFar[n] = newCost;
+                    float priority = newCost + Heuristic(n, end);
+                    open.Enqueue(n, priority);
+                    cameFrom[n] = current;
                 }
             }
-            itter++;
-            if(itter >= 10000)
-            {
-                break;
-            }
-            previous = current;
         }
 
-        // No path!
-        Cleanup();
+        if (clean)
+        {
+            Clean();
+        }
         return null;
     }
 
-    private static void Cleanup()
+    private static float GetCost(Node a, Node b)
     {
-        open.Clear();
-        closed.Clear();
+        // Only intended for neighbours.
+
+        // Is directly horzontal
+        if(Mathf.Abs(a.X - b.X) == 1 && a.Y == b.Y)
+        {
+            return 1;
+        }
+
+        // Directly vertical.
+        if (Mathf.Abs(a.Y - b.Y) == 1 && a.X == b.X)
+        {
+            return 1;
+        }
+
+        // Assume that it is on one of the corners.
+        return 1.41421356237f;
+    }
+
+    private static void Clean()
+    {
+        costSoFar.Clear();
+        cameFrom.Clear();
         near.Clear();
     }
 
-    private static float DistanceBetween(Node a, Node b)
+    private static List<Node> TracePath(Node end)
     {
-        // Only made to handle adjacent tiles.
+        List<Node> path = new List<Node>();
+        Node child = end;
 
-        // Directly left or right.
-        if(a.X == b.X - 1 || a.X == b.X + 1)
+        bool run = true;
+        while (run)
         {
-            return 1f;
+            Node previous = cameFrom[child];
+            path.Add(child);
+            if(previous != null && child != previous)
+            {
+                child = previous;
+            }
+            else
+            {
+                run = false;
+            }
         }
 
-        // Directly above or below.
-        if(a.Y == b.Y - 1 || a.Y == b.Y + 1)
-        {
-            return 1f;
-        }
+        path.Reverse();
 
-        // Assume diagonal.
-        // Sqrt(horizontal distance squared + diagonal distance squared)
-        return 1.41421356f;
+        return path;
     }
 
-    private static List<Node> GetNear(Node spot, TileLayer layer)
+    private static List<Node> GetNear(Node node, TileLayer layer)
     {
+        // Want to add nodes connected to the center node, if they are walkable.
         near.Clear();
-
         for (int x = 0; x < 3; x++)
         {
             for (int y = 0; y < 3; y++)
@@ -134,52 +135,34 @@ public static class Pathfinding
                 if (x == 1 && y == 1)
                     continue;
 
-                int X = spot.X - 1 + x;
-                int Y = spot.Y - 1 + y;
+                int X = node.X - 1 + x;
+                int Y = node.Y - 1 + y;
 
-                if (X < 0 || Y < 0)
-                    continue;
-
+                // Make a fast version of getTile.
                 BaseTile tile = layer.GetTile(X, Y);
-                if(tile == null) // TODO change this with IF NOT SOLID!
+
+                // If (is not solid) then add to near tiles.
+                if(tile == null)
+                {
                     near.Add(new Node() { X = X, Y = Y });
+                }
             }
         }
 
         return near;
     }
 
-    private static List<Node> TracePath(Node current)
+    private static float Heuristic(Node a, Node b)
     {
-        List<Node> path = new List<Node>();
-
-        Node c = current;
-        while(c != null)
-        {
-            path.Add(c);
-            c = c.Parent;
-        }
-
-        return path;
-    }
-
-    private static int ComputeH(Node current, Node target)
-    {
-        return Mathf.Abs(target.X - current.X) - Mathf.Abs(target.Y - current.Y);
+        // Gives a rough distance.
+        return Mathf.Abs(a.X - b.X) + Mathf.Abs(a.Y - b.Y);
     }
 }
 
-public class Node
+public class Node : FastPriorityQueueNode
 {
     public int X;
     public int Y;
-
-    // G + H
-    public float F;
-
-    public float G;
-    public float H;
-    public Node Parent;
 
     public override bool Equals(object obj)
     {
