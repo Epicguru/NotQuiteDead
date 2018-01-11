@@ -3,6 +3,7 @@ using Priority_Queue;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 public static class Pathfinding
 {
@@ -14,9 +15,12 @@ public static class Pathfinding
     private static bool left, right, below, above;
     private static BaseTile tile;
 
+    public static bool Find(int startX, int startY, int endX, int endY, TileLayer layer, UnityAction<List<Node>> done)
+    {
+        return PathfindingManager.Find(startX, startY, endX, endY, layer, done);
+    }
 
-
-    private static List<Node> Find(int startX, int startY, int endX, int endY, TileLayer layer, bool clean = false)
+    public static List<Node> Run(int startX, int startY, int endX, int endY, TileLayer layer, bool clean = false)
     {
         open.Clear();
         cameFrom.Clear();
@@ -30,9 +34,9 @@ public static class Pathfinding
         costSoFar[start] = 0;
 
         int count = 1;
-        while((count = open.Count) > 0)
+        while ((count = open.Count) > 0)
         {
-            if(count > MAX - 9)
+            if (count > MAX - 9)
             {
                 Debug.Log("Too many open nodes!");
                 if (clean)
@@ -59,7 +63,7 @@ public static class Pathfinding
             foreach (Node n in neighbours)
             {
                 float newCost = costSoFar[current] + GetCost(current, n); // This is the cost of the tile! Could be the weight depending on terrain!
-                if(!costSoFar.ContainsKey(n) || newCost < costSoFar[n]) // (effectiveCost ? GetCost(current, n) : 0)
+                if (!costSoFar.ContainsKey(n) || newCost < costSoFar[n]) // (effectiveCost ? GetCost(current, n) : 0)
                 {
                     costSoFar[n] = newCost;
                     float priority = newCost + Heuristic(n, end);
@@ -81,7 +85,7 @@ public static class Pathfinding
         // Only intended for neighbours.
 
         // Is directly horzontal
-        if(Mathf.Abs(a.X - b.X) == 1 && a.Y == b.Y)
+        if (Mathf.Abs(a.X - b.X) == 1 && a.Y == b.Y)
         {
             return 1;
         }
@@ -96,7 +100,7 @@ public static class Pathfinding
         return 1.41421356237f;
     }
 
-    private static void Clean()
+    public static void Clean()
     {
         costSoFar.Clear();
         cameFrom.Clear();
@@ -114,7 +118,7 @@ public static class Pathfinding
         {
             Node previous = cameFrom[child];
             path.Add(child);
-            if(previous != null && child != previous)
+            if (previous != null && child != previous)
             {
                 child = previous;
             }
@@ -173,7 +177,7 @@ public static class Pathfinding
         }
 
         // Above-Left
-        if(left && above)
+        if (left && above)
         {
             tile = layer.Unsafe_GetTile(node.X - 1, node.Y + 1);
             if (CanWalk(tile))

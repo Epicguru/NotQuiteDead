@@ -7,7 +7,9 @@ using UnityEngine;
 public class FitChild : MonoBehaviour
 {
     public RectTransform[] Targets;
-    public bool Width = true, Height = true;
+    public bool Width = true, Height = true, Position = false;
+    public Vector3 PositionOffset;
+    public Vector2 SizeOffset;
 
     private static Vector2 tempVector = new Vector2();
     
@@ -23,6 +25,11 @@ public class FitChild : MonoBehaviour
                 tempVector.y += target.sizeDelta.y;
         }
 
-        (transform as RectTransform).sizeDelta = tempVector;
+        (transform as RectTransform).sizeDelta = tempVector + SizeOffset;
+
+        if (Position)
+        {
+            transform.position = Targets[0].transform.position + PositionOffset;
+        }
     }
 }

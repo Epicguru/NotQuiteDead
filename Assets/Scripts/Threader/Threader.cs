@@ -39,16 +39,21 @@ public class Threader : MonoBehaviour
     public void Awake()
     {
         Instance = this;
+        PathfindingManager.Start();
     }
 
     public void OnDestroy()
     {
         Instance = null;
+        PathfindingManager.Stop();
+        Pathfinding.Clean();
     }
 
     public void Update()
     {
         float deltaTime = Time.unscaledDeltaTime;
+
+        PathfindingManager.Update();
 
         UpdateTimer(deltaTime);
         UpdateStats(deltaTime);

@@ -6,18 +6,28 @@ public class PathTest : MonoBehaviour {
 
     public Transform A, B;
     public bool Line;
-    public bool NewCost;
     public Color LineColour;
-
     public TileLayer Layer;
-
     public List<Node> path;
+
+
+    private Vector3 oldPosA;
+    private Vector3 oldPosB;
 
     public void Update()
     {
-        path = Pathfinding.Find((int)A.transform.position.x, (int)A.transform.position.y, (int)B.transform.position.x, (int)B.transform.position.y, Layer);
+        if(B.transform.position != oldPosB || A.transform.position != oldPosA)
+            Pathfinding.Find((int)A.transform.position.x, (int)A.transform.position.y, (int)B.transform.position.x, (int)B.transform.position.y, Layer, PathFound);
+
+        oldPosA = A.transform.position;
+        oldPosB = B.transform.position;
     }
 
+    public void PathFound(List<Node> path)
+    {
+        this.path = path;
+    }
+         
     public void OnDrawGizmos()
     {
         Gizmos.color = LineColour;
