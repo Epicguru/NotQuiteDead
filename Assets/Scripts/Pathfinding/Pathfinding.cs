@@ -6,13 +6,17 @@ using UnityEngine;
 
 public static class Pathfinding
 {
-    public const int MAX = 1000;
+    public const int MAX = 2000;
     private static FastPriorityQueue<Node> open = new FastPriorityQueue<Node>(MAX);
     private static Dictionary<Node, Node> cameFrom = new Dictionary<Node, Node>();
     private static Dictionary<Node, float> costSoFar = new Dictionary<Node, float>();
     private static List<Node> near = new List<Node>();
+    private static bool left, right, below, above;
+    private static BaseTile tile;
 
-    public static List<Node> Find(int startX, int startY, int endX, int endY, TileLayer layer, bool clean = false)
+
+
+    private static List<Node> Find(int startX, int startY, int endX, int endY, TileLayer layer, bool clean = false)
     {
         open.Clear();
         cameFrom.Clear();
@@ -97,6 +101,7 @@ public static class Pathfinding
         costSoFar.Clear();
         cameFrom.Clear();
         near.Clear();
+        tile = null;
     }
 
     private static List<Node> TracePath(Node end)
@@ -127,51 +132,97 @@ public static class Pathfinding
     private static List<Node> GetNear(Node node, TileLayer layer)
     {
         // Want to add nodes connected to the center node, if they are walkable.
+        // This code stops the pathfinder from cutting corners, and going through walls that are diagonal from each other.
+
         near.Clear();
-        for (int x = 0; x < 3; x++)
+
+        // Left
+        tile = layer.Unsafe_GetTile(node.X - 1, node.Y);
+        left = false;
+        if (CanWalk(tile))
         {
-            for (int y = 0; y < 3; y++)
+            near.Add(new Node() { X = node.X - 1, Y = node.Y });
+            left = true;
+        }
+
+        // Right
+        tile = layer.Unsafe_GetTile(node.X + 1, node.Y);
+        right = false;
+        if (CanWalk(tile))
+        {
+            near.Add(new Node() { X = node.X + 1, Y = node.Y });
+            right = true;
+        }
+
+        // Above
+        tile = layer.Unsafe_GetTile(node.X, node.Y + 1);
+        above = false;
+        if (CanWalk(tile))
+        {
+            near.Add(new Node() { X = node.X, Y = node.Y + 1 });
+            above = true;
+        }
+
+        // Below
+        tile = layer.Unsafe_GetTile(node.X, node.Y - 1);
+        below = false;
+        if (CanWalk(tile))
+        {
+            near.Add(new Node() { X = node.X, Y = node.Y - 1 });
+            below = true;
+        }
+
+        // Above-Left
+        if(left && above)
+        {
+            tile = layer.Unsafe_GetTile(node.X - 1, node.Y + 1);
+            if (CanWalk(tile))
             {
-                if (x == 1 && y == 1)
-                    continue;
+                near.Add(new Node() { X = node.X - 1, Y = node.Y + 1 });
+            }
+        }
 
-                int X = node.X - 1 + x;
-                int Y = node.Y - 1 + y;
+        // Above-Right
+        if (right && above)
+        {
+            tile = layer.Unsafe_GetTile(node.X + 1, node.Y + 1);
+            if (CanWalk(tile))
+            {
+                near.Add(new Node() { X = node.X + 1, Y = node.Y + 1 });
+            }
+        }
 
-                // Make a fast version of getTile.
-                BaseTile tile = layer.GetTile(X, Y);
+        // Below-Left
+        if (left && below)
+        {
+            tile = layer.Unsafe_GetTile(node.X - 1, node.Y - 1);
+            if (CanWalk(tile))
+            {
+                near.Add(new Node() { X = node.X - 1, Y = node.Y - 1 });
+            }
+        }
 
-                // If (is not solid) then add to near tiles.
-                if(tile == null)
-                {
-                    near.Add(new Node() { X = X, Y = Y });
-                }
+        // Below-Right
+        if (right && below)
+        {
+            tile = layer.Unsafe_GetTile(node.X + 1, node.Y - 1);
+            if (CanWalk(tile))
+            {
+                near.Add(new Node() { X = node.X + 1, Y = node.Y - 1 });
             }
         }
 
         return near;
     }
 
+    private static bool CanWalk(BaseTile tile)
+    {
+        return tile == null;
+    }
+
     private static float Heuristic(Node a, Node b)
     {
         // Gives a rough distance.
         return Mathf.Abs(a.X - b.X) + Mathf.Abs(a.Y - b.Y);
-    }
-}
-
-public class Node : FastPriorityQueueNode
-{
-    public int X;
-    public int Y;
-
-    public override bool Equals(object obj)
-    {
-        Node other = (Node)obj;
-        return other.X == X && other.Y == Y;
-    }
-
-    public override int GetHashCode()
-    {
-        return X + Y * 7;
     }
 }

@@ -182,6 +182,18 @@ public class TileLayer : NetworkBehaviour
         return Tiles[x][y];
     }
 
+    public BaseTile Unsafe_GetTile(int x, int y)
+    {
+        if(InLayerBounds(x, y))
+        {
+            return Tiles[x][y];
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     /// <summary>
     /// Places a tile, can be called on client or server from the main thread.
     /// Has widely varying implementation depending on the situation and server status.
