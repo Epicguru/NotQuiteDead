@@ -17,6 +17,8 @@ public static class PathfindingManager
     private static bool run;
     private static Stopwatch watch = new Stopwatch();
     private static HashSet<string> hasPending = new HashSet<string>();
+    private static List<KeyValuePair<UnityAction<List<Node>>, List<Node>>> finished = new List<KeyValuePair<UnityAction<List<Node>>, List<Node>>>();
+    private static bool reading;
 
     private static void Run()
     {
@@ -37,10 +39,14 @@ public static class PathfindingManager
                 {
                     watch.Reset();
                     watch.Start();
+
+                    // Pathfind here.
                     List<Node> path = Pathfinding.Run(request.StartX, request.StartY, request.EndX, request.EndY, request.Layer);
+
                     watch.Stop();
                     long elapsed = watch.ElapsedMilliseconds;
                     times.Add(elapsed);
+
                     if (times.Count > 100)
                     {
                         times.RemoveAt(0);
@@ -48,8 +54,12 @@ public static class PathfindingManager
 
                     if (request.Done != null)
                     {
-                        request.Done.Invoke(path);
                         hasPending.Remove(request.ID);
+                        while (reading)
+                        {
+                            Thread.Sleep(10);
+                        }
+                        finished.Add(new KeyValuePair<UnityAction<List<Node>>, List<Node>>(request.Done, path));
                     }
                     else
                     {
@@ -94,14 +104,37 @@ public static class PathfindingManager
 
     public static void Update()
     {
-        DebugText.Log(pending.Count + " / " + MAX_PENDING + " pathfinding operations pending, " + hasPending.Count + " unique keys.", Color.Lerp(Color.green, Color.red, pending.Count / (float)MAX_PENDING));
-        if(times.Count > 0)
+        ProcessDone();
+
+        try
         {
-            DebugText.Log("Latest path time: " + times[times.Count - 1] + "ms <--", Color.yellow);
-            DebugText.Log("Average path time (" + times.Count + " samples): " + Mathf.RoundToInt((float)times.Average()) + "ms <--", Color.yellow);
-            DebugText.Log("Lowest path time (" + times.Count + " samples): " + times.Min() + "ms <--", Color.yellow);
-            DebugText.Log("Highest path time (" + times.Count + " samples): " + times.Max() + "ms <--", Color.yellow);
+            DebugText.Log(pending.Count + " / " + MAX_PENDING + " pathfinding operations pending, " + hasPending.Count + " unique keys.", Color.Lerp(Color.green, Color.red, pending.Count / (float)MAX_PENDING));
+            if (times.Count > 0)
+            {
+                DebugText.Log("Latest path time: " + times[times.Count - 1] + "ms <--", Color.yellow);
+                DebugText.Log("Average path time (" + times.Count + " samples): " + Mathf.RoundToInt((float)times.Average()) + "ms <--", Color.yellow);
+                DebugText.Log("Lowest path time (" + times.Count + " samples): " + times.Min() + "ms <--", Color.yellow);
+                DebugText.Log("Highest path time (" + times.Count + " samples): " + times.Max() + "ms <--", Color.yellow);
+                DebugText.Log(finished.Count + " processed requests pending for application.", Color.yellow);
+            }
         }
+        catch
+        {
+            // Gotta catch em' all!
+        }
+    }
+
+    private static void ProcessDone()
+    {
+        reading = true;
+
+        foreach(var x in finished)
+        {
+            x.Key.Invoke(x.Value);
+        }
+        finished.Clear();
+
+        reading = false;
     }
 
     public static void Stop()
@@ -122,6 +155,7 @@ public static class PathfindingManager
 
         run = true;
         writing = false;
+        reading = false;
         if (pending == null)
             pending = new Queue<PathfindingRequest>();
         pending.Clear();
