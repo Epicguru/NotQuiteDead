@@ -15,9 +15,9 @@ public static class Pathfinding
     private static bool left, right, below, above;
     private static BaseTile tile;
 
-    public static bool Find(int startX, int startY, int endX, int endY, TileLayer layer, UnityAction<List<Node>> done)
+    public static bool Find(string ID, int startX, int startY, int endX, int endY, TileLayer layer, UnityAction<List<Node>> done)
     {
-        return PathfindingManager.Find(startX, startY, endX, endY, layer, done);
+        return PathfindingManager.Find(ID, startX, startY, endX, endY, layer, done);
     }
 
     public static List<Node> Run(int startX, int startY, int endX, int endY, TileLayer layer, bool clean = false)

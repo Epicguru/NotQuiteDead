@@ -16,6 +16,7 @@ public static class PathfindingManager
     private static bool writing;
     private static bool run;
     private static Stopwatch watch = new Stopwatch();
+    private static HashSet<string> hasPending = new HashSet<string>();
 
     private static void Run()
     {
@@ -39,7 +40,6 @@ public static class PathfindingManager
                     List<Node> path = Pathfinding.Run(request.StartX, request.StartY, request.EndX, request.EndY, request.Layer);
                     watch.Stop();
                     long elapsed = watch.ElapsedMilliseconds;
-                    UnityEngine.Debug.Log(elapsed);
                     times.Add(elapsed);
                     if (times.Count > 100)
                     {
@@ -47,16 +47,22 @@ public static class PathfindingManager
                     }
 
                     if (request.Done != null)
+                    {
                         request.Done.Invoke(path);
+                        hasPending.Remove(request.ID);
+                    }
                     else
+                    {
+                        hasPending.Remove(request.ID);
                         UnityEngine.Debug.LogWarning("Wasted pathfinding (" + (path == null ? "NO PATH" : "PATH FOUND") + "), no receptor!");
+                    }
                 }
             }
         }
         UnityEngine.Debug.Log("Shutdown pathfinding multithread.");
     }
 
-    public static bool Find(int x, int y, int ex, int ey, TileLayer layer, UnityAction<List<Node>> done)
+    public static bool Find(string ID, int x, int y, int ex, int ey, TileLayer layer, UnityAction<List<Node>> done)
     {
         if(pending.Count >= MAX_PENDING)
         {
@@ -64,11 +70,17 @@ public static class PathfindingManager
             return false;
         }
 
-        PathfindingRequest r = new PathfindingRequest() { StartX = x, StartY = y, EndX = ex, EndY = ey, Layer = layer, Done = done };
+        if (hasPending.Contains(ID))
+        {
+            return false;
+        }
+
+        PathfindingRequest r = new PathfindingRequest() { StartX = x, StartY = y, EndX = ex, EndY = ey, Layer = layer, Done = done, ID = ID };
 
         if (r.IsValid())
         {
             writing = true;
+            hasPending.Add(ID);
             pending.Enqueue(r);
             writing = false;
             return true;
@@ -82,7 +94,7 @@ public static class PathfindingManager
 
     public static void Update()
     {
-        DebugText.Log(pending.Count + " / " + MAX_PENDING + " pathfinding operations pending.", Color.Lerp(Color.green, Color.red, pending.Count / (float)MAX_PENDING));
+        DebugText.Log(pending.Count + " / " + MAX_PENDING + " pathfinding operations pending, " + hasPending.Count + " unique keys.", Color.Lerp(Color.green, Color.red, pending.Count / (float)MAX_PENDING));
         if(times.Count > 0)
         {
             DebugText.Log("Latest path time: " + times[times.Count - 1] + "ms <--", Color.yellow);

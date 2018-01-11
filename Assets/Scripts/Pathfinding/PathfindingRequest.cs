@@ -4,6 +4,7 @@ using UnityEngine.Events;
 
 public struct PathfindingRequest
 {
+    public string ID;
     public int StartX;
     public int StartY;
     public int EndX;
@@ -17,9 +18,17 @@ public struct PathfindingRequest
             return false;
         if (Done == null)
             return false;
+        if (ID == null)
+            return false;
 
         if(!Layer.InLayerBounds(EndX, EndY))
         {
+            return false;
+        }
+
+        if(Layer.GetTile(EndX, EndY) != null)
+        {
+            // Within a solid tile.
             return false;
         }
 

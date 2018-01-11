@@ -30,9 +30,8 @@ public class DebugText : MonoBehaviour {
     {
         if (!_Instance.Active)
             return;
-        if(_Instance.sB.Length != 0)
-            _Instance.sB.Append('\n');
         _Instance.sB.Append(RichText.InColour(text, colour));
+        _Instance.sB.Append('\n');
     }
 
     public void Update()
@@ -50,8 +49,7 @@ public class DebugText : MonoBehaviour {
         if (!Active)
             return;
 
-        string text = sB.ToString();
-
+        string text = sB.ToString().Trim();
         sB.Length = 0;
 
         Text.text = text;

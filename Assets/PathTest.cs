@@ -17,7 +17,7 @@ public class PathTest : MonoBehaviour {
     public void Update()
     {
         if(B.transform.position != oldPosB || A.transform.position != oldPosA)
-            Pathfinding.Find((int)A.transform.position.x, (int)A.transform.position.y, (int)B.transform.position.x, (int)B.transform.position.y, Layer, PathFound);
+            Pathfinding.Find("Path Test", (int)A.transform.position.x, (int)A.transform.position.y, (int)B.transform.position.x, (int)B.transform.position.y, Layer, PathFound);
 
         oldPosA = A.transform.position;
         oldPosB = B.transform.position;
