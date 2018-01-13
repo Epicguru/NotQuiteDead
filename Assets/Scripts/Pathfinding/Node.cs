@@ -1,5 +1,7 @@
 ﻿using Priority_Queue;
+using System;
 
+[Serializable]
 public class Node : FastPriorityQueueNode
 {
     public int X;
@@ -14,5 +16,10 @@ public class Node : FastPriorityQueueNode
     public override int GetHashCode()
     {
         return X + Y * 7;
+    }
+
+    public override string ToString()
+    {
+        return "(" + X.ToString() + ", " + Y.ToString() + ")";
     }
 }

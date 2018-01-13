@@ -5,6 +5,8 @@ using UnityEngine.Networking;
 
 public class PawnPathfinding : NetworkBehaviour
 {
+    public const int MAX_SKIPPED = 20;
+
     [Tooltip("Measured in tiles per second.")]
     public float MovementSpeed = 5f;
 
@@ -22,10 +24,12 @@ public class PawnPathfinding : NetworkBehaviour
     [HideInInspector]
     public List<Node> path;
 
-
     private List<Node> pathPreloaded;
+    private List<Node> backupPath;
     private TileLayer layer;
     private float timer;
+    private int skipped;
+    private bool forcePause;
 
     public void Awake()
     {
@@ -82,6 +86,103 @@ public class PawnPathfinding : NetworkBehaviour
         return Pawn.Prefab + Pawn.ID;
     }
 
+    public void Update()
+    {
+        if (!isServer)
+            return;
+
+        NavigatePath();
+    }
+
+    public bool AtTarget()
+    {
+        // TODO optimise;
+        return Vector2.Distance(transform.position, target) <= 0f;
+    }
+
+    private bool WalkSegment()
+    {
+        // Path is NOT null.
+        // Only on server.
+        // Just move from the first node to the second based on time and distance.
+
+        if (path == null)
+            return true;
+        if (path.Count < 2) // Can't walk from A to B if there is no B!
+            return true;
+
+        // Increase time.
+        timer += Time.deltaTime;
+
+        Vector2 lastNode = new Vector2(path[0].X + 0.5f, path[0].Y + 0.5f);
+        Vector2 targetNode = new Vector2(path[1].X + 0.5f, path[1].Y + 0.5f);
+
+        bool nextIsUnwalkable = false;
+        BaseTile tile = GetLayer().GetTile(path[1].X, path[1].Y);
+        if (tile != null)
+            nextIsUnwalkable = true;
+
+        if (nextIsUnwalkable)
+        {
+            // Tile that we are moving towards is unwalkable.
+            // Indicate that we have reached the end of the segment and snap back to zero.
+            timer = 0;
+            return true;
+        }
+
+        if (lastNode == targetNode)
+            return true;
+
+        // Get distance.
+        float distance = Vector2.Distance(lastNode, targetNode);
+
+        // Time = distance / speed.
+        float duration = distance / MovementSpeed;
+
+        // Point along segment = time / total time.
+        float p = Mathf.Clamp(timer / duration, 0f, 1f);
+
+        // Forcibly move to that point.
+        Vector2 position = Vector2.Lerp(lastNode, targetNode, p);
+        transform.position = position;
+
+        // Potato code.
+        if (!forcePause)
+        {
+            timer %= duration;
+        }
+        else
+        {
+            if (timer > duration)
+                timer = duration;
+        }
+
+        // Are we at the end of the segment?
+        return p == 1;
+    }
+
+    private void PreLoad()
+    {
+        // Load the path from the 'next' node to the target.
+
+        if(path.Count < 2)
+        {
+            return;
+        }
+
+        if (AtTarget())
+        {
+            return;
+        }
+
+        if(pathPreloaded != null)
+        {
+            return;
+        }
+
+        Pathfinding.Find(GetID(), path[1].X, path[1].Y, target.x, target.y, GetLayer(), SetPathPreloaded);
+    }
+
     private void SetPath(List<Node> path)
     {
         this.path = path;
@@ -92,72 +193,127 @@ public class PawnPathfinding : NetworkBehaviour
         this.pathPreloaded = path;
     }
 
-    public void Update()
+    private void SetBackupPath(List<Node> path)
     {
-        if (!isServer)
-            return;
-
-        if (!Pathfind)
-            return;
-
-        if(path != null)
-        {
-            // TODO walk here.
-        }
-        else
-        {
-            if (!Pathfinding.HasRequested(GetID()))
-            {
-                Vector2Int pos = GetCurrentPosition();
-                Pathfinding.Find(GetID(), pos.x, pos.y, target.x, target.y, GetLayer(), SetPath);
-            }
-        }
-
-        NavigatePath();
+        backupPath = path;
     }
 
     private void NavigatePath()
     {
-        // Path is not null, and we need to walk it and also plan a few steps ahead to make a seamless walk.
+        // Only on server.
+        // Beyond that, anything goes.
 
-        if (path == null || path.Count < 2)
+        if (AtTarget())
         {
-            path = null;
-            timer = 0f;
+            timer = 0;
             return;
         }
 
-        if (!isServer)
+        if (Pathfind == false)
             return;
 
-        timer += Time.deltaTime;
-        Vector2 lastNode = new Vector2(path[0].X + 0.5f, path[0].Y + 0.5f);
-        Vector2 targetNode = new Vector2(path[1].X + 0.5f, path[1].Y + 0.5f);
-        float distance = Vector2.Distance(lastNode, targetNode);
-
-        // If we are 1 tile away, the duration = 1 / MovementSpeed;
-        float duration = distance / MovementSpeed;
-
-        float p = Mathf.Clamp(timer / duration, 0f, 1f);
-
-        Vector2 position = Vector2.Lerp(lastNode, targetNode, p);
-
-        transform.position = position;
-
-        // Need to find a new path, if not already preloaded.
-        if (pathPreloaded == null)
+        if(path == null)
         {
-            Pathfinding.Find(GetID(), path[1].X, path[1].Y, target.x, target.y, GetLayer(), SetPathPreloaded);
-        }
-
-        if (p == 1)
-        {
-            // Check for a preloaded path.
-            if (pathPreloaded != null)
+            // Path is null.
+            // Are we preloading?
+            if (!Pathfinding.HasRequested(GetID()))
             {
-                timer = 0;
-                path = pathPreloaded;
-                pathPreloaded = null;
+                // We are not at the target, we are pathfinding but the path is null.
+                // Lets find the path.
+                Pathfinding.Find(GetID(), GetCurrentPosition().x, GetCurrentPosition().y, target.x, target.y, GetLayer(), SetPath);
+                // Note that if execution is stuck in this part, it is likely that the path is impossible to calculate.
+            }
+        }
+        else
+        {
+            // There currently is a path to walk! Walk it!
+            bool endOfSegment = WalkSegment();
+
+            // Pre-load the next part of the path. We want seamless transition between segments.
+            // Don't bother pre loading if at the end of the segment, it should have already been done.
+            if(!endOfSegment)
+                PreLoad();
+
+            // Are we at the end of the segment?
+            if (endOfSegment)
+            {
+                // This means that we need to recalculate the path.
+                // It should already be done loading...
+                if(pathPreloaded != null && pathPreloaded[0].Equals(path[1]))
+                {
+                    // Set the current path to this preloaded, if it is still relevant.
+                    path = pathPreloaded;
+                    pathPreloaded = null;
+                    skipped = 0;
+                    backupPath = null;
+                    forcePause = false;
+                }
+                else
+                {
+                    // Check to see if we have a useless preloaded.
+                    if (pathPreloaded != null)
+                    {
+                        // Dispose of it, we need another one calculated ASAP.
+                        pathPreloaded = null;
+                    }
+
+                    // We don't have a preloaded path. Maybe we have completed the path.
+                    if (AtTarget())
+                    {
+                        // Cool! We are done.
+                        Pathfind = false;
+
+                        path = null;
+                    }
+                    else
+                    {
+                        // We have not reached the target, but there is no preloaded...
+                        // The pathfinder must be running slow.
+                        // Solution for now:
+                        // Keep following the existing path.
+                        if(path.Count <= 2)
+                        {
+                            // Reached the end of the path, should be at target!
+                            path = null;
+                            Pathfind = false;
+                        }
+                        else
+                        {
+                            // Keep moving.
+                            if (!forcePause)
+                            {
+                                int old = path.Count;
+                                path.RemoveAt(0);
+                                skipped += 1;
+                            }
+                            if(skipped >= MAX_SKIPPED)
+                            {
+                                //DebugText.Log("Critical mode: " + GetID() + " x" + skipped, Color.red);
+                                //Alright, we have missed the preload deadline too many times now, and more of this leads the AI to walk to completely the wrong place,
+                                //assuming that the target is moving.
+                                //Now, we just prioritize getting our main Path calculated.
+                                // Do this by using our backup path.
+
+                                // We need to stand still until our new path arrives, because otherwise the pathfinder does not have time to catch up.
+                                // TODO stand still.
+                                forcePause = true;
+                                if (backupPath == null)
+                                {
+                                    Pathfinding.Find(GetID(), path[1].X, path[1].Y, target.x, target.y, GetLayer(), SetBackupPath);
+                                }
+                                else
+                                {
+                                    // Finally, our backup path.
+                                    path = backupPath;
+                                    backupPath = null;
+                                    forcePause = false;
+                                    skipped = 0;
+                                    timer = 0;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
