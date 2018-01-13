@@ -23,6 +23,9 @@ public class Pawn : NetworkBehaviour
     public ActiveObject AO;
 
     [HideInInspector]
+    public PawnPathfinding Path;
+
+    [HideInInspector]
     public NetPositionSync NetPositionSync;
 
     // What should a pawn do in an unloaded chunk?
@@ -33,6 +36,7 @@ public class Pawn : NetworkBehaviour
         Health = GetComponent<Health>();
         AO = GetComponent<ActiveObject>();
         NetPositionSync = GetComponent<NetPositionSync>();
+        Path = GetComponent<PawnPathfinding>();
     }
 
     public int GetTypeCount()
@@ -71,6 +75,11 @@ public class Pawn : NetworkBehaviour
         }
 
         ID = PawnCount[Prefab] - 1;
+    }
+
+    public void Update()
+    {
+        Path.SetTarget((int)InputManager.GetMousePos().x, (int)InputManager.GetMousePos().y);
     }
 
     public void OnDestroy()

@@ -8,7 +8,7 @@ public class PawnPathfinding : NetworkBehaviour
     [Tooltip("Measured in tiles per second.")]
     public float MovementSpeed = 5f;
 
-    [ReadOnly]
+    //[ReadOnly]
     [SerializeField]
     private Vector2Int target;
 
@@ -22,7 +22,10 @@ public class PawnPathfinding : NetworkBehaviour
     [HideInInspector]
     public List<Node> path;
 
+
+    private List<Node> pathPreloaded;
     private TileLayer layer;
+    private float timer;
 
     public void Awake()
     {
@@ -79,12 +82,14 @@ public class PawnPathfinding : NetworkBehaviour
         return Pawn.Prefab + Pawn.ID;
     }
 
-    public void SetPath(List<Node> path)
+    private void SetPath(List<Node> path)
     {
-        if(path != null)
-            Pathfind = true;
-
         this.path = path;
+    }
+
+    private void SetPathPreloaded(List<Node> path)
+    {
+        this.pathPreloaded = path;
     }
 
     public void Update()
@@ -101,8 +106,59 @@ public class PawnPathfinding : NetworkBehaviour
         }
         else
         {
-            Vector2Int pos = GetCurrentPosition();
-            Pathfinding.Find(GetID(), pos.x, pos.y, target.x, target.y, GetLayer(), SetPath);
+            if (!Pathfinding.HasRequested(GetID()))
+            {
+                Vector2Int pos = GetCurrentPosition();
+                Pathfinding.Find(GetID(), pos.x, pos.y, target.x, target.y, GetLayer(), SetPath);
+            }
+        }
+
+        NavigatePath();
+    }
+
+    private void NavigatePath()
+    {
+        // Path is not null, and we need to walk it and also plan a few steps ahead to make a seamless walk.
+
+        if (path == null || path.Count < 2)
+        {
+            path = null;
+            timer = 0f;
+            return;
+        }
+
+        if (!isServer)
+            return;
+
+        timer += Time.deltaTime;
+        Vector2 lastNode = new Vector2(path[0].X + 0.5f, path[0].Y + 0.5f);
+        Vector2 targetNode = new Vector2(path[1].X + 0.5f, path[1].Y + 0.5f);
+        float distance = Vector2.Distance(lastNode, targetNode);
+
+        // If we are 1 tile away, the duration = 1 / MovementSpeed;
+        float duration = distance / MovementSpeed;
+
+        float p = Mathf.Clamp(timer / duration, 0f, 1f);
+
+        Vector2 position = Vector2.Lerp(lastNode, targetNode, p);
+
+        transform.position = position;
+
+        // Need to find a new path, if not already preloaded.
+        if (pathPreloaded == null)
+        {
+            Pathfinding.Find(GetID(), path[1].X, path[1].Y, target.x, target.y, GetLayer(), SetPathPreloaded);
+        }
+
+        if (p == 1)
+        {
+            // Check for a preloaded path.
+            if (pathPreloaded != null)
+            {
+                timer = 0;
+                path = pathPreloaded;
+                pathPreloaded = null;
+            }
         }
     }
 
@@ -110,5 +166,21 @@ public class PawnPathfinding : NetworkBehaviour
     {
         if (path != null)
             Pathfinding.DrawPathLine(path, Color.magenta);
+
+        if (GetLayer() == null)
+            return;
+
+        bool inBounds = GetLayer().InLayerBounds(target.x, target.y);
+
+        bool inSolid = GetLayer().GetTile(target.x, target.y) != null;
+
+        Color c = Color.green;
+
+        if (!inBounds || inSolid)
+            c = Color.red;
+
+        Gizmos.color = c;
+        Gizmos.DrawLine(new Vector3(target.x, target.y), new Vector3(target.x + 0.9f, target.y + 0.9f));
+        Gizmos.DrawLine(new Vector3(target.x, target.y + 0.9f), new Vector3(target.x + 0.9f, target.y));
     }
 }

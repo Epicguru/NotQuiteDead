@@ -170,6 +170,11 @@ public static class PathfindingManager
         reading = false;
     }
 
+    public static HashSet<string> GetPending()
+    {
+        return hasPending;
+    }
+
     public static string GetPendingIDs()
     {
         return pending.ToString();

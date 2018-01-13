@@ -20,6 +20,11 @@ public static class Pathfinding
         return PathfindingManager.Find(ID, startX, startY, endX, endY, layer, done);
     }
 
+    public static bool HasRequested(string ID)
+    {
+        return PathfindingManager.GetPending().Contains(ID);
+    }
+
     public static List<Node> Run(int startX, int startY, int endX, int endY, TileLayer layer, bool clean = false)
     {
         open.Clear();
