@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -19,6 +20,9 @@ public static class PathfindingManager
     private static HashSet<string> hasPending = new HashSet<string>();
     private static List<KeyValuePair<UnityAction<List<Node>>, List<Node>>> finished = new List<KeyValuePair<UnityAction<List<Node>>, List<Node>>>();
     private static bool reading;
+    private static int acc;
+    private static int solved;
+    private static float timer;
 
     private static void Run()
     {
@@ -43,6 +47,8 @@ public static class PathfindingManager
                     // Pathfind here.
                     List<Node> path = Pathfinding.Run(request.StartX, request.StartY, request.EndX, request.EndY, request.Layer);
 
+                    acc++;
+
                     watch.Stop();
                     long elapsed = watch.ElapsedMilliseconds;
                     times.Add(elapsed);
@@ -54,7 +60,10 @@ public static class PathfindingManager
 
                     if (request.Done != null)
                     {
-                        hasPending.Remove(request.ID);
+                        lock (hasPending)
+                        {
+                            hasPending.Remove(request.ID);
+                        }
                         while (reading)
                         {
                             Thread.Sleep(10);
@@ -63,7 +72,10 @@ public static class PathfindingManager
                     }
                     else
                     {
-                        hasPending.Remove(request.ID);
+                        lock (hasPending)
+                        {
+                            hasPending.Remove(request.ID);
+                        }
                         UnityEngine.Debug.LogWarning("Wasted pathfinding (" + (path == null ? "NO PATH" : "PATH FOUND") + "), no receptor!");
                     }
                 }
@@ -74,9 +86,17 @@ public static class PathfindingManager
 
     public static bool Find(string ID, int x, int y, int ex, int ey, TileLayer layer, UnityAction<List<Node>> done)
     {
+        if (!run)
+        {
+            if (done != null)
+                done.Invoke(null);
+            return false;
+        }
+
         if(pending.Count >= MAX_PENDING)
         {
-            done.Invoke(null);
+            if(done != null)
+                done.Invoke(null);
             return false;
         }
 
@@ -90,14 +110,18 @@ public static class PathfindingManager
         if (r.IsValid())
         {
             writing = true;
-            hasPending.Add(ID);
+            lock (hasPending)
+            {
+                hasPending.Add(ID);
+            }
             pending.Enqueue(r);
             writing = false;
             return true;
         }
         else
         {
-            done.Invoke(null);
+            if(done != null)
+                done.Invoke(null);
             return false;
         }
     }
@@ -106,11 +130,20 @@ public static class PathfindingManager
     {
         ProcessDone();
 
+        timer += Time.unscaledDeltaTime;
+        if(timer >= 1f)
+        {
+            timer -= 1f;
+            solved = acc;
+            acc = 0;
+        }
+
         try
         {
             DebugText.Log(pending.Count + " / " + MAX_PENDING + " pathfinding operations pending, " + hasPending.Count + " unique keys.", Color.Lerp(Color.green, Color.red, pending.Count / (float)MAX_PENDING));
             if (times.Count > 0)
             {
+                DebugText.Log("Solved per second: " + solved + " <--", Color.yellow);
                 DebugText.Log("Latest path time: " + times[times.Count - 1] + "ms <--", Color.yellow);
                 DebugText.Log("Average path time (" + times.Count + " samples): " + Mathf.RoundToInt((float)times.Average()) + "ms <--", Color.yellow);
                 DebugText.Log("Lowest path time (" + times.Count + " samples): " + times.Min() + "ms <--", Color.yellow);
@@ -135,6 +168,11 @@ public static class PathfindingManager
         finished.Clear();
 
         reading = false;
+    }
+
+    public static string GetPendingIDs()
+    {
+        return pending.ToString();
     }
 
     public static void Stop()

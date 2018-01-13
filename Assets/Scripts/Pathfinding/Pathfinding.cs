@@ -110,7 +110,7 @@ public static class Pathfinding
 
     public static void DrawPathLine(List<Node> path, Color colour)
     {
-        Gizmos.color = colour == null ? Color.black : colour;
+        Gizmos.color = colour;
 
         if (path == null)
         {

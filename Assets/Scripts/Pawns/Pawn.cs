@@ -3,12 +3,18 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(Health), typeof(ActiveObject), typeof(NetPositionSync))]
+[RequireComponent(typeof(PawnPathfinding))]
 public class Pawn : NetworkBehaviour
 {
     // Represents something that can move around the world map, using AI and pathfinding.
 
+    // Static things.
+    public static Dictionary<string, List<Pawn>> PawnMap = new Dictionary<string, List<Pawn>>();
+    public static Dictionary<string, int> PawnCount = new Dictionary<string, int>();
+
     public string Prefab;
     public string Name;
+    public int ID { get; private set; } // Not concurrent with client-server! Probably the same, but not necessarily.
 
     [HideInInspector]
     public Health Health;
@@ -18,9 +24,6 @@ public class Pawn : NetworkBehaviour
 
     [HideInInspector]
     public NetPositionSync NetPositionSync;
-
-    private List<Node> path;
-    private float timer;
 
     // What should a pawn do in an unloaded chunk?
     // Lets just load the chunks around pawns!
@@ -32,55 +35,52 @@ public class Pawn : NetworkBehaviour
         NetPositionSync = GetComponent<NetPositionSync>();
     }
 
-    public void Start()
+    public int GetTypeCount()
     {
-        Name = Random.Range(0, 1000000).ToString();
-        Pathfinding.Find(Name + "(" + Prefab + ")", (int)transform.position.x, (int)transform.position.y, (int)Random.Range(transform.position.x - 10, transform.position.x + 10), (int)Random.Range(transform.position.y - 10, transform.position.y + 10), World.Instance.TileMap.GetLayer("Foreground"), PathFound);
+        // How may spawned instances of this type of pwan are there?
+        if(PawnMap.ContainsKey(Prefab))
+            return PawnMap[Prefab].Count;
+        return 0;
     }
 
-    public void Update()
+    public List<Pawn> GetAllTypes()
     {
-        if (!isServer)
-            return;
+        // Gets a list of all spawned pawns of this type.
+        if (PawnMap.ContainsKey(Prefab))
+            return PawnMap[Prefab];
+        return null;
+    }
 
-        timer += Time.deltaTime * 15f; // * Speed
-
-        if (path == null)
+    public override void OnStartClient()
+    {
+        if (!PawnMap.ContainsKey(Prefab))
         {
-            Pathfinding.Find(Name + "(" + Prefab + ")", (int)transform.position.x, (int)transform.position.y, (int)Random.Range(transform.position.x - 10, transform.position.x + 10), (int)Random.Range(transform.position.y - 10, transform.position.y + 10), World.Instance.TileMap.GetLayer("Foreground"), PathFound);
-            timer = 0;
+            PawnMap.Add(Prefab, new List<Pawn>());
+        }
+
+        if(!PawnMap[Prefab].Contains(this))
+            PawnMap[Prefab].Add(this);
+
+        if (!PawnCount.ContainsKey(Prefab))
+        {
+            PawnCount.Add(Prefab, 1);
+        }
+        else
+        {
+            PawnCount[Prefab] += 1;
+        }
+
+        ID = PawnCount[Prefab] - 1;
+    }
+
+    public void OnDestroy()
+    {
+        if (!PawnMap.ContainsKey(Prefab))
+        {
             return;
         }
 
-        // Move along the path
-        float p = Mathf.Clamp(timer / path.Count, 0, 1);
-
-        int index = (int)(p * path.Count);
-
-        if (index >= path.Count)
-            index = path.Count - 1;
-
-        float remainder = (p * path.Count) - index;
-
-        Node start = path[index];
-        Node end = path[index + 1 == path.Count ? index : index + 1];
-        Vector3 position = Vector3.Lerp(new Vector3(start.X+  0.5f, start.Y + 0.5f), new Vector3(end.X + 0.5f, end.Y + 0.5f), remainder);
-
-        transform.position = position;
-
-        if(p == 1)
-        {
-            path = null;            
-        }
-    }
-
-    private void PathFound(List<Node> path)
-    {
-        this.path = path;
-    }
-
-    public void OnDrawGizmosSelected()
-    {
-        Pathfinding.DrawPathLine(path, Color.magenta);
+        if (PawnMap[Prefab].Contains(this))
+            PawnMap[Prefab].Remove(this);
     }
 }
