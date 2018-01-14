@@ -16,6 +16,9 @@ public class Pawn : NetworkBehaviour
     public string Name;
     public int ID { get; private set; } // Not concurrent with client-server! Probably the same, but not necessarily.
 
+    [Tooltip("A healthbar for this pawn to use, can be null.")]
+    public HealthBar HealthBar;
+
     [HideInInspector]
     public Health Health;
 
@@ -37,6 +40,15 @@ public class Pawn : NetworkBehaviour
         AO = GetComponent<ActiveObject>();
         NetPositionSync = GetComponent<NetPositionSync>();
         Path = GetComponent<PawnPathfinding>();
+    }
+
+    public void Update()
+    {
+        if (HealthBar != null && Health != null)
+        {
+            HealthBar.MaxValue = Health.GetMaxHealth();
+            HealthBar.CurrentValue = Health.GetHealth();
+        }
     }
 
     public int GetTypeCount()

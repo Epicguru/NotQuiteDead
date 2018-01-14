@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-[ExecuteInEditMode]
 public class HealthBar : MonoBehaviour
 {
     public Color Health;
@@ -13,6 +12,8 @@ public class HealthBar : MonoBehaviour
     public bool Lerp = true;
     public AnimationCurve Curve;
     public float LerpTime = 0.2f;
+    public bool DynamicHide = true;
+    public float ShowTime = 7f;
 
     public SpriteRenderer OutlineSprite;
     public SpriteRenderer HealthSprite;
@@ -29,6 +30,12 @@ public class HealthBar : MonoBehaviour
 
     public void Update()
     {
+        timer += Time.deltaTime;
+
+        OutlineSprite.enabled = IsShowing();
+        HealthSprite.enabled = IsShowing();
+        NoHealthSprite.enabled = IsShowing();
+
         DetectChange();
         float value = GetLerpedValue();
 
@@ -48,7 +55,8 @@ public class HealthBar : MonoBehaviour
         NoHealthSprite.size = new Vector2(width - 0.1f, NoHealthSprite.size.y);
 
         // Apply width to the active health sprite.
-        HealthSprite.size = new Vector2(2f * (value / 100f) - 0.1f, HealthSprite.size.y);
+        float w = Mathf.Clamp(2f * (value / 100f) - 0.1f, 0f, float.MaxValue);
+        HealthSprite.size = new Vector2(w, HealthSprite.size.y);
 
         // Apply colour to the health sprite.
         HealthSprite.color = GetLerpedColour();
@@ -64,7 +72,7 @@ public class HealthBar : MonoBehaviour
         if(timer <= LerpTime)
         {
             float lerp = GetCurveEvaluation();
-            float value = Mathf.LerpUnclamped(lerpFrom, CurrentValue, lerp);
+            float value = Mathf.LerpUnclamped(CurrentValue, lerpFrom, lerp);
             return value;
         }
         else
@@ -81,9 +89,12 @@ public class HealthBar : MonoBehaviour
         if (!(timer <= LerpTime))
             return Health;
 
-        float x = GetCurveEvaluation();
+        if (lerpFrom <= CurrentValue)
+            return Health;
 
-        Color c = Color.Lerp(DamagedHealth, Health, x);
+        float x = 1f - Mathf.Clamp(timer / LerpTime, 0f, 1f);
+
+        Color c = Color.Lerp(Health, DamagedHealth, x);
 
         return c;
     }
@@ -103,5 +114,10 @@ public class HealthBar : MonoBehaviour
             lerpFrom = oldHealth;
             oldHealth = CurrentValue;
         }
+    }
+
+    public bool IsShowing()
+    {
+        return !DynamicHide || timer <= ShowTime;
     }
 }
