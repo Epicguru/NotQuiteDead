@@ -26,7 +26,13 @@ public struct PathfindingRequest
             return false;
         }
 
-        if(Layer.GetTile(EndX, EndY) != null)
+        if (Layer.GetTile(StartX, StartY) != null)
+        {
+            // Within a solid tile.
+            return false;
+        }
+
+        if (Layer.GetTile(EndX, EndY) != null)
         {
             // Within a solid tile.
             return false;

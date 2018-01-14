@@ -118,6 +118,11 @@ public class HealthBar : MonoBehaviour
 
     public bool IsShowing()
     {
+        if(GetLerpedValue() <= 0f)
+        {
+            return false;
+        }
+
         return !DynamicHide || timer <= ShowTime;
     }
 }

@@ -24,8 +24,7 @@ public class Caveman : NetworkBehaviour
     [Server]
     public void UponDeath()
     {
-        Debug.Log("Dead!");
-
-        Destroy(gameObject);
+        Pawn.DestroyAllColliders();
+        Destroy(gameObject, 10f);
     }
 }

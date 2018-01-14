@@ -43,7 +43,7 @@ public static class Pathfinding
         {
             if (count > MAX - 9)
             {
-                Debug.Log("Too many open nodes!");
+                //Debug.Log("Too many open nodes!");
                 if (clean)
                 {
                     Clean();

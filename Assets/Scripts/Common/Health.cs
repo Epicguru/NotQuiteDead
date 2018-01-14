@@ -58,7 +58,6 @@ public class Health : NetworkBehaviour {
             this.health = 0;
             // This is where the player dies.
             // At this point, we want to notify the local object that owns this, (the one with authority).
-            hasBeenDead = false; // This does not represent the dead state, but it is used in callbacks.
         }
         if (this.health > maxHealth)
             this.health = maxHealth;

@@ -86,6 +86,9 @@ public class GunAnimation : NetworkBehaviour
     {
         // Check if the gun is blocked by a wall directly in fron of it.
 
+        if (Player.Local == null)
+            return;
+
         bool blocked = false;
         float dst = gun.Shooting.GunBlockedDistance;
 

@@ -10,7 +10,6 @@ public class PawnPathfinding : NetworkBehaviour
     [Tooltip("Measured in tiles per second.")]
     public float MovementSpeed = 5f;
 
-    //[ReadOnly]
     [SerializeField]
     private Vector2Int target;
 
@@ -23,6 +22,9 @@ public class PawnPathfinding : NetworkBehaviour
 
     [HideInInspector]
     public List<Node> path;
+
+    public bool MovingRight { get; private set; }
+    public bool Moving { get; private set; }
 
     private List<Node> pathPreloaded;
     private List<Node> backupPath;
@@ -91,13 +93,21 @@ public class PawnPathfinding : NetworkBehaviour
         if (!isServer)
             return;
 
+        if(Pawn.Health.GetHealth() <= 0f)
+        {
+            Moving = false;
+            Pathfind = false;
+            return;
+        }
+
+        Moving = false;
         NavigatePath();
     }
 
     public bool AtTarget()
     {
         // TODO optimise;
-        return Vector2.Distance(transform.position, target) <= 0f;
+        return Vector2.Distance(transform.position, target + new Vector2(0.5f, 0.5f)) <= 0f;
     }
 
     private bool WalkSegment()
@@ -113,9 +123,16 @@ public class PawnPathfinding : NetworkBehaviour
 
         // Increase time.
         timer += Time.deltaTime;
+        Moving = true;
 
         Vector2 lastNode = new Vector2(path[0].X + 0.5f, path[0].Y + 0.5f);
         Vector2 targetNode = new Vector2(path[1].X + 0.5f, path[1].Y + 0.5f);
+
+        float diff = targetNode.x - lastNode.x;
+        if(diff != 0)
+        {
+            MovingRight = diff > 0;
+        }
 
         bool nextIsUnwalkable = false;
         BaseTile tile = GetLayer().GetTile(path[1].X, path[1].Y);
@@ -127,11 +144,17 @@ public class PawnPathfinding : NetworkBehaviour
             // Tile that we are moving towards is unwalkable.
             // Indicate that we have reached the end of the segment and snap back to zero.
             timer = 0;
+            Moving = false;
+            // Any preloaded path is invalid, because the next tile is blocked.
+            pathPreloaded = null;
             return true;
         }
 
         if (lastNode == targetNode)
+        {
+            Moving = false;
             return true;
+        }
 
         // Get distance.
         float distance = Vector2.Distance(lastNode, targetNode);
@@ -206,7 +229,13 @@ public class PawnPathfinding : NetworkBehaviour
         if (AtTarget())
         {
             timer = 0;
+            Moving = false;
             return;
+        }
+
+        if (forcePause)
+        {
+            Moving = false;
         }
 
         if (Pathfind == false)
@@ -262,7 +291,7 @@ public class PawnPathfinding : NetworkBehaviour
                     {
                         // Cool! We are done.
                         Pathfind = false;
-
+                        timer = 0;
                         path = null;
                     }
                     else
@@ -273,17 +302,22 @@ public class PawnPathfinding : NetworkBehaviour
                         // Keep following the existing path.
                         if(path.Count <= 2)
                         {
-                            // Reached the end of the path, should be at target!
+                            // Reached the end of the path, are at the targets last know location.
                             path = null;
                             Pathfind = false;
                         }
                         else
                         {
+                            // Check if the next tile is blocked.
+                            bool blocked = GetLayer().GetTile(path[1].X, path[1].Y) != null;
+
                             // Keep moving.
                             if (!forcePause)
                             {
-                                int old = path.Count;
-                                path.RemoveAt(0);
+                                if (!blocked)
+                                {
+                                    path.RemoveAt(0);
+                                }
                                 skipped += 1;
                             }
                             if(skipped >= MAX_SKIPPED)
@@ -295,14 +329,19 @@ public class PawnPathfinding : NetworkBehaviour
                                 // Do this by using our backup path.
 
                                 // We need to stand still until our new path arrives, because otherwise the pathfinder does not have time to catch up.
-                                // TODO stand still.
+
+                                DebugText.Log("Skipped mode...");                                
+
                                 forcePause = true;
                                 if (backupPath == null)
                                 {
-                                    Pathfinding.Find(GetID(), path[1].X, path[1].Y, target.x, target.y, GetLayer(), SetBackupPath);
+                                    DebugText.Log("Looking for backup path...");
+                                    Pathfinding.Find(GetID(), path[0].X, path[0].Y, target.x, target.y, GetLayer(), SetBackupPath);
                                 }
                                 else
                                 {
+                                    DebugText.Log("Got backup path...");
+
                                     // Finally, our backup path.
                                     path = backupPath;
                                     backupPath = null;

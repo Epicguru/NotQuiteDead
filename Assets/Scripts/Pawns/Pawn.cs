@@ -59,6 +59,14 @@ public class Pawn : NetworkBehaviour
         return 0;
     }
 
+    public void DestroyAllColliders()
+    {
+        foreach(Collider2D c in GetComponentsInChildren<Collider2D>())
+        {
+            Destroy(c);
+        }
+    }
+
     public List<Pawn> GetAllTypes()
     {
         // Gets a list of all spawned pawns of this type.
