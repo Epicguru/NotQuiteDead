@@ -77,11 +77,6 @@ public class Pawn : NetworkBehaviour
         ID = PawnCount[Prefab] - 1;
     }
 
-    public void Update()
-    {
-        Path.SetTarget((int)InputManager.GetMousePos().x, (int)InputManager.GetMousePos().y);
-    }
-
     public void OnDestroy()
     {
         if (!PawnMap.ContainsKey(Prefab))
