@@ -7,6 +7,8 @@ public class PawnAnimation : NetworkBehaviour
     [Tooltip("Should the pawn change direction based on pathfinding?")]
     public bool FacePathfinding = true;
 
+    public Transform Flipped;
+
     [SyncVar]
     public bool Right;
     [SyncVar]
@@ -55,6 +57,8 @@ public class PawnAnimation : NetworkBehaviour
             if(moving != Moving)
                 Moving = Pawn.Path.Moving;
         }
+
+        Transform transform = Flipped == null ? this.transform : Flipped;
 
         if (Right)
         {

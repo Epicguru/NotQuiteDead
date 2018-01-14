@@ -45,6 +45,9 @@ public class PawnPathfinding : NetworkBehaviour
 
     public TileLayer GetLayer()
     {
+        if (World.Instance == null)
+            return null;
+
         if (layer == null)
             layer = World.Instance.TileMap.GetLayer(Layer);
 

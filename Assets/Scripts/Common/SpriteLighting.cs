@@ -34,10 +34,12 @@ public class SpriteLighting : MonoBehaviour
     {
         foreach (SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>(true))
         {
-            if (Exceptions.Contains<SpriteRenderer>(r))
+            if (Exceptions.Contains(r))
                 continue;
+            if (r.GetComponentInParent<HealthBar>() != null)
+                continue;
+
             r.material = MaterialProvider._Instance.LitSprite;
-            r.UpdateGIMaterials();
         }
     }
 
