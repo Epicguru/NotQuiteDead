@@ -54,6 +54,7 @@ public class NetPositionSync : NetworkBehaviour {
             else
             {
                 // Need to send a CMD. Use the local player to set.
+                // EDIT - Not currently in use.
                 Player.Local.NetUtils.CmdSetPositionSync(gameObject, transform.position);
 
             }
@@ -65,7 +66,8 @@ public class NetPositionSync : NetworkBehaviour {
         if (!isServer)
         {
             timeSinceReceived += Time.deltaTime;
-            transform.position = GetInterpolatedPosition(!Extrapolate);
+            //transform.position = GetInterpolatedPosition(!Extrapolate);
+            transform.position = GetInterpolatedPosition(true); // EDIT - Extrapolation is buggy AF TODO FIXME
         }
     }
 

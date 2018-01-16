@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(ActiveObject))]
+[RequireComponent(typeof(SpriteLighting))]
 public class Furniture : NetworkBehaviour
 {
     // Furniture is a tile-like object that is placed within the world, that can have special behaviour,
@@ -15,9 +16,10 @@ public class Furniture : NetworkBehaviour
 
     public string Layer = "Foreground";
 
+    public bool Walkable = false;
+
     public int X { get; private set; }
     public int Y { get; private set; }
-    public float Z = 0;
 
     [HideInInspector]
     public ActiveObject AO;
@@ -71,7 +73,7 @@ public class Furniture : NetworkBehaviour
             this.Y = y;
         }
 
-        transform.position = new Vector3(X, Y, Z);
+        transform.position = new Vector3(X, Y);
         name = Name + " (" + X + ", " + Y + ")";
     }
 

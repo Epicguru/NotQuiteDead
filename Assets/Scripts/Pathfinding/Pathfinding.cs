@@ -13,7 +13,6 @@ public static class Pathfinding
     private static Dictionary<Node, float> costSoFar = new Dictionary<Node, float>();
     private static List<Node> near = new List<Node>();
     private static bool left, right, below, above;
-    private static BaseTile tile;
 
     public static bool Find(string ID, int startX, int startY, int endX, int endY, TileLayer layer, UnityAction<List<Node>> done)
     {
@@ -110,7 +109,6 @@ public static class Pathfinding
         costSoFar.Clear();
         cameFrom.Clear();
         near.Clear();
-        tile = null;
     }
 
     public static void DrawPathLine(List<Node> path, Color colour)
@@ -169,36 +167,32 @@ public static class Pathfinding
         near.Clear();
 
         // Left
-        tile = layer.Unsafe_GetTile(node.X - 1, node.Y);
         left = false;
-        if (CanWalk(tile))
+        if (layer.IsSpotWalkable(node.X - 1, node.Y))
         {
             near.Add(new Node() { X = node.X - 1, Y = node.Y });
             left = true;
         }
 
         // Right
-        tile = layer.Unsafe_GetTile(node.X + 1, node.Y);
         right = false;
-        if (CanWalk(tile))
+        if (layer.IsSpotWalkable(node.X + 1, node.Y))
         {
             near.Add(new Node() { X = node.X + 1, Y = node.Y });
             right = true;
         }
 
         // Above
-        tile = layer.Unsafe_GetTile(node.X, node.Y + 1);
         above = false;
-        if (CanWalk(tile))
+        if (layer.IsSpotWalkable(node.X, node.Y + 1))
         {
             near.Add(new Node() { X = node.X, Y = node.Y + 1 });
             above = true;
         }
 
         // Below
-        tile = layer.Unsafe_GetTile(node.X, node.Y - 1);
         below = false;
-        if (CanWalk(tile))
+        if (layer.IsSpotWalkable(node.X, node.Y - 1))
         {
             near.Add(new Node() { X = node.X, Y = node.Y - 1 });
             below = true;
@@ -207,8 +201,7 @@ public static class Pathfinding
         // Above-Left
         if (left && above)
         {
-            tile = layer.Unsafe_GetTile(node.X - 1, node.Y + 1);
-            if (CanWalk(tile))
+            if (layer.IsSpotWalkable(node.X - 1, node.Y + 1))
             {
                 near.Add(new Node() { X = node.X - 1, Y = node.Y + 1 });
             }
@@ -217,8 +210,7 @@ public static class Pathfinding
         // Above-Right
         if (right && above)
         {
-            tile = layer.Unsafe_GetTile(node.X + 1, node.Y + 1);
-            if (CanWalk(tile))
+            if (layer.IsSpotWalkable(node.X + 1, node.Y + 1))
             {
                 near.Add(new Node() { X = node.X + 1, Y = node.Y + 1 });
             }
@@ -227,8 +219,7 @@ public static class Pathfinding
         // Below-Left
         if (left && below)
         {
-            tile = layer.Unsafe_GetTile(node.X - 1, node.Y - 1);
-            if (CanWalk(tile))
+            if (layer.IsSpotWalkable(node.X - 1, node.Y - 1))
             {
                 near.Add(new Node() { X = node.X - 1, Y = node.Y - 1 });
             }
@@ -237,8 +228,7 @@ public static class Pathfinding
         // Below-Right
         if (right && below)
         {
-            tile = layer.Unsafe_GetTile(node.X + 1, node.Y - 1);
-            if (CanWalk(tile))
+            if (layer.IsSpotWalkable(node.X + 1, node.Y - 1))
             {
                 near.Add(new Node() { X = node.X + 1, Y = node.Y - 1 });
             }

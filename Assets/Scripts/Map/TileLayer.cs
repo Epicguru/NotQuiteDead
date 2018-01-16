@@ -48,6 +48,10 @@ public class TileLayer : NetworkBehaviour
             {
                 World.Instance.Furniture.PlaceFurniture("Torch", x, y);
             }
+            if (Input.GetKey(KeyCode.G))
+            {
+                World.Instance.Furniture.PlaceFurniture("Turret", x, y);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Y))
@@ -192,6 +196,30 @@ public class TileLayer : NetworkBehaviour
         {
             return null;
         }
+    }
+
+    public bool IsSpotWalkable(int x, int y)
+    {
+        if (!InLayerBounds(x, y))
+            return false;
+
+        bool tileWalkable = true;
+        BaseTile tile = Tiles[x][y];
+        if(tile != null)
+        {
+            if (tile.Walkable == false)
+                tileWalkable = false;
+        }
+
+        bool furnitureWalkable = true;
+        Furniture f = World.Instance.Furniture.GetFurnitureAt(x, y);
+        if(f != null)
+        {
+            if (!f.Walkable)
+                furnitureWalkable = false;
+        }
+
+        return tileWalkable && furnitureWalkable;
     }
 
     /// <summary>

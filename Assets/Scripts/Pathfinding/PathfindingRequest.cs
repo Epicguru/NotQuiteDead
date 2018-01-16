@@ -26,13 +26,13 @@ public struct PathfindingRequest
             return false;
         }
 
-        if (Layer.GetTile(StartX, StartY) != null)
+        if (!Layer.IsSpotWalkable(StartX, StartY))
         {
             // Within a solid tile.
             return false;
         }
 
-        if (Layer.GetTile(EndX, EndY) != null)
+        if (!Layer.IsSpotWalkable(EndX, EndY))
         {
             // Within a solid tile.
             return false;

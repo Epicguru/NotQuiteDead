@@ -12,10 +12,10 @@ public class BaseTile : ScriptableObject
     public string Prefab;
 
     [Tooltip("The visual name of the tile.")]
-    public string Name; // TODO add ID or Prefab
+    public string Name;
 
-    [Tooltip("Is this considered solid? Can AI walk through it?")]
-    public bool Solid = false;
+    [Tooltip("Can this tile be walked though.")]
+    public bool Walkable = false;
 
     [Tooltip("A reference to the physics body.")]
     public Collider2D Physics;

@@ -12,9 +12,15 @@ public class Pawn : NetworkBehaviour
     // Static things.
     public static Dictionary<string, List<Pawn>> PawnMap = new Dictionary<string, List<Pawn>>();
     public static Dictionary<string, int> PawnCount = new Dictionary<string, int>();
+    public static List<Pawn> AllPawns = new List<Pawn>();
+    public static List<Pawn> EnemyPawns = new List<Pawn>();
 
     public string Prefab;
     public string Name;
+
+    [Tooltip("Does it try to attack or harm the player?")]
+    public bool IsEnemy = false;
+
     public int ID { get; private set; } // Not concurrent with client-server! Probably the same, but not necessarily.
 
     [Tooltip("A healthbar for this pawn to use, can be null.")]
@@ -95,6 +101,17 @@ public class Pawn : NetworkBehaviour
             PawnCount[Prefab] += 1;
         }
 
+        if (!AllPawns.Contains(this))
+            AllPawns.Add(this);
+
+        if (IsEnemy)
+        {
+            if (!EnemyPawns.Contains(this))
+            {
+                EnemyPawns.Add(this);
+            }
+        }
+
         ID = PawnCount[Prefab] - 1;
     }
 
@@ -107,5 +124,16 @@ public class Pawn : NetworkBehaviour
 
         if (PawnMap[Prefab].Contains(this))
             PawnMap[Prefab].Remove(this);
+
+        if (AllPawns.Contains(this))
+            AllPawns.Remove(this);
+
+        if (IsEnemy)
+        {
+            if (EnemyPawns.Contains(this))
+            {
+                EnemyPawns.Remove(this);
+            }
+        }
     }
 }
