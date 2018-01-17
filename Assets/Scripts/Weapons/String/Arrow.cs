@@ -73,7 +73,7 @@ public class Arrow : MonoBehaviour {
         if (collider.GetComponent<Arrow>() != null)
             return false;
 
-        return Health.ShouldHit(collider, this.Team);
+        return Health.CanHitObject(collider, this.Team);
     }
 
     public void DetectCollision()

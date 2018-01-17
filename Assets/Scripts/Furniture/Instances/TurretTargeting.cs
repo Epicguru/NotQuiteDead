@@ -7,9 +7,13 @@ public class TurretTargeting : NetworkBehaviour
     [Header("System")]
     public Transform center;
     public TurretAiming Aim;
+    public Turret Turret;
+    public TurretShooting Shooting;
 
     [Header("Targeting")]
     public bool Active;
+    [Tooltip("Does this shoot through other non-solid entities in an attempt to hit the target?")]
+    public bool FireInTheHole = true;
     public Pawn Target;
 
     [Header("Lerping")]
@@ -51,7 +55,61 @@ public class TurretTargeting : NetworkBehaviour
                 {
                     LerpRate = ActiveAndIdleLerpRates.x;
                     TargetAngle = GetAngleToTarget();
-                    ShouldShoot = true;
+
+                    // Test to shoot:
+                    // 1. Is the target beyond the minimum range?
+                    // 2. Can I hit the target? As in: Is there an impenetrable object before I hit the target?
+
+                    float dst = Vector2.Distance(center.transform.position, Target.transform.position);
+                    if(dst <= Turret.Deadzone)
+                    {
+                        // Inside the deadzone.
+                        ShouldShoot = false;
+                    }
+                    else
+                    {
+                        // Raycast test.
+                        RaycastHit2D[] hits = Physics2D.RaycastAll(Shooting.Muzzle.transform.position, Shooting.Muzzle.transform.up, Turret.Range);
+                        bool clearPath = true;
+                        foreach(var hit in hits)
+                        {
+                            // Something solid, that we can hit...
+                            if(Health.CanHitObject(hit.collider, null)) // Allow this algorithm take into account friendly players to not shoot when they stand in front.
+                            {
+                                // Should be damaged, cannot be shot though!
+                                if(!Health.CanDamageObject(hit.collider, Shooting.Team))
+                                {
+                                    clearPath = false;
+                                    break;
+                                }
+                                else
+                                {
+                                    // Is it the target?
+                                    if (hit.transform.GetComponentInParent<Pawn>() == Target)
+                                    {
+                                        clearPath = true;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        // There is an object that can take damage standing between us and the target...
+                                        // Should we shoot though it?
+                                        if (FireInTheHole)
+                                        {
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Clearpath means that we COULD hit the target.
+                        ShouldShoot = clearPath;
+                    }
                 }
                 else
                 {
@@ -82,10 +140,15 @@ public class TurretTargeting : NetworkBehaviour
     [Server]
     private void FindTarget()
     {
-        if(Target != null)
+        if(Target != null && Target.Health != null)
         {
             float dst = Vector2.Distance(center.position, Target.transform.position);
             if(dst > MaxSearchRange)
+            {
+                Target = null;
+            }
+
+            if(Target.Health.GetHealth() <= 0)
             {
                 Target = null;
             }
@@ -119,6 +182,8 @@ public class TurretTargeting : NetworkBehaviour
     [Server]
     private void LerpToAngle()
     {
-        Aim.Angle = Mathf.LerpAngle(Aim.Angle, TargetAngle, Time.deltaTime * LerpRate);
+        float a = Mathf.LerpAngle(Aim.Angle, TargetAngle, Time.deltaTime * LerpRate);
+        if (Aim.Angle != a)
+            Aim.Angle = a;
     }
 }

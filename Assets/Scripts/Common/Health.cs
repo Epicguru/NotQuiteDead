@@ -274,7 +274,67 @@ public class Health : NetworkBehaviour {
         return s;
     }
 
-    public static bool ShouldHit(Collider2D collider, string friendlyTeam)
+    /// <summary>
+    /// Can the gameobject that owns the collider be damaged? May not be possible to hit it using bullets, check Health.CanHitObject().
+    /// </summary>
+    public static bool CanDamageObject(Collider2D collider, string friendlyTeam)
+    {
+        Health h = collider.GetComponentInParent<Health>();
+
+        if (h != null)
+        {
+            if (!h.CanHit)
+                return false;
+
+            if (h.CannotHit.Contains(collider))
+            {
+                return false;
+            }
+
+            if (collider.gameObject.GetComponentInParent<Item>() != null)
+            {
+                return false;
+            }
+
+            if (collider.GetComponent<NeverHitMe>() != null)
+            {
+                return false;
+            }
+
+            Player p = collider.GetComponent<Player>();
+            if (p != null)
+            {
+                if(friendlyTeam == null)
+                {
+                    // Takes no sides, will always damage the player.
+                    return true;
+                }
+
+                if (Teams.I.PlayerInTeam(p.Name, friendlyTeam))
+                {
+                    // Player is in the same team as me.
+                    return false; // DO NOT ALLOW TEAM DAMAGE. TODO IMPLEMENT GAME RULES!!!
+                }
+                else
+                {
+                    // Fair game.
+                    return true;
+                }
+            }
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Checks to see if the gameobject that owns the collider can be HIT by a bullet, or if the bullet should sail right though it without affecting it.
+    /// If this returns true, the bullet should treat the object as SOLID, but it may not be possible to DAMAGE it. See Health.CanDamageObject().
+    /// </summary>
+    public static bool CanHitObject(Collider2D collider, string friendlyTeam)
     {
         Health h = collider.GetComponentInParent<Health>();
 
@@ -297,8 +357,12 @@ public class Health : NetworkBehaviour {
             Player p = collider.GetComponent<Player>();
             if (p != null)
             {
-                if (p == Player.Local)
-                    return false;
+                if(friendlyTeam == null)
+                {
+                    // This gun/turret/weapon takes no sides! They will hit any player!
+                    return true;
+                }
+
                 if (Teams.I.PlayerInTeam(p.Name, friendlyTeam))
                 {
                     return false; // DO NOT ALLOW TEAM DAMAGE. TODO IMPLEMENT GAME RULES!!!

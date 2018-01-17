@@ -10,7 +10,8 @@ public class TurretDetails : NetworkBehaviour
 
     [Header("Colours")]
     public Color LaserNormal;
-    public Color LaserFoundTarget;
+    public Color LaserBlockedFriendly;
+    public Color LaserHittingTarget;
     public Color DetailsNormal;
     public Color DetailsNotActive;
 
@@ -25,6 +26,10 @@ public class TurretDetails : NetworkBehaviour
 
     [SyncVar]
     [ReadOnly]
+    public bool LaserBlocked;
+
+    [SyncVar]
+    [ReadOnly]
     public bool Active;
 
     [Server]
@@ -33,6 +38,15 @@ public class TurretDetails : NetworkBehaviour
         if(Active != flag)
         {
             Active = flag;
+        }
+    }
+
+    [Server]
+    public void SetBlocked(bool flag)
+    {
+        if(LaserBlocked != flag)
+        {
+            LaserBlocked = flag;
         }
     }
 
@@ -50,10 +64,11 @@ public class TurretDetails : NetworkBehaviour
         if (isServer)
         {
             SetActive(Turret.Active);
-            SetFoundTarget(Targeting.Target != null);
+            SetBlocked(Targeting.ShouldShoot == false && Targeting.Target != null);
+            SetFoundTarget(Targeting.ShouldShoot);
         }
 
-        Laser.color = !Active ? Color.clear : (FoundTarget ? LaserFoundTarget : LaserNormal);
+        Laser.color = !Active ? Color.clear : (LaserBlocked ? LaserBlockedFriendly : (FoundTarget ? LaserHittingTarget : LaserNormal));
         TopDetails.color = Active ? DetailsNormal : DetailsNotActive;
     }
 }

@@ -495,8 +495,7 @@ public class GunShooting : RotatingWeapon
                 continue;
 
             if (hit.collider.gameObject.GetComponent<NeverHitMe>() != null)            
-                continue;
-            
+                continue;            
 
             if (objects.Contains(h)) // Do not allow multiple hits to one object.
                 continue;
