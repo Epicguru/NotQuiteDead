@@ -140,17 +140,19 @@ public class TurretTargeting : NetworkBehaviour
     [Server]
     private void FindTarget()
     {
-        if(Target != null && Target.Health != null)
+        if(Target != null)
         {
             float dst = Vector2.Distance(center.position, Target.transform.position);
             if(dst > MaxSearchRange)
             {
                 Target = null;
             }
-
-            if(Target.Health.GetHealth() <= 0)
+            else
             {
-                Target = null;
+                if (Target.Health.GetHealth() <= 0)
+                {
+                    Target = null;
+                }
             }
         }
 

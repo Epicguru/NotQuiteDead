@@ -15,6 +15,8 @@ public class Pawn : NetworkBehaviour
     public static List<Pawn> AllPawns = new List<Pawn>();
     public static List<Pawn> EnemyPawns = new List<Pawn>();
 
+    private static Dictionary<string, Pawn> loaded = new Dictionary<string, Pawn>();
+
     public string Prefab;
     public string Name;
 
@@ -135,5 +137,76 @@ public class Pawn : NetworkBehaviour
                 EnemyPawns.Remove(this);
             }
         }
+    }
+
+    public static void LoadAllPawns()
+    {
+        if (loaded == null)
+            loaded = new Dictionary<string, Pawn>();
+
+        Pawn[] x = Resources.LoadAll<Pawn>("Pawns/");
+        foreach(Pawn p in x)
+        {
+            if(p.Prefab == null || p.Prefab.Trim() == "")
+            {
+                // Invalid pawn.
+                continue;
+            }
+
+            loaded.Add(p.Prefab.Trim(), p);
+            Debug.Log("Loaded pawn: " + p.Prefab);
+        }
+    }
+
+    public static void RegisterPawns()
+    {
+        foreach(Pawn p in loaded.Values)
+        {
+            NetworkManager.singleton.spawnPrefabs.Add(p.gameObject);
+        }
+    }
+
+    public static bool IsPawnLoaded(string prefab)
+    {
+        return loaded != null && loaded.ContainsKey(prefab);
+    }
+
+    public static Pawn GetPawn(string prefab)
+    {
+        if (!IsPawnLoaded(prefab))
+        {
+            Debug.LogError("No loaded pawn found for prefab name '" + prefab + "'.");
+            return null;
+        }
+
+        return loaded[prefab];
+    }
+
+    [Server]
+    public static Pawn SpawnPawn(string prefab, Vector3 location)
+    {
+        Pawn p = GetPawn(prefab);
+        if(p == null)
+        {
+            return null;
+        }
+
+        GameObject g = Instantiate(p.gameObject);
+        Pawn x = g.GetComponent<Pawn>();
+
+        g.transform.position = location;
+
+        NetworkServer.Spawn(g);
+
+        return x;
+    }
+
+    public static void Dispose()
+    {
+        AllPawns.Clear();
+        EnemyPawns.Clear();
+        PawnCount.Clear();
+        PawnMap.Clear();
+        loaded.Clear();
     }
 }

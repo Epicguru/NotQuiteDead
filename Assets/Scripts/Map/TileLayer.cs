@@ -52,6 +52,10 @@ public class TileLayer : NetworkBehaviour
             {
                 World.Instance.Furniture.PlaceFurniture("Turret", x, y);
             }
+            if (isServer && Input.GetKey(KeyCode.H))
+            {
+                Pawn.SpawnPawn("Caveman", InputManager.GetMousePos());
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Y))

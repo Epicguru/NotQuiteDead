@@ -31,5 +31,6 @@ public class World : NetworkBehaviour
     public void OnDestroy()
     {
         //Instance = null;
+        Pawn.Dispose();
     }
 }
