@@ -6,12 +6,11 @@ using UnityEngine.Networking.Match;
 
 public class MenuNet : MonoBehaviour {
 
-    public NetworkLobbyManager Net;
+    public NetworkManager Net;
 
     public void HostNewGame()
     {
         Net.StartHost();
-        Net.SendReturnToLobby();
     }
 
     public void JoinLocalhost()
