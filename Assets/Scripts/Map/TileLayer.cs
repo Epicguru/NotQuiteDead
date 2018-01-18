@@ -40,6 +40,10 @@ public class TileLayer : NetworkBehaviour
             {
                 SetTile(BaseTile.GetTile("Dirt"), x, y);
             }
+            if (Input.GetKey(KeyCode.T))
+            {
+                SetTile(BaseTile.GetTile("Wood"), x, y);
+            }
             if (Input.GetKey(KeyCode.E))
             {
                 SetTile(null, x, y);
