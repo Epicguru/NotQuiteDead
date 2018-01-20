@@ -6,11 +6,16 @@ using UnityEngine.UI;
 public class GunHUD : MonoBehaviour {
 
     public static GunHUD Instance;
+
+    public Text Title;
+    public Text FireMode;
+    public Text AmmoText;
+    public Image Icon;
+
     public bool Open;
     public float ClosedX;
     public AnimationCurve Curve;
     public float OpenDuration;
-    public Text Text;
     public Color Red, BlinkRed;
 
     private float timer2;
@@ -72,37 +77,51 @@ public class GunHUD : MonoBehaviour {
         if (holding == null)
             return;
         timer2 += Time.deltaTime * 2;
-        string text = GetText();
-        if(Text.text != text)
-        {
-            Text.text = text;
-        }
+        SetText();
     }
 
-    private string GetText()
+    private void SetText()
     {
         if (holding == null)
-            return string.Empty;
+        {
+            AmmoText.text = "-/-";
+            FireMode.text = "---";
+            Title.text = "---";
+            Icon.sprite = null;
+            return;
+        }
 
-        string s = RichText.InColour(holding.Item.Name, Color.white);
-        float percent = (float)holding.Shooting.bulletsInMagazine / (float)holding.Shooting.Capacity.MagazineCapacity;
+        // Title - Name
+        string name = holding.Item.Name;
+
+        // Ammo counter.
+        float percent = holding.Shooting.Capacity.MagazineCapacity <= 3 ? 0f : ((float)holding.Shooting.bulletsInMagazine / (float)holding.Shooting.Capacity.MagazineCapacity);
         bool isLow = percent <= BulletWarningPercentage || holding.Shooting.bulletsInMagazine <= BulletWarningCount;
-        Color colour = Text.color;
+
+        Color colour = AmmoText.color;
         if (isLow)
         {
             bool isBlink = ((int)timer2) % 2 == 0;
             colour = isBlink ? BlinkRed : Red;
         }
-        string maxMagString = holding.Shooting.Capacity.MagazineCapacity + "";
+
+        string maxMagString = holding.Shooting.Capacity.MagazineCapacity.ToString();
         string ammoString = string.Empty + (holding.Shooting.bulletsInMagazine + (holding.Shooting.bulletInChamber ? 1 : 0));
 
         while (ammoString.Length < maxMagString.Length)
         {
-            ammoString = "0" + ammoString;
+            ammoString = '0' + ammoString;
         }
-        s += "\n" + RichText.InColour(ammoString, colour) + "/" + maxMagString;
-        s += "\n" + holding.Shooting.FiringMode;
 
-        return s;
+        string ammo = RichText.InColour(ammoString, colour) + '/' + maxMagString;
+
+        // Firing mode.
+        string fireMode = holding.Shooting.FiringMode.ToString();
+
+        //Apply all
+        AmmoText.text = ammo;
+        FireMode.text = fireMode;
+        Title.text = name;
+        Icon.sprite = holding.Item.ItemIcon;
     }
 }
