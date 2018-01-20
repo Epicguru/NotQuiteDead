@@ -90,14 +90,14 @@ public class Gun : Weapon
 
     public void UpdateData(ItemData data)
     {
-        data.GUN_BulletInChamber = Shooting.bulletInChamber;
+        data.GUN_BulletInChamber = Shooting.BulletInChamber;
         data.GUN_BulletsInMagazine = Shooting.bulletsInMagazine;
         data.GUN_FiringMode = Shooting.firingModeIndex;
     }
 
     public void ApplyData(ItemData data)
     {
-        Shooting.bulletInChamber = data.GUN_BulletInChamber;
+        Shooting.BulletInChamber = data.GUN_BulletInChamber;
         Shooting.bulletsInMagazine = data.GUN_BulletsInMagazine;
         Shooting.firingModeIndex = data.GUN_FiringMode;
     }

@@ -33,9 +33,9 @@ public class BoltActionShooting : GunShooting
     public override void FromAnimReload()
     {
         // Add a bullet...
-        if(bulletInChamber) //... IF there is already one in the chamber! 
+        if(BulletInChamber) //... IF there is already one in the chamber! 
             bulletsInMagazine++;
-        bulletInChamber = true; // After first bullet, chamber is full.
+        BulletInChamber = true; // After first bullet, chamber is full.
 
         if (!CanReload())
         {

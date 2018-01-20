@@ -57,7 +57,7 @@ public class GunAnimation : NetworkBehaviour
 
         if(SingleShotsPending > 0)
         {
-            if(gun.Shooting.bulletInChamber == false && hasAuthority)
+            if(gun.Shooting.BulletInChamber == false && hasAuthority)
             {
                 SingleShotsPending = 0;
             }

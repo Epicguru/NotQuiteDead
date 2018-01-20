@@ -106,7 +106,7 @@ public class GunHUD : MonoBehaviour {
         }
 
         string maxMagString = holding.Shooting.Capacity.MagazineCapacity.ToString();
-        string ammoString = string.Empty + (holding.Shooting.bulletsInMagazine + (holding.Shooting.bulletInChamber ? 1 : 0));
+        string ammoString = string.Empty + (holding.Shooting.bulletsInMagazine + (holding.Shooting.BulletInChamber ? 1 : 0));
 
         while (ammoString.Length < maxMagString.Length)
         {

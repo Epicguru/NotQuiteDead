@@ -8,21 +8,30 @@ using UnityEngine.Networking;
 [DisallowMultipleComponent]
 public class GunShooting : RotatingItem
 {
+    [Header("Firing Modes")]
+    [ReadOnly]
     public FiringMode FiringMode = FiringMode.SEMI;
+    public FiringMode[] AllowedModes = new FiringMode[] { FiringMode.SEMI };
+
+    [Header("Bullet Firing")]
     public Transform DefaultBulletSpawn;
+    [Tooltip("If true, when the reload animation end, if there is not a round in the chamber then the first bullet from the magazine is automatically chambered, so the chamber animation never plays.")]
+    public bool ReloadAutoChambers = false;
+    [Tooltip("If true, when the reload animation starts, the chambered round is discarded (not visually), which could cause the chamber animation every reload unless ReloadAutoChambers is set to true.")]
+    public bool ReloadEjectsChambered = false;
+
+    [Header("Visuals")]
+    public float GunBlockedDistance = 1.2f;
     public GunDamage Damage;
     public GunCapacity Capacity;
     public ShellData Shells;
     public GunAudio Audio;
-    public FiringMode[] AllowedModes = new FiringMode[] { FiringMode.SEMI };
-    public float GunBlockedDistance = 1.2f;
     [HideInInspector] public AudioSource AudioSource;
 
-    //[HideInInspector]
+    [ReadOnly]
     public int bulletsInMagazine;
 
-    //[HideInInspector]
-    public bool bulletInChamber;
+    public bool BulletInChamber;
 
     private Gun gun;
     private new GunAnimation animation;
@@ -30,8 +39,6 @@ public class GunShooting : RotatingItem
     private bool inBurstFire = false; // Are we in the middle of a burst fire?
     private int burstFireRemaining;
     private float timer;
-    [SerializeField]
-    [Range(0f, 1f)]
     private float shotInaccuracy;
 
     [HideInInspector]
@@ -78,7 +85,7 @@ public class GunShooting : RotatingItem
         FiringMode = AllowedModes[firingModeIndex];
 
         bool requestingShoot = ShootNow();
-        bool ready = animation.IsAiming && bulletInChamber && !animation.IsDropped && !animation.IsChambering && !animation.IsReloading;
+        bool ready = animation.IsAiming && BulletInChamber && !animation.IsDropped && !animation.IsChambering && !animation.IsReloading;
 
         // Problem: We tell server to shoot more than once, beucase:
         // 1. We request one shot, one frame.
@@ -104,8 +111,8 @@ public class GunShooting : RotatingItem
             animation.AnimShoot(false);
         }
 
-        bool requestingChamber = !bulletInChamber && CanChamber();
-        ready = !animation.IsChambering && !animation.IsEquipping && !animation.IsAiming;
+        bool requestingChamber = !BulletInChamber && CanChamber();
+        ready = !animation.IsChambering && !animation.IsEquipping && !animation.IsAiming && !ReloadAutoChambers;
         if (requestingChamber && ready)
         {
             // Chamber new bullet!
@@ -117,6 +124,11 @@ public class GunShooting : RotatingItem
 
         if(requestingReload && ready)
         {
+            if (ReloadEjectsChambered)
+            {
+                BulletInChamber = false;
+            }
+
             // Reload!
             animation.AnimReload();
         }
@@ -175,7 +187,7 @@ public class GunShooting : RotatingItem
                     {
                         // Start salvo of bullets!
                         // Check if we can shoot...
-                        if (!bulletInChamber) // Not the best test...
+                        if (!BulletInChamber) // Not the best test...
                             return false;
 
                         inBurstFire = true;
@@ -215,7 +227,7 @@ public class GunShooting : RotatingItem
         }
 
         bulletsInMagazine -= Capacity.BulletsConsumed;
-        bulletInChamber = true;
+        BulletInChamber = true;
     }
 
     public Transform GetBulletSpawn()
@@ -270,7 +282,7 @@ public class GunShooting : RotatingItem
         // LOCAL CLIENT ONLY!!!
 
         // Remove bullet from chamber...
-        bulletInChamber = false;
+        BulletInChamber = false;
 
         // Add one to shot count
         shotsFired++;
@@ -282,7 +294,7 @@ public class GunShooting : RotatingItem
         if(CanChamber())
         {
             bulletsInMagazine -= Capacity.BulletsConsumed;
-            bulletInChamber = true;
+            BulletInChamber = true;
         }
     }
 
@@ -324,7 +336,7 @@ public class GunShooting : RotatingItem
 
         int bullets = bulletsInMagazine;
         if (Capacity.ChamberCountsAsMag)
-            if (bulletInChamber)
+            if (BulletInChamber)
                 bullets++;
 
         if (bullets < Capacity.MagazineCapacity)
@@ -342,8 +354,19 @@ public class GunShooting : RotatingItem
             return;
         }
 
-        // TODO improve me.
+        // Full up out current magazine.
         bulletsInMagazine = Capacity.MagazineCapacity;
+
+        // If this is a self chambering gun, such as a bolt action sniper rifle, chamber a round.
+        // Only if not already chambered.
+        if (ReloadAutoChambers)
+        {
+            if(!BulletInChamber && bulletsInMagazine >= 1)
+            {
+                BulletInChamber = true;
+                bulletsInMagazine--;
+            }
+        }
     }
 
     public void FromAnimSpawnShell()
