@@ -7,7 +7,9 @@ public class ActionHUD : MonoBehaviour {
 
     public float FadeTime;
     public AnimationCurve Curve;
-    [HideInInspector] public Text Text;
+
+    public Text Text;
+    public CanvasRenderer[] Renderers;
 
     private float timer;
     private Color tempColour = new Color();
@@ -25,7 +27,13 @@ public class ActionHUD : MonoBehaviour {
         Text = GetComponentInChildren<Text>();
     }
 
-    public void SetText(string text)
+    public void OnDestroy()
+    {
+        if(Instance == this)
+            Instance = null;
+    }
+
+    private void SetText(string text)
     {
         if(Text.text != text)
             Text.text = text;
@@ -33,15 +41,22 @@ public class ActionHUD : MonoBehaviour {
 
     public void Update()
     {
-        timer += Time.deltaTime;
+        timer += Time.unscaledDeltaTime;
         float p = 1 - Mathf.Clamp(timer / FadeTime, 0, 1);
 
+        if(timer < 0.1f)
+        {
+            p = 1f;
+        }
 
         tempColour.r = 1;
         tempColour.g = 1;
         tempColour.b = 1;
         tempColour.a = Curve.Evaluate(p);
-        //Text.color = tempColour;
-        GetComponentInChildren<CanvasRenderer>().SetColor(tempColour);
+
+        foreach(var r in this.Renderers)
+        {
+            r.SetColor(tempColour);
+        }
     }
 }

@@ -8,6 +8,8 @@ public class DebugText : MonoBehaviour {
 
     public static DebugText _Instance;
 
+    public Image Box;
+
     public bool Active;
 
     private StringBuilder sB = new StringBuilder();
@@ -16,6 +18,14 @@ public class DebugText : MonoBehaviour {
     public void Awake()
     {
         _Instance = this;
+    }
+
+    public void OnDestroy()
+    {
+        if(_Instance == this)
+        {
+            _Instance = null;
+        }
     }
 
     public static void Log(string text)
@@ -40,6 +50,8 @@ public class DebugText : MonoBehaviour {
         {
             Active = !Active;
         }
+
+        Box.enabled = Active;
 
         Text.enabled = Active;
     }
