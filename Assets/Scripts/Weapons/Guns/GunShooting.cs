@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 [RequireComponent(typeof(AudioSource))]
 [DisallowMultipleComponent]
-public class GunShooting : RotatingWeapon
+public class GunShooting : RotatingItem
 {
     public FiringMode FiringMode = FiringMode.SEMI;
     public Transform DefaultBulletSpawn;
@@ -572,7 +572,7 @@ public class GunShooting : RotatingWeapon
         return angle;
     }
 
-    public override bool ShouldRotateNow()
+    public override bool AllowRotateNow()
     {
         return !animation.IsReloading && !animation.IsChambering;
     }

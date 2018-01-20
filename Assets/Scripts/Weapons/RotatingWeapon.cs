@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using UnityEngine.Networking;
 
-public abstract class RotatingWeapon : NetworkBehaviour
+[RequireComponent(typeof(Item))]
+public abstract class RotatingItem : NetworkBehaviour
 {
-    public abstract bool ShouldRotateNow();
+    public abstract bool AllowRotateNow();
 
     public virtual bool ForceRotateNow()
     {

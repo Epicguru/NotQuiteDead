@@ -1,32 +1,43 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(Item))]
-public class Throwable : NetworkBehaviour
+public class Throwable : RotatingItem
 {
-    //[HideInInspector]
+    [HideInInspector]
     public bool DoneEquipping;
-    //[HideInInspector]
+    [HideInInspector]
     public bool PreparingToThrow;
-    //[HideInInspector]
+    [HideInInspector]
     public bool PreparedToThrow;
+    [HideInInspector]
+    public bool HasThrown;
 
+    [Header("References")]
     public GameObject Prefab;
     public Transform SpawnPostion;
     public Animator Anim;
+
+    [Header("Throwing")]
+    public AnimationCurve AimCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+    public float AimTime = 0.2f;
 
     private Item Item;
 
     public void Start()
     {
-        Item = GetComponent<Item>();
+        Item = GetComponent<Item>();        
     }
 
     public void Update()
     {
         // TODO MAKE ME DECENT!
+
+        transform.localRotation = Quaternion.identity;
+
         if (!hasAuthority)
             return;
         if (!Item.IsEquipped())
@@ -72,8 +83,11 @@ public class Throwable : NetworkBehaviour
 
     public void Anim_Throw()
     {
-        if(hasAuthority)
+        HasThrown = true;
+        if (hasAuthority)
+        {
             SpawnInstance();
+        }
     }
 
     public void Anim_DoneEquipping()
@@ -87,16 +101,6 @@ public class Throwable : NetworkBehaviour
             return;
         // Remove from holding, completely destroy...
         GetComponentInParent<PlayerHolding>().CmdDrop(false, true, Player.Local.gameObject, new ItemData()); // Completely destroy this object...
-    }
-
-    [Client]
-    private void SpawnInstance()
-    {
-        if (SpawnPostion == null)
-            return;
-
-        // Make new object.
-        CmdSpawnPrefab(Player.Local.gameObject, SpawnPostion.position, SpawnPostion.rotation, InputManager.GetMousePos());
 
         // Look for new throwable of same type in inventory, and if we find one...
         InventoryItem i = PlayerInventory.inv.Inventory.GetOfType(Item.Prefab);
@@ -107,6 +111,16 @@ public class Throwable : NetworkBehaviour
         }
     }
 
+    [Client]
+    private void SpawnInstance()
+    {
+        if (SpawnPostion == null)
+            return;
+
+        // Make new object.
+        CmdSpawnPrefab(Player.Local.gameObject, SpawnPostion.position, SpawnPostion.rotation, InputManager.GetMousePos());
+    }
+
     [Command]
     public void CmdSpawnPrefab(GameObject player, Vector2 position, Quaternion rotation, Vector2 targetPos)
     {
@@ -115,5 +129,25 @@ public class Throwable : NetworkBehaviour
         x.GetComponent<ThrowableInstance>().StartPosition = position;
         x.transform.position = position;
         NetworkServer.Spawn(x);
+    }
+
+    public override bool AllowRotateNow()
+    {
+        return !HasThrown && (DoneEquipping && (PreparingToThrow || PreparedToThrow));
+    }
+
+    public override bool ForceRotateNow()
+    {
+        return PreparingToThrow;
+    }
+
+    public override float GetAimTime()
+    {
+        return AimTime;
+    }
+
+    public override float GetCurvedTime(float rawTime)
+    {
+        return AimCurve.Evaluate(rawTime);
     }
 }

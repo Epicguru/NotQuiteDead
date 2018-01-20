@@ -104,7 +104,6 @@ public class PlayerHolding : NetworkBehaviour
         }
     }
 
-    // TODO network!
     [Command]
     public void CmdDrop(bool drop, bool destroy, GameObject localPlayer, ItemData data)
     {
@@ -189,7 +188,7 @@ public class PlayerHolding : NetworkBehaviour
             return;
         }            
 
-        RotatingWeapon r = Item.GetComponent<RotatingWeapon>();
+        RotatingItem r = Item.GetComponent<RotatingItem>();
         if (r == null)
         {
             // Is not rotating weapon, quit.
@@ -204,7 +203,7 @@ public class PlayerHolding : NetworkBehaviour
             // Is rotating weapon, activate.
 
             // Detect aiming...
-            if ((InputManager.InputPressed("Aim") || r.ForceRotateNow()) && r.ShouldRotateNow())
+            if ((InputManager.InputPressed("Aim") || r.ForceRotateNow()) && r.AllowRotateNow())
             {
                 // Increate percentage and lerp.
                 timer += Time.deltaTime;                
@@ -214,17 +213,14 @@ public class PlayerHolding : NetworkBehaviour
             {
                 timer -= Time.deltaTime;
                 looking.Looking = false;
+                DebugText.Log("Timer is lowering, is now " + timer + " / " + r.GetAimTime() + ", lerp is " + lerp);
             }
 
-            if (timer > r.GetAimTime())
-                timer = r.GetAimTime();
-            if (timer < 0)
-                timer = 0;
+            timer = Mathf.Clamp(timer, 0f, r.GetAimTime());
 
             float p = timer / r.GetAimTime();
 
             lerp = r.GetCurvedTime(p);
-
 
             // Finally send angle update call!
             SendAngle(); // Does not send every frame.

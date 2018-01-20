@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-public class BowAiming : RotatingWeapon
+public class BowAiming : RotatingItem
 {
     public Bow Bow;
 
@@ -22,7 +22,7 @@ public class BowAiming : RotatingWeapon
         return Bow.Released || Bow.InFire;
     }
 
-    public override bool ShouldRotateNow()
+    public override bool AllowRotateNow()
     {
         return true; // TODO FIXME
     }
