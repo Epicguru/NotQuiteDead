@@ -72,7 +72,7 @@ public class GunAnimation : NetworkBehaviour
             animator.SetBool(Reload, IsRecursiveReload);
         }
 
-        Hand.SetEquipHandRender(transform, !IsDropped);
+        Hand.RenderHands(transform, !IsDropped);
 
         if (!isServer)
             return;

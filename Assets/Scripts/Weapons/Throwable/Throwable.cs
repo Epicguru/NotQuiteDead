@@ -34,14 +34,28 @@ public class Throwable : RotatingItem
 
     public void Update()
     {
-        // TODO MAKE ME DECENT!
-
         transform.localRotation = Quaternion.identity;
 
         if (!hasAuthority)
             return;
         if (!Item.IsEquipped())
+        {
+            // Item is on the gorund...
+
+            // Don't render hands.
+            Hand.RenderHands(transform, false);
+
+            // Play the dropped animation.
+            Anim.SetBool("Dropped", true);
             return;
+        }
+        else
+        {
+            // Make sure that the animator is not in the dropped mode.
+            Anim.SetBool("Dropped", false);
+
+            // Assume that hands are rendering, the y should be...
+        }
 
         // Wait until it is equipped.
         if (!DoneEquipping)

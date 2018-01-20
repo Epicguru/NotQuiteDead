@@ -13,7 +13,7 @@ public class Hand : MonoBehaviour {
 
     private SpriteRenderer r;
 
-    public static void SetEquipHandRender(Transform parent, bool flag)
+    public static void RenderHands(Transform parent, bool flag)
     {
         foreach(Hand hand in parent.GetComponentsInChildren<Hand>())
         {

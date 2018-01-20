@@ -37,7 +37,7 @@ public class Bow : Weapon {
     public void Update()
     {
         Animator.SetBool("Dropped", !Item.IsEquipped());
-        Hand.SetEquipHandRender(transform, Item.IsEquipped());
+        Hand.RenderHands(transform, Item.IsEquipped());
 
         if (!Item.IsEquipped())
             return;

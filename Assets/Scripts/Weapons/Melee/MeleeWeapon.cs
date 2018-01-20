@@ -44,7 +44,7 @@ public class MeleeWeapon : Weapon {
         if (IsDropped)
         {
             Animation.Animator.SetBool(Animation.Dropped, true);
-            Hand.SetEquipHandRender(transform, false);
+            Hand.RenderHands(transform, false);
         }
         if (!Item.IsEquipped() && isServer)
         {
