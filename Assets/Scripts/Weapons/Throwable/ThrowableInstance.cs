@@ -4,37 +4,37 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(NetworkIdentity))]
-public class ThrowableInstance : NetworkBehaviour {
-
+public class ThrowableInstance : NetworkBehaviour
+{
     [SyncVar]
-    public Vector2 Target; // Target position.
-    [SyncVar]
-    public Vector2 StartPosition; // Starting position
-    public float ThrowTime = 1f;
-    public AnimationCurve Curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+    public Vector2 TargetPosition;
+    public float Speed = 15f;
+    public float Rotation;
 
-    public delegate void UponHitTarget();
-    public event UponHitTarget AuthorityHitTarget;
-
+    private Vector2 startPos;
+    private float p;
+    private float time;
     private float timer;
+
+    public void Start()
+    {
+        startPos = transform.position;
+        float distance = Vector2.Distance(transform.position, TargetPosition);
+        time = distance / Speed; // About as much physics as I know :/
+    }
 
     public void Update()
     {
+        if (!isServer)
+            return;
+
+        transform.Rotate(0, 0, Rotation * Time.deltaTime);
+
+        // Move towards the target.
         timer += Time.deltaTime;
 
-        // Get position based on time.
-        float p = Mathf.Clamp(timer / ThrowTime, 0f, 1f);
-        // Evaluate using curve to allow custom motion.
-        float x = Curve.Evaluate(p);
-        
-        transform.position = Vector2.Lerp(StartPosition, Target, x);
+        float p = Mathf.Clamp(timer / time, 0f, 1f);
+        Vector2 newPos = Vector2.Lerp(startPos, TargetPosition, p);
 
-        if(p >= 1f)
-        {
-            // Done!
-            if(isServer)
-                if (AuthorityHitTarget != null)
-                    AuthorityHitTarget();
-        }
     }
 }
