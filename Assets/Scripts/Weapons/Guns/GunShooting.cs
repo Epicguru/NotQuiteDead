@@ -15,7 +15,7 @@ public class GunShooting : RotatingItem
 
     [Header("Bullet Firing")]
     public Transform DefaultBulletSpawn;
-    [Tooltip("If true, when the reload animation end, if there is not a round in the chamber then the first bullet from the magazine is automatically chambered, so the chamber animation never plays.")]
+    [Tooltip("If true, when the reload animation ends, if there is not a round in the chamber then the first bullet from the magazine is automatically chambered, so the chamber animation never plays.")]
     public bool ReloadAutoChambers = false;
     [Tooltip("If true, when the reload animation starts, the chambered round is discarded (not visually), which could cause the chamber animation every reload unless ReloadAutoChambers is set to true.")]
     public bool ReloadEjectsChambered = false;

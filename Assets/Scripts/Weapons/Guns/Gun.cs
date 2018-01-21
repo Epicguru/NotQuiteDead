@@ -105,8 +105,8 @@ public class Gun : Weapon
     public void SetDataDefaults(ItemData data)
     {
         // Set gun data.
-        data.GUN_BulletInChamber = false;
-        data.GUN_BulletsInMagazine = Shooting.Capacity.MagazineCapacity;
+        data.GUN_BulletInChamber = Shooting.ReloadAutoChambers;
+        data.GUN_BulletsInMagazine = Shooting.Capacity.MagazineCapacity - (Shooting.ReloadAutoChambers ? 1 : 0);
         data.GUN_FiringMode = 0;
     }
 }
