@@ -43,11 +43,7 @@ public class TileLayer : NetworkBehaviour
             if (Input.GetKey(KeyCode.T))
             {
                 SetTile(BaseTile.GetTile("Wood"), x, y);
-            }
-            if (Input.GetKey(KeyCode.E))
-            {
-                SetTile(null, x, y);
-            }
+            }            
             if (Input.GetKey(KeyCode.F))
             {
                 World.Instance.Furniture.PlaceFurniture("Torch", x, y);
@@ -55,11 +51,26 @@ public class TileLayer : NetworkBehaviour
             if (Input.GetKey(KeyCode.G))
             {
                 World.Instance.Furniture.PlaceFurniture("Turret", x, y);
-            }
-            if (isServer && Input.GetKey(KeyCode.H))
+            }            
+        }
+
+        if (Input.GetKey(KeyCode.E))
+        {
+            if (isServer)
             {
-                Pawn.SpawnPawn("Caveman", InputManager.GetMousePos());
+                Furniture f = World.Instance.Furniture.GetFurnitureAt(x, y);
+                if (f != null)
+                {
+                    Destroy(f.gameObject);
+                }
             }
+            if(CanPlaceTile(x, y))
+                SetTile(null, x, y);
+        }
+
+        if (isServer && Input.GetKeyDown(KeyCode.H))
+        {
+            Pawn.SpawnPawn("Caveman", InputManager.GetMousePos());
         }
 
         if (Input.GetKeyDown(KeyCode.Y))
