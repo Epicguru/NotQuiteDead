@@ -52,6 +52,12 @@ public class Workbench : MonoBehaviour
         PopulateAvailable();
     }
 
+    public void OnDestroy()
+    {
+        if (Bench == this)
+            Bench = null;
+    }
+
     public void Update()
     {
         if(InputManager.InputDown("Escape", true))
@@ -81,7 +87,7 @@ public class Workbench : MonoBehaviour
         }
     }
 
-    public void OpenChange()
+    private void OpenChange()
     {
         Container.gameObject.SetActive(Open);
         InputManager.Active = !Open;

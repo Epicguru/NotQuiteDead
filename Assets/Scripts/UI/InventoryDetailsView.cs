@@ -45,7 +45,7 @@ public class InventoryDetailsView : MonoBehaviour
         string desc = BuildDescription(item);
         
         Text.text = desc;
-        Title.text = item.Name;
+        Title.text = RichText.InColour(item.Name, ItemRarityUtils.GetColour(item.Rarity));
 
         SetStats(BuildStats(item));
 
@@ -117,11 +117,11 @@ public class InventoryDetailsView : MonoBehaviour
                 stats.Add(new DetailStat { Icon = AccuracyIcon, Key = "Accuracy", Value = gun.Shooting.Damage.Inaccuracy.x.ToString() + "° innacuracy" });
 
             if (gun.Shooting.Damage.DamageFalloff != 1f)
-                stats.Add(new DetailStat { Icon = DamageFalloffIcon, Key = "Damage Falloff", Value = (int)(100f * (1f - gun.Shooting.Damage.DamageFalloff)) + "% less damage" });
+                stats.Add(new DetailStat { Icon = DamageFalloffIcon, Key = "Damage Falloff", Value = Mathf.CeilToInt(100f * (1f - gun.Shooting.Damage.DamageFalloff)) + "% less damage" });
             if(gun.Shooting.Damage.Penetration != 1)
             {
                 stats.Add(new DetailStat { Icon = PenetrationIcon, Key = "Penetration", Value = gun.Shooting.Damage.Penetration.ToString() });
-                stats.Add(new DetailStat { Icon = PenetrationDamageFalloffIcon, Key = "Penetration Damage Falloff", Value = (int)(100f * (1f - gun.Shooting.Damage.PenetrationFalloff)) + "%" });
+                stats.Add(new DetailStat { Icon = PenetrationDamageFalloffIcon, Key = "Penetration Damage Falloff", Value = Mathf.CeilToInt(100f * (1f - gun.Shooting.Damage.PenetrationFalloff)) + "%" });
             }
         }
 

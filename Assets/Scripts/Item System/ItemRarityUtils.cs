@@ -27,6 +27,12 @@ public class ItemRarityUtils : MonoBehaviour
         instance = this;
     }
 
+    public void OnDestroy()
+    {
+        if (instance == this)
+            instance = null;
+    }
+
     public void Start()
     {
         Item.RegisterItems();

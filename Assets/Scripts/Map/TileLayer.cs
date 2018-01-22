@@ -48,6 +48,10 @@ public class TileLayer : NetworkBehaviour
             {
                 World.Instance.Furniture.PlaceFurniture("Torch", x, y);
             }
+            if (Input.GetKey(KeyCode.J))
+            {
+                World.Instance.Furniture.PlaceFurniture("Workbench", x, y);
+            }
             if (Input.GetKey(KeyCode.G))
             {
                 World.Instance.Furniture.PlaceFurniture("Turret", x, y);

@@ -21,6 +21,12 @@ public class PlayerInventory : MonoBehaviour
         inv = this;
     }
 
+    public void OnDestroy()
+    {
+        if (inv == this)
+            inv = null;
+    }
+
     public void Update()
     {
         if (!Inventory.QSI.Open && !Inventory.Options.isActiveAndEnabled && InputManager.InputDown("Inventory", true))
