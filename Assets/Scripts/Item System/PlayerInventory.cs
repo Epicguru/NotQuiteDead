@@ -23,7 +23,7 @@ public class PlayerInventory : MonoBehaviour
 
     public void Update()
     {
-        if (InputManager.InputDown("Inventory", true))
+        if (!Inventory.QSI.Open && !Inventory.Options.isActiveAndEnabled && InputManager.InputDown("Inventory", true))
         {
             if (inv.Inventory.gameObject.activeSelf)
             {
@@ -38,10 +38,23 @@ public class PlayerInventory : MonoBehaviour
         }
         if(!Inventory.QSI.Open && InputManager.InputDown("Escape", true))
         {
-            if (inv.Inventory.gameObject.activeSelf)
+            if (Inventory.DetailsView.isActiveAndEnabled)
             {
-                // Close
-                Close();
+                // Close the details view.
+                Inventory.DetailsView.Exit();
+            }
+            else if (Inventory.Options.isActiveAndEnabled)
+            {
+                // Close options panel.
+                Inventory.Options.Close();
+            }
+            else
+            {
+                if (inv.Inventory.gameObject.activeSelf)
+                {
+                    // Close
+                    Close();
+                }
             }
         }
     }

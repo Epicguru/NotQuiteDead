@@ -42,19 +42,16 @@ public class Inventory : MonoBehaviour
     [Tooltip("The maximum combined weight of all items in this inventory. Negaitve numbers means that there is no limit.")]
     public float MaxWeight = 100f; // If negative, ignored.
 
+    public ItemOptionsPanel Options;
+
     [HideInInspector]
     public List<InventoryItem> Contents = new List<InventoryItem>();
+
     private float weight;
     private int items;
-    [HideInInspector] public ItemOptionsPanel Options;
 
     public delegate void OnContentsChange();
     public event OnContentsChange ContentsChange;
-
-    public void Start()
-    {
-        Options = GetComponentInChildren<ItemOptionsPanel>(true);
-    }
 
     public void Update()
     {
