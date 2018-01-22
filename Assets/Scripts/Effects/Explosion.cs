@@ -16,7 +16,7 @@ public class Explosion : MonoBehaviour {
         if (NetworkServer.active)
         {
             // TODO FIXME!
-            ExplosionDamage(transform.position, 10, "Explosion", 20, 300, AnimationCurve.Linear(0, 1, 1, 0));
+            ExplosionDamage(transform.position, null, 10, "Explosion", 20, 300, AnimationCurve.Linear(0, 1, 1, 0));
         }
 
         Player.Local.ExplosionAt(transform.position);
@@ -34,22 +34,36 @@ public class Explosion : MonoBehaviour {
     }
 
     private static List<Health> HitObjects = new List<Health>();
-    public void ExplosionDamage(Vector2 point, float radius, string killer, float minDamage, float maxDamage, AnimationCurve Curve)
+    public void ExplosionDamage(Vector2 point, string team, float radius, string killer, float minDamage, float maxDamage, AnimationCurve Curve)
     {
         Collider2D[] colliders = Physics2D.OverlapCircleAll(point, radius);
 
         foreach(Collider2D c in colliders)
         {
+            bool canDamage = Health.CanDamageObject(c, team);
+            if (!canDamage)
+                continue;
             Health h = c.GetComponentInParent<Health>();
-            if (h == null)
-                continue;
-            if (!h.CanHit)
-                continue;
-            if (h.CannotHit.Contains(c))
-                continue;
             if (HitObjects.Contains(h))
                 continue;
-            // TODO team damage?
+
+            // Raycast from the point of the explosion to the target collider, to ensure that it can be hit.
+            RaycastHit2D[] hits = Physics2D.LinecastAll(point, c.transform.position);
+            bool pathToTarget = true;
+            foreach(var hit in hits)
+            {
+                // Just check if any are not triggers.
+                if(hit.collider.isTrigger == false)
+                {
+                    if(hit.collider != c)
+                    {
+                        pathToTarget = false;
+                        break;
+                    }
+                }
+            }
+            if (!pathToTarget)
+                continue;
 
             float distanceFromCenter = Vector2.Distance(point, c.transform.position);
 
