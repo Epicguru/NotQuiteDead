@@ -33,7 +33,8 @@ public class CameraZoom : MonoBehaviour {
 
     public void Update()
     {
-        Size -= (Input.mouseScrollDelta).y * (Size / 10f);
+        if (!PlayerInventory.IsOpen)
+            Size -= (Input.mouseScrollDelta).y * (Size / 10f);
 
         timer += Time.unscaledDeltaTime;
         while(timer >= 1f / 60f)

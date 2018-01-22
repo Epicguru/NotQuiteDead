@@ -70,12 +70,12 @@ public class InventoryDetailsView : MonoBehaviour
             GameObject g = Instantiate(StatPrefab, Parent);
             spawned.Add(g);
             g.GetComponent<DetailsStatistic>().Set(s);
-            g.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -55 * i++ - 5);
+            g.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -35 * i++ - 5);
         }
 
         int count = stats.Count;
 
-        StatContainer.sizeDelta = new Vector2(0f, 5 + 55 * count);
+        StatContainer.sizeDelta = new Vector2(0f, 10 + 35 * count);
     }
 
     private List<DetailStat> BuildStats(Item item)
