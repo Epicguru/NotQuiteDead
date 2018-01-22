@@ -11,5 +11,6 @@ public enum PoolType
     EXPLOSION,
     FLYING_MAG,
     ARROW,
-    HIT_EFFECT
+    HIT_EFFECT,
+    DAMAGE_NUMBER
 }

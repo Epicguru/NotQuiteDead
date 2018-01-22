@@ -261,7 +261,7 @@ public class Player : NetworkBehaviour
     {
         // 'Respawn'
         Health.CmdHeal(Health.GetMaxHealth());
-        transform.position = Random.insideUnitCircle * 3f;
+        transform.position = (((Vector2)Random.insideUnitSphere).normalized) * 3f;
         Debug.Log("Player died:");
         string report = Health.GetDamageReport("killed");
         Debug.Log("Local player was " + report);

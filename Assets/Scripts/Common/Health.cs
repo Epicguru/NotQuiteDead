@@ -13,7 +13,7 @@ public class Health : NetworkBehaviour {
     */
 
     [SerializeField]
-    [SyncVar]
+    [SyncVar(hook = "HealthChange")]
     private float health = 100;
     [SyncVar]
     [SerializeField]
@@ -24,6 +24,8 @@ public class Health : NetworkBehaviour {
     public bool CanPenetrate = true; // TODO MAKE IN GUN SCRIPT!!!!
     [SyncVar]
     public bool CanHit = true;
+
+    public bool SpawnDamageNumbers = true;
 
     // START SERVER ONLY
     private string source;
@@ -170,6 +172,22 @@ public class Health : NetworkBehaviour {
                 // Dead message
                 // Send message to client who has authority
                 this.DeadEventServer(source, secondary, timeSinceSource, timeSinceSecondary);
+            }
+        }
+    }
+
+    private void HealthChange(float newHealth)
+    {
+        float change = newHealth - health;
+        // For example 80 - 100 gives -20.
+
+        health = newHealth;
+
+        if (SpawnDamageNumbers)
+        {
+            if(change < 0)
+            {
+                DamageNumber.Spawn(transform.position, change * -1);
             }
         }
     }
