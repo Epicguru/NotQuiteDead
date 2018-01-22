@@ -13,6 +13,25 @@ public class InventoryDetailsView : MonoBehaviour
     public Text Title;
     public Text Text;
 
+    public Sprite AccuracyIcon;
+    public Sprite RarityIcon;
+    public Sprite DamageIcon;
+    public Sprite DamageFalloffIcon;
+    public Sprite PenetrationDamageFalloffIcon;
+    public Sprite CapacityIcon;
+    public Sprite PelletsPerShotIcon;
+    public Sprite PenetrationIcon;
+    public Sprite RangeIcon;
+    public Sprite WeaponTypeIcon;
+    public Sprite AttachmentTypeIcon;
+    public Sprite AttachmentTweakIcon;
+
+    public Transform Parent;
+    public GameObject StatPrefab;
+    public RectTransform StatContainer;
+
+    private List<GameObject> spawned = new List<GameObject>();
+
     public void Enter(InventoryItem item)
     {
         this.Enter(item.Item);
@@ -22,68 +41,112 @@ public class InventoryDetailsView : MonoBehaviour
     {
         Debug.Log("Opening details for : " + item.Name);
         gameObject.SetActive(true);
-        // Make description.
 
-        string description = "";
+        string desc = BuildDescription(item);
+        
+        Text.text = desc;
+        Title.text = item.Name;
 
-        // Item first, static.
+        SetStats(BuildStats(item));
 
-        // TODO - We need a system to keep data between inventory items and real items.
-        // ATM the inventory item can only read prefab data, and not real data such as durability
-        // bullets in gun etc.
+        Sprite spr = Atlas.GetSprite(item.ItemIcon.name);
+        Image.sprite = spr == null ? item.ItemIcon : spr;
+    }
 
-        description += RichText.InBold("Rarity - ") + RichText.InColour(item.Rarity.ToString(), ItemRarityUtils.GetColour(item.Rarity)) + "\n";
-        description += RichText.InBold("Weight - ") + item.InventoryInfo.Weight + "Kg\n";
-        if(item.GetComponent<Weapon>() != null)
+    private void SetStats(List<DetailStat> stats)
+    {
+        foreach(GameObject g in spawned)
         {
-            description += RichText.InBold("Weapon Type - ") + item.GetComponent<Weapon>().Type + "\n";
+            Destroy(g);
         }
-        if(item.GetComponent<MeleeAttack>() != null)
+        spawned.Clear();
+
+        if (stats == null)
+            return;
+
+        int i = 0;
+        foreach(DetailStat s in stats)
         {
-            description += RichText.InBold("Damage - ") + item.GetComponent<MeleeAttack>().Damage.Damage + "\n";
+            GameObject g = Instantiate(StatPrefab, Parent);
+            spawned.Add(g);
+            g.GetComponent<DetailsStatistic>().Set(s);
+            g.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -55 * i++ - 5);
         }
+
+        int count = stats.Count;
+
+        StatContainer.sizeDelta = new Vector2(0f, 5 + 55 * count);
+    }
+
+    private List<DetailStat> BuildStats(Item item)
+    {
+        List<DetailStat> stats = new List<DetailStat>();
+
+        // Rarity, all items have this.
+        stats.Add(new DetailStat { Icon = RarityIcon, Key = "Rarity", Value = item.Rarity.ToString() });
+
+        // Melee weapons damage stat.
+        MeleeAttack melee = item.GetComponent<MeleeAttack>();
+        if(melee != null)
+        {
+            stats.Add(new DetailStat { Icon = DamageIcon, Key = "Melee Damage", Value = melee.Damage.Damage.ToString() });
+        }
+
+        // Gun stats:
         Gun gun = item.GetComponent<Gun>();
         if(gun != null)
         {
-            GunDamage damage = gun.GetComponent<GunShooting>().Damage;
-            GunCapacity capacity = gun.GetComponent<GunShooting>().Capacity;
-            description += RichText.InBold("Gun Type - ") + gun.GunType.ToString().Replace('_', ' ') + "\n";
-            description += RichText.InBold("Damage - ") + damage.Damage;
-            if (damage.BulletsShareDamage && capacity.BulletsPerShot.y > 1)
+            stats.Add(new DetailStat { Icon = WeaponTypeIcon, Key = "Gun Type", Value = gun.GunType.ToString().Replace('_', ' ') });
+            stats.Add(new DetailStat { Icon = DamageIcon, Key = "Base Damage", Value = gun.Shooting.Damage.Damage.ToString() + ((gun.Shooting.Capacity.BulletsPerShot.x > 1 || gun.Shooting.Capacity.BulletsPerShot.y > 1) ? (gun.Shooting.Damage.BulletsShareDamage ? " over all pellets." : " per pellet.") : "" )});
+            if((gun.Shooting.Capacity.BulletsPerShot.x > 1 || gun.Shooting.Capacity.BulletsPerShot.y > 1))
             {
-                description += " total over " + ((capacity.BulletsPerShot.x == capacity.BulletsPerShot.y) ? capacity.BulletsPerShot.x + "" : (capacity.BulletsPerShot.x + "-" + capacity.BulletsPerShot.y)) + " projectiles per shot";
+                if((gun.Shooting.Capacity.BulletsPerShot.x != gun.Shooting.Capacity.BulletsPerShot.y))
+                {
+                    stats.Add(new DetailStat { Icon = PelletsPerShotIcon, Key = "Pellets Per Shot", Value = gun.Shooting.Capacity.BulletsPerShot.x + " to " + gun.Shooting.Capacity.BulletsPerShot.y });
+                }
+                else
+                {
+                    stats.Add(new DetailStat { Icon = PelletsPerShotIcon, Key = "Pellets Per Shot", Value = gun.Shooting.Capacity.BulletsPerShot.x.ToString() });
+                }
             }
-            description += "\n";
-            description += RichText.InBold("Range - ") + damage.Range + "\n";
-            description += RichText.InBold("Magazine Capacity - ") + capacity.MagazineCapacity + "\n";
-            description += RichText.InBold("Best Accuracy - ") + damage.Inaccuracy.x + "°\n";
-            description += RichText.InBold("Worst Accuracy - ") + damage.Inaccuracy.y + "°\n";
-            description += RichText.InBold("Shots Before Worst Accuracy - ") + damage.ShotsToInaccuracy + "\n";
-            description += RichText.InBold("Accuracy Reset - ") + (int)(damage.ShotsInaccuracyCooldown * 100f) + "% per second\n";
-            description += RichText.InBold("Penetration - ") + damage.Penetration + "\n";
-            description += RichText.InBold("Penetration Falloff - ") + (int)(damage.PenetrationFalloff * 100f) + "%\n";
-            description += RichText.InBold("Damage Falloff - ") + (int)(damage.DamageFalloff * 100f) + "%\n";
+            stats.Add(new DetailStat { Icon = RangeIcon, Key = "Range", Value = gun.Shooting.Damage.Range.ToString() + " meters"});
+            stats.Add(new DetailStat { Icon = CapacityIcon, Key = "Magazine Capacity", Value = gun.Shooting.Capacity.MagazineCapacity.ToString() });
+            if(gun.Shooting.Damage.Inaccuracy.x != gun.Shooting.Damage.Inaccuracy.y)
+                stats.Add(new DetailStat { Icon = AccuracyIcon, Key = "Accuracy", Value = "From " + gun.Shooting.Damage.Inaccuracy.x.ToString() + "° to " + gun.Shooting.Damage.Inaccuracy.y.ToString() + "° innaccuracy after " + gun.Shooting.Damage.ShotsToInaccuracy.ToString() + " shots" });
+            else
+                stats.Add(new DetailStat { Icon = AccuracyIcon, Key = "Accuracy", Value = gun.Shooting.Damage.Inaccuracy.x.ToString() + "° innacuracy" });
+
+            if (gun.Shooting.Damage.DamageFalloff != 1f)
+                stats.Add(new DetailStat { Icon = DamageFalloffIcon, Key = "Damage Falloff", Value = (int)(100f * (1f - gun.Shooting.Damage.DamageFalloff)) + "% less damage" });
+            if(gun.Shooting.Damage.Penetration != 1)
+            {
+                stats.Add(new DetailStat { Icon = PenetrationIcon, Key = "Penetration", Value = gun.Shooting.Damage.Penetration.ToString() });
+                stats.Add(new DetailStat { Icon = PenetrationDamageFalloffIcon, Key = "Penetration Damage Falloff", Value = (int)(100f * (1f - gun.Shooting.Damage.PenetrationFalloff)) + "%" });
+            }
         }
 
-        if(item.GetComponent<Attachment>() != null)
+        // Attachment tweaks:
+        Attachment a = item.GetComponent<Attachment>();
+        if(a != null)
         {
-            description += RichText.InBold("Effects:") + "\n";
-            foreach(AttachmentTweak t in item.GetComponents<AttachmentTweak>())
+            stats.Add(new DetailStat() { Icon = AttachmentTypeIcon, Key = "Attachment Slot", Value = a.Type.ToString().Replace('_', ' ') });
+            foreach(AttachmentTweak t in item.GetComponentsInChildren<AttachmentTweak>())
             {
-                description += RichText.InBold(" -") + t.GetEffects() + "\n";
+                stats.Add(new DetailStat() { Icon = AttachmentTweakIcon, Key = "Attribute", Value = t.GetEffects() });
             }
         }
 
-        description += "\n";
+        return stats;
+    }
+
+    private string BuildDescription(Item item)
+    {
+        string description = "\n";
 
         description += RichText.InColour(RichText.InItalics(item.Description.ShortDescription), Color.black) + "\n\n";
         description += RichText.InColour(item.Description.LongDescription, Color.black) + "\n\n";
 
-        Text.text = description;
-        Title.text = item.Name;
-
-        Sprite spr = Atlas.GetSprite(item.ItemIcon.name);
-        Image.sprite = spr == null ? item.ItemIcon : spr;
+        return description;
     }
 
     public void Exit()

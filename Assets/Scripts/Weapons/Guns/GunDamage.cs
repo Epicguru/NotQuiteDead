@@ -28,7 +28,7 @@ public class GunDamage
     public AnimationCurve DamageCurve = AnimationCurve.Linear(0, 1, 1, 0);
     [Tooltip("The amount of objects/enemies that each bullet of pellet can penetrate before stopping. The damage that each one will deal after penetrating an object can be adjusted using the Penetration Falloff variable.")]
     public int Penetration = 1;
-    [Tooltip("The multiplier that affects ")]
+    [Tooltip("The multiplier that affects damage after penetration.")]
     [Range(0f, 1f)]
     public float PenetrationFalloff = 0.5f;
     [Tooltip("If true, if this weapon is a shotgun like weapon, then each individual pellet will share the damage variable, meaning that only if all pellets hit the total value of the Damage variable will be dealt.")]
