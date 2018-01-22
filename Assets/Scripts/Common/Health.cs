@@ -304,7 +304,7 @@ public class Health : NetworkBehaviour {
             Player p = collider.GetComponent<Player>();
             if (p != null)
             {
-                if(friendlyTeam == null)
+                if(string.IsNullOrEmpty(friendlyTeam))
                 {
                     // Takes no sides, will always damage the player.
                     return true;
@@ -357,7 +357,7 @@ public class Health : NetworkBehaviour {
             Player p = collider.GetComponent<Player>();
             if (p != null)
             {
-                if(friendlyTeam == null)
+                if(string.IsNullOrEmpty(friendlyTeam))
                 {
                     // This gun/turret/weapon takes no sides! They will hit any player!
                     return true;

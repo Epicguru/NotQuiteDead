@@ -139,8 +139,8 @@ public class Throwable : RotatingItem
     public void CmdSpawnPrefab(GameObject player, Vector2 position, Quaternion rotation, Vector2 targetPos)
     {
         GameObject x = Instantiate(this.Prefab, position, rotation);
-        x.GetComponent<ThrowableInstance>().Target = targetPos;
-        x.GetComponent<ThrowableInstance>().StartPosition = position;
+        x.GetComponent<ThrowableInstance>().TargetPosition = targetPos;
+        x.GetComponent<ThrowableInstance>().Team = player.GetComponent<Player>().Team;
         x.transform.position = position;
         NetworkServer.Spawn(x);
     }
