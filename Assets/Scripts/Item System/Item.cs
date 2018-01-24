@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(ItemPickup), typeof(NetPositionSync), typeof(SpriteLighting))]
+[RequireComponent(typeof(ItemPickup), typeof(NetPositionSync))]
 public class Item : NetworkBehaviour
 {
 
@@ -58,14 +58,12 @@ public class Item : NetworkBehaviour
     [SyncVar]
     private GameObject PlayerHolding;
     [HideInInspector] public ItemPickup pickup;
-    [HideInInspector] public SpriteLighting Lighting;
     private string currentLayer;
 
     public void Awake()
     {
         NetPosSync = GetComponent<NetPositionSync>();
         pickup = GetComponent<ItemPickup>();
-        Lighting = GetComponent<SpriteLighting>();
     }
 
     public void Start()
@@ -90,7 +88,8 @@ public class Item : NetworkBehaviour
             return;
         foreach(SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>(true))
         {
-            r.sortingLayerName = layer;
+            if(r.gameObject.layer != 9)
+                r.sortingLayerName = layer;
         }
         currentLayer = layer;
     }

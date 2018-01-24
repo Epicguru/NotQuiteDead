@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(ActiveObject))]
-[RequireComponent(typeof(SpriteLighting))]
 public class Furniture : NetworkBehaviour
 {
     // Furniture is a tile-like object that is placed within the world, that can have special behaviour,

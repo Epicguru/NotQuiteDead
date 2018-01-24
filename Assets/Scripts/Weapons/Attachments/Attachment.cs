@@ -91,7 +91,8 @@ public class Attachment : NetworkBehaviour
             return;
         foreach (SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>())
         {
-            r.sortingLayerName = layer;
+            if (r.gameObject.layer != 9)
+                r.sortingLayerName = layer;
         }
 
         this.layer = layer;

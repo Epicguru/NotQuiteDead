@@ -4,7 +4,6 @@ using UnityEngine.Networking;
 
 [RequireComponent(typeof(Health), typeof(ActiveObject), typeof(NetPositionSync))]
 [RequireComponent(typeof(PawnPathfinding))]
-[RequireComponent(typeof(SpriteLighting))]
 public class Pawn : NetworkBehaviour
 {
     // Represents something that can move around the world map, using AI and pathfinding.

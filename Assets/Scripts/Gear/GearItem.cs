@@ -67,7 +67,8 @@ public class GearItem : NetworkBehaviour
         foreach (SpriteRenderer r in Renderers)
         {
             if(r.sortingLayerName != layer)
-                r.sortingLayerName = layer;
+                if (r.gameObject.layer != 9)
+                    r.sortingLayerName = layer;
         }
     }
 }

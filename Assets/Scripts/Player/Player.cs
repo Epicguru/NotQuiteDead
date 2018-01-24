@@ -27,7 +27,6 @@ public class Player : NetworkBehaviour
     public NetworkIdentity NetworkIdentity;
     public Health Health;
     public QuickSlot QuickSlot;
-    public SpriteLighting Lighting;
     public BodyGearStats GearStats;
     public ActiveObject AO;
     public BodyGear[] BodyGear;
@@ -171,7 +170,8 @@ public class Player : NetworkBehaviour
 
         foreach (SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>())
         {
-            r.sortingLayerName = "Player";
+            if (r.gameObject.layer != 9)
+                r.sortingLayerName = "Player";
         }
 
         if (isLocalPlayer)
