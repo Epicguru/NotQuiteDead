@@ -22,11 +22,11 @@ public class DamageNumber : MonoBehaviour
 
     public void Init()
     {
-        Vector2 pointWithinCircle = (((Vector2)Random.insideUnitSphere).normalized);
-        initialPos = (Vector2)transform.position + pointWithinCircle * SpawnDistance;
+        Vector2 pointOnCircle = Random.insideUnitCircle.normalized;
+        initialPos = (Vector2)transform.position + pointOnCircle * SpawnDistance;
         float dst = Random.Range(RandomDistance.x, RandomDistance.y);
         initialDuration = Duration;
-        targetPos = (Vector2)transform.position + pointWithinCircle * dst;
+        targetPos = (Vector2)transform.position + pointOnCircle * dst;
 
         Text.text = Mathf.RoundToInt(Value).ToString();
     }

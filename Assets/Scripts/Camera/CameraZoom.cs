@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CameraZoom : MonoBehaviour {
 
+    public Camera[] Cams;
+
     public float MaxSize = 10f;
     public float Size
     {
@@ -22,13 +24,12 @@ public class CameraZoom : MonoBehaviour {
     public static CameraZoom I;
 
     private float _Size = 5;
-    private Camera cam;
     private float timer;
+    private float value;
 
     public void Start()
     {
         I = this;
-        cam = GetComponent<Camera>();
     }
 
     public void Update()
@@ -46,6 +47,9 @@ public class CameraZoom : MonoBehaviour {
 
     public void Tick()
     {
-        cam.orthographicSize += (Size - cam.orthographicSize) * Speed;
+        foreach(var cam in Cams)
+        {
+            cam.orthographicSize += (Size - cam.orthographicSize) * Speed;
+        }
     }
 }
