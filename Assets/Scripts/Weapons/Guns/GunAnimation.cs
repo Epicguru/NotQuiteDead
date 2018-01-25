@@ -34,13 +34,14 @@ public class GunAnimation : NetworkBehaviour
 
     public int SingleShotsPending = 0;
 
-    private Animator animator;
+    [HideInInspector]
+    public Animator Animator;
     private Gun gun;
     private Item item;
 
     public void Start()
     {
-        animator = GetComponentInChildren<Animator>();
+        Animator = GetComponentInChildren<Animator>();
         gun = GetComponent<Gun>();
         item = GetComponent<Item>();
     }
@@ -48,12 +49,12 @@ public class GunAnimation : NetworkBehaviour
     public void Update()
     {
         // Apply animation vars
-        animator.SetBool(Run, IsRunning);
-        animator.SetBool(Dropped, IsDropped);
-        animator.SetBool(Aim, IsAiming);
-        animator.SetBool(Blocked, IsBlocked);
+        Animator.SetBool(Run, IsRunning);
+        Animator.SetBool(Dropped, IsDropped);
+        Animator.SetBool(Aim, IsAiming);
+        Animator.SetBool(Blocked, IsBlocked);
 
-        animator.SetBool(Shoot, IsShooting);
+        Animator.SetBool(Shoot, IsShooting);
 
         if(SingleShotsPending > 0)
         {
@@ -63,13 +64,13 @@ public class GunAnimation : NetworkBehaviour
             }
             else
             {
-                animator.SetBool(Shoot, true);
+                Animator.SetBool(Shoot, true);
             }
         }
 
         if (IsRecursive)
         {
-            animator.SetBool(Reload, IsRecursiveReload);
+            Animator.SetBool(Reload, IsRecursiveReload);
         }
 
         Hand.RenderHands(transform, !IsDropped);
@@ -119,7 +120,7 @@ public class GunAnimation : NetworkBehaviour
 
     public void CancelAnimation(string trigger)
     {
-        animator.ResetTrigger(trigger);
+        Animator.ResetTrigger(trigger);
     }
 
     public void AnimRun(bool run)
@@ -229,7 +230,7 @@ public class GunAnimation : NetworkBehaviour
 
         // Cause local animation.
         IsChambering = true;
-        animator.SetTrigger(Chamber);
+        Animator.SetTrigger(Chamber);
     }
     
     public void AnimReload()
@@ -262,7 +263,7 @@ public class GunAnimation : NetworkBehaviour
             CmdTrigger(Reload); // For other clients only!
 
             // Cause local animation.
-            animator.SetTrigger(Reload);
+            Animator.SetTrigger(Reload);
 
             //Debug.Log("Triggered reload!");
         }
@@ -270,7 +271,7 @@ public class GunAnimation : NetworkBehaviour
         {
             //Debug.Log("Doing a recursive reload!");
             AnimReload(true); // Set the recursive state.
-            animator.SetBool(Reload, true); // Apply local state.
+            Animator.SetBool(Reload, true); // Apply local state.
         }
         IsReloading = true;
     }
@@ -296,7 +297,7 @@ public class GunAnimation : NetworkBehaviour
         // If is owner of weapon, return. Animation has already been caused.
         if (hasAuthority)
             return;
-        animator.SetTrigger(name);
+        Animator.SetTrigger(name);
     }
 
     public void CallbackReloadEnd()

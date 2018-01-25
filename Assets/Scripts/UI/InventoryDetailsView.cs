@@ -15,6 +15,7 @@ public class InventoryDetailsView : MonoBehaviour
 
     public Sprite AccuracyIcon;
     public Sprite RarityIcon;
+    public Sprite RPS_Icon;
     public Sprite DamageIcon;
     public Sprite DamageFalloffIcon;
     public Sprite PenetrationDamageFalloffIcon;
@@ -111,6 +112,7 @@ public class InventoryDetailsView : MonoBehaviour
             }
             stats.Add(new DetailStat { Icon = RangeIcon, Key = "Range", Value = gun.Shooting.Damage.Range.ToString() + " meters"});
             stats.Add(new DetailStat { Icon = CapacityIcon, Key = "Magazine Capacity", Value = gun.Shooting.Capacity.MagazineCapacity.ToString() });
+            stats.Add(new DetailStat { Icon = RPS_Icon, Key = "RPS", Value = gun.Shooting.GetRPS().ToString("n1") });
             if(gun.Shooting.Damage.Inaccuracy.x != gun.Shooting.Damage.Inaccuracy.y)
                 stats.Add(new DetailStat { Icon = AccuracyIcon, Key = "Accuracy", Value = "From " + gun.Shooting.Damage.Inaccuracy.x.ToString() + "° to " + gun.Shooting.Damage.Inaccuracy.y.ToString() + "° innaccuracy after " + gun.Shooting.Damage.ShotsToInaccuracy.ToString() + " shots" });
             else

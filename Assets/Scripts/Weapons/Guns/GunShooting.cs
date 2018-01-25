@@ -40,6 +40,9 @@ public class GunShooting : RotatingItem
     private int burstFireRemaining;
     private float timer;
     private float shotInaccuracy;
+    private AnimationClip shootClip;
+    private AnimationClip reloadClip;
+    private AnimationClip chamberClip;
 
     [HideInInspector]
     public int firingModeIndex = 0;
@@ -456,6 +459,34 @@ public class GunShooting : RotatingItem
         //Debug.Log("Hit at " + dst + "/" + Damage.Range + "(" + p + ") that evaluated to " + f + " then lerped from " + m + " to " + d + " to give " + x + " finally applied penetration x" + penetration + " @" + (Damage.PenetrationFalloff * 100f) + "% producing " + final + ".");
 
         return final;
+    }
+
+    public float GetRPS()
+    {
+        // Aprox rounds per second.
+        if(shootClip == null)
+        {
+            foreach (var c in GetComponentInChildren<Animator>().runtimeAnimatorController.animationClips)
+            {
+                if (c.name == "Shoot")
+                {
+                    shootClip = c;
+                }
+                if (c.name == "Reload")
+                {
+                    reloadClip = c;
+                }
+                if (c.name == "Chamber")
+                {
+                    chamberClip = c;
+                }
+            }
+        }
+
+        if (shootClip == null)
+            return 0f;
+
+        return 1f / shootClip.length;
     }
 
     private Vector2 startPos = new Vector2();

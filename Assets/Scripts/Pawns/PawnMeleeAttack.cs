@@ -65,8 +65,8 @@ public class PawnMeleeAttack : NetworkBehaviour
     public virtual void HitTarget()
     {
         VerifyTarget();
-
-        Target.ServerDamage(AttackDamage, Pawn.Name, false);
+        if(Target != null)
+            Target.ServerDamage(AttackDamage, Pawn.Name, false);
     }
 
     [Server]
