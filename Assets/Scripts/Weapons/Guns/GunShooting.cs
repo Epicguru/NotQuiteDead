@@ -41,8 +41,8 @@ public class GunShooting : RotatingItem
     private float timer;
     private float shotInaccuracy;
     private AnimationClip shootClip;
-    private AnimationClip reloadClip;
-    private AnimationClip chamberClip;
+    //private AnimationClip reloadClip;
+    //private AnimationClip chamberClip;
 
     [HideInInspector]
     public int firingModeIndex = 0;
@@ -472,14 +472,14 @@ public class GunShooting : RotatingItem
                 {
                     shootClip = c;
                 }
-                if (c.name == "Reload")
-                {
-                    reloadClip = c;
-                }
-                if (c.name == "Chamber")
-                {
-                    chamberClip = c;
-                }
+                //if (c.name == "Reload")
+                //{
+                //    reloadClip = c;
+                //}
+                //if (c.name == "Chamber")
+                //{
+                //    chamberClip = c;
+                //}
             }
         }
 
