@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class FitChild : MonoBehaviour
 {
     public RectTransform[] Targets;
@@ -29,7 +30,9 @@ public class FitChild : MonoBehaviour
 
         if (Position)
         {
-            transform.position = Targets[0].transform.position + PositionOffset;
+            if(Targets.Length > 0)
+                if(Targets[0] != null)
+                    transform.position = Targets[0].transform.position + PositionOffset;
         }
     }
 }

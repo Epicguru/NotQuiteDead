@@ -15,7 +15,7 @@ public class CommandInput : MonoBehaviour {
 
     private InputField input;
     private int index;
-    private float timer;
+    private float timer = 100f;
 
     public static CommandInput Instance;
 
