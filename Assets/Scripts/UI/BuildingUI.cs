@@ -7,9 +7,12 @@ public class BuildingUI : MonoBehaviour
     public bool HeadbarOpen;
     public bool MenuOpen;
 
-    [Header("Menus")]
+    [Header("Menu GO's")]
     public GameObject HeadbarGO; 
     public GameObject MenuGO;
+
+    [Header("References")]
+    public BuildingMenuUI Menu;
 
     public void Update()
     {
@@ -20,6 +23,11 @@ public class BuildingUI : MonoBehaviour
 
         HeadbarGO.SetActive(HeadbarOpen);
         MenuGO.SetActive(MenuOpen);
+
+        if (MenuOpen)
+        {
+            Menu.Open();
+        }
     }
 
     public void OpenMenu()

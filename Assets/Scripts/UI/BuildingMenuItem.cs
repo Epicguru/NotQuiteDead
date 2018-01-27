@@ -8,8 +8,11 @@ public class BuildingMenuItem : MonoBehaviour
     public int Count;
     public Sprite Icon;
 
+    [SerializeField]
     private Text text;
+    [SerializeField]
     private Image icon;
+    [SerializeField]
     private Image BG;
 
     public void UpdateVisuals()

@@ -2,25 +2,87 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.UI;
+using System;
 
 public class BuildingMenuUI : MonoBehaviour
 {
+    [Header("Prefabs")]
     public GameObject Prefab;
+
+    [Header("References")]
     public Transform ItemParent;
+    public InputField IF;
+    public Dropdown DD;
 
     private List<GameObject> spawned = new List<GameObject>();
 
     public void Open()
     {
+        UpdateDropdownOptions();
 
+        // Test the functionality.
+        BuildingItemData a = new BuildingItemData() { Name = "Bad Tile", Count = 10, Rarity = ItemRarity.RUBBISH };
+        BuildingItemData b = new BuildingItemData() { Name = "OK Tile", Count = 5, Rarity = ItemRarity.COMMON };
+        BuildingItemData c = new BuildingItemData() { Name = "Great Tile", Count = 12, Rarity = ItemRarity.VALUABLE };
+        BuildingItemData d = new BuildingItemData() { Name = "Lol", Count = 1, Rarity = ItemRarity.GODLIKE };
+        BuildingItemData e = new BuildingItemData() { Name = "Some Name", Count = 999, Rarity = ItemRarity.LEGENDARY };
+
+        List<BuildingItemData> x = new List<BuildingItemData>();
+        x.Add(a);
+        x.Add(e);
+        x.Add(c);
+        x.Add(b);
+        x.Add(d);
+
+        Spawn(x, IF.text.Trim(), GetCurrentSorting());
     }
 
     public void Close()
     {
-
+        DestroySpawned();
     }
 
-    public void Spawn(List<BuildingItemData> items, BuildingMenuSorting sorting, bool reverse)
+    private void UpdateDropdownOptions()
+    {
+        DD.ClearOptions();
+        List<string> op = new List<string>();
+        foreach(BuildingMenuSorting s in Enum.GetValues(typeof(BuildingMenuSorting)))
+        {
+            op.Add(s.ToString());
+        }
+        DD.AddOptions(op);
+    }
+
+    public BuildingMenuSorting GetCurrentSorting()
+    {
+        try
+        {
+            var data = DD.options[DD.value];
+            return (BuildingMenuSorting)Enum.Parse(typeof(BuildingMenuSorting), data.text);
+        }
+        catch
+        {
+            // Gotta catch em' all!
+            return BuildingMenuSorting.NONE;
+        }
+    }
+
+    public void Spawn(List<BuildingItemData> items, string filter, BuildingMenuSorting sorting)
+    {
+        DestroySpawned();
+
+        if(items == null || items.Count == 0)
+        {
+            return;
+        }
+
+        Filter(items, filter);
+
+        Spawn(items, sorting);
+    }
+
+    public void Spawn(List<BuildingItemData> items, BuildingMenuSorting sorting)
     {
         DestroySpawned();
         if (items == null || items.Count == 0)
@@ -49,16 +111,26 @@ public class BuildingMenuUI : MonoBehaviour
                 items = s.ToList();
                 break;
             case BuildingMenuSorting.COUNT:
-                s = from x in items orderby x.Count ascending select x;
+                s = from x in items orderby x.Count descending select x;
                 items = s.ToList();
                 break;
             case BuildingMenuSorting.COUNT_REVERSE:
-                s = from x in items orderby x.Count descending select x;
+                s = from x in items orderby x.Count ascending select x;
                 items = s.ToList();
                 break;
         }
 
         Spawn(items);
+    }
+
+    public void Filter(List<BuildingItemData> items, string filter)
+    {
+        if (items == null || items.Count == 0)
+            return;
+
+        string fLow = filter.ToLower();
+
+        items.RemoveAll(x => !x.Name.ToLower().Contains(fLow));
     }
 
     public void Spawn(List<BuildingItemData> items)
@@ -78,12 +150,17 @@ public class BuildingMenuUI : MonoBehaviour
             i.Icon = item.Icon;
             i.BGColour = item.GetColour();
             i.Name = item.Name;
+            i.Count = item.Count;
             i.UpdateVisuals();
         }
     }
 
     public void DestroySpawned()
     {
+        if (spawned.Count == 0)
+            return;
+
+
         foreach(GameObject go in spawned)
         {
             Destroy(go);
