@@ -45,7 +45,7 @@ public class GiveOneCommand : Command
             return null;
         }
 
-        Item prefab = Item.FindItem(itemName);
+        Item prefab = Item.GetItem(itemName);
 
         if (prefab == null)
             return "Could not find item: '" + itemName + "'";

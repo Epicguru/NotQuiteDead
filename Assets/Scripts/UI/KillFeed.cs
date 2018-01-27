@@ -57,7 +57,7 @@ public class KillFeed : NetworkBehaviour {
 
     public void AddKill(string killer, string killed, string item)
     {
-        Item i = Item.ItemExists(item) ? Item.FindItem(item) : null; // Avoid error, same result.
+        Item i = Item.ItemExists(item) ? Item.GetItem(item) : null; // Avoid error, same result.
         Sprite sprite = i == null ? null : i.ItemIcon;
 
         KillFeedObject spawned = Instantiate(Prefab, transform);

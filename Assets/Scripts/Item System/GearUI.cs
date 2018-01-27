@@ -89,7 +89,7 @@ public class GearUI : MonoBehaviour {
         if (item != null)
             item.Inventory.DetailsView.Enter(item);
         else
-            PlayerInventory.inv.Inventory.DetailsView.Enter(Item.FindItem(prefab));
+            PlayerInventory.inv.Inventory.DetailsView.Enter(Item.GetItem(prefab));
     }
 
     public ItemOption[] GetOptions(ItemData data)

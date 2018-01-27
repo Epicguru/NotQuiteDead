@@ -135,7 +135,7 @@ public static class BlueprintLoader
         }
         else
         {
-            return Item.FindItem(itemString);
+            return Item.GetItem(itemString);
         }
     }
 

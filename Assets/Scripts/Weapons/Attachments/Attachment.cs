@@ -179,7 +179,7 @@ public class Attachment : NetworkBehaviour
     public Gun GetPrefabGun()
     {
         if (PrefabGun == null)
-            PrefabGun = Item.FindItem(GetGun().Item.Prefab).GetComponent<Gun>();
+            PrefabGun = Item.GetItem(GetGun().Item.Prefab).GetComponent<Gun>();
 
         return PrefabGun;
     }

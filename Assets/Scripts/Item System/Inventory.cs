@@ -76,7 +76,7 @@ public class Inventory : MonoBehaviour
 
     public InventoryItem AddItem(string prefab, ItemData data, int amount = 1)
     {
-        Item item = Item.FindItem(prefab);
+        Item item = Item.GetItem(prefab);
         if (CanAdd(item, amount))
         {
             // Add this item to the inventory.

@@ -24,7 +24,7 @@ public class GiveCommand : Command
         if (amount <= 0)
             return "Amount of items must be more than zero!";        
 
-        Item prefab = Item.FindItem(itemName);
+        Item prefab = Item.GetItem(itemName);
 
         if (prefab == null)
             return "Could not find item: '" + itemName + "'";

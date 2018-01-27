@@ -52,7 +52,7 @@ public class InventoryItem : MonoBehaviour
         // Nothing to do here, all rendering done in editor/game.
 
         // Get prefab
-        Item = Item.FindItem(ItemPrefab);
+        Item = Item.GetItem(ItemPrefab);
 
         SetText();
 

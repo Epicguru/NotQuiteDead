@@ -62,25 +62,25 @@ public class GunAttachments : NetworkBehaviour
             return;
         if (!string.IsNullOrEmpty(data.GUN_Muzzle))
         {
-            Item item = Item.FindItem(data.GUN_Muzzle);
+            Item item = Item.GetItem(data.GUN_Muzzle);
             Attachment a = item.GetComponent<Attachment>();
             SetAttachment(a.Type, item);
         }
         if (!string.IsNullOrEmpty(data.GUN_Sight))
         {
-            Item item = Item.FindItem(data.GUN_Sight);
+            Item item = Item.GetItem(data.GUN_Sight);
             Attachment a = item.GetComponent<Attachment>();
             SetAttachment(a.Type, item);
         }
         if (!string.IsNullOrEmpty(data.GUN_Magazine))
         {
-            Item item = Item.FindItem(data.GUN_Magazine);
+            Item item = Item.GetItem(data.GUN_Magazine);
             Attachment a = item.GetComponent<Attachment>();
             SetAttachment(a.Type, item);
         }
         if (!string.IsNullOrEmpty(data.GUN_UnderBarrel))
         {
-            Item item = Item.FindItem(data.GUN_UnderBarrel);
+            Item item = Item.GetItem(data.GUN_UnderBarrel);
             Attachment a = item.GetComponent<Attachment>();
             SetAttachment(a.Type, item);
         }
@@ -171,7 +171,7 @@ public class GunAttachments : NetworkBehaviour
         Transform mount = GetMountFor(type);
 
         // Create item from prefab, and instanciate.
-        Item i = Item.FindItem(prefab);
+        Item i = Item.GetItem(prefab);
 
         GameObject attachment = Instantiate(i.gameObject, transform.position, Quaternion.identity);
         NetworkServer.SpawnWithClientAuthority(attachment, player);

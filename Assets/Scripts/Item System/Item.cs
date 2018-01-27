@@ -113,19 +113,19 @@ public class Item : NetworkBehaviour
 
         if (!string.IsNullOrEmpty(data.GUN_Magazine))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + data.GUN_Magazine, OnSelected = Option_RemoveMagazine });
+            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.GUN_Magazine), OnSelected = Option_RemoveMagazine });
         }
         if (!string.IsNullOrEmpty(data.GUN_Muzzle))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + data.GUN_Muzzle, OnSelected = Option_RemoveMuzzle });
+            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.GUN_Muzzle), OnSelected = Option_RemoveMuzzle });
         }
         if (!string.IsNullOrEmpty(data.GUN_Sight))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + data.GUN_Sight, OnSelected = Option_RemoveSight });
+            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.GUN_Sight), OnSelected = Option_RemoveSight });
         }
         if (!string.IsNullOrEmpty(data.GUN_UnderBarrel))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + data.GUN_UnderBarrel, OnSelected = Option_RemoveUnderBarrel });
+            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.GUN_UnderBarrel), OnSelected = Option_RemoveUnderBarrel });
         }
 
         return options.ToArray();
@@ -230,6 +230,15 @@ public class Item : NetworkBehaviour
         Debug.Log("Loaded " + Items.Count + " items.");
     }
 
+    public static string NameOf(string prefab)
+    {
+        Item i = GetItem(prefab);
+        if (i == null)
+            return null;
+
+        return i.Name;
+    }
+
     public static void RegisterItems()
     {
         if (Items == null)
@@ -255,7 +264,7 @@ public class Item : NetworkBehaviour
     public static Item NewInstance(string prefab, Vector2 position)
     {
         // Create new instance of item.
-        Item x = FindItem(prefab);
+        Item x = GetItem(prefab);
         Item newItem = Instantiate(x, position, Quaternion.identity);
 
         return newItem;
@@ -266,7 +275,7 @@ public class Item : NetworkBehaviour
     /// </summary>
     /// <param name="path">The prefab name of the item, as in Item.Prefab .</param>
     /// <returns>The item object, which is a prefab.</returns>
-    public static Item FindItem(string prefab)
+    public static Item GetItem(string prefab)
     {
         if (Items == null)
             LoadItems();

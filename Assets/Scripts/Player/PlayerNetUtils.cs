@@ -77,7 +77,7 @@ public class PlayerNetUtils : NetworkBehaviour
     [Command]
     public void CmdSetGear(string name, string prefab, ItemData data, bool returnOldItem)
     {
-        GetPlayer().GearMap[name].SetItem(player.gameObject, prefab == null ? null : Item.FindItem(prefab), data, returnOldItem);
+        GetPlayer().GearMap[name].SetItem(player.gameObject, prefab == null ? null : Item.GetItem(prefab), data, returnOldItem);
     }
 
     [Command]
