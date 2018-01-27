@@ -17,10 +17,33 @@ public class GiveOneCommand : Command
         // Give items
 
         string itemName = (string)args[0];
+        itemName = itemName.Trim();
         int amount = 1;
 
-        if (amount <= 0)
-            return "Amount of items must be more than zero!";
+        if (itemName.ToLower() == "all")
+        {
+            // Give all items.
+            foreach(var x in Item.Items.Values)
+            {
+                PlayerInventory.Add(x.Prefab, null, amount);
+            }
+
+            // Give all tiles.
+            foreach(var x in BaseTile.GetAllTiles())
+            {
+                Player.Local.BuildingInventory.AddItems(x, 1000);
+            }
+
+            // Give all furnitures
+            foreach (var x in Furniture.Loaded.Values)
+            {
+                Player.Local.BuildingInventory.AddItems(x, 1000);
+            }
+
+            CommandProcessing.Log("Gave local player 1 of each and every item, and 1000 of all buildables.");
+
+            return null;
+        }
 
         Item prefab = Item.FindItem(itemName);
 

@@ -40,6 +40,11 @@ public class BaseTile : ScriptableObject
         return tiles[prefab.Trim()];
     }
 
+    public static Dictionary<string, BaseTile>.ValueCollection GetAllTiles()
+    {
+        return tiles.Values;
+    }
+
     public static bool ContainsTile(string prefab)
     {
         return tiles.ContainsKey(prefab.Trim());

@@ -15,6 +15,7 @@ public class BuildingItem
         Type = BuildingItemType.TILE;
         Prefab = tile.Prefab;
         Name = tile.Name;
+        Count = count;
     }
 
     public BuildingItem(Furniture furniture, int count)
@@ -22,6 +23,7 @@ public class BuildingItem
         Type = BuildingItemType.FURNITURE;
         Prefab = furniture.Prefab;
         Name = furniture.Name;
+        Count = count;
     }
 
     public BaseTile GetTile()

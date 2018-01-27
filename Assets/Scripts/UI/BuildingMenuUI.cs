@@ -53,9 +53,6 @@ public class BuildingMenuUI : MonoBehaviour
     {
         // Rebuild the whole UI objects. Quite expensive so only done when necessary.
 
-        if (actionID == Player.Local.BuildingInventory.ActionID) // Are we up to date?
-            return;
-
         if (Player.Local == null)
             return;
 

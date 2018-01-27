@@ -18,10 +18,11 @@ public class GiveCommand : Command
         // Give items
 
         string itemName = (string)args[0];
+        itemName = itemName.Trim();
         int amount = (int)args[1];
 
         if (amount <= 0)
-            return "Amount of items must be more than zero!";
+            return "Amount of items must be more than zero!";        
 
         Item prefab = Item.FindItem(itemName);
 
