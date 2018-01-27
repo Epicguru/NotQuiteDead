@@ -1,16 +1,41 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿
 using UnityEngine;
 
-public class BuildingUI : MonoBehaviour {
+public class BuildingUI : MonoBehaviour
+{
+    [Header("Controls")]
+    public bool HeadbarOpen;
+    public bool MenuOpen;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    [Header("Menus")]
+    public GameObject HeadbarGO; 
+    public GameObject MenuGO;
+
+    public void Update()
+    {
+        if (MenuOpen)
+        {
+            HeadbarOpen = true;
+        }
+
+        HeadbarGO.SetActive(HeadbarOpen);
+        MenuGO.SetActive(MenuOpen);
+    }
+
+    public void OpenMenu()
+    {
+        if (MenuOpen)
+            return;
+        MenuOpen = true;
+
+    }
+
+    public void CloseMenu()
+    {
+        if (!MenuOpen)
+            return;
+        MenuOpen = false;
+
+
+    }
 }
