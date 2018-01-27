@@ -19,6 +19,7 @@ public class BuildingMenuItem : MonoBehaviour
     {
         text.text = Name.Trim() + " x" + Count;
         icon.sprite = Icon;
+        BGColour.a = 0.7f;
         BG.color = BGColour;
     }
 }
