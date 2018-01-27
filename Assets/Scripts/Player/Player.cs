@@ -158,6 +158,7 @@ public class Player : NetworkBehaviour
 
         if (isLocalPlayer)
         {
+            UI.Reset();
             Local = this;
             Local._Player = this;
             Camera.main.GetComponent<CameraFollow>().Target = transform;

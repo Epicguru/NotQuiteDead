@@ -96,16 +96,16 @@ public class PlayerInventory : MonoBehaviour
 
     public static void Open()
     {
+        UI.FlagOpen();
         inv.Inventory.gameObject.SetActive(true);
         inv.Inventory.ResetViewport();
-        InputManager.Active = false;
     }
 
     public static void Close()
     {
+        UI.FlagClosed();
         inv.Inventory.gameObject.SetActive(false);
         inv.Inventory.Options.Close();
-        InputManager.Active = true;
         inv.Inventory.QSI.Open = false;
     }
 }

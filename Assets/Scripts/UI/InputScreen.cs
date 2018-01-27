@@ -37,6 +37,8 @@ public class InputScreen : MonoBehaviour {
         showing = true;
         GetComponentsInChildren<Transform>(true)[1].gameObject.SetActive(true);
         InputManagerGUI.Instance.PlaceAllObjects();
+
+        UI.FlagOpen();
     }
 
     public void Hide()
@@ -47,5 +49,7 @@ public class InputScreen : MonoBehaviour {
         showing = false;
         GetComponentsInChildren<Transform>(true)[1].gameObject.SetActive(false);
         InputManagerGUI.Instance.RemoveAllObjects();
+
+        UI.FlagClosed();
     }
 }

@@ -21,13 +21,13 @@ public class BuildingUI : MonoBehaviour
             HeadbarOpen = true;
         }
 
-        HeadbarGO.SetActive(HeadbarOpen);
-        MenuGO.SetActive(MenuOpen);
-
         if (MenuOpen)
         {
             Menu.Open();
         }
+
+        HeadbarGO.SetActive(HeadbarOpen);
+        MenuGO.SetActive(MenuOpen);
     }
 
     public void OpenMenu()

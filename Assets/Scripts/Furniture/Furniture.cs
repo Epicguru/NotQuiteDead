@@ -14,6 +14,7 @@ public class Furniture : NetworkBehaviour
     public string Name;
 
     public string Layer = "Foreground";
+    public ItemRarity Rarity = ItemRarity.COMMON;
 
     public bool Walkable = false;
 

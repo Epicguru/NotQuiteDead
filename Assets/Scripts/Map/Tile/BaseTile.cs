@@ -14,6 +14,9 @@ public class BaseTile : ScriptableObject
     [Tooltip("The visual name of the tile.")]
     public string Name;
 
+    [Tooltip("How valuable is this tile?")]
+    public ItemRarity Rarity = ItemRarity.COMMON;
+
     [Tooltip("Can this tile be walked though.")]
     public bool Walkable = false;
 

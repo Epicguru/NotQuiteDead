@@ -16,11 +16,26 @@ public class BuildingMenuUI : MonoBehaviour
     public Dropdown DD;
 
     private List<GameObject> spawned = new List<GameObject>();
+    private bool isOpen;
+
+    public void Start()
+    {
+        UpdateDropdownOptions();
+    }
 
     public void Open()
     {
-        UpdateDropdownOptions();
+        if (isOpen)
+            return;
 
+        UI.FlagOpen();
+        isOpen = true;
+
+        Refresh();
+    }
+
+    public void Refresh()
+    {
         // Test the functionality.
         BuildingItemData a = new BuildingItemData() { Name = "Bad Tile", Count = 10, Rarity = ItemRarity.RUBBISH };
         BuildingItemData b = new BuildingItemData() { Name = "OK Tile", Count = 5, Rarity = ItemRarity.COMMON };
@@ -40,7 +55,25 @@ public class BuildingMenuUI : MonoBehaviour
 
     public void Close()
     {
+        if (!isOpen)
+            return;
+
+        UI.FlagClosed();
+
+        isOpen = false;
         DestroySpawned();
+    }
+
+    public void DropdownChanged()
+    {
+        if(isOpen)
+            Refresh();
+    }
+
+    public void InputFieldChanged()
+    {
+        if(isOpen)
+            Refresh();
     }
 
     private void UpdateDropdownOptions()

@@ -249,6 +249,9 @@ public static class InputManager
 
     public static void UpdateMousePos()
     {
+        // Set active to true if NOT in any UI.
+        Active = !UI.AnyOpen;
+
         Camera c = Camera.main;
         Vector3 x = c.ScreenPointToRay(Input.mousePosition).origin;
         mousePos.Set(x.x, x.y);

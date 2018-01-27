@@ -35,19 +35,16 @@ public class CommandInput : MonoBehaviour {
         if (InputManager.InputDown("Console", true))
         {
             Open = !Open;
-            //Debug.Log("Now : " + (Open ? "Open" : "Closed"));
             if (Open)
             {
-                //Debug.Log("setting...");
-
+                UI.FlagOpen();
                 input.text = "";
                 EventSystem.current.SetSelectedGameObject(input.gameObject, null);
                 input.ActivateInputField();
-                InputManager.Active = false;
             }
             else
             {
-                InputManager.Active = true;
+                UI.FlagClosed();
             }
         }
 

@@ -34,7 +34,7 @@ public class CameraZoom : MonoBehaviour {
 
     public void Update()
     {
-        if (!PlayerInventory.IsOpen)
+        if (!UI.AnyOpen)
             Size -= (Input.mouseScrollDelta).y * (Size / 10f);
 
         timer += Time.unscaledDeltaTime;

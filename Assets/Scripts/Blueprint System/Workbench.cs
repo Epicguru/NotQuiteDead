@@ -89,8 +89,16 @@ public class Workbench : MonoBehaviour
 
     private void OpenChange()
     {
+        if (Open)
+        {
+            UI.FlagOpen();
+        }
+        else
+        {
+            UI.FlagClosed();
+        }
+
         Container.gameObject.SetActive(Open);
-        InputManager.Active = !Open;
         if (Open)
         {
             RefreshInventory();
