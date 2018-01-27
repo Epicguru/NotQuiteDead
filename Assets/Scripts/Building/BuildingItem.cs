@@ -59,4 +59,18 @@ public class BuildingItem
                 return ItemRarity.COMMON;
         }
     }
+
+    public Sprite GetIcon()
+    {
+        switch (Type)
+        {
+            case BuildingItemType.TILE:
+                return GetTile().Icon;
+
+            case BuildingItemType.FURNITURE:
+                return GetFurniture().Icon;
+            default:
+                return null;
+        }
+    }
 }

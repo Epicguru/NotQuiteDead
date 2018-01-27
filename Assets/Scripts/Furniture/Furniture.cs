@@ -10,12 +10,18 @@ public class Furniture : NetworkBehaviour
 
     public static Dictionary<string, Furniture> Loaded = new Dictionary<string, Furniture>();
 
+    [Header("Basics")]
     public string Prefab;
     public string Name;
 
+    [Header("Placement")]
     public string Layer = "Foreground";
-    public ItemRarity Rarity = ItemRarity.COMMON;
 
+    [Header("Details")]
+    public ItemRarity Rarity = ItemRarity.COMMON;
+    public Sprite Icon;
+
+    [Header("Pathfinding")]
     public bool Walkable = false;
 
     public int X { get; private set; }

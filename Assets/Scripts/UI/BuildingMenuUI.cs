@@ -37,18 +37,17 @@ public class BuildingMenuUI : MonoBehaviour
     public void Refresh()
     {
         // Test the functionality.
-        BuildingItemData a = new BuildingItemData() { Name = "Bad Tile", Count = 10, Rarity = ItemRarity.RUBBISH };
-        BuildingItemData b = new BuildingItemData() { Name = "OK Tile", Count = 5, Rarity = ItemRarity.COMMON };
-        BuildingItemData c = new BuildingItemData() { Name = "Great Tile", Count = 12, Rarity = ItemRarity.VALUABLE };
-        BuildingItemData d = new BuildingItemData() { Name = "Lol", Count = 1, Rarity = ItemRarity.GODLIKE };
-        BuildingItemData e = new BuildingItemData() { Name = "Some Name", Count = 999, Rarity = ItemRarity.LEGENDARY };
-
         List<BuildingItemData> x = new List<BuildingItemData>();
-        x.Add(a);
-        x.Add(e);
-        x.Add(c);
-        x.Add(b);
-        x.Add(d);
+
+        if (Player.Local == null)
+            return;
+
+        var items = Player.Local.BuildingInventory.GetItems();
+
+        foreach(var item in items)
+        {
+            x.Add(new BuildingItemData() { Name = item.Name, Rarity = item.GetRarity(), Count = item.Count, Icon = item.GetIcon() });
+        }
 
         Spawn(x, IF.text.Trim(), GetCurrentSorting());
     }

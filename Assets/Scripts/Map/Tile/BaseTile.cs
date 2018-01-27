@@ -23,6 +23,9 @@ public class BaseTile : ScriptableObject
     [Tooltip("A reference to the physics body.")]
     public Collider2D Physics;
 
+    [Tooltip("The icon used in UI.")]
+    public Sprite Icon;
+
     [Tooltip("The Render Data that is used to get sprites from.")]
     public TileRenderData RenderData;
 
