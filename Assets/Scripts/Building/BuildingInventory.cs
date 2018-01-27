@@ -6,7 +6,9 @@ public class BuildingInventory : NetworkBehaviour
 {
     // Attached to the player, records how many building items are carried at any given time.
     // Building items are Tiles and Furniture. They can be placed within the world.
-    
+
+    public int ActionID { get; private set; }
+
     private Dictionary<string, BuildingItem> items = new Dictionary<string, BuildingItem>();
 
     public void AddItems(BaseTile tile, int count)
@@ -44,6 +46,8 @@ public class BuildingInventory : NetworkBehaviour
             // We don't already have it, so add it!
             items.Add(item.Prefab, item);
         }
+
+        ActionID++;
     }
 
     public Dictionary<string, BuildingItem>.ValueCollection GetItems()

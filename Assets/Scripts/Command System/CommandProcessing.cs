@@ -43,6 +43,8 @@ public static class CommandProcessing
         commands.Add(new TeamSwap());
         commands.Add(new TeamTransfer());
         commands.Add(new TeamData());
+        commands.Add(new PathfindingCommand());
+        commands.Add(new GiveBuildable());
     }
 
     // Returns true to clear the console.

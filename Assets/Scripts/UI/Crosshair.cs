@@ -25,14 +25,14 @@ public class Crosshair : MonoBehaviour {
 
     public void Update()
     {
-        Cursor.visible = !Active;
+        Cursor.visible = !Active || UI.AnyOpen;
 
         foreach (Image i in images)
         {
-            i.enabled = Active;
+            i.enabled = Active && !UI.AnyOpen;
         }
 
-        if (!Active)
+        if (!Active || UI.AnyOpen)
             return;
 
         (transform as RectTransform).anchoredPosition = Input.mousePosition;

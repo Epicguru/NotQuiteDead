@@ -7,14 +7,15 @@ public class PathfindingCommand : Command
 {
     public PathfindingCommand()
     {
-        //base.
+        base.Name = "pathfinding";
+        base.parameters.Add(typeof(string));
     }
 
     public override string Execute(object[] args)
     {
-        string arg = (string)args[0];
+        string arg = ((string)(args[0])).Trim().ToLower();
 
-        if(arg.Trim().ToLower() == "stats")
+        if(arg == "stats")
         {
             CommandProcessing.Log("Max open nodes: " + Pathfinding.MAX);
             CommandProcessing.Log("Max pending requests: " + PathfindingManager.MAX_PENDING);
@@ -22,6 +23,13 @@ public class PathfindingCommand : Command
             return null;
         }
 
-        return "Error: Unknown sub-command '" + arg + "'";
+        if (arg == "wipe")
+        {
+            CommandProcessing.Log("Wiping: " + PathfindingManager.GetPending().Count + " pending requests.");
+            PathfindingManager.DissolveAllPending();
+            return null;
+        }
+
+        return "Error: Unknown pathing sub-command '" + arg + "'. Valid commands are 'stats' and 'wipe'";
     }
 }

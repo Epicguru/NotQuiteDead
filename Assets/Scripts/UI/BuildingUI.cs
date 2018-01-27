@@ -25,6 +25,10 @@ public class BuildingUI : MonoBehaviour
         {
             Menu.Open();
         }
+        else
+        {
+            Menu.Close();
+        }
 
         HeadbarGO.SetActive(HeadbarOpen);
         MenuGO.SetActive(MenuOpen);

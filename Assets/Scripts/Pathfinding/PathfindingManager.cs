@@ -174,6 +174,16 @@ public static class PathfindingManager
         return hasPending;
     }
 
+    public static void DissolveAllPending()
+    {
+        foreach(var x in pending)
+        {
+            if (x.Done != null)
+                x.Done.Invoke(null);
+        }
+        pending.Clear();
+    }
+
     public static string GetPendingIDs()
     {
         return pending.ToString();

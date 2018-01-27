@@ -17,10 +17,25 @@ public class BuildingMenuUI : MonoBehaviour
 
     private List<GameObject> spawned = new List<GameObject>();
     private bool isOpen;
+    private int actionID;
 
     public void Start()
     {
         UpdateDropdownOptions();
+    }
+
+    public void Update()
+    {
+        if (!isOpen)
+            return;
+
+        if (Player.Local == null)
+            return;
+
+        if (actionID != Player.Local.BuildingInventory.ActionID)
+        {
+            Refresh();
+        }
     }
 
     public void Open()
@@ -36,11 +51,15 @@ public class BuildingMenuUI : MonoBehaviour
 
     public void Refresh()
     {
-        // Test the functionality.
-        List<BuildingItemData> x = new List<BuildingItemData>();
+        // Rebuild the whole UI objects. Quite expensive so only done when necessary.
+
+        if (actionID == Player.Local.BuildingInventory.ActionID) // Are we up to date?
+            return;
 
         if (Player.Local == null)
             return;
+
+        List<BuildingItemData> x = new List<BuildingItemData>();
 
         var items = Player.Local.BuildingInventory.GetItems();
 
@@ -50,6 +69,8 @@ public class BuildingMenuUI : MonoBehaviour
         }
 
         Spawn(x, IF.text.Trim(), GetCurrentSorting());
+
+        actionID = Player.Local.BuildingInventory.ActionID;
     }
 
     public void Close()
