@@ -77,6 +77,9 @@ public class BuildingBarUI : MonoBehaviour
 
         UpdateSelected();
         UpdatePanelSize();
+
+        if (Items.Count == 0)
+            SelectedText.text = "---";
     }
 
     public void UpdatePanelSize()

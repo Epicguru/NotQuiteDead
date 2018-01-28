@@ -20,8 +20,10 @@ public class BuildingMenuUI : MonoBehaviour
     public Transform GhostParent;
     public Image BuildBarDropDropZone;
 
+    [HideInInspector]
+    public bool IsOpen;
+
     private List<GameObject> spawned = new List<GameObject>();
-    private bool isOpen;
     private int actionID;
 
     public void Start()
@@ -31,7 +33,7 @@ public class BuildingMenuUI : MonoBehaviour
 
     public void Update()
     {
-        if (!isOpen)
+        if (!IsOpen)
             return;
 
         if (Player.Local == null)
@@ -48,11 +50,11 @@ public class BuildingMenuUI : MonoBehaviour
 
     public void Open()
     {
-        if (isOpen)
+        if (IsOpen)
             return;
 
         UI.FlagOpen();
-        isOpen = true;
+        IsOpen = true;
 
         Refresh();
         Dragging = false;
@@ -80,7 +82,7 @@ public class BuildingMenuUI : MonoBehaviour
 
     public void Close()
     {
-        if (!isOpen)
+        if (!IsOpen)
             return;
 
         UI.FlagClosed();
@@ -91,19 +93,19 @@ public class BuildingMenuUI : MonoBehaviour
             Destroy(t.gameObject);
         }
 
-        isOpen = false;
+        IsOpen = false;
         DestroySpawned();
     }
 
     public void DropdownChanged()
     {
-        if(isOpen)
+        if(IsOpen)
             Refresh();
     }
 
     public void InputFieldChanged()
     {
-        if(isOpen)
+        if(IsOpen)
             Refresh();
     }
 

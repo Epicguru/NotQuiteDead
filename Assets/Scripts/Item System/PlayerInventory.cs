@@ -96,6 +96,9 @@ public class PlayerInventory : MonoBehaviour
 
     public static void Open()
     {
+        if (UI.AnyOpen)
+            return;
+
         UI.FlagOpen();
         inv.Inventory.gameObject.SetActive(true);
         inv.Inventory.ResetViewport();

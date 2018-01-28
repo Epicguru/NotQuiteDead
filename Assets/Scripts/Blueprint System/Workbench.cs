@@ -89,6 +89,12 @@ public class Workbench : MonoBehaviour
 
     private void OpenChange()
     {
+        if(Open && UI.AnyOpen)
+        {
+            _Open = false;
+            return;
+        }
+
         if (Open)
         {
             UI.FlagOpen();

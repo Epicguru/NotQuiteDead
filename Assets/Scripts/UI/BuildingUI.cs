@@ -17,6 +17,21 @@ public class BuildingUI : MonoBehaviour
 
     public void Update()
     {
+        if (UI.AnyOpen)
+        {
+            // Is that UI the menu?
+            if (Menu.IsOpen)
+            {
+                // That's fine!
+            }
+            else
+            {
+                // Our menus cannot be open at the same time as another UI.
+                MenuOpen = false;
+                BarOpen = false;
+            }
+        }
+
         if (MenuOpen)
         {
             BarOpen = true;

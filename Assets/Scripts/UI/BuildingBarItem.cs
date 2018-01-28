@@ -115,13 +115,6 @@ public class BuildingBarItem : MonoBehaviour
             bar.Items.RemoveAt(oldIndex + 1);
             bar.Refresh();
         }
-
-        // 0, 1, 2, 3
-        // a, b, c, d
-
-        // Moving from 2 to 1
-
-        Debug.Log("Moved from " + oldIndex + " to " + index);
     }
 
     public void UpdateVisuals(bool selected)
