@@ -16,7 +16,7 @@ public class BuildingInventory : NetworkBehaviour
     {
         if (!items.ContainsKey(prefab))
         {
-            Debug.LogError("Item could not be found for that prefab name, it might not be in the inventory right now.");
+            Debug.LogError("Item could not be found for that prefab name, it might not be in the inventory right now. (" + prefab + ")");
             return null;
         }
 

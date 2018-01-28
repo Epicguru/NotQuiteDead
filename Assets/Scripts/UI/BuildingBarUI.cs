@@ -13,6 +13,8 @@ public class BuildingBarUI : MonoBehaviour
     public Transform ItemParent;
     public Text SelectedText;
 
+    public List<BuildingItem> Items = new List<BuildingItem>();
+
     private List<BuildingBarItem> items = new List<BuildingBarItem>();
     private bool isOpen;
 
@@ -29,11 +31,16 @@ public class BuildingBarUI : MonoBehaviour
         foreach(var x in items)
         {
             GameObject go = Instantiate(Prefab, ItemParent);
+
             BuildingBarItem item = go.GetComponent<BuildingBarItem>();
+            item.Prefab = x.Prefab;
+            item.Icon = x.GetIcon();
+            item.Name = x.Name;
+            item.UpdateVisuals(false);
 
             go.GetComponent<RectTransform>().anchoredPosition = new Vector2(5 + 55 * index, 0f);
-            this.items.Add(item);
 
+            this.items.Add(item);
             index++;
         }
     }
@@ -44,8 +51,7 @@ public class BuildingBarUI : MonoBehaviour
             return;
 
         isOpen = true;
-        List<BuildingItem> i = new List<BuildingItem>(Player.Local.BuildingInventory.GetItems());
-        Spawn(i);
+        Spawn(Items);
     }
 
     public void Close()
@@ -68,6 +74,8 @@ public class BuildingBarUI : MonoBehaviour
 
     public void HighlightIndex()
     {
+        SelectedIndex = Mathf.Clamp(SelectedIndex, 0, items.Count - 1);
+
         for (int i = 0; i < items.Count; i++)
         {
             items[i].UpdateSelected(i == SelectedIndex);
@@ -83,7 +91,6 @@ public class BuildingBarUI : MonoBehaviour
     {
         if (items == null || items.Count == 0)
             return;
-
 
         foreach(var x in items)
         {

@@ -14,6 +14,7 @@ public class BuildingMenuUI : MonoBehaviour
     public Transform ItemParent;
     public InputField IF;
     public Dropdown DD;
+    public Transform GhostParent;
 
     private List<GameObject> spawned = new List<GameObject>();
     private bool isOpen;
@@ -52,7 +53,6 @@ public class BuildingMenuUI : MonoBehaviour
     public void Refresh()
     {
         // Rebuild the whole UI objects. Quite expensive so only done when necessary.
-
         if (Player.Local == null)
             return;
 
@@ -76,6 +76,11 @@ public class BuildingMenuUI : MonoBehaviour
             return;
 
         UI.FlagClosed();
+
+        foreach(Transform t in GhostParent)
+        {
+            Destroy(t.gameObject);
+        }
 
         isOpen = false;
         DestroySpawned();
