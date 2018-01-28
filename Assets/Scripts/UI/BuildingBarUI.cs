@@ -12,6 +12,7 @@ public class BuildingBarUI : MonoBehaviour
     public GameObject Prefab;
     public Transform ItemParent;
     public Text SelectedText;
+    public RectTransform Panel;
 
     public List<BuildingItem> Items = new List<BuildingItem>();
 
@@ -75,6 +76,19 @@ public class BuildingBarUI : MonoBehaviour
             return;
 
         UpdateSelected();
+        UpdatePanelSize();
+    }
+
+    public void UpdatePanelSize()
+    {
+        // Size.x = 10 + 55 * items (min 250)
+        // Size.y = 90
+
+        float x = Mathf.Clamp(10f + 55f * Items.Count, 250, float.MaxValue);
+        float y = 90;
+        Vector2 size = new Vector2(x, y);
+
+        Panel.sizeDelta = size;
     }
 
     public void UpdateSelected()

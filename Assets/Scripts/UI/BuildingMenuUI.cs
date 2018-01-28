@@ -10,11 +10,15 @@ public class BuildingMenuUI : MonoBehaviour
     [Header("Prefabs")]
     public GameObject Prefab;
 
+    [Header("States")]
+    public bool Dragging;
+
     [Header("References")]
     public Transform ItemParent;
     public InputField IF;
     public Dropdown DD;
     public Transform GhostParent;
+    public Image BuildBarDropDropZone;
 
     private List<GameObject> spawned = new List<GameObject>();
     private bool isOpen;
@@ -37,6 +41,9 @@ public class BuildingMenuUI : MonoBehaviour
         {
             Refresh();
         }
+
+        // Update raycasting state for the drop zone based on the dragging status.
+        BuildBarDropDropZone.raycastTarget = Dragging;
     }
 
     public void Open()
@@ -48,6 +55,7 @@ public class BuildingMenuUI : MonoBehaviour
         isOpen = true;
 
         Refresh();
+        Dragging = false;
     }
 
     public void Refresh()
@@ -76,6 +84,7 @@ public class BuildingMenuUI : MonoBehaviour
             return;
 
         UI.FlagClosed();
+        Dragging = false;
 
         foreach(Transform t in GhostParent)
         {

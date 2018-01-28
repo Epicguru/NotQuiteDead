@@ -71,6 +71,9 @@ public class BuildingMenuItem : MonoBehaviour
         ghost.Icon = Icon;
         ghost.UpdateVisuals();
         Ghost = go;
+
+        // Indicate that we are now dragging.
+        GetComponentInParent<BuildingMenuUI>().Dragging = true;
     }
 
     public void DragOngoing(PointerEventData eventData)
@@ -100,5 +103,8 @@ public class BuildingMenuItem : MonoBehaviour
         {
             Destroy(Ghost);
         }
+
+        // We are no logner dragging, tell the manager class that.
+        GetComponentInParent<BuildingMenuUI>().Dragging = false;
     }
 }

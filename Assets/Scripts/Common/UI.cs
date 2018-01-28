@@ -18,15 +18,24 @@ public static class UI
     public static void FlagOpen()
     {
         OpenCount++;
+        Verify();
     }
 
     public static void FlagClosed()
     {
         OpenCount--;
+        Verify();
     }
 
     public static void Reset()
     {
         OpenCount = 0;
+        Verify();
+    }
+
+    private static void Verify()
+    {
+        if (OpenCount < 0)
+            OpenCount = 0;
     }
 }

@@ -11,7 +11,7 @@ public class BuildingBarDrop : MonoBehaviour
         EventTrigger trigger = GetComponent<EventTrigger>();
         EventTrigger.Entry entry;
 
-        // Drag begin.
+        // Drop.
         entry = new EventTrigger.Entry();
         entry.eventID = EventTriggerType.Drop;
         entry.callback.AddListener((data) => { Drop((PointerEventData)data); });
