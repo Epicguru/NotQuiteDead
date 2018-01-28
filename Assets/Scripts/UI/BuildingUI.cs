@@ -15,6 +15,8 @@ public class BuildingUI : MonoBehaviour
     public BuildingMenuUI Menu;
     public BuildingBarUI Bar;
 
+    public static BuildingUI Instance;
+
     public void Update()
     {
         if (UI.AnyOpen)
@@ -57,5 +59,15 @@ public class BuildingUI : MonoBehaviour
         {
             Bar.Close();
         }
+    }
+
+    public void Awake()
+    {
+        Instance = this;
+    }
+
+    public void OnDestroy()
+    {
+        Instance = null;
     }
 }

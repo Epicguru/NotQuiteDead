@@ -47,6 +47,9 @@ public static class InputManager
         defaultKeyBindings.Add("Quick Store", KeyCode.LeftShift);
         defaultKeyBindings.Add("Quick Drop", KeyCode.LeftControl);
 
+        // Building
+        defaultKeyBindings.Add("Toggle Build Mode", KeyCode.Q);
+
         // Control
         defaultKeyBindings.Add("Fullscreen", KeyCode.F11);
         defaultKeyBindings.Add("Key Config", KeyCode.F1);

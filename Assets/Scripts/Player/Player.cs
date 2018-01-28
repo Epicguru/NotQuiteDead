@@ -30,6 +30,7 @@ public class Player : NetworkBehaviour
     public BodyGearStats GearStats;
     public ActiveObject AO;
     public BuildingInventory BuildingInventory;
+    public PlayerBuilding Building;
     public BodyGear[] BodyGear;
     public Dictionary<string, BodyGear> GearMap = new Dictionary<string, BodyGear>();
     public Player _Player;
