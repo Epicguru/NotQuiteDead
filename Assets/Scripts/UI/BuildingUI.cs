@@ -4,7 +4,7 @@ using UnityEngine;
 public class BuildingUI : MonoBehaviour
 {
     [Header("Controls")]
-    public bool HeadbarOpen;
+    public bool BarOpen;
     public bool MenuOpen;
 
     [Header("Menu GO's")]
@@ -13,13 +13,17 @@ public class BuildingUI : MonoBehaviour
 
     [Header("References")]
     public BuildingMenuUI Menu;
+    public BuildingBarUI Bar;
 
     public void Update()
     {
         if (MenuOpen)
         {
-            HeadbarOpen = true;
+            BarOpen = true;
         }
+
+        HeadbarGO.SetActive(BarOpen);
+        MenuGO.SetActive(MenuOpen);
 
         if (MenuOpen)
         {
@@ -30,24 +34,13 @@ public class BuildingUI : MonoBehaviour
             Menu.Close();
         }
 
-        HeadbarGO.SetActive(HeadbarOpen);
-        MenuGO.SetActive(MenuOpen);
-    }
-
-    public void OpenMenu()
-    {
-        if (MenuOpen)
-            return;
-        MenuOpen = true;
-
-    }
-
-    public void CloseMenu()
-    {
-        if (!MenuOpen)
-            return;
-        MenuOpen = false;
-
-
+        if (BarOpen)
+        {
+            Bar.Open();
+        }
+        else
+        {
+            Bar.Close();
+        }
     }
 }

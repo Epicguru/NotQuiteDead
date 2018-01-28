@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BuildingBarUI : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class BuildingBarUI : MonoBehaviour
     [Header("Editor Only")]
     public GameObject Prefab;
     public Transform ItemParent;
+    public Text SelectedText;
 
     private List<BuildingBarItem> items = new List<BuildingBarItem>();
     private bool isOpen;
@@ -42,8 +44,8 @@ public class BuildingBarUI : MonoBehaviour
             return;
 
         isOpen = true;
-
-
+        List<BuildingItem> i = new List<BuildingItem>(Player.Local.BuildingInventory.GetItems());
+        Spawn(i);
     }
 
     public void Close()
@@ -69,6 +71,11 @@ public class BuildingBarUI : MonoBehaviour
         for (int i = 0; i < items.Count; i++)
         {
             items[i].UpdateSelected(i == SelectedIndex);
+            if(i == SelectedIndex)
+            {
+                if(Player.Local != null)
+                    items[i].SetText(SelectedText, Player.Local.BuildingInventory.GetItem(items[i].Prefab).Count);
+            }
         }
     }
 

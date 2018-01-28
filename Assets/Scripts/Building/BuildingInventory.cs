@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Networking;
 
 public class BuildingInventory : NetworkBehaviour
@@ -10,6 +11,17 @@ public class BuildingInventory : NetworkBehaviour
     public int ActionID { get; private set; }
 
     private Dictionary<string, BuildingItem> items = new Dictionary<string, BuildingItem>();
+
+    public BuildingItem GetItem(string prefab)
+    {
+        if (!items.ContainsKey(prefab))
+        {
+            Debug.LogError("Item could not be found for that prefab name, it might not be in the inventory right now.");
+            return null;
+        }
+
+        return items[prefab];
+    }
 
     public void AddItems(BaseTile tile, int count)
     {
