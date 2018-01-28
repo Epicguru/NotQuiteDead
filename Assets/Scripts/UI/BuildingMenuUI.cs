@@ -62,7 +62,7 @@ public class BuildingMenuUI : MonoBehaviour
 
         foreach(var item in items)
         {
-            x.Add(new BuildingItemData() { Name = item.Name, Rarity = item.GetRarity(), Count = item.Count, Icon = item.GetIcon() });
+            x.Add(new BuildingItemData() { Name = item.Name, Prefab = item.Prefab, Rarity = item.GetRarity(), Count = item.Count, Icon = item.GetIcon() });
         }
 
         Spawn(x, IF.text.Trim(), GetCurrentSorting());
@@ -206,6 +206,7 @@ public class BuildingMenuUI : MonoBehaviour
             i.BGColour = item.GetColour();
             i.Name = item.Name;
             i.Count = item.Count;
+            i.Prefab = item.Prefab;
             i.UpdateVisuals();
         }
     }

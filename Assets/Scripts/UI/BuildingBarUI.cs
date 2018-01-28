@@ -51,6 +51,11 @@ public class BuildingBarUI : MonoBehaviour
             return;
 
         isOpen = true;
+        Refresh();
+    }
+
+    public void Refresh()
+    {
         Spawn(Items);
     }
 
@@ -69,10 +74,10 @@ public class BuildingBarUI : MonoBehaviour
         if (!isOpen)
             return;
 
-        HighlightIndex();
+        UpdateSelected();
     }
 
-    public void HighlightIndex()
+    public void UpdateSelected()
     {
         SelectedIndex = Mathf.Clamp(SelectedIndex, 0, items.Count - 1);
 

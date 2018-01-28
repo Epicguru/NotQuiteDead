@@ -8,7 +8,7 @@ public class BuildingItem
     public string Name; // UI name.
     public BuildingItemType Type; // Tile or furniture?
     public string Prefab; // For both tiles and furnitures.
-    public int Count; // Since this iswithin an inventory, how many do we have?
+    public int Count; // Since this is within an inventory, how many do we have?
 
     public BuildingItem(BaseTile tile, int count)
     {

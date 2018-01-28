@@ -7,6 +7,7 @@ public class BuildingMenuItem : MonoBehaviour
     [Header("Code Only")]
     public Color BGColour;
     public string Name;
+    public string Prefab;
     public int Count;
     public Sprite Icon;
 
@@ -65,6 +66,10 @@ public class BuildingMenuItem : MonoBehaviour
 
         // Create the ghost object and parent to this.
         GameObject go = Instantiate(GhostPrefab, GetComponentInParent<BuildingMenuUI>().GhostParent);
+        var ghost = go.GetComponent<BuildingItemGhost>();
+        ghost.Prefab = Prefab;
+        ghost.Icon = Icon;
+        ghost.UpdateVisuals();
         Ghost = go;
     }
 
