@@ -8,6 +8,6 @@ public class TacLight : MonoBehaviour
 
     public void Update()
     {
-        Disabler.Enabled = Attachment.IsAttached;
+        Disabler.Enabled = Attachment.IsAttached && Attachment.Gun.GetComponent<Item>().IsEquipped();
     }
 }

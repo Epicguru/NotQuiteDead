@@ -164,6 +164,18 @@ public class PlayerHolding : NetworkBehaviour
             if(handyRemoval.IsShowingHands() != (Item == null))
                 handyRemoval.CmdSetShowHands(Item == null);
             //looking.Looking = Item != null;
+
+            if(Player.Local != null)
+            {
+                if (Player.Local.Building.InBuildMode)
+                {
+                    if (Item != null)
+                    {
+                        Item.RequestDataUpdate();
+                        CmdDrop(false, false, Player.Local.gameObject, Item.Data);
+                    }
+                }
+            }
         }
 
         UpdateRotation();
