@@ -67,6 +67,20 @@ public class QuickSlotInput : MonoBehaviour
                         }
                     }
 
+                    if(item == null)
+                    {
+                        if(Player.Local != null)
+                        {
+                            if(Player.Local.Holding.Item != null)
+                            {
+                                if(Player.Local.Holding.Item.Data.QuickSlot == i + 1)
+                                {
+                                    Player.Local.Holding.Item.Data.QuickSlot = 0;
+                                }
+                            }
+                        }
+                    }
+
                     if (item != null)
                     {
                         item.Data.QuickSlot = 0;
