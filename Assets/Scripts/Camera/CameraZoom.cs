@@ -41,11 +41,12 @@ public class CameraZoom : MonoBehaviour {
             Tick();
         }
 
-        if (!UI.AnyOpen)
+        if (UI.AnyOpen)
             return;
         if (Player.Local != null)
             if (Player.Local.Building.InBuildMode)
                 return;
+
         Size -= (Input.mouseScrollDelta).y * (Size / 10f);
     }
 
