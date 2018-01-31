@@ -34,15 +34,19 @@ public class CameraZoom : MonoBehaviour {
 
     public void Update()
     {
-        if (!UI.AnyOpen)
-            Size -= (Input.mouseScrollDelta).y * (Size / 10f);
-
         timer += Time.unscaledDeltaTime;
         while(timer >= 1f / 60f)
         {
             timer -= 1f / 60f;
             Tick();
         }
+
+        if (!UI.AnyOpen)
+            return;
+        if (Player.Local != null)
+            if (Player.Local.Building.InBuildMode)
+                return;
+        Size -= (Input.mouseScrollDelta).y * (Size / 10f);
     }
 
     public void Tick()

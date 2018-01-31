@@ -12,7 +12,8 @@ public class PlayerBuilding : NetworkBehaviour
 
     [Header("Data")]
     [ReadOnly]
-    public bool MenuOpen;
+    [SerializeField]
+    private bool menuOpen;
 
     private float timer;
     private bool clicked;
@@ -26,14 +27,15 @@ public class PlayerBuilding : NetworkBehaviour
         UpdateMenuOpening();
         UpdateModeToggle();    
         UpdateMenuClosing();
+        UpdateSelected();
 
         BuildingUI.Instance.BarOpen = InBuildMode;
-        BuildingUI.Instance.MenuOpen = MenuOpen;
+        BuildingUI.Instance.MenuOpen = menuOpen;
     }
 
     private void UpdateModeToggle()
     {
-        if (MenuOpen)
+        if (menuOpen)
         {
             // Controls are different when within menu.
             return;
@@ -70,11 +72,11 @@ public class PlayerBuilding : NetworkBehaviour
 
     private void UpdateMenuClosing()
     {
-        if (MenuOpen)
+        if (menuOpen)
         {
             if (InputManager.InputDown("Toggle Build Mode", true))
             {
-                MenuOpen = false;
+                menuOpen = false;
                 justClosed = true;
             }
         }
@@ -98,7 +100,37 @@ public class PlayerBuilding : NetworkBehaviour
         if(timer > HoldTime)
         {
             timer = 0;
-            MenuOpen = true;
+            menuOpen = true;
+        }
+    }
+
+    private void UpdateSelected()
+    {
+        // TODO - I would like to use the scrollwheel, but that controls zoom!
+
+        if (BuildingUI.Instance == null)
+            return;
+        if (!InBuildMode)
+            return;
+
+        float delta = Input.mouseScrollDelta.y;
+
+        if(delta != 0f)
+        {
+            bool up = delta > 0f;
+
+            int selected = BuildingUI.Instance.Bar.SelectedIndex;
+            if (up)
+            {
+                selected++;
+            }
+            else
+            {
+                selected--;
+            }
+
+            selected = Mathf.Clamp(selected, 0, BuildingUI.Instance.Bar.Items.Count - 1);
+            BuildingUI.Instance.Bar.SelectedIndex = selected;
         }
     }
 }

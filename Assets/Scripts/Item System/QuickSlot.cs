@@ -13,6 +13,9 @@ public class QuickSlot : NetworkBehaviour
             return;
         if (!InputManager.Active)
             return;
+        if (Player.Local != null)
+            if (Player.Local.Building.InBuildMode)
+                return;
 
         for (int i = 0; i < Slots.Length; i++)
         {
