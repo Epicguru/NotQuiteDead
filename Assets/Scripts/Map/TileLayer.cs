@@ -314,9 +314,14 @@ public class TileLayer : NetworkBehaviour
         // On a client, we need to request that the tile is placed on the server. How long it will take until the tile is placed it unknown.
 
         if(GetTile(x, y) != tile)
+        {
             Player.Local.NetUtils.CmdRequestTileChange(tile == null ? null : tile.Prefab, x, y, Name);
-
-        return false;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     [Server]

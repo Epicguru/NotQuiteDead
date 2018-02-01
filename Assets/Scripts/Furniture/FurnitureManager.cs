@@ -24,20 +24,20 @@ public class FurnitureManager : NetworkBehaviour
         DebugText.Log(furniture.Count + " furniture placed throughout the world.");
     }
 
-    public void PlaceFurniture(string prefab, int x, int y)
+    public bool PlaceFurniture(string prefab, int x, int y)
     {
         if (isServer)
         {
-            Place_Server(prefab, x, y);
+            return Place_Server(prefab, x, y);
         }
         else
         {
-            Place_Client(prefab, x, y);
+            return Place_Client(prefab, x, y);
         }
     }
 
     [Server]
-    private void Place_Server(string prefab, int x, int y)
+    private bool Place_Server(string prefab, int x, int y)
     {
         if(prefab == null)
         {
@@ -47,23 +47,29 @@ public class FurnitureManager : NetworkBehaviour
 
                 // Will destroy on clients.
                 Destroy(placed);
+
+                // Sucessfully placed...
+                return true;
             }
+            return true;
         }
         else
         {
             if(IsFurnitureAt(x, y))
             {
-                return;
+                // Can't just place where another furniture is...
+                // Destroy it first.
+                return false;
             }
 
             if(!GetLayer().InLayerBounds(x, y))
             {
-                return;
+                return false;
             }
 
             if (TileAt(x, y))
             {
-                return;
+                return false;
             }
 
             Furniture pre = Furniture.GetFurniture(prefab);
@@ -74,36 +80,39 @@ public class FurnitureManager : NetworkBehaviour
                 instance.SetPosition(x, y);
 
                 NetworkServer.Spawn(instance.gameObject);
+                return true;
             }
+            return false;
         }
     }
 
     [Client]
-    private void Place_Client(string prefab, int x, int y)
+    private bool Place_Client(string prefab, int x, int y)
     {
         if (Player.Local == null)
-            return;
+            return false;
 
         if(!GetLayer().InLayerBounds(x, y))
         {
             Debug.LogError("Not in bounds! (" + x + ", " + y + ")");
-            return;
+            return false;
         }
 
         if(IsFurnitureAt(x, y))
         {
             Debug.LogError("Already furniture there! (" + x + ", " + y + ")");
-            return;
+            return false;
         }
 
         // TODO furniture on top of tiles?
         if(TileAt(x, y))
         {
             Debug.LogError("Tile is at that position. Cannot have furniture and tile in the same place!");
-            return;
+            return false;
         }
 
         Player.Local.NetUtils.CmdPlaceFurniture(prefab, prefab == null, x, y);
+        return true;
     }
 
     public bool TileAt(int x, int y)

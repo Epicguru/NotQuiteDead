@@ -23,6 +23,20 @@ public class BuildingInventory : NetworkBehaviour
         return items[prefab];
     }
 
+    public void RemoveItems(string prefab, int count)
+    {
+        if (count < 0)
+            count *= -1;
+
+        if (items.ContainsKey(prefab))
+        {
+            BuildingItem i = items[prefab];
+            i.Count -= count;
+            if (i.Count <= 0)
+                items.Remove(prefab);
+        }
+    }
+
     public void AddItems(BaseTile tile, int count)
     {
         if (count <= 0)

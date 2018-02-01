@@ -116,11 +116,11 @@ public class PlayerBuilding : NetworkBehaviour
 
         float delta = Input.mouseScrollDelta.y;
 
+        int selected = BuildingUI.Instance.Bar.SelectedIndex;
         if(delta != 0f)
         {
             bool up = delta > 0f;
 
-            int selected = BuildingUI.Instance.Bar.SelectedIndex;
             if (up)
             {
                 selected++;
@@ -130,14 +130,17 @@ public class PlayerBuilding : NetworkBehaviour
                 selected--;
             }
 
-            selected = Mathf.Clamp(selected, 0, BuildingUI.Instance.Bar.Items.Count - 1);
-            BuildingUI.Instance.Bar.SelectedIndex = selected;
         }
+        selected = Mathf.Clamp(selected, 0, BuildingUI.Instance.Bar.Items.Count - 1);
+        BuildingUI.Instance.Bar.SelectedIndex = selected;
     }
 
     private void UpdatePlacing()
     {
         if (!InBuildMode)
+            return;
+
+        if (!InputManager.InputPressed("Shoot"))
             return;
 
         if (Player.Local == null)
@@ -147,10 +150,47 @@ public class PlayerBuilding : NetworkBehaviour
             return;
 
         int index = BuildingUI.Instance.Bar.SelectedIndex;
+        if (index < 0 || index >= BuildingUI.Instance.Bar.Items.Count)
+            return;
+
         BuildingItem item = BuildingUI.Instance.Bar.Items[index];
         if(item != null)
         {
+            // Place this item where the mouse is, and remove one from the inventory.
 
+            string layer = "Foreground";
+            int x = (int)InputManager.GetMousePos().x;
+            int y = (int)InputManager.GetMousePos().y;
+
+            switch (item.Type)
+            {
+                case BuildingItemType.FURNITURE:
+
+                    Furniture f = item.GetFurniture();
+                    layer = f.Layer;
+
+                    // Place furniture.
+                    bool worked = World.Instance.Furniture.PlaceFurniture(f.Prefab, x, y);
+
+                    // Remove one from inventory.
+                    if(worked)
+                        Player.Local.BuildingInventory.RemoveItems(f.Prefab, 1);
+
+                    break;
+
+                case BuildingItemType.TILE:
+
+                    BaseTile tile = item.GetTile();
+
+                    // Place tile.
+                    worked = World.Instance.TileMap.GetLayer(layer).SetTile(tile, x, y);
+
+                    // Remove one from inventory.
+                    if(worked)
+                        Player.Local.BuildingInventory.RemoveItems(tile.Prefab, 1);
+
+                    break;
+            }
         }
     }
 }
