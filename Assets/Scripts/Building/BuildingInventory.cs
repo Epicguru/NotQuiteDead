@@ -12,6 +12,11 @@ public class BuildingInventory : NetworkBehaviour
 
     private Dictionary<string, BuildingItem> items = new Dictionary<string, BuildingItem>();
 
+    public bool ContainsItem(string prefab)
+    {
+        return items.ContainsKey(prefab);
+    }
+
     public BuildingItem GetItem(string prefab)
     {
         if (!items.ContainsKey(prefab))

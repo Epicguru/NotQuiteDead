@@ -98,6 +98,14 @@ public class BuildingBarUI : MonoBehaviour
     {
         SelectedIndex = Mathf.Clamp(SelectedIndex, 0, items.Count - 1);
 
+        bool inInventory = Player.Local.BuildingInventory.ContainsItem(items[SelectedIndex].Prefab);
+
+        if (!inInventory)
+        {
+            Refresh();
+            return;
+        }
+
         for (int i = 0; i < items.Count; i++)
         {
             items[i].UpdateSelected(i == SelectedIndex);
