@@ -225,7 +225,6 @@ public class PlayerHolding : NetworkBehaviour
             {
                 timer -= Time.deltaTime;
                 looking.Looking = false;
-                DebugText.Log("Timer is lowering, is now " + timer + " / " + r.GetAimTime() + ", lerp is " + lerp);
             }
 
             timer = Mathf.Clamp(timer, 0f, r.GetAimTime());
