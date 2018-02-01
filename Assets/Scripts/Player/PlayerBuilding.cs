@@ -28,6 +28,7 @@ public class PlayerBuilding : NetworkBehaviour
         UpdateModeToggle();    
         UpdateMenuClosing();
         UpdateSelected();
+        UpdatePlacing();
 
         BuildingUI.Instance.BarOpen = InBuildMode;
         BuildingUI.Instance.MenuOpen = menuOpen;
@@ -131,6 +132,25 @@ public class PlayerBuilding : NetworkBehaviour
 
             selected = Mathf.Clamp(selected, 0, BuildingUI.Instance.Bar.Items.Count - 1);
             BuildingUI.Instance.Bar.SelectedIndex = selected;
+        }
+    }
+
+    private void UpdatePlacing()
+    {
+        if (!InBuildMode)
+            return;
+
+        if (Player.Local == null)
+            return;
+
+        if (BuildingUI.Instance == null)
+            return;
+
+        int index = BuildingUI.Instance.Bar.SelectedIndex;
+        BuildingItem item = BuildingUI.Instance.Bar.Items[index];
+        if(item != null)
+        {
+
         }
     }
 }
