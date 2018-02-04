@@ -53,6 +53,11 @@ public class GameTime : NetworkBehaviour
         return (int)(hours * remainder);
     }
 
+    public float GetDayProgress()
+    {
+        return time - GetDay();
+    }
+
     public string GetPartOfDay()
     {
         int hour = GetHour();
