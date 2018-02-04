@@ -125,6 +125,6 @@ public class GameTime : NetworkBehaviour
 
     public string GetTimeFull()
     {
-        return "Day " + GetDay() + " " + GetPartOfDay() + " - " + GetTime();
+        return "Day " + GetDay() + " " + GetPartOfDay() + " - " + GetTime() + " (" + (DayNight.IsDay ? "Daytime" : "Night-time") + ")";
     }
 }
