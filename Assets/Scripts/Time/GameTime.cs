@@ -3,10 +3,14 @@ using System;
 using UnityEngine;
 using UnityEngine.Networking;
 
+[RequireComponent(typeof(DayNightCycle))]
 public class GameTime : NetworkBehaviour
 {
     // Holds the current in-game time of day, month, year etc.
     public static GameTime Instance;
+
+    [HideInInspector]
+    public DayNightCycle DayNight;
 
     // In in-game days.
     // Value of 0.00 is midnight day zero.
@@ -21,6 +25,8 @@ public class GameTime : NetworkBehaviour
     public void Awake()
     {
         Instance = this;
+
+        DayNight = GetComponent<DayNightCycle>();
     }
 
     public void OnDestroy()
