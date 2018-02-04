@@ -12,6 +12,8 @@ public class GameTime : NetworkBehaviour
     [HideInInspector]
     public DayNightCycle DayNight;
 
+    public float SecondsPerDay = 120;
+
     // In in-game days.
     // Value of 0.00 is midnight day zero.
     // Value of 0.25 is morning day zero.
@@ -36,6 +38,11 @@ public class GameTime : NetworkBehaviour
 
     public void Update()
     {
+        if (isServer)
+        {
+            time += Time.deltaTime / SecondsPerDay;
+        }
+
         DebugText.Log("Time: " + GetTimeFull());
     }
 
