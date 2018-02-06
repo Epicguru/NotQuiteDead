@@ -17,12 +17,27 @@ public class EnemySpawner : NetworkBehaviour
             return;
 
         int day = GameTime.Instance.GetDay();
+        float secondsPerDay = GameTime.Instance.SecondsPerDay;
         foreach (var info in Enemies)
         {
             // Chance per frame:
             // CpD  * Time.deltaTime / SecondsPerDay
 
+            int hourRange = info.MaxHour - info.MinHour;
+            float partOfDay = hourRange / 24f;
+
             float enemiesPerDay = info.GetSpawnRate(day);
+            float enemiesPerPart = enemiesPerDay / (partOfDay);
+
+            float enemiesPerSecond = enemiesPerPart / secondsPerDay;
+            float enemiesPerFrame = enemiesPerSecond * Time.deltaTime;
+
+            bool spawn = Random.value <= enemiesPerFrame;
+
+            if (spawn)
+            {
+                Spawn(info.Pawn.Prefab, info.SpawnType);
+            }
         }
     }
 
