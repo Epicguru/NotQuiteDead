@@ -30,6 +30,10 @@ public class EnemySpawningInfo
     {
         if (day < 0)
             return 0f;
+        if (day < MinDay)
+            return 0f;
+        if (day > MaxDay)
+            return 0f;
 
         if(MaxDay < 0)
         {

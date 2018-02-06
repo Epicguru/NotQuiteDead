@@ -48,7 +48,7 @@ public class EnemySpawner : NetworkBehaviour
 
         if(day != this.day)
         {
-            Debug.Log("In this day spawned " + spawned + " enemies.");
+            Debug.Log("In this previous day, " + spawned + " enemies spawned.");
             spawned = 0;
             this.day = day;
         }
