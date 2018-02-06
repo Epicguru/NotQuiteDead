@@ -23,6 +23,9 @@ public class EnemySpawningInfo
     [Header("Spawn Type")]
     public EnemySpawnType SpawnType = EnemySpawnType.AROUND_RANDOM_PLAYER;
 
+    [HideInInspector]
+    public float Timer;
+
     public float GetSpawnRate(int day)
     {
         if (day < 0)

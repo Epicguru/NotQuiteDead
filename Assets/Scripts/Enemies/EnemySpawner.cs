@@ -10,6 +10,8 @@ public class EnemySpawner : NetworkBehaviour
 
     public bool SpawnEnemies = true;
     public float SpawnMultiplier = 1f;
+    public int day = 0;
+    public int spawned = 0;
 
     public void Update()
     {
@@ -17,27 +19,38 @@ public class EnemySpawner : NetworkBehaviour
             return;
 
         int day = GameTime.Instance.GetDay();
+        int hour = GameTime.Instance.GetHour();
         float secondsPerDay = GameTime.Instance.SecondsPerDay;
         foreach (var info in Enemies)
         {
-            // Chance per frame:
-            // CpD  * Time.deltaTime / SecondsPerDay
+            if (hour < info.MinHour)
+                return;
+            if (hour > info.MaxHour)
+                return;
 
-            int hourRange = info.MaxHour - info.MinHour;
-            float partOfDay = hourRange / 24f;
+            info.Timer += Time.deltaTime;
 
-            float enemiesPerDay = info.GetSpawnRate(day);
-            float enemiesPerPart = enemiesPerDay / (partOfDay);
+            float partOfDay = (info.MaxHour - info.MinHour) / 24f;
+            float perDay = info.GetSpawnRate(day);
 
-            float enemiesPerSecond = enemiesPerPart / secondsPerDay;
-            float enemiesPerFrame = enemiesPerSecond * Time.deltaTime * SpawnMultiplier;
+            float daySection = (1f / perDay) * partOfDay;
 
-            bool spawn = Random.value <= enemiesPerFrame;
+            float seconds = (daySection * secondsPerDay) / SpawnMultiplier;
 
-            if (spawn)
+            while(info.Timer >= seconds)
             {
+                info.Timer -= seconds;
+
                 Spawn(info.Pawn.Prefab, info.SpawnType);
+                spawned++;
             }
+        }
+
+        if(day != this.day)
+        {
+            Debug.Log("In this day spawned " + spawned + " enemies.");
+            spawned = 0;
+            this.day = day;
         }
     }
 
