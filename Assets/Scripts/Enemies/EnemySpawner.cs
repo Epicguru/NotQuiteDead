@@ -30,7 +30,7 @@ public class EnemySpawner : NetworkBehaviour
             float enemiesPerPart = enemiesPerDay / (partOfDay);
 
             float enemiesPerSecond = enemiesPerPart / secondsPerDay;
-            float enemiesPerFrame = enemiesPerSecond * Time.deltaTime;
+            float enemiesPerFrame = enemiesPerSecond * Time.deltaTime * SpawnMultiplier;
 
             bool spawn = Random.value <= enemiesPerFrame;
 
