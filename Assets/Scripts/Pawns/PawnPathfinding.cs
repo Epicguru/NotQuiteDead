@@ -331,20 +331,15 @@ public class PawnPathfinding : NetworkBehaviour
                                 //Now, we just prioritize getting our main Path calculated.
                                 // Do this by using our backup path.
 
-                                // We need to stand still until our new path arrives, because otherwise the pathfinder does not have time to catch up.
-
-                                DebugText.Log("Skipped mode...");                                
+                                // We need to stand still until our new path arrives, because otherwise the pathfinder does not have time to catch up.                         
 
                                 forcePause = true;
                                 if (backupPath == null)
                                 {
-                                    DebugText.Log("Looking for backup path...");
                                     Pathfinding.Find(GetID(), path[0].X, path[0].Y, target.x, target.y, GetLayer(), SetBackupPath);
                                 }
                                 else
                                 {
-                                    DebugText.Log("Got backup path...");
-
                                     // Finally, our backup path.
                                     path = backupPath;
                                     backupPath = null;
