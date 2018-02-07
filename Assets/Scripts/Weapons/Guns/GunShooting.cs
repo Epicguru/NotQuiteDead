@@ -423,10 +423,11 @@ public class GunShooting : RotatingItem
         switch (BulletType)
         {
             case GunBulletType.HITSCAN:
-                Hit_Hitscan(myPos, bulletCount);
+                Hit_Hitscan(endPos, bulletCount);
                 break;
 
             case GunBulletType.SUBSONIC:
+                Hit_Subsonic(endPos, bulletCount);
                 break;
         }
     }
@@ -605,6 +606,11 @@ public class GunShooting : RotatingItem
         CmdSpawnBulletTrail(GetBulletSpawn().position, trailEnd);
 
         objects.Clear();
+    }
+
+    private void Hit_Subsonic(Vector2 end, int bullets)
+    {
+
     }
 
     [Command]
