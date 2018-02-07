@@ -623,7 +623,7 @@ public class GunShooting : RotatingItem
             if(Health.CanHitObject(hit.collider, Player.Local.Team))
             {
                 // The bullet cannot fire because it will hit the wall in front of us...
-                // oh well. TODO fixme.
+                // Oh well.
                 return;
             }
         }

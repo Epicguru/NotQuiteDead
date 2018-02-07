@@ -13,18 +13,27 @@ public class SubsonicBullet : MonoBehaviour
     public string Shooter;
     public string Weapon;
 
+    [Header("References")]
+    public Transform Tip;
+
     public void Update()
     {
-        Vector2 a = transform.position;
-        Vector2 b = a + (Vector2)(transform.right * Time.deltaTime * Speed);
+        Vector2 a = Tip.position;
+        Vector2 b = a + (Vector2)(Tip.right * Time.deltaTime * Speed);
 
         RaycastHit2D hit;
         bool collides = DetectCollision(a, b, out hit);
 
         if (collides)
         {
-            transform.position = hit.point;
+            // Spawn hit effect.
+            float angle = Mathf.Atan2(hit.normal.y, hit.normal.x) * Mathf.Rad2Deg + 180;
+            HitEffect.Spawn(hit.point, angle, 15, Color.yellow, HitEffectPreset.Sparks);
+
+            // Deal damage to the object if we are on the server.
             HitObject(hit);
+
+            // Pool
             Recycle();
         }
         else
