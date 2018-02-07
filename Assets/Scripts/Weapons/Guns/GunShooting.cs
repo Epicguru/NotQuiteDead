@@ -15,6 +15,8 @@ public class GunShooting : RotatingItem
 
     [Header("Bullet Firing")]
     public Transform DefaultBulletSpawn;
+    [Tooltip("The type of projectile that this gun fires.")]
+    public GunBulletType BulletType = GunBulletType.HITSCAN;
     [Tooltip("If true, when the reload animation ends, if there is not a round in the chamber then the first bullet from the magazine is automatically chambered, so the chamber animation never plays.")]
     public bool ReloadAutoChambers = false;
     [Tooltip("If true, when the reload animation starts, the chambered round is discarded (not visually), which could cause the chamber animation every reload unless ReloadAutoChambers is set to true.")]
@@ -406,14 +408,27 @@ public class GunShooting : RotatingItem
             float yOffset = Mathf.Sin(angle * Mathf.Deg2Rad) * range;
             myPos.Set(transform.position.x + xOffset, transform.position.y + yOffset);
 
-            // Hit real objects...
-            HitObjects(myPos, bullets);
+            // Hit real objects using the current bullet type.
+            EvaluateBulletType(myPos, bullets);            
         }
 
         // Set time since last shot...
         timer = 0; // Now!
         // This will add inaccuracy.
         shotInaccuracy += 1f / Damage.ShotsToInaccuracy;
+    }
+
+    private void EvaluateBulletType(Vector2 endPos, int bulletCount)
+    {
+        switch (BulletType)
+        {
+            case GunBulletType.HITSCAN:
+                Hit_Hitscan(myPos, bulletCount);
+                break;
+
+            case GunBulletType.SUBSONIC:
+                break;
+        }
     }
 
     private float GetBaseBulletDamage(int totalBullets)
@@ -492,7 +507,7 @@ public class GunShooting : RotatingItem
     private Vector2 startPos = new Vector2();
     private Vector2 trailEnd = new Vector2();
     private List<Health> objects = new List<Health>();
-    private void HitObjects(Vector2 end, int bullets)
+    private void Hit_Hitscan(Vector2 end, int bullets)
     {
         objects.Clear();
         startPos.Set(transform.position.x, transform.position.y);
