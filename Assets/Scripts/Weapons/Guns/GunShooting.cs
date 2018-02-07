@@ -628,7 +628,7 @@ public class GunShooting : RotatingItem
             }
         }
 
-        Vector2 start = b;
+        Vector2 start = GetBulletSpawn().position;
         Vector2 vector = end - start;
         float angle = Mathf.Atan2(vector.y, vector.x) * Mathf.Rad2Deg;
 

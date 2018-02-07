@@ -90,7 +90,7 @@ public class SubsonicBullet : MonoBehaviour
     {
         SubsonicBullet sb = ObjectPool.Instantiate(Spawnables.I.SubsonicBullet, PoolType.SUBSONIC_BULLET).GetComponent<SubsonicBullet>();
 
-        Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        Quaternion rotation = Quaternion.Euler(0, 0, angle);
 
         sb.Init(pos, rotation, speed, team, shooter, weapon, damage);
     }
