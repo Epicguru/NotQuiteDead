@@ -17,6 +17,9 @@ public class GunShooting : RotatingItem
     public Transform DefaultBulletSpawn;
     [Tooltip("The type of projectile that this gun fires.")]
     public GunBulletType BulletType = GunBulletType.HITSCAN;
+    [Header("Bullet Firing - Subsonic")]
+    public float SubsonicBulletSpeed = 50f;
+    [Header("Bullet Firing - Other")]
     [Tooltip("If true, when the reload animation ends, if there is not a round in the chamber then the first bullet from the magazine is automatically chambered, so the chamber animation never plays.")]
     public bool ReloadAutoChambers = false;
     [Tooltip("If true, when the reload animation starts, the chambered round is discarded (not visually), which could cause the chamber animation every reload unless ReloadAutoChambers is set to true.")]
@@ -610,7 +613,26 @@ public class GunShooting : RotatingItem
 
     private void Hit_Subsonic(Vector2 end, int bullets)
     {
+        Vector2 a = transform.position;
+        Vector2 b = GetBulletSpawn().position;
 
+        RaycastHit2D[] hits = Physics2D.LinecastAll(a, b);
+
+        foreach(var hit in hits)
+        {
+            if(Health.CanHitObject(hit.collider, Player.Local.Team))
+            {
+                // The bullet cannot fire because it will hit the wall in front of us...
+                // oh well. TODO fixme.
+                return;
+            }
+        }
+
+        Vector2 start = b;
+        Vector2 vector = end - start;
+        float angle = Mathf.Atan2(vector.y, vector.x) * Mathf.Rad2Deg;
+
+        SubsonicBullet.Spawn(start, angle, SubsonicBulletSpeed, Player.Local.Team, Player.Local.Name, gun.Item.Prefab, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage);
     }
 
     [Command]
