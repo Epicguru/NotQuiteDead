@@ -629,7 +629,11 @@ public class GunShooting : RotatingItem
         }
 
         Vector2 start = GetBulletSpawn().position;
-        Vector2 vector = end - start;
+        Vector2 realEnd = end;
+        realEnd -= (Vector2)transform.position;
+        realEnd *= 1000f;
+        realEnd += (Vector2)transform.position;
+        Vector2 vector = realEnd - start;
         float angle = Mathf.Atan2(vector.y, vector.x) * Mathf.Rad2Deg;
 
         SubsonicBullet.Spawn(start, angle, SubsonicBulletSpeed, Player.Local.Team, Player.Local.Name, gun.Item.Prefab, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage);
