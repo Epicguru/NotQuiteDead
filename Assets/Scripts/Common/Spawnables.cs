@@ -10,6 +10,7 @@ public class Spawnables : MonoBehaviour
 
     public GameObject Arrow;
     public GameObject DamageNumber;
+    public GameObject SubsonicBullet;
 
     public void Awake()
     {
