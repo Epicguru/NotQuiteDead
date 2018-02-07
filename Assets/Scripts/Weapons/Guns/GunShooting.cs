@@ -621,10 +621,28 @@ public class GunShooting : RotatingItem
         foreach(var hit in hits)
         {
             if(Health.CanHitObject(hit.collider, Player.Local.Team))
-            {
-                // The bullet cannot fire because it will hit the wall in front of us...
-                // Oh well.
-                return;
+            {                
+                // The bullet will definitely hit something before it exits the barrel, because of the way shooting works in this game.
+                if(!Health.CanDamageObject(hit.collider, Player.Local.Team))
+                {
+                    // If we cant damage this object, return.
+                    return;
+                }
+                else
+                {
+                    // We are intersecting an object, but it can be damaged...
+                    // Hit it with out shot!
+                    // No shot is spawned, we just automatically damage it.
+
+                    if (isServer)
+                    {
+                        hit.collider.GetComponentInParent<Health>().ServerDamage(Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage, Player.Local.Name + ":" + gun.Item.Prefab, false);
+                    }
+                    else
+                    {
+                        Player.Local.NetUtils.CmdDamageHealth(hit.collider.GetComponentInParent<Health>().gameObject, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage, Player.Local.Name + ":" + gun.Item.Prefab, false);
+                    }
+                }
             }
         }
 
@@ -638,11 +656,11 @@ public class GunShooting : RotatingItem
 
         if (isServer)
         {
-            SpawnSubsonic(start, angle, SubsonicBulletSpeed, Player.Local.Team, Player.Local.Name, gun.Item.Prefab, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage, true);
+            SpawnSubsonic(start, angle, SubsonicBulletSpeed, Player.Local.Team, gun.Item.Prefab, Player.Local.Name, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage, true);
         }
         else
         {
-            CmdSpawnSubsonic(start, angle, SubsonicBulletSpeed, Player.Local.Team, Player.Local.Name, gun.Item.Prefab, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage);
+            CmdSpawnSubsonic(start, angle, SubsonicBulletSpeed, Player.Local.Team, gun.Item.Prefab, Player.Local.Name, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage);
 
         }
     }
