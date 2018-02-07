@@ -636,7 +636,43 @@ public class GunShooting : RotatingItem
         Vector2 vector = realEnd - start;
         float angle = Mathf.Atan2(vector.y, vector.x) * Mathf.Rad2Deg;
 
-        SubsonicBullet.Spawn(start, angle, SubsonicBulletSpeed, Player.Local.Team, Player.Local.Name, gun.Item.Prefab, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage);
+        if (isServer)
+        {
+            SpawnSubsonic(start, angle, SubsonicBulletSpeed, Player.Local.Team, Player.Local.Name, gun.Item.Prefab, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage, true);
+        }
+        else
+        {
+            CmdSpawnSubsonic(start, angle, SubsonicBulletSpeed, Player.Local.Team, Player.Local.Name, gun.Item.Prefab, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage);
+
+        }
+    }
+
+    [Command]
+    private void CmdSpawnSubsonic(Vector2 start, float angle, float speed, string team, string weapon, string shooter, float damage)
+    {
+        SpawnSubsonic(start, angle, speed, team, weapon, shooter, damage, true);
+    }
+
+    [Server]
+    private void SpawnSubsonic(Vector2 start, float angle, float speed, string team, string weapon, string shooter, float damage, bool network)
+    {
+        // Deals real damage and is the authorative version. The other spawned projectiles are just ghosts and unfortunately will often be innacurate due to latency.
+        SubsonicBullet.Spawn(start, angle, speed, team, shooter, weapon, damage);
+
+        if (network)
+        {
+            // These are the only values that average clients need.
+            RpcSpawnSubsonic(start, angle, speed);
+        }
+    }
+
+    [ClientRpc]
+    public void RpcSpawnSubsonic(Vector2 start, float angle, float speed)
+    {
+        if (isServer)
+            return; // Don't spawn on the server side.
+
+        SubsonicBullet.Spawn(start, angle, speed, null, null, null, 0);
     }
 
     [Command]

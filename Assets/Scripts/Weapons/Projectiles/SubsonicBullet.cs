@@ -18,11 +18,12 @@ public class SubsonicBullet : MonoBehaviour
 
     public void Update()
     {
-        Vector2 a = Tip.position;
-        Vector2 b = a + (Vector2)(Tip.right * Time.deltaTime * Speed);
+        Vector2 a = transform.position;
+        Vector2 movement = transform.right * Time.deltaTime * Speed;
+        Vector2 b = a + movement;
 
         RaycastHit2D hit;
-        bool collides = DetectCollision(a, b, out hit);
+        bool collides = DetectCollision(Tip.transform.position, (Vector2)Tip.transform.position + movement, out hit);
 
         if (collides)
         {
