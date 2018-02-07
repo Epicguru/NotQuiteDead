@@ -656,41 +656,50 @@ public class GunShooting : RotatingItem
 
         if (isServer)
         {
-            SpawnSubsonic(start, angle, SubsonicBulletSpeed, Player.Local.Team, gun.Item.Prefab, Player.Local.Name, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage, true);
+            SpawnSubsonic(start, angle, SubsonicBulletSpeed, Player.Local.Team, gun.Item.Prefab, Player.Local.Name, gameObject, bullets, true);
         }
         else
         {
-            CmdSpawnSubsonic(start, angle, SubsonicBulletSpeed, Player.Local.Team, gun.Item.Prefab, Player.Local.Name, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage);
-
+            CmdSpawnSubsonic(start, angle, SubsonicBulletSpeed, Player.Local.Team, gun.Item.Prefab, Player.Local.Name, gameObject, bullets);
         }
     }
 
     [Command]
-    private void CmdSpawnSubsonic(Vector2 start, float angle, float speed, string team, string weapon, string shooter, float damage)
+    private void CmdSpawnSubsonic(Vector2 start, float angle, float speed, string team, string weapon, string shooter, GameObject gun, int bullets)
     {
-        SpawnSubsonic(start, angle, speed, team, weapon, shooter, damage, true);
+        SpawnSubsonic(start, angle, speed, team, weapon, shooter, gun, bullets, true);
     }
 
     [Server]
-    private void SpawnSubsonic(Vector2 start, float angle, float speed, string team, string weapon, string shooter, float damage, bool network)
+    private void SpawnSubsonic(Vector2 start, float angle, float speed, string team, string weapon, string shooter, GameObject gun, int bullets, bool network)
     {
         // Deals real damage and is the authorative version. The other spawned projectiles are just ghosts and unfortunately will often be innacurate due to latency.
-        SubsonicBullet.Spawn(start, angle, speed, team, shooter, weapon, damage);
+
+        if (gun == null)
+            return;
+
+        GunShooting shooting = gun.GetComponent<GunShooting>();
+        float baseDamage = shooting.Damage.Damage / (shooting.Damage.BulletsShareDamage ? bullets : 1f);
+        float falloffDamage = (shooting.Damage.Damage * shooting.Damage.DamageFalloff) / (shooting.Damage.BulletsShareDamage ? bullets : 1f);
+        AnimationCurve curve = shooting.Damage.DamageCurve;
+        float range = shooting.Damage.Range;
+
+        SubsonicBullet.Spawn(start, angle, speed, team, shooter, weapon, new Vector2(baseDamage, falloffDamage), curve, range);
 
         if (network)
         {
             // These are the only values that average clients need.
-            RpcSpawnSubsonic(start, angle, speed);
+            RpcSpawnSubsonic(start, angle, speed, range);
         }
     }
 
     [ClientRpc]
-    public void RpcSpawnSubsonic(Vector2 start, float angle, float speed)
+    public void RpcSpawnSubsonic(Vector2 start, float angle, float speed, float range)
     {
         if (isServer)
             return; // Don't spawn on the server side.
 
-        SubsonicBullet.Spawn(start, angle, speed, null, null, null, 0);
+        SubsonicBullet.Spawn(start, angle, speed, null, null, null, Vector2.zero, null, range);
     }
 
     [Command]

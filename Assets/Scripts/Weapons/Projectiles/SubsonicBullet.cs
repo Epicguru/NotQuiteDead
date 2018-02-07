@@ -6,7 +6,11 @@ public class SubsonicBullet : MonoBehaviour
 {
     [Header("Controls")]
     public float Speed = 10f;
-    public float Damage = 20f;
+    public Vector2 Damage;
+    public float MaxRange = 30f;
+
+    [Header("Falloff")]
+    public AnimationCurve Curve;
 
     [Header("Shooter")]
     public string FriendlyTeam;
@@ -15,6 +19,8 @@ public class SubsonicBullet : MonoBehaviour
 
     [Header("References")]
     public Transform Tip;
+
+    private Vector2 startPos;
 
     public void Update()
     {
@@ -36,10 +42,45 @@ public class SubsonicBullet : MonoBehaviour
 
             // Pool
             Recycle();
+
+            // Exit early.
+            return;
         }
         else
         {
             transform.position = b;
+        }
+
+        CheckRange();
+    }
+
+    private float GetDamage(Vector2 hitPoint)
+    {
+        float d = Damage.x;
+        float m = Damage.y;
+        float dst = Vector2.Distance(startPos, hitPoint);
+        if (dst > MaxRange)
+        {
+            // Should never happen, but might be possible because of small mathematical inaccuracies.
+            return 0;
+        }
+        float p = dst / MaxRange;
+        float f = Curve.Evaluate(p);
+        float x = Mathf.LerpUnclamped(m, d, f);
+
+
+        float final = x; // Apply damage falloff.
+
+        return final;
+    }
+
+    private void CheckRange()
+    {
+        float distance = Vector2.Distance(Tip.transform.position, startPos);
+
+        if(distance > MaxRange)
+        {
+            Recycle();
         }
     }
 
@@ -57,7 +98,7 @@ public class SubsonicBullet : MonoBehaviour
 
         if(Health.CanDamageObject(hit.collider, FriendlyTeam))
         {
-            hit.collider.GetComponentInParent<Health>().ServerDamage(Damage, Shooter + ":" + Weapon, false);
+            hit.collider.GetComponentInParent<Health>().ServerDamage(GetDamage(hit.point), Shooter + ":" + Weapon, false);
         }
     }
 
@@ -80,7 +121,7 @@ public class SubsonicBullet : MonoBehaviour
         return false;
     }
 
-    public void Init(Vector2 pos, Quaternion rotation, float speed, string team, string shooter, string weapon, float damage)
+    public void Init(Vector2 pos, Quaternion rotation, float speed, string team, string shooter, string weapon, Vector2 damage, AnimationCurve curve, float range)
     {
         transform.position = pos;
         transform.rotation = rotation;
@@ -89,6 +130,10 @@ public class SubsonicBullet : MonoBehaviour
         Shooter = shooter;
         Weapon = weapon;
         Damage = damage;
+        Curve = curve;
+        MaxRange = range;
+
+        startPos = pos;
     }
 
     private void Recycle()
@@ -96,18 +141,18 @@ public class SubsonicBullet : MonoBehaviour
         ObjectPool.Destroy(this.gameObject, PoolType.SUBSONIC_BULLET);
     }
 
-    public static void Spawn(Vector2 pos, float angle, float speed, string team, string shooter, string weapon, float damage)
+    public static void Spawn(Vector2 pos, float angle, float speed, string team, string shooter, string weapon, Vector2 damage, AnimationCurve curve, float range)
     {
         SubsonicBullet sb = ObjectPool.Instantiate(Spawnables.I.SubsonicBullet, PoolType.SUBSONIC_BULLET).GetComponent<SubsonicBullet>();
 
         Quaternion rotation = Quaternion.Euler(0, 0, angle);
 
-        sb.Init(pos, rotation, speed, team, shooter, weapon, damage);
+        sb.Init(pos, rotation, speed, team, shooter, weapon, damage, curve, range);
     }
 
-    public static void Spawn(Vector2 pos, Quaternion rotation, float speed, string team, string shooter, string weapon, float damage)
+    public static void Spawn(Vector2 pos, Quaternion rotation, float speed, string team, string shooter, string weapon, Vector2 damage, AnimationCurve curve, float range)
     {
         SubsonicBullet sb = ObjectPool.Instantiate(Spawnables.I.SubsonicBullet, PoolType.SUBSONIC_BULLET).GetComponent<SubsonicBullet>();
-        sb.Init(pos, rotation, speed, team, shooter, weapon, damage);
+        sb.Init(pos, rotation, speed, team, shooter, weapon, damage, curve, range);
     }
 }
