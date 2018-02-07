@@ -19,6 +19,12 @@ public class SubsonicBullet : MonoBehaviour
 
     [Header("References")]
     public Transform Tip;
+    public SpriteRenderer Light;
+    public SpriteRenderer Bullet;
+
+    [Header("Visuals")]
+    public float InitialLightAlpha = 0.1f;
+    public AnimationCurve AlphaDropoff = AnimationCurve.Linear(0, 0, 1, 1);
 
     private Vector2 startPos;
 
@@ -27,6 +33,8 @@ public class SubsonicBullet : MonoBehaviour
         Vector2 a = transform.position;
         Vector2 movement = transform.right * Time.deltaTime * Speed;
         Vector2 b = a + movement;
+
+        UpdateAlpha();
 
         RaycastHit2D hit;
         bool collides = DetectCollision(Tip.transform.position, (Vector2)Tip.transform.position + movement, out hit);
@@ -74,9 +82,29 @@ public class SubsonicBullet : MonoBehaviour
         return final;
     }
 
-    private void CheckRange()
+    private void UpdateAlpha()
+    {
+        float a = Mathf.Clamp(DistanceFromSpawn() / MaxRange, 0f, 1f);
+        a = AlphaDropoff.Evaluate(a);
+
+        Color l = Light.color;
+        l.a = Mathf.Lerp(a, 0f, InitialLightAlpha);
+        Light.color = l;
+
+        //Color b = Bullet.color;
+        //b.a = a;
+        //Bullet.color = b;
+    }
+
+    private float DistanceFromSpawn()
     {
         float distance = Vector2.Distance(Tip.transform.position, startPos);
+        return distance;
+    }
+
+    private void CheckRange()
+    {
+        float distance = DistanceFromSpawn();
 
         if(distance > MaxRange)
         {
@@ -134,6 +162,8 @@ public class SubsonicBullet : MonoBehaviour
         MaxRange = range;
 
         startPos = pos;
+
+        UpdateAlpha();
     }
 
     private void Recycle()
