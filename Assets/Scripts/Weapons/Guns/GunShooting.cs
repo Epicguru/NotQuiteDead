@@ -15,6 +15,11 @@ public class GunShooting : RotatingItem
 
     [Header("Bullet Firing")]
     public Transform DefaultBulletSpawn;
+    [Tooltip("The type of projectile that this gun fires.")]
+    public GunBulletType BulletType = GunBulletType.HITSCAN;
+    [Header("Bullet Firing - Subsonic")]
+    public float SubsonicBulletSpeed = 50f;
+    [Header("Bullet Firing - Other")]
     [Tooltip("If true, when the reload animation ends, if there is not a round in the chamber then the first bullet from the magazine is automatically chambered, so the chamber animation never plays.")]
     public bool ReloadAutoChambers = false;
     [Tooltip("If true, when the reload animation starts, the chambered round is discarded (not visually), which could cause the chamber animation every reload unless ReloadAutoChambers is set to true.")]
@@ -406,14 +411,28 @@ public class GunShooting : RotatingItem
             float yOffset = Mathf.Sin(angle * Mathf.Deg2Rad) * range;
             myPos.Set(transform.position.x + xOffset, transform.position.y + yOffset);
 
-            // Hit real objects...
-            HitObjects(myPos, bullets);
+            // Hit real objects using the current bullet type.
+            EvaluateBulletType(myPos, bullets);            
         }
 
         // Set time since last shot...
         timer = 0; // Now!
         // This will add inaccuracy.
         shotInaccuracy += 1f / Damage.ShotsToInaccuracy;
+    }
+
+    private void EvaluateBulletType(Vector2 endPos, int bulletCount)
+    {
+        switch (BulletType)
+        {
+            case GunBulletType.HITSCAN:
+                Hit_Hitscan(endPos, bulletCount);
+                break;
+
+            case GunBulletType.SUBSONIC:
+                Hit_Subsonic(endPos, bulletCount);
+                break;
+        }
     }
 
     private float GetBaseBulletDamage(int totalBullets)
@@ -492,7 +511,7 @@ public class GunShooting : RotatingItem
     private Vector2 startPos = new Vector2();
     private Vector2 trailEnd = new Vector2();
     private List<Health> objects = new List<Health>();
-    private void HitObjects(Vector2 end, int bullets)
+    private void Hit_Hitscan(Vector2 end, int bullets)
     {
         objects.Clear();
         startPos.Set(transform.position.x, transform.position.y);
@@ -590,6 +609,97 @@ public class GunShooting : RotatingItem
         CmdSpawnBulletTrail(GetBulletSpawn().position, trailEnd);
 
         objects.Clear();
+    }
+
+    private void Hit_Subsonic(Vector2 end, int bullets)
+    {
+        Vector2 a = transform.position;
+        Vector2 b = GetBulletSpawn().position;
+
+        RaycastHit2D[] hits = Physics2D.LinecastAll(a, b);
+
+        foreach(var hit in hits)
+        {
+            if(Health.CanHitObject(hit.collider, Player.Local.Team))
+            {                
+                // The bullet will definitely hit something before it exits the barrel, because of the way shooting works in this game.
+                if(!Health.CanDamageObject(hit.collider, Player.Local.Team))
+                {
+                    // If we cant damage this object, return.
+                    return;
+                }
+                else
+                {
+                    // We are intersecting an object, but it can be damaged...
+                    // Hit it with out shot!
+                    // No shot is spawned, we just automatically damage it.
+
+                    if (isServer)
+                    {
+                        hit.collider.GetComponentInParent<Health>().ServerDamage(Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage, Player.Local.Name + ":" + gun.Item.Prefab, false);
+                    }
+                    else
+                    {
+                        Player.Local.NetUtils.CmdDamageHealth(hit.collider.GetComponentInParent<Health>().gameObject, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage, Player.Local.Name + ":" + gun.Item.Prefab, false);
+                    }
+                }
+            }
+        }
+
+        Vector2 start = GetBulletSpawn().position;
+        Vector2 realEnd = end;
+        realEnd -= (Vector2)transform.position;
+        realEnd *= 1000f;
+        realEnd += (Vector2)transform.position;
+        Vector2 vector = realEnd - start;
+        float angle = Mathf.Atan2(vector.y, vector.x) * Mathf.Rad2Deg;
+
+        if (isServer)
+        {
+            SpawnSubsonic(start, angle, SubsonicBulletSpeed, Player.Local.Team, gun.Item.Prefab, Player.Local.Name, gameObject, bullets, true);
+        }
+        else
+        {
+            CmdSpawnSubsonic(start, angle, SubsonicBulletSpeed, Player.Local.Team, gun.Item.Prefab, Player.Local.Name, gameObject, bullets);
+        }
+    }
+
+    [Command]
+    private void CmdSpawnSubsonic(Vector2 start, float angle, float speed, string team, string weapon, string shooter, GameObject gun, int bullets)
+    {
+        SpawnSubsonic(start, angle, speed, team, weapon, shooter, gun, bullets, true);
+    }
+
+    [Server]
+    private void SpawnSubsonic(Vector2 start, float angle, float speed, string team, string weapon, string shooter, GameObject gun, int bullets, bool network)
+    {
+        // Deals real damage and is the authorative version. The other spawned projectiles are just ghosts and unfortunately will often be innacurate due to latency.
+
+        if (gun == null)
+            return;
+
+        GunShooting shooting = gun.GetComponent<GunShooting>();
+        float baseDamage = shooting.Damage.Damage / (shooting.Damage.BulletsShareDamage ? bullets : 1f);
+        float falloffDamage = (shooting.Damage.Damage * shooting.Damage.DamageFalloff) / (shooting.Damage.BulletsShareDamage ? bullets : 1f);
+        AnimationCurve curve = shooting.Damage.DamageCurve;
+        float range = shooting.Damage.Range;
+
+        SubsonicBullet.Spawn(start, angle, speed, team, shooter, weapon, new Vector2(baseDamage, falloffDamage), curve, range);
+
+        if (network)
+        {
+            // These are the only values that average clients need.
+            RpcSpawnSubsonic(start, angle, speed, range);
+        }
+    }
+
+    [ClientRpc]
+    public void RpcSpawnSubsonic(Vector2 start, float angle, float speed, float range)
+    {
+        if (isServer)
+            return; // Don't spawn on the server side.
+
+        SubsonicBullet.Spawn(start, angle, speed, null, null, null, Vector2.zero, null, range);
     }
 
     [Command]
