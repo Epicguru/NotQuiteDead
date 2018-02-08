@@ -27,6 +27,10 @@ public class EnemySpawner : NetworkBehaviour
                 return;
             if (hour > info.MaxHour)
                 return;
+            if (day < info.MinDay)
+                return;
+            if (day > info.MaxDay)
+                return;
 
             info.Timer += Time.deltaTime;
 
