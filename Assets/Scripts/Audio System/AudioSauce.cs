@@ -41,11 +41,6 @@ public class AudioSauce : MonoBehaviour
         ConfigureSource(Source);
     }
 
-    public void Start()
-    {
-        Play(Camera.main.transform);
-    }
-
     public void Play(Transform listener)
     {
         if(listener == null)
@@ -149,5 +144,7 @@ public class AudioSauce : MonoBehaviour
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, Range);
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, PanMagnitude);
     }
 }
