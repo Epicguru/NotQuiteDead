@@ -7,7 +7,7 @@ public class TurretShooting : NetworkBehaviour
     public Turret Turret;
     public Transform Muzzle;
     public Transform MuzzleFlash;
-    public AudioSource Source;
+    public AudioSauce Sauce;
     public AudioClip Clip;
     public Vector2 Volume;
     public Vector2 Pitch;
@@ -25,10 +25,10 @@ public class TurretShooting : NetworkBehaviour
         if (isClient)
         {
             // Play sound and muzzle flash.
-            Source.clip = Clip;
-            Source.volume = Random.Range(Volume.x, Volume.y);
-            Source.pitch = Random.Range(Pitch.x, Pitch.y) * Time.timeScale;
-            Source.PlayOneShot(Clip);
+            Sauce.Clip = Clip;
+            Sauce.Volume = Random.Range(Volume.x, Volume.y);
+            Sauce.Pitch = Random.Range(Pitch.x, Pitch.y) * Time.timeScale;
+            Sauce.Play();
 
             // Place muzzle flash.
             GameObject g = ObjectPool.Instantiate(Prefab, PoolType.MUZZLE_FLASH);

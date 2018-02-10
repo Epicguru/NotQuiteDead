@@ -64,8 +64,13 @@ public class AudioSauce : MonoBehaviour
     {
         if(PlayOnStart && Clip != null)
         {
-            Play(Camera.main.transform);
+            Play();
         }
+    }
+
+    public void Play()
+    {
+        Play(Camera.main.transform);
     }
 
     public void Play(Transform listener)
