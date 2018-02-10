@@ -35,7 +35,7 @@ public class AudioSauce : MonoBehaviour
     [ReadOnly]
     public Transform Listener;
     [ReadOnly]
-    public bool Playing;
+    public bool IsPlaying;
 
     public AudioSource Source { get; private set; }
     public AudioLowPassFilter LPF { get; private set; }
@@ -94,7 +94,7 @@ public class AudioSauce : MonoBehaviour
         this.Listener = listener; 
         Source.clip = this.Clip;
         Source.Play();
-        Playing = true;
+        IsPlaying = true;
         Update();
     }
 
@@ -103,11 +103,11 @@ public class AudioSauce : MonoBehaviour
         if (Range < 0)
             Range = 0f;
 
-        if (Playing)
+        if (IsPlaying)
         {
             if(Listener == null)
             {
-                Playing = false;
+                IsPlaying = false;
                 Source.Stop();
                 // TODO destroy obj.
             }
@@ -118,7 +118,7 @@ public class AudioSauce : MonoBehaviour
             LPF.cutoffFrequency = GetLowPassFrequency(Listener.position);
 
             if (!Source.isPlaying)
-                Playing = false;
+                IsPlaying = false;
         }
     }
 
