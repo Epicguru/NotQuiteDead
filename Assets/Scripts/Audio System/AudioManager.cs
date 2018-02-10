@@ -43,6 +43,8 @@ public class AudioManager : MonoBehaviour
         s.PanMagnitude = panMagnitude;
         s.transform.position = position;
 
+        s.Play();
+
         return s;
     }
 
