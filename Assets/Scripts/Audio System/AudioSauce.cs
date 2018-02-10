@@ -1,7 +1,7 @@
 ﻿
 using UnityEngine;
 
-[RequireComponent(typeof(AudioSource))]
+[RequireComponent(typeof(AudioSource), typeof(AudioLowPassFilter))]
 [ExecuteInEditMode]
 public class AudioSauce : MonoBehaviour
 {
@@ -20,6 +20,13 @@ public class AudioSauce : MonoBehaviour
     [Range(0f, 1f)]
     public float PanRange = 0.85f;
 
+    [Header("Low Pass")]
+    [Range(10f, 22000f)]
+    public float LowPassCutoff = 600;
+    [Range(0f, 1f)]
+    public float LowPassStart = 0.6f;
+    public AnimationCurve LowPassCurve = AnimationCurve.EaseInOut(0, 1, 1, 0);
+
     [Header("Info")]
     [ReadOnly]
     public Transform Listener;
@@ -27,14 +34,22 @@ public class AudioSauce : MonoBehaviour
     public bool Playing;
 
     public AudioSource Source { get; private set; }
+    public AudioLowPassFilter LPF { get; private set; }
 
     public void Awake()
     {
         Source = GetComponent<AudioSource>();
+        LPF = GetComponent<AudioLowPassFilter>();
 
         if(Source == null)
         {
             Debug.LogError("Audio Sauce's AudioSource component is null!");
+            return;
+        }
+
+        if(LPF == null)
+        {
+            Debug.LogError("Audio Sauce's Low Pass Filter component is null!");
             return;
         }
 
@@ -83,6 +98,7 @@ public class AudioSauce : MonoBehaviour
             Source.volume = GetVolume(Listener.position);
             Source.pitch = GetPitch(Listener.position);
             Source.panStereo = GetPan(Listener.position);
+            LPF.cutoffFrequency = GetLowPassFrequency(Listener.position);
 
             if (!Source.isPlaying)
                 Playing = false;
@@ -134,6 +150,39 @@ public class AudioSauce : MonoBehaviour
         return this.Pitch * Time.timeScale;
     }
 
+    public virtual float GetLowPassFrequency(Vector2 listener)
+    {
+        const float MAX_FREQ = 22000f;
+        float MIN_FREQ = LowPassCutoff;
+
+        float distance = Vector2.Distance(transform.position, listener);
+        float effectStartDst = Range * LowPassStart;
+
+        // Out of range?
+        if(distance > Range)
+        {
+            return MIN_FREQ;
+        }
+
+        // Before effect start distance?
+        if(distance < effectStartDst)
+        {
+            return MAX_FREQ;
+        }
+
+        float dst = distance - effectStartDst;
+        float maxDst = Range - effectStartDst;
+
+        float p = Mathf.Clamp(dst / maxDst, 0f, 1f);
+        float x = Mathf.Clamp(LowPassCurve.Evaluate(p), 0f, 1f);
+        // Value of 0 means lowest freq.
+        // Value of 1 means max freq.
+
+        float frequency = Mathf.Lerp(MIN_FREQ, MAX_FREQ, x);
+
+        return frequency;
+    }
+
     public virtual void ConfigureSource(AudioSource source)
     {
         source.spatialBlend = 0f;
@@ -144,6 +193,8 @@ public class AudioSauce : MonoBehaviour
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, Range);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, Range * LowPassStart);
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, PanMagnitude);
     }
