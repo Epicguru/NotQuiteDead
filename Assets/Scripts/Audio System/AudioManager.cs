@@ -40,7 +40,7 @@ public class AudioManager : MonoBehaviour
         s.Volume = volume;
         s.Pitch = pitch;
         s.Range = range;
-        s.PanMagnitude = panMagnitude;
+        s.FullPanDistance = panMagnitude;
         s.transform.position = position;
 
         s.Play();

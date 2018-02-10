@@ -20,7 +20,8 @@ public class AudioSauce : MonoBehaviour
     public AnimationCurve SoundFalloff = AnimationCurve.Linear(0, 1, 1, 0);
 
     [Header("Pan")]
-    public float PanMagnitude = 30f;
+    public float NoPanDistance = 2f;
+    public float FullPanDistance = 30f;
     [Range(0f, 1f)]
     public float PanRange = 0.85f;
 
@@ -102,6 +103,12 @@ public class AudioSauce : MonoBehaviour
     {
         if (Range < 0)
             Range = 0f;
+        if (NoPanDistance < 0)
+            NoPanDistance = 0;
+        if (FullPanDistance < 0)
+            FullPanDistance = 0;
+        if (NoPanDistance > FullPanDistance)
+            NoPanDistance = FullPanDistance;
 
         if (IsPlaying)
         {
@@ -143,13 +150,21 @@ public class AudioSauce : MonoBehaviour
     {
         float offX = listener.x - transform.position.x;
 
+        if (Mathf.Abs(offX) < NoPanDistance)
+            return 0f;
+
+        if (offX > 0)
+            offX -= NoPanDistance;
+        else if(offX < 0)
+            offX += NoPanDistance;
+
         // When offX >= PanMagnitude, the sound plays exclusively in the left ear.
         // When offX <= -PanMagnitude, the sound plays exclusively in the right ear.
 
         // When offX / PanMag == 1, x = -1;
         // When offX / PanMag == -1, x = 1;
 
-        float x = Mathf.Clamp(offX / PanMagnitude, -1f, 1f);
+        float x = Mathf.Clamp(offX / FullPanDistance, -1f, 1f);
         x *= -1;
 
         // This is now the value that is played in each ear.
@@ -216,6 +231,8 @@ public class AudioSauce : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, Range * LowPassStart);
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, PanMagnitude);
+        Gizmos.DrawWireSphere(transform.position, FullPanDistance);
+        Gizmos.color = Color.grey;
+        Gizmos.DrawWireSphere(transform.position, NoPanDistance);
     }
 }
