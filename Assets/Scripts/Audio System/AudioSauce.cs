@@ -5,11 +5,15 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class AudioSauce : MonoBehaviour
 {
+    // Yes, the name is a joke.
+    // Also so it doesn't conflict with AudioSource.
+
     [Header("Basics")]
     public AudioClip Clip;
     public float Pitch = 1f;
     [Range(0f, 1f)]
     public float Volume = 1f;
+    public bool PlayOnStart = false;
 
     [Header("Falloff")]
     public float Range = 100f;
@@ -54,6 +58,14 @@ public class AudioSauce : MonoBehaviour
         }
 
         ConfigureSource(Source);
+    }
+
+    public void Start()
+    {
+        if(PlayOnStart && Clip != null)
+        {
+            Play(Camera.main.transform);
+        }
     }
 
     public void Play(Transform listener)
@@ -185,8 +197,11 @@ public class AudioSauce : MonoBehaviour
 
     public virtual void ConfigureSource(AudioSource source)
     {
+        source.Stop();
         source.spatialBlend = 0f;
         source.loop = false;
+        source.playOnAwake = false;
+        source.bypassEffects = false;
     }
 
     public void OnDrawGizmosSelected()
