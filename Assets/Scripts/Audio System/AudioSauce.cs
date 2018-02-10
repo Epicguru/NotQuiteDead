@@ -2,6 +2,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
+[ExecuteInEditMode]
 public class AudioSauce : MonoBehaviour
 {
     [Header("Basics")]
@@ -16,6 +17,8 @@ public class AudioSauce : MonoBehaviour
 
     [Header("Pan")]
     public float PanMagnitude = 30f;
+    [Range(0f, 1f)]
+    public float PanRange = 0.85f;
 
     [Header("Info")]
     [ReadOnly]
@@ -38,6 +41,11 @@ public class AudioSauce : MonoBehaviour
         ConfigureSource(Source);
     }
 
+    public void Start()
+    {
+        Play(Camera.main.transform);
+    }
+
     public void Play(Transform listener)
     {
         if(listener == null)
@@ -58,14 +66,32 @@ public class AudioSauce : MonoBehaviour
 
         this.Listener = listener; 
         Source.clip = this.Clip;
-
+        Source.Play();
         Playing = true;
+        Update();
     }
 
     public void Update()
     {
         if (Range < 0)
             Range = 0f;
+
+        if (Playing)
+        {
+            if(Listener == null)
+            {
+                Playing = false;
+                Source.Stop();
+                // TODO destroy obj.
+            }
+
+            Source.volume = GetVolume(Listener.position);
+            Source.pitch = GetPitch(Listener.position);
+            Source.panStereo = GetPan(Listener.position);
+
+            if (!Source.isPlaying)
+                Playing = false;
+        }
     }
 
     public virtual float GetVolume(Vector2 listener)
@@ -80,7 +106,9 @@ public class AudioSauce : MonoBehaviour
         if (x < 0)
             x = 0;
 
-        return p;
+        x *= this.Volume;
+
+        return x;
     }
 
     public virtual float GetPan(Vector2 listener)
@@ -100,12 +128,21 @@ public class AudioSauce : MonoBehaviour
         // However, is sounds really weird if a sound plays exclusively in one ear. To fix that the value is restricted to a maximum range.
         // By default about 90% in one ear, 10% in the other.
 
-        return 0f;
+        x = Mathf.Clamp(x, -PanRange, PanRange);
+
+        return x;
+    }
+
+    public virtual float GetPitch(Vector2 listener)
+    {
+        // For now leave as-is.
+        return this.Pitch * Time.timeScale;
     }
 
     public virtual void ConfigureSource(AudioSource source)
     {
         source.spatialBlend = 0f;
+        source.loop = false;
     }
 
     public void OnDrawGizmosSelected()
