@@ -37,7 +37,9 @@ public class SubsonicBullet : MonoBehaviour
         UpdateAlpha();
 
         RaycastHit2D hit;
+        RaycastHit2D hit2;
         bool collides = DetectCollision(Tip.transform.position, (Vector2)Tip.transform.position + movement, out hit);
+        bool collidesInternal = DetectCollision(transform.position, (Vector2)transform.position + movement, out hit2);
 
         if (collides)
         {
@@ -47,6 +49,21 @@ public class SubsonicBullet : MonoBehaviour
 
             // Deal damage to the object if we are on the server.
             HitObject(hit);
+
+            // Pool
+            Recycle();
+
+            // Exit early.
+            return;
+        }
+        else if(collidesInternal)
+        {
+            // Spawn hit effect.
+            float angle = Mathf.Atan2(hit2.normal.y, hit2.normal.x) * Mathf.Rad2Deg + 180;
+            HitEffect.Spawn(hit2.point, angle, 15, Color.yellow, HitEffectPreset.Sparks);
+
+            // Deal damage to the object if we are on the server.
+            HitObject(hit2);
 
             // Pool
             Recycle();
