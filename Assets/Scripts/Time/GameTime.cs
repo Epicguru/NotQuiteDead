@@ -31,6 +31,14 @@ public class GameTime : NetworkBehaviour
         DayNight = GetComponent<DayNightCycle>();
     }
 
+    public void Start()
+    {
+        if (isServer)
+        {
+            time = 0.5f; // Midday of day one.
+        }
+    }
+
     public void OnDestroy()
     {
         Instance = null;
