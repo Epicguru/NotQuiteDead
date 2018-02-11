@@ -64,6 +64,10 @@ public class Workbench : MonoBehaviour
         {
             Open = false;
         }
+        if (InputManager.InputDown("Inventory", true))
+        {
+            Open = false;
+        }
     }
 
     public void LoadFiles(List<string> files)
