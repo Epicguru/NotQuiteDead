@@ -8,8 +8,8 @@ using UnityEngine.Events;
 public class ItemOption
 {
     public string OptionName;
-    public UnityAction<InventoryItem, string> OnSelected;
-    public InventoryItem InvItem;
+    public UnityAction<InventoryItemData, string> OnSelected;
+    public InventoryItemData InvItem;
     /// <summary>
     /// Used when the InvItem cannot be set, such as in gear items.
     /// </summary>
@@ -21,7 +21,7 @@ public class ItemOption
         {
             if(Prefab == null)
             {
-                Prefab = InvItem.ItemPrefab;
+                Prefab = InvItem.Prefab;
             }
         }
         else

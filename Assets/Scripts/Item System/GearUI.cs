@@ -39,7 +39,7 @@ public class GearUI : MonoBehaviour {
         }
     }
 
-    public void Store(InventoryItem item, string prefab)
+    public void Store(InventoryItemData item, string prefab)
     {
         if (Hands)
         {
@@ -55,7 +55,7 @@ public class GearUI : MonoBehaviour {
         }
     }
 
-    public void Drop(InventoryItem item, string prefab)
+    public void Drop(InventoryItemData item, string prefab)
     {
         if (Hands)
         {
@@ -83,11 +83,11 @@ public class GearUI : MonoBehaviour {
         }
     }
 
-    public void Details(InventoryItem item, string prefab)
+    public void Details(InventoryItemData item, string prefab)
     {
         // Show the details view.
         if (item != null)
-            item.Inventory.DetailsView.Enter(item);
+            PlayerInventory.inv.Inventory.DetailsView.Enter(item.Prefab);
         else
             PlayerInventory.inv.Inventory.DetailsView.Enter(Item.GetItem(prefab));
     }

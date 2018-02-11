@@ -33,13 +33,16 @@ public class InventoryDetailsView : MonoBehaviour
 
     private List<GameObject> spawned = new List<GameObject>();
 
-    public void Enter(InventoryItem item)
+    public void Enter(string prefab)
     {
-        this.Enter(item.Item);
+        this.Enter(Item.GetItem(prefab));
     }
 
     public void Enter(Item item)
     {
+        if (item == null)
+            return;
+
         Debug.Log("Opening details for : " + item.Name);
         gameObject.SetActive(true);
 

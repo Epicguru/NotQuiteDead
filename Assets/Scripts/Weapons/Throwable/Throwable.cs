@@ -117,11 +117,11 @@ public class Throwable : RotatingItem
         GetComponentInParent<PlayerHolding>().CmdDrop(false, true, Player.Local.gameObject, new ItemData()); // Completely destroy this object...
 
         // Look for new throwable of same type in inventory, and if we find one...
-        InventoryItem i = PlayerInventory.inv.Inventory.GetOfType(Item.Prefab);
+        InventoryItemData i = PlayerInventory.inv.Inventory.GetOfType(Item.Prefab);
         if (i != null)
         {
             // Equip it!
-            Item.Option_Equip(i, i.ItemPrefab);
+            Item.Option_Equip(i, i.Prefab);
         }
     }
 

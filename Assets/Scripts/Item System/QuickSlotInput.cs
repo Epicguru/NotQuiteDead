@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class QuickSlotInput : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class QuickSlotInput : MonoBehaviour
             {
                 if (value)
                 {
+                    SetText();
                     gameObject.SetActive(true);
                 }
                 else
@@ -29,34 +31,32 @@ public class QuickSlotInput : MonoBehaviour
     }
     private bool _Open;
 
+    public Text Text;
     public QuickSlotSelectEvent SelectedEvent = new QuickSlotSelectEvent();
+
+    public void SetText()
+    {
+        Text.text = "Press a quick slot key to bind\nPress " + InputManager.GetInput("Escape") + " to cancel.";
+    }
 
     public void Update()
     {
         if (Open)
         {
-            if (Input.GetKeyUp(KeyCode.Escape))
+            if (InputManager.InputDown("Escape", true))
             {
                 SelectedEvent.RemoveAllListeners();
                 Open = false;
                 return;
             }
 
-            //if (Input.GetKeyUp(KeyCode.Space))
-            //{
-            //    SelectedEvent.Invoke(0);
-            //    SelectedEvent.RemoveAllListeners();
-            //    Open = false;
-            //    return;
-            //}
-
             for (int i = 0; i < Player.Local.QuickSlot.Slots.Length; i++)
             {
                 if (Input.GetKeyDown(Player.Local.QuickSlot.Slots[i]))
                 {
-                    InventoryItem item = null;
+                    InventoryItemData item = null;
 
-                    foreach(InventoryItem x in PlayerInventory.inv.Inventory.Contents)
+                    foreach(InventoryItemData x in PlayerInventory.inv.Inventory.Contents)
                     {
                         if (x.Data == null)
                             continue;
@@ -84,7 +84,7 @@ public class QuickSlotInput : MonoBehaviour
                     if (item != null)
                     {
                         item.Data.QuickSlot = 0;
-                        item.SetText();
+                        PlayerInventory.inv.Inventory.Refresh = true;
                     }
 
                     SelectedEvent.Invoke(i + 1);

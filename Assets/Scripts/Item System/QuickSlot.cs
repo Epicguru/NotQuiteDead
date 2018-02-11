@@ -13,6 +13,8 @@ public class QuickSlot : NetworkBehaviour
             return;
         if (!InputManager.Active)
             return;
+        if (PlayerInventory.inv.Inventory.isActiveAndEnabled)
+            return;
         if (Player.Local != null)
             if (Player.Local.Building.InBuildMode)
                 return;
@@ -36,13 +38,13 @@ public class QuickSlot : NetworkBehaviour
             return;
 
 
-        foreach (InventoryItem i in PlayerInventory.inv.Inventory.Contents)
+        foreach (InventoryItemData i in PlayerInventory.inv.Inventory.Contents)
         {
             if (i.Data == null)
                 continue;
             if (i.Data.QuickSlot == number)
             {
-                Item.Option_Equip(i, i.ItemPrefab);
+                Item.Option_Equip(i, i.Prefab);
                 break;
             }
         }
