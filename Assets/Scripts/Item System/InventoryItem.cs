@@ -38,7 +38,7 @@ public class InventoryItem : MonoBehaviour
         if (ItemData.Data != null && ItemData.Data.QuickSlot != 0)
             quickSlot = RichText.InColour(" (Slot #" + ItemData.Data.QuickSlot + ")", Color.black);
         Text.text = ItemData.Item.Name + quantity + quickSlot;
-        Text.color = ItemRarityUtils.GetColour(ItemData.Item.Rarity);
+        Text.color = Color.Lerp(ItemRarityUtils.GetColour(ItemData.Item.Rarity), Color.black, 0.2f);
         if(Details != null)
             Details.text = (ItemData.Item.InventoryInfo.Weight * ItemData.Count) + "Kg";
         if (Atlas == null)

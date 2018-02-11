@@ -221,7 +221,7 @@ public class Inventory : MonoBehaviour
                 s = from x in alpha orderby x.Item.Rarity descending select x;
                 return s.ToList();
             case InventorySortingMode.QUICKSLOTTED:
-                s = from x in alpha orderby (x.Data == null ? 0 : (x.Data.QuickSlot == 0 ? -1 : (3 - x.Data.QuickSlot))) descending select x;
+                s = from x in alpha orderby (x.Data == null ? -1 : (x.Data.QuickSlot == 0 ? -1 : (100 - x.Data.QuickSlot))) descending select x;
                 return s.ToList();
             case InventorySortingMode.TYPE:
                 return unsorted;
