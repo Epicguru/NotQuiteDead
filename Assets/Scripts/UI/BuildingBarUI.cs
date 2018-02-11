@@ -98,6 +98,9 @@ public class BuildingBarUI : MonoBehaviour
     {
         SelectedIndex = Mathf.Clamp(SelectedIndex, 0, items.Count - 1);
 
+        if (items.Count == 0)
+            return;
+
         bool inInventory = Player.Local.BuildingInventory.ContainsItem(items[SelectedIndex].Prefab);
 
         if (!inInventory)

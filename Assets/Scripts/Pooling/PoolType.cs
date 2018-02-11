@@ -12,5 +12,6 @@ public enum PoolType
     FLYING_MAG,
     ARROW,
     HIT_EFFECT,
-    DAMAGE_NUMBER
+    DAMAGE_NUMBER,
+    SUBSONIC_BULLET
 }

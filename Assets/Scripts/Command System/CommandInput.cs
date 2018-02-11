@@ -50,7 +50,7 @@ public class CommandInput : MonoBehaviour {
 
         float closedX = -Screen.width - 100;
 
-        timer += Time.deltaTime * (Open ? -1f : 1f);
+        timer += Time.unscaledDeltaTime * (Open ? -1f : 1f);
         if (timer > OpenTime)
             timer = OpenTime;
         if (timer < 0)

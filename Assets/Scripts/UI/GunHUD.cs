@@ -35,7 +35,7 @@ public class GunHUD : MonoBehaviour {
 
     public void Update()
     {
-        timer += Time.deltaTime * (Open ? 1 : -1);
+        timer += Time.unscaledDeltaTime * (Open ? 1 : -1);
 
         if (timer < 0)
             timer = 0;
