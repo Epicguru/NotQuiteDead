@@ -36,6 +36,12 @@ public class AudioSauce : MonoBehaviour
     [ReadOnly]
     public Transform Listener;
     [ReadOnly]
+    public float PitchMultiplier = 1f;
+    [ReadOnly]
+    public float VolumeMultiplier = 1f;
+    [ReadOnly]
+    public float RangeMultiplier = 1f;
+    [ReadOnly]
     public bool IsPlaying;
 
     public AudioSource Source { get; private set; }
@@ -93,8 +99,7 @@ public class AudioSauce : MonoBehaviour
         }
 
         this.Listener = listener; 
-        Source.clip = this.Clip;
-        Source.Play();
+        Source.PlayOneShot(this.Clip);
         IsPlaying = true;
         Update();
     }
@@ -129,19 +134,25 @@ public class AudioSauce : MonoBehaviour
         }
     }
 
+    public virtual float GetMaxRange()
+    {
+        return Range * RangeMultiplier;
+    }
+
     public virtual float GetVolume(Vector2 listener)
     {
         float distance = Vector2.Distance(transform.position, listener);
-        if (distance > Range)
+        if (distance > GetMaxRange())
             return 0f;
 
-        float p = Mathf.Clamp(distance / Range, 0f, 1f);
+        float p = Mathf.Clamp(distance / GetMaxRange(), 0f, 1f);
         float x = SoundFalloff.Evaluate(p);
 
         if (x < 0)
             x = 0;
 
         x *= this.Volume;
+        x *= VolumeMultiplier;
 
         return x;
     }
@@ -179,7 +190,7 @@ public class AudioSauce : MonoBehaviour
     public virtual float GetPitch(Vector2 listener)
     {
         // For now leave as-is.
-        return this.Pitch * Time.timeScale;
+        return this.Pitch * Time.timeScale * PitchMultiplier;
     }
 
     public virtual float GetLowPassFrequency(Vector2 listener)
@@ -188,10 +199,10 @@ public class AudioSauce : MonoBehaviour
         float MIN_FREQ = LowPassCutoff;
 
         float distance = Vector2.Distance(transform.position, listener);
-        float effectStartDst = Range * LowPassStart;
+        float effectStartDst = GetMaxRange() * LowPassStart;
 
         // Out of range?
-        if(distance > Range)
+        if(distance > GetMaxRange())
         {
             return MIN_FREQ;
         }
@@ -203,7 +214,7 @@ public class AudioSauce : MonoBehaviour
         }
 
         float dst = distance - effectStartDst;
-        float maxDst = Range - effectStartDst;
+        float maxDst = GetMaxRange() - effectStartDst;
 
         float p = Mathf.Clamp(dst / maxDst, 0f, 1f);
         float x = Mathf.Clamp(LowPassCurve.Evaluate(p), 0f, 1f);
@@ -227,9 +238,9 @@ public class AudioSauce : MonoBehaviour
     public void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, Range);
+        Gizmos.DrawWireSphere(transform.position, GetMaxRange());
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, Range * LowPassStart);
+        Gizmos.DrawWireSphere(transform.position, GetMaxRange() * LowPassStart);
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, FullPanDistance);
         Gizmos.color = Color.grey;

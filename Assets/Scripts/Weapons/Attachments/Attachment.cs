@@ -11,13 +11,25 @@ public class Attachment : NetworkBehaviour
     [SyncVar]
     public GameObject Gun;
 
+    [Header("Basics")]
     public AttachmentType Type;
     public bool Hidden = false;
+
+    [Header("Muzzle Only")]
     public Transform BulletSpawn;
 
+    [Header("Muzzle Only - Custom Shot Sound")]
     public AudioClip CustomShotSound;
+    [Header("Muzzle Only - Original Shot Effects")]
     [Range(0f, 1f)]
-    public float ShotVolume = 1f, ShotPitch = 1f;
+    public float ShotVolume = 0f;
+    [Range(0f, 1f)]
+    public float ShotRange = 1f;
+    public float ShotPitch = 1f;
+    [Header("Muzzle Only - Custom Shot Effects")]
+    [Range(0f, 1f)]
+    public float CustomShotVolume = 1f;
+    public float CustomShotPitch = 1f, CustomShotRange = 40f;
 
     private bool applied = false;
     private string layer = null;
@@ -112,6 +124,12 @@ public class Attachment : NetworkBehaviour
         if(GetGun() != null)
         {
             GetGun().OnShoot.AddListener(OnShoot);
+            if(CustomShotSound != null && Type == AttachmentType.MUZZLE)
+            {
+                GetGun().Shooting.AudioSauce.PitchMultiplier = ShotPitch;
+                GetGun().Shooting.AudioSauce.RangeMultiplier = ShotRange;
+                GetGun().Shooting.AudioSauce.VolumeMultiplier = ShotVolume;
+            }
         }
     }
 
@@ -129,6 +147,13 @@ public class Attachment : NetworkBehaviour
         foreach (AttachmentTweak tweak in GetComponents<AttachmentTweak>())
         {
             tweak.Remove(this);
+        }
+
+        if (CustomShotSound != null && Type == AttachmentType.MUZZLE)
+        {
+            GetGun().Shooting.AudioSauce.PitchMultiplier = 1;
+            GetGun().Shooting.AudioSauce.RangeMultiplier = 1;
+            GetGun().Shooting.AudioSauce.VolumeMultiplier = 1;
         }
 
         applied = false;
@@ -188,13 +213,11 @@ public class Attachment : NetworkBehaviour
     {
         if(Type == AttachmentType.MUZZLE)
         {
-            // Play suppressed sound, if necessary.
+            // Play custom sound, if necessary.
             if (CustomShotSound != null)
             {
-                GetGun().Shooting.AudioSauce.Pitch = ShotPitch * Time.timeScale;
-                GetGun().Shooting.AudioSauce.Clip = CustomShotSound;
-                GetGun().Shooting.AudioSauce.Volume = ShotVolume;
-                GetGun().Shooting.AudioSauce.Play();
+                // Use an external audio sauce to play the sound, allowing us custom falloff and effects independent of gun sound.
+                AudioManager.Instance.PlayOneShot(transform.position, CustomShotSound, CustomShotVolume, CustomShotPitch, CustomShotRange, CustomShotRange * 0.35f);
             }
         }
     }
