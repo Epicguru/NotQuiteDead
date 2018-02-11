@@ -4,7 +4,6 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(AudioSource))]
 [DisallowMultipleComponent]
 public class GunShooting : RotatingItem
 {
@@ -31,7 +30,7 @@ public class GunShooting : RotatingItem
     public GunCapacity Capacity;
     public ShellData Shells;
     public GunAudio Audio;
-    [HideInInspector] public AudioSource AudioSource;
+    public AudioSauce AudioSauce;
 
     [ReadOnly]
     public int bulletsInMagazine;
@@ -56,7 +55,7 @@ public class GunShooting : RotatingItem
     {
         gun = GetComponent<Gun>();
         animation = GetComponent<GunAnimation>();
-        AudioSource = GetComponent<AudioSource>();
+        AudioSauce = GetComponentInChildren<AudioSauce>();
 
         if(DefaultBulletSpawn == null)
         {
@@ -64,12 +63,8 @@ public class GunShooting : RotatingItem
             return;
         }
 
-        AudioSource.spatialBlend = 1;
-
-        // TODO FIXME!
-
         if (AllowedModes.Length == 0)
-            throw new System.Exception("No allowed firing modes on " + gun.Item.Name);
+            Debug.LogError("No allowed firing modes on " + gun.Item.Name);
     }
 
     public virtual void Update()
@@ -324,16 +319,17 @@ public class GunShooting : RotatingItem
 
     private void PlayLocalShot()
     {
-        // Plays the local version of the shot
+        // Plays the local version of the shot. Done on all clients.
 
         float volume = Audio.GetRandomVolume();
         float pitch = Audio.GetRandomPitch() * Time.timeScale;
 
         AudioClip clip = Audio.GetRandomClip();
 
-        AudioSource.volume = volume;
-        AudioSource.pitch = pitch;
-        AudioSource.PlayOneShot(clip);
+        AudioSauce.Volume = volume;
+        AudioSauce.Pitch = pitch;
+        AudioSauce.Clip = clip;
+        AudioSauce.Play();
     }
 
     public virtual bool CanReload()

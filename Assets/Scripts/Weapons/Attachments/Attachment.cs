@@ -191,8 +191,10 @@ public class Attachment : NetworkBehaviour
             // Play suppressed sound, if necessary.
             if (CustomShotSound != null)
             {
-                GetGun().Shooting.AudioSource.pitch = ShotPitch * Time.timeScale;
-                GetGun().Shooting.AudioSource.PlayOneShot(CustomShotSound, ShotVolume);
+                GetGun().Shooting.AudioSauce.Pitch = ShotPitch * Time.timeScale;
+                GetGun().Shooting.AudioSauce.Clip = CustomShotSound;
+                GetGun().Shooting.AudioSauce.Volume = ShotVolume;
+                GetGun().Shooting.AudioSauce.Play();
             }
         }
     }
