@@ -43,6 +43,14 @@ public class SubsonicBullet : MonoBehaviour
 
         if (collides)
         {
+            // Check range...
+            float dst = Vector2.Distance(hit.point, startPos);
+            if(dst > MaxRange)
+            {
+                Recycle();
+                return;
+            }
+
             // Spawn hit effect.
             float angle = Mathf.Atan2(hit.normal.y, hit.normal.x) * Mathf.Rad2Deg + 180;
             HitEffect.Spawn(hit.point, angle, 15, Color.yellow, HitEffectPreset.Sparks);
@@ -58,6 +66,13 @@ public class SubsonicBullet : MonoBehaviour
         }
         else if(collidesInternal)
         {
+            float dst = Vector2.Distance(hit2.point, startPos);
+            if (dst > MaxRange)
+            {
+                Recycle();
+                return;
+            }
+
             // Spawn hit effect.
             float angle = Mathf.Atan2(hit2.normal.y, hit2.normal.x) * Mathf.Rad2Deg + 180;
             HitEffect.Spawn(hit2.point, angle, 15, Color.yellow, HitEffectPreset.Sparks);
