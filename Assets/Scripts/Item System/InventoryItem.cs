@@ -18,111 +18,55 @@ public class InventoryItem : MonoBehaviour
     public Text Details;
     public bool Resize = true;
 
-    [Tooltip("The path to the prefab of this inventory item.")]
-    public string ItemPrefab; // Used to find the item.
-
-    [HideInInspector]
-    public int ItemCount; // The number of items in this slot.
-
-    [Tooltip("The inventory containing this item.")]
-    public Inventory Inventory; // The inventory that 
-
-    [Tooltip("The prefab version of this item. Not an instance.")]
-    public Item Item; // The prefab version, not an instance!!!
-
-    public ItemData Data
-    {
-        get
-        {
-            return _Data;
-        }
-        set
-        {
-            _Data = value;
-            SetText();
-        }
-    }
-
-    private ItemData _Data;
-
-    private static Vector2 StaticPos = new Vector2();
+    public InventoryItemData ItemData;
 
     public void Init(ItemData data)
     {
         // Nothing to do here, all rendering done in editor/game.
-
-        // Get prefab
-        Item = Item.GetItem(ItemPrefab);
-
         SetText();
 
-        this.Data = data;
+        this.ItemData.Data = data;
 
         if(Resize)
-            Image.rectTransform.sizeDelta = new Vector2(Item.ItemIcon.texture.width > 200 ? 200 : Item.ItemIcon.texture.width, 29);
-    }
-
-    public void Start()
-    {
-        if (Item == null)
-            Init(null);
-    }
-
-    public void SetItemCount(int items)
-    {
-        if (ItemCount == items)
-            return;
-
-        ItemCount = items;
-
-        if (ItemCount > 1)
-            Data = null; // Should already be null...
-
-        SetText();
+            Image.rectTransform.sizeDelta = new Vector2(ItemData.Item.ItemIcon.texture.width > 200 ? 200 : ItemData.Item.ItemIcon.texture.width, 29);
     }
 
     public void SetText()
     {
-        string quantity = ItemCount > 1 ? " x" + ItemCount : "";
+        string quantity = ItemData.Count > 1 ? " x" + ItemData.Count : "";
         string quickSlot = "";
-        if (Data != null && Data.QuickSlot != 0)
-            quickSlot = RichText.InColour(" (Slot #" + Data.QuickSlot + ")", Color.black);
-        Text.text = Item.Name + quantity + quickSlot;
-        Text.color = ItemRarityUtils.GetColour(Item.Rarity);
+        if (ItemData.Data != null && ItemData.Data.QuickSlot != 0)
+            quickSlot = RichText.InColour(" (Slot #" + ItemData.Data.QuickSlot + ")", Color.black);
+        Text.text = ItemData.Item.Name + quantity + quickSlot;
+        Text.color = ItemRarityUtils.GetColour(ItemData.Item.Rarity);
         if(Details != null)
-            Details.text = (Item.InventoryInfo.Weight * ItemCount) + "Kg";
+            Details.text = (ItemData.Item.InventoryInfo.Weight * ItemData.Count) + "Kg";
         if (Atlas == null)
             Atlas = Resources.Load<SpriteAtlas>("Atlas/Game Point");
-        Sprite spr = Atlas.GetSprite(Item.ItemIcon.name);
-        Image.sprite = spr == null ? Item.ItemIcon : spr;
-    }
-
-    public void Update()
-    {
-        StaticPos.y = (transform as RectTransform).anchoredPosition.y;
-        (transform as RectTransform).anchoredPosition = StaticPos;
+        Sprite spr = Atlas.GetSprite(ItemData.Item.ItemIcon.name);
+        Image.sprite = spr == null ? ItemData.Item.ItemIcon : spr;
     }
 
     public void Clicked()
     {
         // Check quick options:
-        if(((Item.Equipable && !Player.Local.Building.InBuildMode) || Item.GetComponent<GearItem>() != null) && InputManager.InputPressed("Quick Equip", true))
+        if(((ItemData.Item.Equipable && !Player.Local.Building.InBuildMode) || ItemData.Item.GetComponent<GearItem>() != null) && InputManager.InputPressed("Quick Equip", true))
         {
             // Wants to quick equip, do it!
-            if (Item.GetComponent<GearItem>() != null)
-                Item.Option_EquipGear(this, Item.Prefab);
+            if (ItemData.Item.GetComponent<GearItem>() != null)
+                Item.Option_EquipGear(this.ItemData, this.ItemData.Prefab);
             else
-                Item.Option_Equip(this, ItemPrefab);
+                Item.Option_Equip(this.ItemData, this.ItemData.Prefab);
             return;
         }
 
         if (InputManager.InputPressed("Quick Drop", true))
         {
             // Wants to quick drop, do it!
-            Item.Option_Drop(this, ItemPrefab);
+            Item.Option_Drop(this.ItemData, this.ItemData.Prefab);
             return;
         }
 
-        Inventory.Options.Open(this);
+        PlayerInventory.inv.Inventory.Options.Open(this);
     }
 }

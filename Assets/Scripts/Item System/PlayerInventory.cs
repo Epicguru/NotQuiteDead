@@ -29,6 +29,12 @@ public class PlayerInventory : MonoBehaviour
 
     public void Update()
     {
+        if (UI.AnyOpen)
+        {
+            Close();
+            return;
+        }
+
         if (!Inventory.QSI.Open && !Inventory.Options.isActiveAndEnabled && InputManager.InputDown("Inventory", true))
         {
             if (inv.Inventory.gameObject.activeSelf)
@@ -65,33 +71,14 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
-    public static void Add(Item item, ItemData data, int amount)
+    public static void Add(string prefab, ItemData data, int amount)
     {
-        inv.Inventory.AddItem(item.Prefab, data, amount);
+        inv.Inventory.AddItem(prefab, data, amount);
     }
 
-    public static void Add(string item, ItemData data, int amount)
+    public static int Remove(string prefab, Vector2 position, bool drop = false, int amount = 1)
     {
-        inv.Inventory.AddItem(item, data, amount);
-    }
-
-    public static void Remove(Item item, int amount, bool drop = false)
-    {
-        if (item.CanStack)
-        {
-            inv.Inventory.RemoveItem(inv.Inventory.GetOfType(item.Prefab), Vector2.zero, drop, amount);
-        }
-        else
-        {
-            for (int i = 0; i < amount; i++)
-            {
-                InventoryItem x = inv.Inventory.GetOfType(item.Prefab);
-                if (x != null)
-                    inv.Inventory.RemoveItem(x, Vector2.zero, drop, 1);
-                else
-                    break;
-            }
-        }
+        return inv.Inventory.RemoveItem(prefab, position, drop, amount);
     }
 
     public static void Open()
@@ -99,14 +86,12 @@ public class PlayerInventory : MonoBehaviour
         if (UI.AnyOpen)
             return;
 
-        UI.FlagOpen();
         inv.Inventory.gameObject.SetActive(true);
-        inv.Inventory.ResetViewport();
+        inv.Inventory.Open();
     }
 
     public static void Close()
     {
-        UI.FlagClosed();
         inv.Inventory.gameObject.SetActive(false);
         inv.Inventory.Options.Close();
         inv.Inventory.QSI.Open = false;

@@ -11,7 +11,7 @@ public class Blueprint
     {
         for (int i = 0; i < Requirements.Length; i++)
         {
-            bool has = PlayerInventory.inv.Inventory.Contains(Requirements[i], RequirementQuantities[i]);
+            bool has = PlayerInventory.inv.Inventory.Contains(Requirements[i].Prefab, RequirementQuantities[i]);
             if (!has)
                 return false;
         }
