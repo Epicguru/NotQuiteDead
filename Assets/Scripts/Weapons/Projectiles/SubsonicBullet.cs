@@ -53,7 +53,7 @@ public class SubsonicBullet : MonoBehaviour
 
             // Spawn hit effect.
             float angle = Mathf.Atan2(hit.normal.y, hit.normal.x) * Mathf.Rad2Deg + 180;
-            HitEffect.Spawn(hit.point, angle, 15, Color.yellow, HitEffectPreset.Sparks);
+            HitEffect.Spawn(hit.point, angle, hit.collider, true);
 
             // Deal damage to the object if we are on the server.
             HitObject(hit);
@@ -75,7 +75,7 @@ public class SubsonicBullet : MonoBehaviour
 
             // Spawn hit effect.
             float angle = Mathf.Atan2(hit2.normal.y, hit2.normal.x) * Mathf.Rad2Deg + 180;
-            HitEffect.Spawn(hit2.point, angle, 15, Color.yellow, HitEffectPreset.Sparks);
+            HitEffect.Spawn(hit2.point, angle, hit2.collider, true);
 
             // Deal damage to the object if we are on the server.
             HitObject(hit2);

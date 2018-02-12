@@ -217,7 +217,7 @@ public class Attachment : NetworkBehaviour
             if (CustomShotSound != null)
             {
                 // Use an external audio sauce to play the sound, allowing us custom falloff and effects independent of gun sound.
-                AudioManager.Instance.PlayOneShot(transform.position, CustomShotSound, CustomShotVolume, CustomShotPitch, CustomShotRange, CustomShotRange * 0.35f);
+                AudioManager.Instance.PlayOneShot(transform.position, CustomShotSound, CustomShotVolume, CustomShotPitch, CustomShotRange, 2f, CustomShotRange * 0.35f, 0.7f);
             }
         }
     }

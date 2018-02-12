@@ -67,20 +67,45 @@ public class HitEffect : MonoBehaviour
 
     public static void Spawn(Vector2 position, float rotation, float FPS, Color colour, Sprite[] sprites)
     {
-        GameObject prefab = HitEffectPresets._Instance.Prefab;
+        GameObject prefab = Spawnables.I.HitEffect;
         GameObject go = ObjectPool.Instantiate(prefab, PoolType.HIT_EFFECT);
 
         HitEffect effect = go.GetComponent<HitEffect>();
         effect.Init(position, rotation, FPS, colour, sprites);
     }
 
-    public static void Spawn(Vector2 position, float rotation, float FPS, Color colour, HitEffectPreset preset)
+    public static void Spawn(Vector2 position, float rotation, HitEffectPreset preset)
     {
-        Spawn(position, rotation, FPS, colour, HitEffectPresets._Instance.GetSprites((int)preset));
+        Spawn(position, rotation, preset.FPS, preset.Colour, preset.Sprites);
     }
-}
 
-public enum HitEffectPreset : int
-{
-    Sparks = 0
+    public static void Spawn(Vector2 position, float rotation, Collider2D collisionSurface, bool playAudio)
+    {
+        // Using a collision surface, look for an appropriate CollisionSurface component in the parent.
+        CollisionSurface surface = collisionSurface.GetComponentInParent<CollisionSurface>();
+
+        if(surface != null)
+        {
+            // Spawn effect, if present.
+            HitEffectPreset effect = surface.GetHitEffect();
+            if(effect != null)
+            {
+                Spawn(position, rotation, effect);
+            }
+
+            // Now play audio using the settings on the CollisionSurface
+            AudioClip c = surface.GetAudioClip();
+            if(c != null)
+            {
+                float volume = surface.GetVolume();
+                float pitch = surface.GetPitch();
+                float range = surface.GetRange();
+                float maxPanRange = surface.GetMaxPanRange();
+                float minPanRange = surface.GetMinPanRange();
+                float lowPassStart = surface.GetLowPassDistance();
+
+                AudioManager.Instance.PlayOneShot(position, c, volume, pitch, range, minPanRange, maxPanRange, lowPassStart);
+            }
+        }
+    }
 }

@@ -24,10 +24,10 @@ public class AudioManager : MonoBehaviour
 
     public AudioSauce PlayOneShot(Vector2 position, AudioClip clip, float volume, float pitch)
     {
-        return PlayOneShot(position, clip, volume, pitch, 20, 10);
+        return PlayOneShot(position, clip, volume, pitch, 20f, 2f, 10f, 0.6f);
     }
 
-    public AudioSauce PlayOneShot(Vector2 position, AudioClip clip, float volume, float pitch, float range, float panMagnitude)
+    public AudioSauce PlayOneShot(Vector2 position, AudioClip clip, float volume, float pitch, float range, float minPanRange, float maxPanRange, float lowPassStart)
     {
         AudioSauce s = GetNextSauce();
         if(s == null)
@@ -40,8 +40,10 @@ public class AudioManager : MonoBehaviour
         s.Volume = volume;
         s.Pitch = pitch;
         s.Range = range;
-        s.FullPanDistance = panMagnitude;
+        s.FullPanDistance = maxPanRange;
+        s.NoPanDistance = minPanRange;
         s.transform.position = position;
+        s.LowPassStart = lowPassStart;
 
         s.Play();
 
