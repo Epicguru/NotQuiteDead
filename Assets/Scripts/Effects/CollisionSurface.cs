@@ -8,9 +8,9 @@ public class CollisionSurface : MonoBehaviour
 
     [Header("Audio")]
     public AudioClip[] HitSounds;
-    public float Range = 20;
+    public float Range = 15;
     [Range(0f, 1f)]
-    public float PanRangePercentage = 0.2f;
+    public float PanRangePercentage = 0.35f;
 
     public virtual AudioClip GetAudioClip()
     {
@@ -48,7 +48,7 @@ public class CollisionSurface : MonoBehaviour
 
     public virtual float GetVolume()
     {
-        return 1f;
+        return 0.65f;
     }
 
     public virtual float GetPitch()
