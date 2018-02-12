@@ -150,7 +150,7 @@ public class Inventory : MonoBehaviour
                 ID.Prefab = prefab;
                 ID.Data = data;
                 ID.Count = amount;
-                Contents.Add(ID);
+                Contents.Insert(0, ID);
 
                 ContentsChange.Invoke();
                 return;
@@ -164,7 +164,7 @@ public class Inventory : MonoBehaviour
                     ID.Prefab = prefab;
                     ID.Data = data;
                     ID.Count = 1;
-                    Contents.Add(ID);
+                    Contents.Insert(0, ID);
                 }
 
                 ContentsChange.Invoke();
