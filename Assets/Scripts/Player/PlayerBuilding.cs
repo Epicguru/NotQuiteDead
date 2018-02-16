@@ -6,9 +6,15 @@ public class PlayerBuilding : NetworkBehaviour
 {
     [Header("Controls")]
     public bool InBuildMode;
+    public float MaxBuildRange = 15f;
+    public float MaxInteractRange = 10f;
 
     [Header("Menu Opening")]
     public float HoldTime = 0.7f;
+
+    [Header("Preview")]
+    public GameObject PreviewPrefab;
+    private GameObject Preview;
 
     [Header("Data")]
     [ReadOnly]
@@ -29,9 +35,26 @@ public class PlayerBuilding : NetworkBehaviour
         UpdateMenuClosing();
         UpdateSelected();
         UpdatePlacing();
+        UpdatePreview();
 
         BuildingUI.Instance.BarOpen = InBuildMode;
         BuildingUI.Instance.MenuOpen = menuOpen;
+    }
+
+    private void UpdatePreview()
+    {
+        if(Preview == null)
+        {
+            Preview = Instantiate(PreviewPrefab);
+        }
+
+        Preview.SetActive(InBuildMode);
+        if (InBuildMode)
+        {
+            int x = (int)InputManager.GetMousePos().x;
+            int y = (int)InputManager.GetMousePos().y;
+            Preview.transform.position = new Vector3(x, y, 0f);
+        }
     }
 
     private void UpdateModeToggle()
