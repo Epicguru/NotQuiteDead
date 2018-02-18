@@ -50,14 +50,21 @@ public class InventoryItem : MonoBehaviour
     public void Clicked()
     {
         // Check quick options:
-        if(((ItemData.Item.Equipable && !Player.Local.Building.InBuildMode) || ItemData.Item.GetComponent<GearItem>() != null) && InputManager.InputPressed("Quick Equip", true))
+        if((ItemData.Item.Equipable || ItemData.Item.GetComponent<GearItem>() != null) && InputManager.InputPressed("Quick Equip", true))
         {
-            // Wants to quick equip, do it!
-            if (ItemData.Item.GetComponent<GearItem>() != null)
-                Item.Option_EquipGear(this.ItemData, this.ItemData.Prefab);
+            if (Player.Local.Building.InBuildMode)
+            {
+                ErrorMessageUI.Instance.DisplayMessage = "Cannot equip items when in build mode.\nPress [" + InputManager.GetInput("Toggle Build Mode").ToString() + "] to exit build mode.";
+            }
             else
-                Item.Option_Equip(this.ItemData, this.ItemData.Prefab);
-            return;
+            {
+                // Wants to quick equip, do it!
+                if (ItemData.Item.GetComponent<GearItem>() != null)
+                    Item.Option_EquipGear(this.ItemData, this.ItemData.Prefab);
+                else
+                    Item.Option_Equip(this.ItemData, this.ItemData.Prefab);
+                return;
+            }
         }
 
         if (InputManager.InputPressed("Quick Drop", true))
