@@ -16,7 +16,14 @@ public class ErrorMessageUI : MonoBehaviour
         set
         {
             _DM = value;
-            time = 0f;
+            alphaTime = 0f;
+        }
+    }
+    public bool IsDisplaying
+    {
+        get
+        {
+            return alphaTime < Duration;
         }
     }
     private string _DM;
@@ -33,11 +40,13 @@ public class ErrorMessageUI : MonoBehaviour
     [SerializeField]
     private Text Text;
     [SerializeField]
-    private float time;
+    private float alphaTime;
+    [SerializeField]
+    private float pulseTime;
 
     public void Awake()
     {
-        time = Duration + 1;
+        alphaTime = Duration + 1;
         Instance = this;
     }
 
@@ -48,7 +57,8 @@ public class ErrorMessageUI : MonoBehaviour
 
     public void Update()
     {
-        time += Time.unscaledDeltaTime;
+        alphaTime += Time.unscaledDeltaTime;
+        pulseTime += Time.unscaledDeltaTime;
         float alpha = CalculateAlpha();
 
         Text.text = DisplayMessage;
@@ -62,7 +72,7 @@ public class ErrorMessageUI : MonoBehaviour
 
     public float CalculateAlpha()
     {
-        float p = Mathf.Clamp(time / Duration, 0f, 1f);
+        float p = Mathf.Clamp(alphaTime / Duration, 0f, 1f);
         float x = Mathf.Clamp(AlphaCurve.Evaluate(p), 0f, 1f);
 
         return GetPulseAlpha() * x;
@@ -70,6 +80,6 @@ public class ErrorMessageUI : MonoBehaviour
 
     public float GetPulseAlpha()
     {
-        return PulseBase + (Mathf.Sin(time * PulseFrequency) * PulseMagnitude);
+        return PulseBase + (Mathf.Sin(pulseTime * PulseFrequency) * PulseMagnitude);
     }
 }

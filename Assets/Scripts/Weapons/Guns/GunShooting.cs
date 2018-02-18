@@ -90,6 +90,12 @@ public class GunShooting : RotatingItem
         bool requestingShoot = ShootNow();
         bool ready = animation.IsAiming && BulletInChamber && !animation.IsDropped && !animation.IsChambering && !animation.IsReloading;
 
+        if(requestingShoot && bulletsInMagazine == 0 && !BulletInChamber)
+        {
+            if(!ErrorMessageUI.Instance.IsDisplaying)
+                ErrorMessageUI.Instance.DisplayMessage = "Reload [" + InputManager.GetInput("Reload").ToString() + "]";
+        }
+
         // Problem: We tell server to shoot more than once, beucase:
         // 1. We request one shot, one frame.
         // 2. Shoot bool reaches server.
