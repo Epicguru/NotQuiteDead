@@ -14,7 +14,7 @@ public class PlayerBuilding : NetworkBehaviour
 
     [Header("Preview")]
     public GameObject PreviewPrefab;
-    private GameObject Preview;
+    private TilePreview Preview;
 
     [Header("Data")]
     [ReadOnly]
@@ -45,16 +45,58 @@ public class PlayerBuilding : NetworkBehaviour
     {
         if(Preview == null)
         {
-            Preview = Instantiate(PreviewPrefab);
+            Preview = Instantiate(PreviewPrefab).GetComponent<TilePreview>();
         }
 
-        Preview.SetActive(InBuildMode);
-        if (InBuildMode)
+        bool placementMode = InBuildMode && !menuOpen;
+
+        Preview.gameObject.SetActive(placementMode);
+        if (!placementMode)
         {
-            int x = (int)InputManager.GetMousePos().x;
-            int y = (int)InputManager.GetMousePos().y;
-            Preview.transform.position = new Vector3(x, y, 0f);
+            return;
         }
+
+        int x = (int)InputManager.GetMousePos().x;
+        int y = (int)InputManager.GetMousePos().y;
+
+        string error = CanPlace(x, y);
+        bool canPlace = error == null;
+
+        Preview.CanPlace = canPlace;
+
+        if (!canPlace && InputManager.InputPressed("Shoot"))
+        {
+            ErrorMessageUI.Instance.DisplayMessage = "Cannot Place:\n" + error;
+        }
+
+        Preview.transform.position = new Vector3(x, y, 0f);
+    }
+
+    public string CanPlace(int x, int y)
+    {
+        if (!InBuildMode)
+            return "Not in build mode!";
+
+
+        bool inBounds = World.Instance.TileMap.InBounds(x, y);
+        if (!inBounds)
+        {
+            return "Out of world bounds!";
+        }
+
+        bool placementMode = InBuildMode && !menuOpen;
+        if (!placementMode)
+        {
+            return "Not in placement mode!";
+        }
+
+        bool hasSelected = GetSelectedItem() != null;
+        if (!hasSelected)
+        {
+            return "No buildable selected! Hold [" + InputManager.GetInput("Toggle Build Mode") + "] to open menu.";
+        }
+
+        return null;
     }
 
     private void UpdateModeToggle()
@@ -158,6 +200,16 @@ public class PlayerBuilding : NetworkBehaviour
         BuildingUI.Instance.Bar.SelectedIndex = selected;
     }
 
+    public BuildingItem GetSelectedItem()
+    {
+        int index = BuildingUI.Instance.Bar.SelectedIndex;
+        if (index < 0 || index >= BuildingUI.Instance.Bar.Items.Count)
+            return null;
+
+        BuildingItem item = BuildingUI.Instance.Bar.Items[index];
+        return item;
+    }
+
     private void UpdatePlacing()
     {
         if (!InBuildMode)
@@ -166,24 +218,23 @@ public class PlayerBuilding : NetworkBehaviour
         if (!InputManager.InputPressed("Shoot"))
             return;
 
+        int x = (int)InputManager.GetMousePos().x;
+        int y = (int)InputManager.GetMousePos().y;
+        if (CanPlace(x, y) != null)
+            return;
+
         if (Player.Local == null)
             return;
 
         if (BuildingUI.Instance == null)
             return;
 
-        int index = BuildingUI.Instance.Bar.SelectedIndex;
-        if (index < 0 || index >= BuildingUI.Instance.Bar.Items.Count)
-            return;
-
-        BuildingItem item = BuildingUI.Instance.Bar.Items[index];
+        BuildingItem item = GetSelectedItem();
         if(item != null)
         {
             // Place this item where the mouse is, and remove one from the inventory.
 
             string layer = "Foreground";
-            int x = (int)InputManager.GetMousePos().x;
-            int y = (int)InputManager.GetMousePos().y;
 
             switch (item.Type)
             {

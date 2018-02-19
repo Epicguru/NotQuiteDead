@@ -128,6 +128,11 @@ public class TileMap : NetworkBehaviour
         return new RectInt(chunkStartX - increment, chunkStartY - increment, (chunkEndX - chunkStartX) + increment * 2, (chunkEndY - chunkStartY) + increment * 2);
     }
 
+    public bool InBounds(int tileX, int tileY)
+    {
+        return tileX >= 0 && tileY >= 0 && tileX < Width && tileY < Height;
+    }
+    
     public void OnDrawGizmos()
     {
         if (CameraBounds.Instance == null)
