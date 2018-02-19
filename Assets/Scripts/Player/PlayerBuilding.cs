@@ -34,8 +34,8 @@ public class PlayerBuilding : NetworkBehaviour
         UpdateModeToggle();    
         UpdateMenuClosing();
         UpdateSelected();
-        UpdatePlacing();
         UpdatePreview();
+        UpdatePlacing();
 
         BuildingUI.Instance.BarOpen = InBuildMode;
         BuildingUI.Instance.MenuOpen = menuOpen;
@@ -64,7 +64,7 @@ public class PlayerBuilding : NetworkBehaviour
 
         Preview.CanPlace = canPlace;
 
-        if (!canPlace && InputManager.InputPressed("Shoot"))
+        if (!canPlace && InputManager.InputDown("Shoot"))
         {
             ErrorMessageUI.Instance.DisplayMessage = "Cannot Place:\n" + error;
         }
@@ -74,10 +74,6 @@ public class PlayerBuilding : NetworkBehaviour
 
     public string CanPlace(int x, int y)
     {
-        if (!InBuildMode)
-            return "Not in build mode!";
-
-
         bool inBounds = World.Instance.TileMap.InBounds(x, y);
         if (!inBounds)
         {
@@ -90,10 +86,35 @@ public class PlayerBuilding : NetworkBehaviour
             return "Not in placement mode!";
         }
 
-        bool hasSelected = GetSelectedItem() != null;
+        BuildingItem item = GetSelectedItem();
+        bool hasSelected = item != null;
         if (!hasSelected)
         {
             return "No buildable selected! Hold [" + InputManager.GetInput("Toggle Build Mode") + "] to open menu.";
+        }
+
+        if(item.Type == BuildingItemType.TILE)
+        {
+            BaseTile oldTile = World.Instance.TileMap.GetLayer(item.GetTile().Layer).GetTile(x, y);
+
+            if (oldTile != null)
+            {
+                return "Space already occupied!";
+            }
+
+            bool canPlaceTile = World.Instance.TileMap.GetLayer(item.GetTile().Layer).CanPlaceTile(x, y);
+            if (!canPlaceTile)
+            {
+                return "Space already occupied!";
+            }
+        }
+        else if(item.Type == BuildingItemType.FURNITURE)
+        {
+            bool canPlaceFurniture = !World.Instance.Furniture.IsFurnitureAt(x, y) && World.Instance.TileMap.GetLayer(item.GetFurniture().Layer).GetTile(x, y) == null;
+            if (!canPlaceFurniture)
+            {
+                return "Space already occupied!";
+            }
         }
 
         return null;
@@ -255,6 +276,14 @@ public class PlayerBuilding : NetworkBehaviour
                 case BuildingItemType.TILE:
 
                     BaseTile tile = item.GetTile();
+                    layer = tile.Layer;
+
+                    BaseTile oldTile = World.Instance.TileMap.GetLayer(layer).GetTile(x, y);
+
+                    if (oldTile != null && oldTile.Prefab == tile.Prefab)
+                    {
+                        return;
+                    }
 
                     // Place tile.
                     worked = World.Instance.TileMap.GetLayer(layer).SetTile(tile, x, y);
