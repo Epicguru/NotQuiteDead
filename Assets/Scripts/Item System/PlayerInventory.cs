@@ -34,6 +34,11 @@ public class PlayerInventory : MonoBehaviour
             Close();
             return;
         }
+        
+        if(Player.Local != null && Player.Local.Building.InBuildMode)
+        {
+            Close();
+        }
 
         if (!Inventory.QSI.Open && !Inventory.Options.isActiveAndEnabled && InputManager.InputDown("Inventory", true))
         {
@@ -44,6 +49,8 @@ public class PlayerInventory : MonoBehaviour
             }
             else
             {
+                // Close the building mode if it is open.
+                Player.Local.Building.InBuildMode = false;
                 // Open
                 Open();
             }
