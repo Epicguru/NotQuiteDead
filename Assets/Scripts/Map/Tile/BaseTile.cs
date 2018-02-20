@@ -14,6 +14,9 @@ public class BaseTile : ScriptableObject
     [Tooltip("The visual name of the tile.")]
     public string Name;
 
+    [Tooltip("The name of the world layer that this tile is placed in. Should never change at runtime.")]
+    public string Layer = "Foreground";
+
     [Tooltip("How valuable is this tile?")]
     public ItemRarity Rarity = ItemRarity.COMMON;
 

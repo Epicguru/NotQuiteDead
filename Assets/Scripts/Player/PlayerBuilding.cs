@@ -6,9 +6,15 @@ public class PlayerBuilding : NetworkBehaviour
 {
     [Header("Controls")]
     public bool InBuildMode;
+    public float MaxBuildRange = 15f;
+    public float MaxInteractRange = 10f;
 
     [Header("Menu Opening")]
     public float HoldTime = 0.7f;
+
+    [Header("Preview")]
+    public GameObject PreviewPrefab;
+    private TilePreview Preview;
 
     [Header("Data")]
     [ReadOnly]
@@ -28,10 +34,90 @@ public class PlayerBuilding : NetworkBehaviour
         UpdateModeToggle();    
         UpdateMenuClosing();
         UpdateSelected();
+        UpdatePreview();
         UpdatePlacing();
 
         BuildingUI.Instance.BarOpen = InBuildMode;
         BuildingUI.Instance.MenuOpen = menuOpen;
+    }
+
+    private void UpdatePreview()
+    {
+        if(Preview == null)
+        {
+            Preview = Instantiate(PreviewPrefab).GetComponent<TilePreview>();
+        }
+
+        bool placementMode = InBuildMode && !menuOpen;
+
+        Preview.gameObject.SetActive(placementMode);
+        if (!placementMode)
+        {
+            return;
+        }
+
+        int x = (int)InputManager.GetMousePos().x;
+        int y = (int)InputManager.GetMousePos().y;
+
+        string error = CanPlace(x, y);
+        bool canPlace = error == null;
+
+        Preview.CanPlace = canPlace;
+
+        if (!canPlace && InputManager.InputDown("Shoot"))
+        {
+            ErrorMessageUI.Instance.DisplayMessage = "Cannot Place:\n" + error;
+        }
+
+        Preview.transform.position = new Vector3(x, y, 0f);
+    }
+
+    public string CanPlace(int x, int y)
+    {
+        bool inBounds = World.Instance.TileMap.InBounds(x, y);
+        if (!inBounds)
+        {
+            return "Out of world bounds!";
+        }
+
+        bool placementMode = InBuildMode && !menuOpen;
+        if (!placementMode)
+        {
+            return "Not in placement mode!";
+        }
+
+        BuildingItem item = GetSelectedItem();
+        bool hasSelected = item != null;
+        if (!hasSelected)
+        {
+            return "No buildable selected! Hold [" + InputManager.GetInput("Toggle Build Mode") + "] to open menu.";
+        }
+
+        if(item.Type == BuildingItemType.TILE)
+        {
+            BaseTile oldTile = World.Instance.TileMap.GetLayer(item.GetTile().Layer).GetTile(x, y);
+
+            if (oldTile != null)
+            {
+                return "Space already occupied!";
+            }
+
+            bool canPlaceTile = World.Instance.TileMap.GetLayer(item.GetTile().Layer).CanPlaceTile(x, y);
+            if (!canPlaceTile)
+            {
+                return "Space already occupied!";
+            }
+        }
+        else if(item.Type == BuildingItemType.FURNITURE)
+        {
+            bool canPlaceFurniture = !World.Instance.Furniture.IsFurnitureAt(x, y) && World.Instance.TileMap.GetLayer(item.GetFurniture().Layer).GetTile(x, y) == null;
+            if (!canPlaceFurniture)
+            {
+                return "Space already occupied!";
+            }
+        }
+
+        return null;
     }
 
     private void UpdateModeToggle()
@@ -135,6 +221,16 @@ public class PlayerBuilding : NetworkBehaviour
         BuildingUI.Instance.Bar.SelectedIndex = selected;
     }
 
+    public BuildingItem GetSelectedItem()
+    {
+        int index = BuildingUI.Instance.Bar.SelectedIndex;
+        if (index < 0 || index >= BuildingUI.Instance.Bar.Items.Count)
+            return null;
+
+        BuildingItem item = BuildingUI.Instance.Bar.Items[index];
+        return item;
+    }
+
     private void UpdatePlacing()
     {
         if (!InBuildMode)
@@ -143,24 +239,23 @@ public class PlayerBuilding : NetworkBehaviour
         if (!InputManager.InputPressed("Shoot"))
             return;
 
+        int x = (int)InputManager.GetMousePos().x;
+        int y = (int)InputManager.GetMousePos().y;
+        if (CanPlace(x, y) != null)
+            return;
+
         if (Player.Local == null)
             return;
 
         if (BuildingUI.Instance == null)
             return;
 
-        int index = BuildingUI.Instance.Bar.SelectedIndex;
-        if (index < 0 || index >= BuildingUI.Instance.Bar.Items.Count)
-            return;
-
-        BuildingItem item = BuildingUI.Instance.Bar.Items[index];
+        BuildingItem item = GetSelectedItem();
         if(item != null)
         {
             // Place this item where the mouse is, and remove one from the inventory.
 
             string layer = "Foreground";
-            int x = (int)InputManager.GetMousePos().x;
-            int y = (int)InputManager.GetMousePos().y;
 
             switch (item.Type)
             {
@@ -181,6 +276,14 @@ public class PlayerBuilding : NetworkBehaviour
                 case BuildingItemType.TILE:
 
                     BaseTile tile = item.GetTile();
+                    layer = tile.Layer;
+
+                    BaseTile oldTile = World.Instance.TileMap.GetLayer(layer).GetTile(x, y);
+
+                    if (oldTile != null && oldTile.Prefab == tile.Prefab)
+                    {
+                        return;
+                    }
 
                     // Place tile.
                     worked = World.Instance.TileMap.GetLayer(layer).SetTile(tile, x, y);
