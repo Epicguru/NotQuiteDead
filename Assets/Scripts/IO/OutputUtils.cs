@@ -22,6 +22,22 @@ public static class OutputUtils
         }
     }
 
+    public static string ItemSaveDirectory
+    {
+        get
+        {
+            return S + "Items" + S;
+        }
+    }
+
+    public static string ItemSaveFile
+    {
+        get
+        {
+            return ItemSaveDirectory + "Dropped Items.txt";
+        }
+    }
+
     public static string InputSaveDirectory
     {
         get
@@ -101,9 +117,9 @@ public static class OutputUtils
         File.WriteAllText(path, json);
     }
 
-    public static void ObjectToFile(object obj, string path)
+    public static void ObjectToFile(object obj, string path, JsonSerializerSettings settings = null)
     {
-        string json = ObjectToJson(obj);
+        string json = ObjectToJson(obj, settings);
         JsonToFile(json, path);
     }
 

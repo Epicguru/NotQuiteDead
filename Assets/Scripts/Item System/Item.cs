@@ -140,6 +140,16 @@ public class Item : NetworkBehaviour
         SetLayer(IsEquipped() ? "Equipped Items" : "Dropped Items");
 
         UpdateParent();
+
+        if (Input.GetKeyDown(KeyCode.K) && Prefab == "TSMG")
+        {
+            ItemIO.ItemsToFile("James' Reality", this);
+        }
+    }
+
+    public virtual ItemSaveData GetSaveData()
+    {
+        return new ItemSaveData(this);
     }
 
     public void RequestDataUpdate()
