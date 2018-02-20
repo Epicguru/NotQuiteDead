@@ -142,6 +142,26 @@ public class Item : NetworkBehaviour
         UpdateParent();
     }
 
+    public virtual bool ShouldSerialize()
+    {
+        // Should this item be serialized? Generally should only return true if it is dropped on the ground.
+
+        // Do not serialize equipped items.
+        if (IsEquipped())
+        {
+            return false;
+        }
+
+        // Do not serialize attachments if they are currently attached to a weapon.
+        Attachment a = GetComponent<Attachment>();
+        if (a != null && a.IsAttached)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public virtual ItemSaveData GetSaveData()
     {
         return new ItemSaveData(this);

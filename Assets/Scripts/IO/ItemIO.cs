@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.Linq;
 
 public static class ItemIO
 {
@@ -26,8 +27,14 @@ public static class ItemIO
         return sd;
     }
 
+    public static Item[] FilterItems(params Item[] items)
+    {
+        return (from x in items where x.ShouldSerialize() select x).ToArray();
+    }
+
     public static void ItemsToFile(string reality, params Item[] items)
     {
+        items = FilterItems(items);
         ItemSaveData[] saveData = new ItemSaveData[items.Length];
 
         for (int i = 0; i < items.Length; i++)
