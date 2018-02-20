@@ -140,11 +140,6 @@ public class Item : NetworkBehaviour
         SetLayer(IsEquipped() ? "Equipped Items" : "Dropped Items");
 
         UpdateParent();
-
-        if (Input.GetKeyDown(KeyCode.K) && Prefab == "TSMG")
-        {
-            ItemIO.ItemsToFile("James' Reality", this);
-        }
     }
 
     public virtual ItemSaveData GetSaveData()
@@ -269,7 +264,7 @@ public class Item : NetworkBehaviour
     }
 
     /// <summary>
-    /// Creates a new instance of an object and spawns it into the world.
+    /// Creates a new instance of an object and spawns it into the world. Not networked.
     /// </summary>
     public static Item NewInstance(string prefab, Vector2 position)
     {

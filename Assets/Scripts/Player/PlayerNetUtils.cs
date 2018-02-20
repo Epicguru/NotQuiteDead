@@ -89,6 +89,12 @@ public class PlayerNetUtils : NetworkBehaviour
     [Command]
     public void CmdSpawnDroppedItem(string prefab, Vector3 position, ItemData data)
     {
+        Server_SpawnDroppedItem(prefab, position, data);
+    }
+
+    [Server]
+    public void Server_SpawnDroppedItem(string prefab, Vector3 position, ItemData data)
+    {
         Item newItem = Item.NewInstance(prefab, position);
         newItem.transform.position = position; // Set position.
         if (data == null)

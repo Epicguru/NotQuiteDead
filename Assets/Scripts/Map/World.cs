@@ -33,4 +33,25 @@ public class World : NetworkBehaviour
         //Instance = null;
         Pawn.Dispose();
     }
+
+    public void Update()
+    {
+        if (isServer)
+        {
+            if (Input.GetKeyDown(KeyCode.Y))
+            {
+                TileMap.SaveAll();
+                ItemIO.ItemsToFile("James' Reality", GameObject.FindObjectsOfType<Item>());
+            }
+
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                foreach (Item item in GameObject.FindObjectsOfType<Item>())
+                {
+                    Destroy(item.gameObject);
+                }
+                ItemIO.FileToWorldItems("James' Reality");
+            }
+        }
+    }
 }

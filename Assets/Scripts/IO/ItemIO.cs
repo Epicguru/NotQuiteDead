@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public static class ItemIO
 {
@@ -57,6 +58,29 @@ public static class ItemIO
 
         ItemSaveData[] data = InputUtils.FileToObject<ItemSaveData[]>(filePath);
         return data;
+    }
+
+    public static void SaveDataToWorldItems(ItemSaveData[] data)
+    {
+        // Should only be called on server!
+        for (int i = 0; i < data.Length; i++)
+        {
+            ItemSaveData save = data[i];
+            if (!Item.ItemExists(save.Prefab))
+            {
+                Debug.LogError("Item '" + save.Prefab + "' not found when loading items from item save data! (Item #" + i + ")");
+                continue;
+            }
+
+            Item instance = Item.NewInstance(save.Prefab, new Vector2(save.X, save.Y));
+            instance.Data = save.Data;
+            NetworkServer.Spawn(instance.gameObject);
+        }
+    }
+
+    public static void FileToWorldItems(string reality)
+    {
+        SaveDataToWorldItems(FileToSaveDatas(reality));
     }
 }
 

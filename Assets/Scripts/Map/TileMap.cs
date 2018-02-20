@@ -89,6 +89,14 @@ public class TileMap : NetworkBehaviour
         return Layers.Values;
     }
 
+    public void SaveAll()
+    {
+        foreach (TileLayer layer in Layers.Values)
+        {
+            layer.SaveAll();
+        }
+    }
+
     public void Update()
     {
         DebugText.Log(Chunk.InstanceCount + " chunks instantiated.");

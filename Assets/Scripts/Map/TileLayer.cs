@@ -53,11 +53,6 @@ public class TileLayer : NetworkBehaviour
             Pawn.SpawnPawn("Caveman", InputManager.GetMousePos());
         }
 
-        if (Input.GetKeyDown(KeyCode.Y))
-        {
-            SaveAll();
-        }
-
         if (!DebugText._Instance.Active)
             return;
 
