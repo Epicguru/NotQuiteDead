@@ -62,6 +62,22 @@ public static class OutputUtils
         }
     }
 
+    public static string PlayerSaveDirectory
+    {
+        get
+        {
+            return S + "Players" + S;
+        }
+    }
+
+    public static string PlayerStateFile
+    {
+        get
+        {
+            return S + "State.txt";
+        }
+    }
+
     public static string InputSaveDirectory
     {
         get

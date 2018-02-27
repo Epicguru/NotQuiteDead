@@ -18,6 +18,7 @@ public class World : NetworkBehaviour
     [HideInInspector]
     public FurnitureManager Furniture;
 
+    [Server]
     public void Save()
     {
         // Save all tile layers to file.
@@ -33,12 +34,19 @@ public class World : NetworkBehaviour
         // Save currently held item. TODO see above.
         InventoryIO.SaveHolding(RealityName, Player.Local);
 
+        // Save player state (position, health, etc.)
+        PlayerIO.SavePlayerState(RealityName, Player.Local);
+
         // Save all world items to file.
         ItemIO.ItemsToFile(RealityName, GameObject.FindObjectsOfType<Item>());
     }
 
+    [Server]
     public void Load()
     {
+        // Load player state (position, health, etc.)
+        PlayerIO.LoadPlayerState(RealityName, Player.Local);
+
         // Load all world items to map.
         ItemIO.FileToWorldItems(RealityName, true);
 

@@ -215,11 +215,11 @@ public static class InventoryIO
         // Apply!
         if(sd == null || string.IsNullOrEmpty(sd.Prefab))
         {
-            player.Holding.CmdDrop(false, true, player.gameObject, null);
+            holding.CmdDrop(false, true, player.gameObject, null);
         }
         else
         {
-            player.Holding.ServerEquip(sd.Prefab, player.gameObject, sd.Data);
+            holding.ServerEquip(sd.Prefab, player.gameObject, sd.Data);
         }
     }
 }
