@@ -30,11 +30,19 @@ public static class OutputUtils
         }
     }
 
-    public static string ItemSaveFile
+    public static string WorldItemSaveFile
     {
         get
         {
             return ItemSaveDirectory + "Dropped Items.txt";
+        }
+    }
+
+    public static string InventoryItemSaveFile
+    {
+        get
+        {
+            return ItemSaveDirectory + "Inventory Items.txt";
         }
     }
 

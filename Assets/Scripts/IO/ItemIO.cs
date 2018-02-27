@@ -41,7 +41,7 @@ public static class ItemIO
             saveData[i] = sd;
         }
 
-        string filePath = OutputUtils.RealitySaveDirectory + reality + OutputUtils.ItemSaveFile;
+        string filePath = OutputUtils.RealitySaveDirectory + reality + OutputUtils.WorldItemSaveFile;
         Debug.Log("Saving " + items.Length + " items to '" + filePath + "'");
         OutputUtils.ObjectToFile(saveData, filePath, new JsonSerializerSettings() { Formatting = Formatting.Indented, ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
     }
@@ -54,7 +54,7 @@ public static class ItemIO
             return null;
         }
 
-        string filePath = OutputUtils.RealitySaveDirectory + reality + OutputUtils.ItemSaveFile;
+        string filePath = OutputUtils.RealitySaveDirectory + reality + OutputUtils.WorldItemSaveFile;
         if (!File.Exists(filePath))
         {
             Debug.LogError("File '" + filePath + "' does not exist!");

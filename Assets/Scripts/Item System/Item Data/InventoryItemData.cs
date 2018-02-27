@@ -1,13 +1,16 @@
 ﻿
+using Newtonsoft.Json;
 using System;
 
 [Serializable]
+[JsonObject(MemberSerialization = MemberSerialization.OptOut)]
 public class InventoryItemData
 {
     public string Prefab;
     public int Count;
     public ItemData Data;
 
+    [JsonIgnore]
     public Item Item
     {
         get

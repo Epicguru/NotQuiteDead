@@ -23,6 +23,13 @@ public class World : NetworkBehaviour
         // Save all tile layers to file.
         TileMap.SaveAll();
 
+        // Save the player inventory:
+        // This will only save the host's inventory. TODO support other clients saving inventory data.
+        InventoryIO.SaveInventory(RealityName);
+
+        // Save current gear held and worn by player.
+        InventoryIO.SaveGear();
+
         // Save all world items to file.
         ItemIO.ItemsToFile(RealityName, GameObject.FindObjectsOfType<Item>());
     }
@@ -31,6 +38,13 @@ public class World : NetworkBehaviour
     {
         // Load all world items to map.
         ItemIO.FileToWorldItems(RealityName, true);
+
+        // Load the player inventory.
+        // This will only load the host's inventory. TODO support other clients loading inventory data.
+        InventoryIO.LoadInventory(RealityName);
+
+        // Save current gear held and worn by player.
+        InventoryIO.LoadGear();
 
         // No need to load tile layers, this is done all the time passively.
     }
