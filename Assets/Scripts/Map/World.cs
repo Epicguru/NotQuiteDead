@@ -37,6 +37,13 @@ public class World : NetworkBehaviour
 
     public void Awake()
     {
+        RealityName = RealityName == null ? null : RealityName.Trim();
+        if (string.IsNullOrEmpty(RealityName))
+        {
+            Debug.LogError("Reality name is null or empty! Invalid world for reality!");
+            return;
+        }
+
         Instance = this;
 
         TileMap = GetComponent<TileMap>();

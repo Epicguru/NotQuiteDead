@@ -67,6 +67,11 @@ public static class ItemIO
 
     public static void SaveDataToWorldItems(ItemSaveData[] data)
     {
+        if(data == null)
+        {
+            Debug.LogError("Save data array is null! Cannot spawn world items!");
+            return;
+        }
         // Should only be called on server!
         for (int i = 0; i < data.Length; i++)
         {
