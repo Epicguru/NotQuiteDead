@@ -8,6 +8,8 @@ public class TileMap : NetworkBehaviour
     // Is the networked part, contains the layers.
     // In charge of updating tile bounds and that kind of stuff.
 
+    public World World;
+
     public int ChunkSize;
 
     public int Width
@@ -61,7 +63,10 @@ public class TileMap : NetworkBehaviour
         foreach (TileLayer layer in LayersInit)
         {
             if (layer != null)
+            {
+                layer.Map = this;
                 Layers.Add(layer.Name, layer);
+            }
         }
         LayersInit = null;
     }
@@ -89,6 +94,7 @@ public class TileMap : NetworkBehaviour
         return Layers.Values;
     }
 
+    [Server]
     public void SaveAll()
     {
         foreach (TileLayer layer in Layers.Values)

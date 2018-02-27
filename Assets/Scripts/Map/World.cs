@@ -10,7 +10,7 @@ public class World : NetworkBehaviour
 {
     public static World Instance { get; private set; }
 
-    public string Name;
+    public string RealityName;
 
     [HideInInspector]
     public TileMap TileMap;
@@ -18,14 +18,33 @@ public class World : NetworkBehaviour
     [HideInInspector]
     public FurnitureManager Furniture;
 
+    public void Save()
+    {
+        // Save all tile layers to file.
+        TileMap.SaveAll();
+
+        // Save all world items to file.
+        ItemIO.ItemsToFile(RealityName, GameObject.FindObjectsOfType<Item>());
+    }
+
+    public void Load()
+    {
+        // Load all world items to map.
+        ItemIO.FileToWorldItems(RealityName, true);
+
+        // No need to load tile layers, this is done all the time passively.
+    }
+
     public void Awake()
     {
+        Instance = this;
+
         TileMap = GetComponent<TileMap>();
+        TileMap.World = this;
+
         Furniture = GetComponent<FurnitureManager>();
 
         TileMap.Create();
-
-        Instance = this;
     }
 
     public void OnDestroy()
@@ -40,17 +59,12 @@ public class World : NetworkBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Y))
             {
-                TileMap.SaveAll();
-                ItemIO.ItemsToFile("James' Reality", GameObject.FindObjectsOfType<Item>());
+                Save();
             }
 
             if (Input.GetKeyDown(KeyCode.U))
             {
-                foreach (Item item in GameObject.FindObjectsOfType<Item>())
-                {
-                    Destroy(item.gameObject);
-                }
-                ItemIO.FileToWorldItems("James' Reality");
+                Load();
             }
         }
     }

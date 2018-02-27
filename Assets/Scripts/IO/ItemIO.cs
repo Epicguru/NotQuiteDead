@@ -15,8 +15,6 @@ public static class ItemIO
             return null;
         }
 
-        string prefab = i.Prefab;
-
         ItemSaveData sd = i.GetSaveData();
         if(sd == null)
         {
@@ -81,11 +79,19 @@ public static class ItemIO
 
             Item instance = Item.NewInstance(save.Prefab, new Vector2(save.X, save.Y), save.Data);
             NetworkServer.Spawn(instance.gameObject);
+            instance.LoadSaveData(save);
         }
     }
 
-    public static void FileToWorldItems(string reality)
+    public static void FileToWorldItems(string reality, bool destroyOldItems = true)
     {
+        if (destroyOldItems)
+        {
+            foreach (Item item in GameObject.FindObjectsOfType<Item>())
+            {
+                GameObject.Destroy(item.gameObject);
+            }
+        }
         SaveDataToWorldItems(FileToSaveDatas(reality));
     }
 }

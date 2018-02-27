@@ -184,6 +184,13 @@ public class Item : NetworkBehaviour
         return true;
     }
 
+    public virtual void LoadSaveData(ItemSaveData saveData)
+    {
+        // Used for custom data that may need to be saved for particular types of items.
+        // Called only on the server just after the item has been spawned.
+        return;
+    }
+
     public virtual ItemSaveData GetSaveData()
     {
         return new ItemSaveData(this);
@@ -192,14 +199,12 @@ public class Item : NetworkBehaviour
     public void RequestDataUpdate()
     {
         // Indicates that we should get Data up-to-date. Happens when the item changes state.
-        Debug.Log("Requesting data update...");
         this.BroadcastMessage("UpdateData", Data, SendMessageOptions.DontRequireReceiver);
     }
 
     public void RequestDataApplication()
     {
         // Indicates that we should apply the data. Happens when the item changes state.
-        Debug.Log("Requesting data application...");
         this.BroadcastMessage("ApplyData", Data, SendMessageOptions.DontRequireReceiver);
 
     }
@@ -207,7 +212,6 @@ public class Item : NetworkBehaviour
     public void RequestSetDefaultData()
     {
         // Called when item spawns out of nowhere, such as a random spawn event or a mob drop.
-        Debug.Log("Requesting data default...");
         this.BroadcastMessage("SetDataDefaults", Data, SendMessageOptions.DontRequireReceiver);
     }
 
