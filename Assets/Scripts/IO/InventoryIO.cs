@@ -16,7 +16,6 @@ public static class InventoryIO
         // Make array of inventory item data.
         List<InventoryItemData> items = PlayerInventory.inv.Inventory.Contents;
         InventoryItemData[] array = items.ToArray();
-        items.Clear();
         items = null;
 
         // Get save file path.
