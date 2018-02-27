@@ -79,8 +79,7 @@ public static class ItemIO
                 continue;
             }
 
-            Item instance = Item.NewInstance(save.Prefab, new Vector2(save.X, save.Y));
-            instance.Data = save.Data;
+            Item instance = Item.NewInstance(save.Prefab, new Vector2(save.X, save.Y), save.Data);
             NetworkServer.Spawn(instance.gameObject);
         }
     }

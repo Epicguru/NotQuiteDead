@@ -46,8 +46,7 @@ public class PlayerNetUtils : NetworkBehaviour
             Item old = g.GetGearItem().Item;
             g.SetItem(GetPlayer().gameObject, null, null, false);
 
-            Item instance = Item.NewInstance(old.Prefab, GetPlayer().transform.position);
-            instance.Data = data;
+            Item instance = Item.NewInstance(old.Prefab, GetPlayer().transform.position, data);
 
             NetworkServer.Spawn(instance.gameObject);
         }
@@ -95,11 +94,7 @@ public class PlayerNetUtils : NetworkBehaviour
     [Server]
     public void Server_SpawnDroppedItem(string prefab, Vector3 position, ItemData data)
     {
-        Item newItem = Item.NewInstance(prefab, position);
-        newItem.transform.position = position; // Set position.
-        if (data == null)
-            data = new ItemData();
-        newItem.Data = data;
+        Item newItem = Item.NewInstance(prefab, position, data);
 
         NetworkServer.Spawn(newItem.gameObject);
     }

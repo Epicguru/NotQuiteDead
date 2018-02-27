@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,6 @@ using UnityEngine;
 [System.Serializable]
 public class ItemData
 {
-
     // Unity networking does not understand inheritance, so this is my temporary solution to tranferring and saving item data.
 
     // GENERAL
@@ -25,4 +25,8 @@ public class ItemData
     // Holding
     public int QuickSlot = 0;
 
+    public override string ToString()
+    {
+        return JsonConvert.SerializeObject(this);
+    }
 }

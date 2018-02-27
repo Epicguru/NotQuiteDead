@@ -47,12 +47,11 @@ public class PlayerHolding : NetworkBehaviour
             return;
         }
 
-        Item created = Item.NewInstance(prefab, localPlayer.transform.position);
         if(data == null)
         {
             data = new ItemData();
         }
-        created.Data = data; // This should sync.
+        Item created = Item.NewInstance(prefab, localPlayer.transform.position, data);
         // Data is applied upon 'Start'
 
         // Assuming that this item has not been spawned...

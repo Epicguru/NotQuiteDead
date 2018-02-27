@@ -45,9 +45,28 @@ public class Item : NetworkBehaviour
     [Tooltip("The image for the icon in menus and inventories.")]
     public Sprite ItemIcon;
 
+    public ItemData Data
+    {
+        get
+        {
+            return _Data;
+        }
+        set
+        {
+            if (IsPrefab)
+            {
+                Debug.LogError("Cannot set item data for an item prefab!");
+                Debug.Log(value);
+                return;
+            }
+            _Data = value;
+        }
+    }
+
     [Tooltip("Current item data.")]
     [SyncVar]
-    public ItemData Data;
+    [SerializeField]
+    private ItemData _Data;
 
     [HideInInspector]
     public NetPositionSync NetPosSync;
@@ -60,8 +79,11 @@ public class Item : NetworkBehaviour
     [HideInInspector] public ItemPickup pickup;
     private string currentLayer;
 
+    private bool IsPrefab = true;
+
     public void Awake()
     {
+        IsPrefab = false;
         NetPosSync = GetComponent<NetPositionSync>();
         pickup = GetComponent<ItemPickup>();
     }
@@ -170,18 +192,22 @@ public class Item : NetworkBehaviour
     public void RequestDataUpdate()
     {
         // Indicates that we should get Data up-to-date. Happens when the item changes state.
+        Debug.Log("Requesting data update...");
         this.BroadcastMessage("UpdateData", Data, SendMessageOptions.DontRequireReceiver);
     }
 
     public void RequestDataApplication()
     {
         // Indicates that we should apply the data. Happens when the item changes state.
+        Debug.Log("Requesting data application...");
         this.BroadcastMessage("ApplyData", Data, SendMessageOptions.DontRequireReceiver);
+
     }
 
     public void RequestSetDefaultData()
     {
         // Called when item spawns out of nowhere, such as a random spawn event or a mob drop.
+        Debug.Log("Requesting data default...");
         this.BroadcastMessage("SetDataDefaults", Data, SendMessageOptions.DontRequireReceiver);
     }
 
@@ -286,11 +312,12 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// Creates a new instance of an object and spawns it into the world. Not networked.
     /// </summary>
-    public static Item NewInstance(string prefab, Vector2 position)
+    public static Item NewInstance(string prefab, Vector2 position, ItemData data)
     {
         // Create new instance of item.
         Item x = GetItem(prefab);
         Item newItem = Instantiate(x, position, Quaternion.identity);
+        newItem.Data = data;
 
         return newItem;
     }

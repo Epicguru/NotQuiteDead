@@ -87,12 +87,11 @@ public class BodyGear : NetworkBehaviour
         }
 
         // Make new instance of item...
-        Item instance = Item.NewInstance(item.Prefab, transform.position);
         if(data == null)
         {
             data = new ItemData();
         }
-        instance.Data = data;
+        Item instance = Item.NewInstance(item.Prefab, transform.position, data);
         NetworkServer.Spawn(instance.gameObject);
 
         SetItem(player, instance, returnItem);

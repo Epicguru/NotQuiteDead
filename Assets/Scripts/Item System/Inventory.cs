@@ -271,10 +271,8 @@ public class Inventory : MonoBehaviour
                         {
                             // Create new instance...
                             // No need to apply data, because it is up to date.
-                            if (item.Data != null)
-                                item.Data.QuickSlot = 0;
                             Vector2 offset = Random.insideUnitCircle * 0.1f;
-                            Player.Local.NetUtils.CmdSpawnDroppedItem(i.Prefab, position + offset, item.Data == null ? new ItemData() : item.Data);
+                            Player.Local.NetUtils.CmdSpawnDroppedItem(i.Prefab, position + offset, null);
                         }
                         i.Count -= 1;
                         removed += 1;
@@ -309,10 +307,10 @@ public class Inventory : MonoBehaviour
 
                     if (drop)
                     {
-                        if (item.Data != null)
-                            item.Data.QuickSlot = 0;
+                        if (d.Data != null)
+                            d.Data.QuickSlot = 0;
                         Vector2 offset = Random.insideUnitCircle * 0.1f;
-                        Player.Local.NetUtils.CmdSpawnDroppedItem(d.Prefab, position + offset, item.Data == null ? new ItemData() : item.Data);
+                        Player.Local.NetUtils.CmdSpawnDroppedItem(d.Prefab, position + offset, d.Data == null ? new ItemData() : d.Data);
                     }
 
                     if(removed == amount)
