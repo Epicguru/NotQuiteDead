@@ -6,6 +6,8 @@ using UnityEngine.Networking;
 
 public class BodyGear : NetworkBehaviour
 {
+    // Always attached to the player. Basically the slots for gear items.
+
     // Calls when gear is placed on or removed from the player.
     public static UnityEvent GearChangeEvent = new UnityEvent();
 
@@ -181,5 +183,10 @@ public class BodyGear : NetworkBehaviour
     {
         if (IGO != null)
             SetupItem();
+    }
+
+    public GearSaveData GetSaveData()
+    {
+        return new GearSaveData(this);
     }
 }

@@ -46,6 +46,22 @@ public static class OutputUtils
         }
     }
 
+    public static string GearItemSaveFile
+    {
+        get
+        {
+            return ItemSaveDirectory + "Gear Items.txt";
+        }
+    }
+
+    public static string HeldItemSaveFile
+    {
+        get
+        {
+            return ItemSaveDirectory + "Hand Item.txt";
+        }
+    }
+
     public static string InputSaveDirectory
     {
         get

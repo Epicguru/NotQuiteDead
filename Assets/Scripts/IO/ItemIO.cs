@@ -37,6 +37,7 @@ public static class ItemIO
 
         for (int i = 0; i < items.Length; i++)
         {
+            items[i].RequestDataUpdate();
             ItemSaveData sd = ItemToSaveData(items[i]);
             saveData[i] = sd;
         }

@@ -80,10 +80,12 @@ public class Item : NetworkBehaviour
     private string currentLayer;
 
     private bool IsPrefab = true;
+    private bool IsGear = false;
 
     public void Awake()
     {
         IsPrefab = false;
+        IsGear = GetComponent<GearItem>() != null;
         NetPosSync = GetComponent<NetPositionSync>();
         pickup = GetComponent<ItemPickup>();
     }
@@ -174,6 +176,17 @@ public class Item : NetworkBehaviour
             return false;
         }
 
+        // Do not serialize gear items if they are equipped.
+        GearItem gear = GetComponent<GearItem>();
+        if(gear != null)
+        {
+            Debug.LogWarning("Gear is not null, " + gear.IsEquipped);
+            if (gear.IsEquipped)
+            {
+                return false;
+            }
+        }
+
         // Do not serialize attachments if they are currently attached to a weapon.
         Attachment a = GetComponent<Attachment>();
         if (a != null && a.IsAttached)
@@ -225,7 +238,8 @@ public class Item : NetworkBehaviour
         }
         else
         {
-            transform.SetParent(null);
+            if(!IsGear)
+                transform.SetParent(null);
         }
     }
 
