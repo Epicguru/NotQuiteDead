@@ -180,7 +180,6 @@ public class Item : NetworkBehaviour
         GearItem gear = GetComponent<GearItem>();
         if(gear != null)
         {
-            Debug.LogWarning("Gear is not null, " + gear.IsEquipped);
             if (gear.IsEquipped)
             {
                 return false;
