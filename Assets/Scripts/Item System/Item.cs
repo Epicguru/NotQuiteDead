@@ -45,9 +45,28 @@ public class Item : NetworkBehaviour
     [Tooltip("The image for the icon in menus and inventories.")]
     public Sprite ItemIcon;
 
+    public ItemData Data
+    {
+        get
+        {
+            return _Data;
+        }
+        set
+        {
+            if (IsPrefab)
+            {
+                Debug.LogError("Cannot set item data for an item prefab!");
+                Debug.Log(value);
+                return;
+            }
+            _Data = value;
+        }
+    }
+
     [Tooltip("Current item data.")]
     [SyncVar]
-    public ItemData Data;
+    [SerializeField]
+    private ItemData _Data;
 
     [HideInInspector]
     public NetPositionSync NetPosSync;
@@ -60,8 +79,13 @@ public class Item : NetworkBehaviour
     [HideInInspector] public ItemPickup pickup;
     private string currentLayer;
 
+    private bool IsPrefab = true;
+    private bool IsGear = false;
+
     public void Awake()
     {
+        IsPrefab = false;
+        IsGear = GetComponent<GearItem>() != null;
         NetPosSync = GetComponent<NetPositionSync>();
         pickup = GetComponent<ItemPickup>();
     }
@@ -142,6 +166,48 @@ public class Item : NetworkBehaviour
         UpdateParent();
     }
 
+    public virtual bool ShouldSerialize()
+    {
+        // Should this item be serialized? Generally should only return true if it is dropped on the ground.
+
+        // Do not serialize equipped items.
+        if (IsEquipped())
+        {
+            return false;
+        }
+
+        // Do not serialize gear items if they are equipped.
+        GearItem gear = GetComponent<GearItem>();
+        if(gear != null)
+        {
+            if (gear.IsEquipped)
+            {
+                return false;
+            }
+        }
+
+        // Do not serialize attachments if they are currently attached to a weapon.
+        Attachment a = GetComponent<Attachment>();
+        if (a != null && a.IsAttached)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public virtual void LoadSaveData(ItemSaveData saveData)
+    {
+        // Used for custom data that may need to be saved for particular types of items.
+        // Called only on the server just after the item has been spawned.
+        return;
+    }
+
+    public virtual ItemSaveData GetSaveData()
+    {
+        return new ItemSaveData(this);
+    }
+
     public void RequestDataUpdate()
     {
         // Indicates that we should get Data up-to-date. Happens when the item changes state.
@@ -152,6 +218,7 @@ public class Item : NetworkBehaviour
     {
         // Indicates that we should apply the data. Happens when the item changes state.
         this.BroadcastMessage("ApplyData", Data, SendMessageOptions.DontRequireReceiver);
+
     }
 
     public void RequestSetDefaultData()
@@ -170,7 +237,8 @@ public class Item : NetworkBehaviour
         }
         else
         {
-            transform.SetParent(null);
+            if(!IsGear)
+                transform.SetParent(null);
         }
     }
 
@@ -259,13 +327,14 @@ public class Item : NetworkBehaviour
     }
 
     /// <summary>
-    /// Creates a new instance of an object and spawns it into the world.
+    /// Creates a new instance of an object and spawns it into the world. Not networked.
     /// </summary>
-    public static Item NewInstance(string prefab, Vector2 position)
+    public static Item NewInstance(string prefab, Vector2 position, ItemData data)
     {
         // Create new instance of item.
         Item x = GetItem(prefab);
         Item newItem = Instantiate(x, position, Quaternion.identity);
+        newItem.Data = data;
 
         return newItem;
     }

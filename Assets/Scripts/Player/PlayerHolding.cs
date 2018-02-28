@@ -35,6 +35,12 @@ public class PlayerHolding : NetworkBehaviour
     [Command]
     public void CmdEquip(string prefab, GameObject localPlayer, ItemData data)
     {
+        ServerEquip(prefab, localPlayer, data);
+    }
+
+    [Server]
+    public void ServerEquip(string prefab, GameObject localPlayer, ItemData data)
+    {
         // We need to equip this item.
         // This runs on the server, which we can think of as in the middle of nowhere.
         // We need to create the item here, but do net mess with settings because that will
@@ -47,12 +53,11 @@ public class PlayerHolding : NetworkBehaviour
             return;
         }
 
-        Item created = Item.NewInstance(prefab, localPlayer.transform.position);
-        if(data == null)
+        if (data == null)
         {
             data = new ItemData();
         }
-        created.Data = data; // This should sync.
+        Item created = Item.NewInstance(prefab, localPlayer.transform.position, data);
         // Data is applied upon 'Start'
 
         // Assuming that this item has not been spawned...
@@ -111,6 +116,9 @@ public class PlayerHolding : NetworkBehaviour
 
         // Drop - If true then the item is dropped to the floor, if false then it is stored in the players inventory.
         // Destroy - If true the item is not stored, not dropped and is removed from existence.
+
+        if (this.Item == null)
+            return;
 
         if (destroy)
         {

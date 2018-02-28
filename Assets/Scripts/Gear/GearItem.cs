@@ -6,9 +6,9 @@ using UnityEngine.Networking;
 [RequireComponent(typeof(Item))]
 public class GearItem : NetworkBehaviour
 {
-
     // Represents the item object of a type of gear that is placed on the player's body.
     // Has stats such as armour, HP boost, speed penalty, warmth ect.
+    // It is a spawnable item.
 
     [Tooltip("The slot that this equips onto.")]
     public string Slot;
@@ -37,7 +37,7 @@ public class GearItem : NetworkBehaviour
     }
     private Item _Item;
 
-    public bool Equipped
+    public bool IsEquipped
     {
         get
         {
@@ -57,9 +57,9 @@ public class GearItem : NetworkBehaviour
     {
         // Note that the parent is set automatically from the player gear script.
 
-        SetRendererLayer(Equipped ? Layer : "Dropped Items");
+        SetRendererLayer(IsEquipped ? Layer : "Dropped Items");
 
-        Item.pickup.AllowPickup = !Equipped;
+        Item.pickup.AllowPickup = !IsEquipped;
     }
 
     public void SetRendererLayer(string layer)
