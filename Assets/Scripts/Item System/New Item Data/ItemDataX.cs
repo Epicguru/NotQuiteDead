@@ -8,6 +8,37 @@ using UnityEngine;
 [JsonObject(MemberSerialization = MemberSerialization.OptOut)]
 public class ItemDataX
 {
+    public static JsonSerializerSettings Settings
+    {
+        get
+        {
+            if(_settings == null)
+            {
+                CreateSettings();
+            }
+
+            return _settings;
+        }
+        set
+        {
+            _settings = value;
+        }
+    }
+
+    private static JsonSerializerSettings _settings;
+    private static void CreateSettings()
+    {
+        _settings = new JsonSerializerSettings();
+
+        _settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+        _settings.ContractResolver = UnityContractResolver.Instance;
+    }
+
+    public ItemDataX()
+    {
+
+    }
+
     [ReadOnly]
     public bool Created = false;
 
@@ -74,7 +105,7 @@ public class ItemDataX
         }
     }
 
-    public T Get<T>(string key, T defaultValue)
+    public T Get<T>(string key, T defaultValue, bool addIfMissing = false)
     {
         if (ContainsKey(key))
         {
@@ -91,7 +122,50 @@ public class ItemDataX
         }
         else
         {
+            if (addIfMissing)
+            {
+                Add(key, defaultValue);
+            }
+
             return defaultValue;
+        }
+    }
+
+    public void Remove(string key)
+    {
+        if (!ContainsKey(key))
+        {
+            Debug.LogError("Item data does not contain entry '" + key + "' cannot remove it!");
+            return;
+        }
+
+        values.Remove(key);
+    }
+
+    public string Serialize(bool pretty = false)
+    {
+        Settings.Formatting = pretty ? Formatting.Indented : Formatting.None;
+
+        return JsonConvert.SerializeObject(this, Settings);
+    }
+
+    public static ItemDataX Deserialize(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            Debug.LogError("Null or whitespace-only input json! Cannot make item data from that!");
+            return null;
+        }
+
+        try
+        {
+            ItemDataX itemData = JsonConvert.DeserializeObject<ItemDataX>(json, Settings);
+            return itemData;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error deserializing json to create item data:\n" + json + "\nException Info:\n" + e);
+            return null;
         }
     }
 }
