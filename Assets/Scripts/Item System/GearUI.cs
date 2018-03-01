@@ -45,13 +45,13 @@ public class GearUI : MonoBehaviour {
         {
             // Store the current item.
             Player.Local.Holding.Item.RequestDataUpdate();
-            Player.Local.Holding.CmdDrop(false, false, Player.Local.gameObject, Player.Local.Holding.Item.Data);
+            Player.Local.Holding.CmdDrop(false, false, Player.Local.gameObject, Player.Local.Holding.Item.Data.Serialize());
         }
         else
         {
             // Remove from slot noramlly.
             Player.Local.GearMap[Title].GetGearItem().Item.RequestDataUpdate();
-            Player.Local.NetUtils.CmdSetGear(Title, null, new ItemData(), true);
+            Player.Local.NetUtils.CmdSetGear(Title, null, null, true);
         }
     }
 
@@ -62,9 +62,9 @@ public class GearUI : MonoBehaviour {
             // Drop the current item.
             Player.Local.Holding.Item.RequestDataUpdate();
             if (Player.Local.Holding.Item.Data != null)
-                Player.Local.Holding.Item.Data.QuickSlot = 0;
+                Player.Local.Holding.Item.Data.Update("Quick Slot", 0);
 
-            Player.Local.Holding.CmdDrop(true, false, Player.Local.gameObject, Player.Local.Holding.Item.Data);
+            Player.Local.Holding.CmdDrop(true, false, Player.Local.gameObject, Player.Local.Holding.Item.Data.Serialize());
         }
         else
         {
@@ -78,8 +78,8 @@ public class GearUI : MonoBehaviour {
             }
 
             g.GetGearItem().Item.RequestDataUpdate();
-            ItemData data = g.GetGearItem().Item.Data;
-            Player.Local.NetUtils.CmdDropGear(Title, data);
+            ItemDataX data = g.GetGearItem().Item.Data;
+            Player.Local.NetUtils.CmdDropGear(Title, data.Serialize());
         }
     }
 
@@ -92,7 +92,7 @@ public class GearUI : MonoBehaviour {
             PlayerInventory.inv.Inventory.DetailsView.Enter(Item.GetItem(prefab));
     }
 
-    public ItemOption[] GetOptions(ItemData data)
+    public ItemOption[] GetOptions(ItemDataX data)
     {
         List<ItemOption> options = new List<ItemOption>();
         options.Add(new ItemOption() { OptionName = "Store", OnSelected = Store });

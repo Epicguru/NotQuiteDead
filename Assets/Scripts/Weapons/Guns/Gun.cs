@@ -88,25 +88,25 @@ public class Gun : Weapon
         transform.localRotation = Quaternion.identity;
     }
 
-    public void UpdateData(ItemData data)
+    public void UpdateData(ItemDataX data)
     {
-        data.GUN_BulletInChamber = Shooting.BulletInChamber;
-        data.GUN_BulletsInMagazine = Shooting.bulletsInMagazine;
-        data.GUN_FiringMode = Shooting.firingModeIndex;
+        data.Update("Bullet In Chamber", Shooting.BulletInChamber);
+        data.Update("Bullets In Magazine", Shooting.bulletsInMagazine);
+        data.Update("Firing Mode", Shooting.firingModeIndex);
     }
 
-    public void ApplyData(ItemData data)
+    public void ApplyData(ItemDataX data)
     {
-        Shooting.BulletInChamber = data.GUN_BulletInChamber;
-        Shooting.bulletsInMagazine = data.GUN_BulletsInMagazine;
-        Shooting.firingModeIndex = data.GUN_FiringMode;
+        Shooting.BulletInChamber = data.Get("Bullet In Chamber", true);
+        Shooting.bulletsInMagazine = data.Get("Bullets In Magazine", 0);
+        Shooting.firingModeIndex = data.Get("Firing Mode", 0);
     }
 
-    public void SetDataDefaults(ItemData data)
+    public void SetDataDefaults(ItemDataX data)
     {
         // Set gun data.
-        data.GUN_BulletInChamber = Shooting.ReloadAutoChambers;
-        data.GUN_BulletsInMagazine = Shooting.Capacity.MagazineCapacity - (Shooting.ReloadAutoChambers ? 1 : 0);
-        data.GUN_FiringMode = 0;
+        data.Update("Bullet In Chamber", Shooting.ReloadAutoChambers);
+        data.Update("Bullets In Magazine", Shooting.Capacity.MagazineCapacity - (Shooting.ReloadAutoChambers ? 1 : 0));
+        data.Update("Firing Mode", 0);
     }
 }

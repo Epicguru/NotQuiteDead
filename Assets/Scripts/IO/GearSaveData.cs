@@ -3,7 +3,7 @@ public class GearSaveData
 {
     public string Slot;
     public string Prefab;
-    public ItemData Data;
+    public ItemDataX Data;
 
     public GearSaveData()
     {

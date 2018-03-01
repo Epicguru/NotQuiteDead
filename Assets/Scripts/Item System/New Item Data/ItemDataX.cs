@@ -45,6 +45,16 @@ public class ItemDataX
     [JsonProperty]
     private Dictionary<string, object> values = new Dictionary<string, object>();
 
+    public int GetValueCount()
+    {
+        return values.Count;
+    }
+
+    public Dictionary<string, object> GetAllValues()
+    {
+        return values;
+    }
+
     public void Add(string key, object value)
     {
         if (values.ContainsKey(key))
@@ -88,9 +98,15 @@ public class ItemDataX
     {
         if (ContainsKey(key))
         {
+            // This is probably the hackiest code I have ever written.
+            // C# can't cast from an object to an int32, even if the object's type is int64.
+            // My solution is to force C# to recognise the type, by using a dynamic variable, and then casting that.
+            // Kinda stupid because its completely obsolete.
+
+            dynamic raw = Convert.ChangeType(values[key], values[key].GetType());
             try
             {
-                T x = (T)values[key];
+                T x = (T)(raw);
                 return x;
             }
             catch (InvalidCastException e)
@@ -109,14 +125,20 @@ public class ItemDataX
     {
         if (ContainsKey(key))
         {
+            // This is probably the hackiest code I have ever written.
+            // C# can't cast from an object to an int32, even if the object's type is int64.
+            // My solution is to force C# to recognise the type, by using a dynamic variable, and then casting that.
+            // Kinda stupid because its completely obsolete.
+
+            dynamic raw = Convert.ChangeType(values[key], values[key].GetType());
             try
             {
-                T x = (T)values[key];
+                T x = (T)(raw);
                 return x;
             }
             catch (InvalidCastException e)
             {
-                Debug.LogError("Invalid cast in item data for key '" + key + "': Value is of type '" + values[key].GetType().ToString() + "', requested type was '" + typeof(T).ToString() + "'!\n" + e);
+                Debug.LogError("Invalid cast in item data for key '" + key + "': Value is of type '" + raw.GetType().ToString() + "', requested type was '" + typeof(T).ToString() + "'!\n" + e.Message);
                 return defaultValue;
             }
         }
@@ -166,6 +188,25 @@ public class ItemDataX
         {
             Debug.LogError("Error deserializing json to create item data:\n" + json + "\nException Info:\n" + e);
             return null;
+        }
+    }
+
+    public static ItemDataX TryDeserialize(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return new ItemDataX();
+        }
+
+        try
+        {
+            ItemDataX itemData = JsonConvert.DeserializeObject<ItemDataX>(json, Settings);
+            return itemData;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error deserializing json to create item data:\n" + json + "\nException Info:\n" + e);
+            return new ItemDataX();
         }
     }
 }

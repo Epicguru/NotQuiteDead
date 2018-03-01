@@ -37,7 +37,7 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
-    public void CmdDropGear(string slot, ItemData data)
+    public void CmdDropGear(string slot, string data)
     {
         BodyGear g = GetPlayer().GearMap[slot];
 
@@ -46,7 +46,7 @@ public class PlayerNetUtils : NetworkBehaviour
             Item old = g.GetGearItem().Item;
             g.SetItem(GetPlayer().gameObject, null, null, false);
 
-            Item instance = Item.NewInstance(old.Prefab, GetPlayer().transform.position, data);
+            Item instance = Item.NewInstance(old.Prefab, GetPlayer().transform.position, ItemDataX.TryDeserialize(data));
 
             NetworkServer.Spawn(instance.gameObject);
         }
@@ -74,9 +74,9 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
-    public void CmdSetGear(string name, string prefab, ItemData data, bool returnOldItem)
+    public void CmdSetGear(string name, string prefab, string data, bool returnOldItem)
     {
-        GetPlayer().GearMap[name].SetItem(player.gameObject, prefab == null ? null : Item.GetItem(prefab), data, returnOldItem);
+        GetPlayer().GearMap[name].SetItem(player.gameObject, prefab == null ? null : Item.GetItem(prefab), ItemDataX.TryDeserialize(data), returnOldItem);
     }
 
     [Command]
@@ -86,13 +86,13 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
-    public void CmdSpawnDroppedItem(string prefab, Vector3 position, ItemData data)
+    public void CmdSpawnDroppedItem(string prefab, Vector3 position, string data)
     {
-        Server_SpawnDroppedItem(prefab, position, data);
+        Server_SpawnDroppedItem(prefab, position, ItemDataX.TryDeserialize(data));
     }
 
     [Server]
-    public void Server_SpawnDroppedItem(string prefab, Vector3 position, ItemData data)
+    public void Server_SpawnDroppedItem(string prefab, Vector3 position, ItemDataX data)
     {
         Item newItem = Item.NewInstance(prefab, position, data);
 

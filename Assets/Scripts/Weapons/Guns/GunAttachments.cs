@@ -48,39 +48,95 @@ public class GunAttachments : NetworkBehaviour
         }
     }
 
-    public void UpdateData(ItemData data)
+    public void UpdateData(ItemDataX data)
     {
-        data.GUN_Magazine = AllowMagazine ? MagazineMount.childCount > 0 ? MagazineMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
-        data.GUN_Muzzle = AllowMuzzle ? MuzzleMount.childCount > 0 ? MuzzleMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
-        data.GUN_Sight = AllowSight ? SightMount.childCount > 0 ? SightMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
-        data.GUN_UnderBarrel = AllowUnderBarrel ? UnderBarrelMount.childCount > 0 ? UnderBarrelMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
+        string magazine = AllowMagazine ? MagazineMount.childCount > 0 ? MagazineMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
+        string muzzle = AllowMuzzle ? MuzzleMount.childCount > 0 ? MuzzleMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
+        string sight = AllowSight ? SightMount.childCount > 0 ? SightMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
+        string underBarrel = AllowUnderBarrel ? UnderBarrelMount.childCount > 0 ? UnderBarrelMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
+
+        string name;
+
+        // Apply magazine attachment.
+        name = "Magazine Attachment";
+        if(magazine != null)
+        {
+            data.Update(name, magazine);
+        }
+        else
+        {
+            if(data.ContainsKey(name))
+                data.Remove(name);
+        }
+
+        // Apply muzzle attachment.
+        name = "Muzzle Attachment";
+        if (muzzle != null)
+        {
+            data.Update(name, muzzle);
+        }
+        else
+        {
+            if (data.ContainsKey(name))
+                data.Remove(name);
+        }
+
+        // Apply sight attachment.
+        name = "Sight Attachment";
+        if (sight != null)
+        {
+            data.Update(name, sight);
+        }
+        else
+        {
+            if (data.ContainsKey(name))
+                data.Remove(name);
+        }
+
+        // Apply under barrel attachment.
+        name = "Under Barrel Attachment";
+        if (underBarrel != null)
+        {
+            data.Update(name, underBarrel);
+        }
+        else
+        {
+            if (data.ContainsKey(name))
+                data.Remove(name);
+        }
     }
 
-    public void ApplyData(ItemData data)
+    public void ApplyData(ItemDataX data)
     {
         if (!isServer)
             return;
-        if (!string.IsNullOrEmpty(data.GUN_Muzzle))
+
+        string sightName = "Sight Attachment";
+        string magazineName = "Magazine Attachment";
+        string underBarrelName = "Under Barrel Attachment";
+        string muzzleName = "Muzzle Attachment";
+
+        if (data.ContainsKey(muzzleName))
         {
-            Item item = Item.GetItem(data.GUN_Muzzle);
+            Item item = Item.GetItem(data.Get<string>(muzzleName));
             Attachment a = item.GetComponent<Attachment>();
             SetAttachment(a.Type, item);
         }
-        if (!string.IsNullOrEmpty(data.GUN_Sight))
+        if (data.ContainsKey(sightName))
         {
-            Item item = Item.GetItem(data.GUN_Sight);
+            Item item = Item.GetItem(data.Get<string>(sightName));
             Attachment a = item.GetComponent<Attachment>();
             SetAttachment(a.Type, item);
         }
-        if (!string.IsNullOrEmpty(data.GUN_Magazine))
+        if (data.ContainsKey(magazineName))
         {
-            Item item = Item.GetItem(data.GUN_Magazine);
+            Item item = Item.GetItem(data.Get<string>(magazineName));
             Attachment a = item.GetComponent<Attachment>();
             SetAttachment(a.Type, item);
         }
-        if (!string.IsNullOrEmpty(data.GUN_UnderBarrel))
+        if (data.ContainsKey(underBarrelName))
         {
-            Item item = Item.GetItem(data.GUN_UnderBarrel);
+            Item item = Item.GetItem(data.Get<string>(underBarrelName));
             Attachment a = item.GetComponent<Attachment>();
             SetAttachment(a.Type, item);
         }

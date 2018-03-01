@@ -112,7 +112,7 @@ public class Inventory : MonoBehaviour
         SortingOption.AddOptions(options);
     }
 
-    public void AddItem(string prefab, ItemData data, int amount = 1)
+    public void AddItem(string prefab, ItemDataX data, int amount = 1)
     {
         if (amount <= 0)
             return;
@@ -221,7 +221,7 @@ public class Inventory : MonoBehaviour
                 s = from x in alpha orderby x.Item.Rarity descending select x;
                 return s.ToList();
             case InventorySortingMode.QUICKSLOTTED:
-                s = from x in alpha orderby (x.Data == null ? -1 : (x.Data.QuickSlot == 0 ? -1 : (100 - x.Data.QuickSlot))) descending select x;
+                s = from x in alpha orderby (x.Data == null ? -1 : (x.Data.Get<int>("Quick Slot") == 0 ? -1 : (100 - x.Data.Get<int>("Quick Slot")))) descending select x;
                 return s.ToList();
             case InventorySortingMode.TYPE:
                 return unsorted;
@@ -308,9 +308,9 @@ public class Inventory : MonoBehaviour
                     if (drop)
                     {
                         if (d.Data != null)
-                            d.Data.QuickSlot = 0;
+                            d.Data.Update("Quick Slot", 0);
                         Vector2 offset = Random.insideUnitCircle * 0.1f;
-                        Player.Local.NetUtils.CmdSpawnDroppedItem(d.Prefab, position + offset, d.Data == null ? new ItemData() : d.Data);
+                        Player.Local.NetUtils.CmdSpawnDroppedItem(d.Prefab, position + offset, d.Data == null ? null : d.Data.Serialize());
                     }
 
                     if(removed == amount)

@@ -106,7 +106,7 @@ public class ItemSaveData
 {
     public string Prefab;
     public float X, Y;
-    public ItemData Data;
+    public ItemDataX Data;
 
     public ItemSaveData()
     {

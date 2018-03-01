@@ -41,7 +41,7 @@ public class GearItem : NetworkBehaviour
     {
         get
         {
-            return transform.parent != null;
+            return transform.parent != null && transform.parent.GetComponentInParent<Player>() != null;
         }
     }
 
@@ -60,6 +60,12 @@ public class GearItem : NetworkBehaviour
         SetRendererLayer(IsEquipped ? Layer : "Dropped Items");
 
         Item.pickup.AllowPickup = !IsEquipped;
+
+        if (!IsEquipped)
+        {
+            if (transform.parent != null)
+                transform.parent = null;
+        }
     }
 
     public void SetRendererLayer(string layer)

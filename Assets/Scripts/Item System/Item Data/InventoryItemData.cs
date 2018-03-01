@@ -8,7 +8,7 @@ public class InventoryItemData
 {
     public string Prefab;
     public int Count;
-    public ItemData Data;
+    public ItemDataX Data;
 
     [JsonIgnore]
     public Item Item
