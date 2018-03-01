@@ -93,8 +93,8 @@ public class Attachment : NetworkBehaviour
             }
         }
 
-        if (isServer && Item.pickup != null)
-            Item.pickup.AllowPickup = !IsAttached;
+        if (isServer && Item.Pickup != null)
+            Item.Pickup.AllowPickup = !IsAttached;
     }
 
     private void SetLayer(string layer)

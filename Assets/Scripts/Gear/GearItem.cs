@@ -59,7 +59,7 @@ public class GearItem : NetworkBehaviour
 
         SetRendererLayer(IsEquipped ? Layer : "Dropped Items");
 
-        Item.pickup.AllowPickup = !IsEquipped;
+        Item.Pickup.AllowPickup = !IsEquipped;
 
         if (!IsEquipped)
         {

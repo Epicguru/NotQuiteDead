@@ -64,7 +64,6 @@ public class Item : NetworkBehaviour
     }
 
     [Tooltip("Current item data.")]
-    [SyncVar]
     [SerializeField]
     private ItemDataX _Data;
 
@@ -76,7 +75,7 @@ public class Item : NetworkBehaviour
     private bool equipped = false;
     [SyncVar]
     private GameObject PlayerHolding;
-    [HideInInspector] public ItemPickup pickup;
+    [HideInInspector] public ItemPickup Pickup;
     private string currentLayer;
 
     private bool IsPrefab = true;
@@ -87,7 +86,7 @@ public class Item : NetworkBehaviour
         IsPrefab = false;
         IsGear = GetComponent<GearItem>() != null;
         NetPosSync = GetComponent<NetPositionSync>();
-        pickup = GetComponent<ItemPickup>();
+        Pickup = GetComponent<ItemPickup>();
     }
 
     public void Start()

@@ -18,6 +18,39 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
+    public void CmdRequestPickup(GameObject player, GameObject item)
+    {
+        Debug.Log("Incoming pickup request from " + player.name);
+        if(item != null)
+        {
+            Item i = item.GetComponent<Item>();
+            if(i != null)
+            {
+                i.RequestDataUpdate();
+                RpcPickupAccepted(player, item, i.Data.Serialize());
+                Destroy(item.gameObject);
+            }
+        }
+    }
+
+    [ClientRpc]
+    private void RpcPickupAccepted(GameObject player, GameObject item, string data)
+    {
+        if (player == null || item == null)
+            return;
+
+        if(Player.Local.netId == player.GetComponent<Player>().netId)
+        {
+            Item i = item.GetComponent<Item>();
+
+            if(i != null)
+            {
+                i.Pickup.PickupAccepted(ItemDataX.TryDeserialize(data));
+            }
+        }
+    }
+
+    [Command]
     public void CmdPlaceFurniture(string prefab, bool isNull, int x, int y)
     {
         World.Instance.Furniture.RequestingPlace(isNull ? null : prefab, x, y);
