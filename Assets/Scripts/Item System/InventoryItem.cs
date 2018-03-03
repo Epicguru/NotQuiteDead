@@ -20,7 +20,7 @@ public class InventoryItem : MonoBehaviour
 
     public InventoryItemData ItemData;
 
-    public void Init(ItemData data)
+    public void Init(ItemDataX data)
     {
         // Nothing to do here, all rendering done in editor/game.
         SetText();
@@ -35,8 +35,8 @@ public class InventoryItem : MonoBehaviour
     {
         string quantity = ItemData.Count > 1 ? " x" + ItemData.Count : "";
         string quickSlot = "";
-        if (ItemData.Data != null && ItemData.Data.QuickSlot != 0)
-            quickSlot = RichText.InColour(" (Slot #" + ItemData.Data.QuickSlot + ")", Color.black);
+        if (ItemData.Data != null && ItemData.Data.Get<int>("Quick Slot") != 0)
+            quickSlot = RichText.InColour(" (Slot #" + ItemData.Data.Get<int>("Quick Slot") + ")", Color.black);
         Text.text = ItemData.Item.Name + quantity + quickSlot;
         Text.color = Color.Lerp(ItemRarityUtils.GetColour(ItemData.Item.Rarity), Color.black, 0.2f);
         if(Details != null)

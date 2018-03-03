@@ -45,7 +45,7 @@ public class Item : NetworkBehaviour
     [Tooltip("The image for the icon in menus and inventories.")]
     public Sprite ItemIcon;
 
-    public ItemData Data
+    public ItemDataX Data
     {
         get
         {
@@ -63,20 +63,23 @@ public class Item : NetworkBehaviour
         }
     }
 
-    [Tooltip("Current item data.")]
+    [HideInInspector]
     [SyncVar]
+    public string PendingData = null;
+
+    [Tooltip("Current item data.")]
     [SerializeField]
-    private ItemData _Data;
+    private ItemDataX _Data;
 
     [HideInInspector]
     public NetPositionSync NetPosSync;
 
     [SyncVar]
     [SerializeField]
-    private bool equiped = false;
+    private bool equipped = false;
     [SyncVar]
     private GameObject PlayerHolding;
-    [HideInInspector] public ItemPickup pickup;
+    [HideInInspector] public ItemPickup Pickup;
     private string currentLayer;
 
     private bool IsPrefab = true;
@@ -87,18 +90,27 @@ public class Item : NetworkBehaviour
         IsPrefab = false;
         IsGear = GetComponent<GearItem>() != null;
         NetPosSync = GetComponent<NetPositionSync>();
-        pickup = GetComponent<ItemPickup>();
+        Pickup = GetComponent<ItemPickup>();
     }
 
     public void Start()
     {
         if (Data == null || Data.Created == false)
         {
-            if (Data == null)
-                Data = new ItemData();
-            Data.Created = true;
-            RequestSetDefaultData();
-            RequestDataApplication(); // Apply loaded or transmitted data.
+            if (string.IsNullOrWhiteSpace(PendingData))
+            {
+                if (Data == null)
+                    Data = new ItemDataX();
+                Data.Created = true;
+                RequestSetDefaultData();
+                RequestDataApplication(); // Apply default data.
+            }
+            else
+            {
+                Data = ItemDataX.TryDeserialize(PendingData);
+                PendingData = null;
+                RequestDataApplication(); // Apply loaded or transmitted data.
+            }
         }
         else
         {
@@ -118,7 +130,7 @@ public class Item : NetworkBehaviour
         currentLayer = layer;
     }
 
-    public ItemOption[] CreateOptions(Item item, ItemData data)
+    public ItemOption[] CreateOptions(Item item, ItemDataX data)
     {
         List<ItemOption> options = new List<ItemOption>();
         options.Add(new ItemOption() { OptionName = "Drop", OnSelected = Option_Drop });
@@ -135,21 +147,21 @@ public class Item : NetworkBehaviour
         if (data == null)
             return options.ToArray();
 
-        if (!string.IsNullOrEmpty(data.GUN_Magazine))
+        if (!string.IsNullOrEmpty(data.Get<string>("Magazine Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.GUN_Magazine), OnSelected = Option_RemoveMagazine });
+            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.Get<string>("Magazine Attachment")), OnSelected = Option_RemoveMagazine });
         }
-        if (!string.IsNullOrEmpty(data.GUN_Muzzle))
+        if (!string.IsNullOrEmpty(data.Get<string>("Muzzle Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.GUN_Muzzle), OnSelected = Option_RemoveMuzzle });
+            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.Get<string>("Muzzle Attachment")), OnSelected = Option_RemoveMuzzle });
         }
-        if (!string.IsNullOrEmpty(data.GUN_Sight))
+        if (!string.IsNullOrEmpty(data.Get<string>("Sight Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.GUN_Sight), OnSelected = Option_RemoveSight });
+            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.Get<string>("Sight Attachment")), OnSelected = Option_RemoveSight });
         }
-        if (!string.IsNullOrEmpty(data.GUN_UnderBarrel))
+        if (!string.IsNullOrEmpty(data.Get<string>("Under Barrel Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.GUN_UnderBarrel), OnSelected = Option_RemoveUnderBarrel });
+            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.Get<string>("Under Barrel Attachment")), OnSelected = Option_RemoveUnderBarrel });
         }
 
         return options.ToArray();
@@ -218,7 +230,6 @@ public class Item : NetworkBehaviour
     {
         // Indicates that we should apply the data. Happens when the item changes state.
         this.BroadcastMessage("ApplyData", Data, SendMessageOptions.DontRequireReceiver);
-
     }
 
     public void RequestSetDefaultData()
@@ -231,14 +242,17 @@ public class Item : NetworkBehaviour
     {
         if (IsEquipped())
         {
-            transform.SetParent(PlayerHolding.GetComponent<Player>().Holding.Holding);
+            Transform t = PlayerHolding.GetComponent<Player>().Holding.Holding;
+            if (transform.parent != t)
+                transform.SetParent(t);
             transform.localPosition = Vector3.zero;
             transform.localScale = Vector3.one;
         }
         else
         {
-            if(!IsGear)
-                transform.SetParent(null);
+            if (!IsGear)
+                if (transform.parent != null)
+                    transform.SetParent(null);
         }
     }
 
@@ -248,7 +262,7 @@ public class Item : NetworkBehaviour
     /// <returns>True if equipped.</returns>
     public bool IsEquipped()
     {
-        return this.equiped;
+        return this.equipped;
     }
 
     /// <summary>
@@ -259,12 +273,12 @@ public class Item : NetworkBehaviour
     {
         if (equipped)
         {
-            if (!this.equiped)
+            if (!this.equipped)
             {
                 // Activate equipped state.
                 if (player == null)
                     Debug.LogError("Player to hold this item is null!");
-                this.equiped = true;
+                this.equipped = true;
                 this.PlayerHolding = player;
 
                 //Debug.Log("Item '" + Name + "' equipped to '" + player.name + "'");
@@ -272,11 +286,11 @@ public class Item : NetworkBehaviour
         }
         else
         {
-            if (this.equiped)
+            if (this.equipped)
             {
                 // Remove equipped state.
                 this.PlayerHolding = null;
-                this.equiped = false;
+                this.equipped = false;
             }
         }
     }
@@ -329,7 +343,7 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// Creates a new instance of an object and spawns it into the world. Not networked.
     /// </summary>
-    public static Item NewInstance(string prefab, Vector2 position, ItemData data)
+    public static Item NewInstance(string prefab, Vector2 position, ItemDataX data)
     {
         // Create new instance of item.
         Item x = GetItem(prefab);
@@ -369,26 +383,14 @@ public class Item : NetworkBehaviour
 
     public static void Option_EquipGear(InventoryItemData x, string prefab)
     {
-        ItemData d = x.Data;
-        if (d == null)
-        {
-            d = new ItemData();
-        }
-        x.Data = d;
         PlayerInventory.Remove(x.Prefab, Vector2.zero, false); // Remove, do not drop.
-        Player.Local.NetUtils.CmdSetGear(x.Item.GetComponent<GearItem>().Slot, prefab, d, true);
+        Player.Local.NetUtils.CmdSetGear(x.Item.GetComponent<GearItem>().Slot, prefab, x.Data == null ? null : x.Data.Serialize(), true);
     }
 
     public static void Option_Equip(InventoryItemData x, string prefab)
     {
-        ItemData d = x.Data;
-        if(d == null)
-        {
-            d = new ItemData();
-        }
-        x.Data = d;
         PlayerInventory.Remove(x.Prefab, Vector2.zero, false, 1); // Remove, do not drop.
-        Player.Local.Holding.CmdEquip(x.Item.Prefab, Player.Local.gameObject, d);
+        Player.Local.Holding.CmdEquip(x.Item.Prefab, Player.Local.gameObject, x.Data == null ? null : x.Data.Serialize());
     }
 
     public static void Option_Drop(InventoryItemData x, string prefab)
@@ -413,11 +415,12 @@ public class Item : NetworkBehaviour
     {
         if (tempSlotData.Data == null)
         {
-            tempSlotData.Data = new ItemData() { QuickSlot = number };
+            tempSlotData.Data = new ItemDataX();
+            tempSlotData.Data.Add("Quick Slot", number);
         }
         else
         {
-            tempSlotData.Data.QuickSlot = number;
+            tempSlotData.Data.Update("Quick Slot", number);
         }
 
         tempSlotData = null;
@@ -436,8 +439,8 @@ public class Item : NetworkBehaviour
     public static void Option_RemoveMagazine(InventoryItemData x, string prefab)
     {
         // Remove attachment...
-        string old = x.Data.GUN_Magazine;
-        x.Data.GUN_Magazine = null;
+        string old = x.Data.Get<string>("Magazine Attachment");
+        x.Data.Remove("Magazine Attachment");
 
         // Give item back to player!
         PlayerInventory.Add(old, null, 1);
@@ -446,8 +449,8 @@ public class Item : NetworkBehaviour
     public static void Option_RemoveMuzzle(InventoryItemData x, string prefab)
     {
         // Remove attachment...
-        string old = x.Data.GUN_Muzzle;
-        x.Data.GUN_Muzzle = null;
+        string old = x.Data.Get<string>("Muzzle Attachment");
+        x.Data.Remove("Muzzle Attachment");
 
         // Give item back to player!
         PlayerInventory.Add(old, null, 1);
@@ -456,8 +459,8 @@ public class Item : NetworkBehaviour
     public static void Option_RemoveSight(InventoryItemData x, string prefab)
     {
         // Remove attachment...
-        string old = x.Data.GUN_Sight;
-        x.Data.GUN_Sight = null;
+        string old = x.Data.Get<string>("Sight Attachment");
+        x.Data.Remove("Sight Attachment");
 
         // Give item back to player!
         PlayerInventory.Add(old, null, 1);
@@ -466,8 +469,8 @@ public class Item : NetworkBehaviour
     public static void Option_RemoveUnderBarrel(InventoryItemData x, string prefab)
     {
         // Remove attachment...
-        string old = x.Data.GUN_UnderBarrel;
-        x.Data.GUN_UnderBarrel = null;
+        string old = x.Data.Get<string>("Under Barrel Attachment");
+        x.Data.Remove("Under Barrel Attachment");
 
         // Give item back to player!
         PlayerInventory.Add(old, null, 1);

@@ -142,6 +142,7 @@ public static class OutputUtils
     {
         jsonSettings = new JsonSerializerSettings();
         jsonSettings.Formatting = Formatting.Indented;
+        jsonSettings.ContractResolver = UnityContractResolver.Instance;
     }
 
     public static string ObjectToJson(object obj, JsonSerializerSettings settings = null)

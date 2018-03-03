@@ -42,7 +42,7 @@ public class QuickSlot : NetworkBehaviour
         {
             if (i.Data == null)
                 continue;
-            if (i.Data.QuickSlot == number)
+            if (i.Data.ContainsKey("Quick Slot") && i.Data.Get<int>("Quick Slot") == number)
             {
                 Item.Option_Equip(i, i.Prefab);
                 break;

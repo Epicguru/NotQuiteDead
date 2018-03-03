@@ -60,7 +60,7 @@ public class QuickSlotInput : MonoBehaviour
                     {
                         if (x.Data == null)
                             continue;
-                        if(x.Data.QuickSlot == i + 1)
+                        if(x.Data.Get("Quick Slot", -1) == i + 1)
                         {
                             item = x;
                             break;
@@ -73,9 +73,9 @@ public class QuickSlotInput : MonoBehaviour
                         {
                             if(Player.Local.Holding.Item != null)
                             {
-                                if(Player.Local.Holding.Item.Data.QuickSlot == i + 1)
+                                if(Player.Local.Holding.Item.Data.Get("Quick Slot", -1) == i + 1)
                                 {
-                                    Player.Local.Holding.Item.Data.QuickSlot = 0;
+                                    Player.Local.Holding.Item.Data.Update("Quick Slot", 0);
                                 }
                             }
                         }
@@ -83,7 +83,7 @@ public class QuickSlotInput : MonoBehaviour
 
                     if (item != null)
                     {
-                        item.Data.QuickSlot = 0;
+                        item.Data.Update("Quick Slot", 0);
                         PlayerInventory.inv.Inventory.Refresh = true;
                     }
 

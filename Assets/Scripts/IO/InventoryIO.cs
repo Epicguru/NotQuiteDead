@@ -219,7 +219,7 @@ public static class InventoryIO
         }
         else
         {
-            holding.ServerEquip(sd.Prefab, player.gameObject, sd.Data);
+            holding.ServerEquip(sd.Prefab, player.gameObject, sd.Data.Serialize());
         }
     }
 }
