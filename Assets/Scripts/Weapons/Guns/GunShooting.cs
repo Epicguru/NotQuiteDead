@@ -83,7 +83,10 @@ public class GunShooting : RotatingItem
         }
 
         if (bulletsInMagazine > Capacity.MagazineCapacity)
+        {
             bulletsInMagazine = Capacity.MagazineCapacity;
+            Debug.Log("Reduced bullet amount");
+        }
 
         FiringMode = AllowedModes[firingModeIndex];
 

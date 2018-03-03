@@ -217,6 +217,7 @@ public class Item : NetworkBehaviour
     {
         // Indicates that we should apply the data. Happens when the item changes state.
         this.BroadcastMessage("ApplyData", Data, SendMessageOptions.DontRequireReceiver);
+        Debug.Log("Applied data! (" + Prefab + ")");
 
     }
 

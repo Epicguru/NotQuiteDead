@@ -52,6 +52,18 @@ public class Attachment : NetworkBehaviour
             Hidden = true;
     }
 
+    public void ApplyData(ItemDataX x)
+    {
+        // Just apply the effects of this attachment if we have not already applied them.
+        if (IsAttached)
+        {
+            if (!applied)
+            {
+                ApplyEffects();
+            }
+        }
+    }
+
     public virtual void Update()
     {
         if (IsAttached)

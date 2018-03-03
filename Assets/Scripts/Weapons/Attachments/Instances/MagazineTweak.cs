@@ -11,6 +11,7 @@ public class MagazineTweak : AttachmentTweak
     public override void Apply(Attachment x)
     {
         x.Effect_Magazine(Multiplier);
+        Debug.Log("Applied magazine effect");
     }
 
     public override void Remove(Attachment x)
