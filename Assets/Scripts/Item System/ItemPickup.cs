@@ -44,18 +44,27 @@ public class ItemPickup : NetworkBehaviour
                     ActionHUD.DisplayAction("Press " + InputManager.GetInput("Pick up") + " to pick up " + RichText.InBold(RichText.InColour(Item.Name, ItemRarityUtils.GetColour(Item.Rarity))) + ".");
                 if(InputManager.InputDown("Pick up"))
                 {
-                    // Set player authority : EDIT - Not needed.
-                    //if(!GetComponent<NetworkIdentity>().hasAuthority)
-                    //    Player.Local.RequestAuthority(this.gameObject);
-
-
-                    // Pick up!
-                    Item.RequestDataUpdate(); // Update data.
-                    PlayerInventory.Add(Item.Prefab, Item.Data, 1); // Give real version with data.
-                    Player.Local.NetUtils.CmdDestroyItem(this.gameObject);
+                    // Check client-server situation...
+                    if (isServer)
+                    {
+                        // Pick up manually.
+                        Item.RequestDataUpdate();
+                        PickupAccepted(Item.Data);
+                        Destroy(this.gameObject);
+                    }
+                    else
+                    {
+                        // Pick up using the command.
+                        Player.Local.NetUtils.CmdRequestPickup(Player.Local.gameObject, this.gameObject);
+                    }
                 }
             }
         }
+    }
+
+    public void PickupAccepted(ItemDataX data)
+    {
+        PlayerInventory.Add(Item.Prefab, data, 1); // Give real version with data.
     }
 
     public void OnMouseEnter()

@@ -29,8 +29,8 @@ public class ItemOptionsPanel : MonoBehaviour
         if (open)
             return;
 
-        ItemOption[] options = item.Item.CreateOptions(item.Item, item.Data);
-        SetOptions(options, item);
+        ItemOption[] options = item.ItemData.Item.CreateOptions(item.ItemData.Item, item.ItemData.Data);
+        SetOptions(options, item.ItemData);
     }
 
     public void Open(GearUI item)
@@ -45,7 +45,7 @@ public class ItemOptionsPanel : MonoBehaviour
         //SetOptions(options, new InventoryItem() { ItemPrefab = item.Item.Prefab, ItemCount = 1, Inventory = PlayerInventory.inv.Inventory, Resize = false, Item = Item.FindItem(item.Item.Prefab), Data = item.Item.Data });
     }
 
-    private void SetOptions(ItemOption[] options, InventoryItem item)
+    private void SetOptions(ItemOption[] options, InventoryItemData item)
     {
         open = true;
 
@@ -79,7 +79,7 @@ public class ItemOptionsPanel : MonoBehaviour
         if (Input.mousePosition.y - height < 0)
             pos.y = height;
 
-        (Parent.GetComponent<Transform>() as RectTransform).anchoredPosition = pos;
+        (Parent.GetComponent<Transform>() as RectTransform).position = pos;
 
         gameObject.SetActive(true);
     }

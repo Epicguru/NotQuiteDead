@@ -22,6 +22,62 @@ public static class OutputUtils
         }
     }
 
+    public static string ItemSaveDirectory
+    {
+        get
+        {
+            return S + "Items" + S;
+        }
+    }
+
+    public static string WorldItemSaveFile
+    {
+        get
+        {
+            return ItemSaveDirectory + "Dropped Items.txt";
+        }
+    }
+
+    public static string InventoryItemSaveFile
+    {
+        get
+        {
+            return ItemSaveDirectory + "Inventory Items.txt";
+        }
+    }
+
+    public static string GearItemSaveFile
+    {
+        get
+        {
+            return ItemSaveDirectory + "Gear Items.txt";
+        }
+    }
+
+    public static string HeldItemSaveFile
+    {
+        get
+        {
+            return ItemSaveDirectory + "Hand Item.txt";
+        }
+    }
+
+    public static string PlayerSaveDirectory
+    {
+        get
+        {
+            return S + "Players" + S;
+        }
+    }
+
+    public static string PlayerStateFile
+    {
+        get
+        {
+            return S + "State.txt";
+        }
+    }
+
     public static string InputSaveDirectory
     {
         get
@@ -86,6 +142,7 @@ public static class OutputUtils
     {
         jsonSettings = new JsonSerializerSettings();
         jsonSettings.Formatting = Formatting.Indented;
+        jsonSettings.ContractResolver = UnityContractResolver.Instance;
     }
 
     public static string ObjectToJson(object obj, JsonSerializerSettings settings = null)
@@ -101,9 +158,9 @@ public static class OutputUtils
         File.WriteAllText(path, json);
     }
 
-    public static void ObjectToFile(object obj, string path)
+    public static void ObjectToFile(object obj, string path, JsonSerializerSettings settings = null)
     {
-        string json = ObjectToJson(obj);
+        string json = ObjectToJson(obj, settings);
         JsonToFile(json, path);
     }
 

@@ -6,6 +6,8 @@ using UnityEngine.Networking;
 
 public class BodyGear : NetworkBehaviour
 {
+    // Always attached to the player. Basically the slots for gear items.
+
     // Calls when gear is placed on or removed from the player.
     public static UnityEvent GearChangeEvent = new UnityEvent();
 
@@ -76,7 +78,7 @@ public class BodyGear : NetworkBehaviour
     }
 
     [Server]
-    public void SetItem(GameObject player, Item item, ItemData data, bool returnItem)
+    public void SetItem(GameObject player, Item item, ItemDataX data, bool returnItem)
     {
         // Item is a PREFAB!
 
@@ -87,12 +89,7 @@ public class BodyGear : NetworkBehaviour
         }
 
         // Make new instance of item...
-        Item instance = Item.NewInstance(item.Prefab, transform.position);
-        if(data == null)
-        {
-            data = new ItemData();
-        }
-        instance.Data = data;
+        Item instance = Item.NewInstance(item.Prefab, transform.position, data);
         NetworkServer.Spawn(instance.gameObject);
 
         SetItem(player, instance, returnItem);
@@ -148,7 +145,9 @@ public class BodyGear : NetworkBehaviour
         if (returnToPlayer)
         {
             // Give item back...
-            RpcReturnItem(GetGearItem().Item.Prefab, GetGearItem().Item.Data, owner);
+            ItemDataX data = GetGearItem().Item.Data;
+
+            RpcReturnItem(GetGearItem().Item.Prefab, data == null ? null : data.Serialize(), owner);
         }
 
         // Destroy the old equipped item.
@@ -167,20 +166,22 @@ public class BodyGear : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RpcReturnItem(string itemPrefab, ItemData data, GameObject owner)
+    public void RpcReturnItem(string itemPrefab, string data, GameObject owner)
     {
-        if (data == null)
-            data = new ItemData(); // Should not happen.
-
         if (Player.Local.netId != owner.GetComponent<Player>().netId)
             return;
 
-        PlayerInventory.Add(itemPrefab, data, 1);
+        PlayerInventory.Add(itemPrefab, ItemDataX.TryDeserialize(data), 1);
     }
 
     public void Update()
     {
         if (IGO != null)
             SetupItem();
+    }
+
+    public GearSaveData GetSaveData()
+    {
+        return new GearSaveData(this);
     }
 }

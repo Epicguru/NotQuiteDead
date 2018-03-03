@@ -7,6 +7,7 @@ using UnityEngine.Networking;
 
 public class TileLayer : NetworkBehaviour
 {
+    public TileMap Map;
     public string Name;
 
     public Chunk ChunkPrefab;
@@ -51,11 +52,6 @@ public class TileLayer : NetworkBehaviour
         if (isServer && Input.GetKeyDown(KeyCode.H))
         {
             Pawn.SpawnPawn("Caveman", InputManager.GetMousePos());
-        }
-
-        if (Input.GetKeyDown(KeyCode.Y))
-        {
-            SaveAll();
         }
 
         if (!DebugText._Instance.Active)
@@ -123,11 +119,8 @@ public class TileLayer : NetworkBehaviour
         {
             Vector2Int pos = GetChunkCoordsFromIndex(index);
             ChunksLeftToSave++;
-            ChunkIO.SaveChunk("James' Reality", Name, Tiles, pos.x, pos.y, ChunkSize, ChunkSavedEmpty);
+            ChunkIO.SaveChunk(this.Map.World.RealityName, Name, Tiles, pos.x, pos.y, ChunkSize, ChunkSavedEmpty);
         }
-
-        // Tile operation merging will be done once all loaded chunks have been saved to file.
-
         // Done!
     }
 
@@ -621,10 +614,10 @@ public class TileLayer : NetworkBehaviour
         Chunks.Add(index, newChunk);
 
         // Check if is saved data...
-        if (ChunkIO.IsChunkSaved("James' Reality", Name, x, y))
+        if (ChunkIO.IsChunkSaved(this.Map.World.RealityName, Name, x, y))
         {
             // Load from disk.
-            ChunkIO.LoadChunk("James' Reality", Name, x, y, ChunkSize, ChunkLoaded, ChunkLoadError);
+            ChunkIO.LoadChunk(this.Map.World.RealityName, Name, x, y, ChunkSize, ChunkLoaded, ChunkLoadError);
         }
         else
         {
@@ -720,20 +713,20 @@ public class TileLayer : NetworkBehaviour
             // When a chunk is saved to file, all pending changes to that chunk are removed.
 
             // 1. Ensure it is saved to file...
-            if(ChunkIO.IsChunkSaved("James' Reality", Name, x, y))
+            if(ChunkIO.IsChunkSaved(this.Map.World.RealityName, Name, x, y))
             {
                 // 2. Load from file.
-                ChunkIO.GetChunkForNet_Unloaded(player, "James' Reality", Name, x, y, ChunkSize, NetChunkLoadedForClient, NetChunkLoadError);
+                ChunkIO.GetChunkForNet_Unloaded(player, this.Map.World.RealityName, Name, x, y, ChunkSize, NetChunkLoadedForClient, NetChunkLoadError);
             }
             else
             {
                 // 3. 'Generate' and save to file, then send normally.
                 string contents = (16 * 16) + "|?";
-                string path = ChunkIO.GetPathForChunk("James' Reality", Name, x, y);
+                string path = ChunkIO.GetPathForChunk(this.Map.World.RealityName, Name, x, y);
                 File.WriteAllText(path, contents);
 
                 // 4. Send it.
-                ChunkIO.GetChunkForNet_Unloaded(player, "James' Reality", Name, x, y, ChunkSize, NetChunkLoadedForClient, NetChunkLoadError);
+                ChunkIO.GetChunkForNet_Unloaded(player, this.Map.World.RealityName, Name, x, y, ChunkSize, NetChunkLoadedForClient, NetChunkLoadError);
             }
         }
     }
@@ -910,7 +903,7 @@ public class TileLayer : NetworkBehaviour
     private void UnloadChunk_Server(int index, Chunk chunk)
     {
         unloading.Add(index);
-        ChunkIO.SaveChunk("James' Reality", Name, Tiles, chunk.X, chunk.Y, ChunkSize, ChunkSaved);
+        ChunkIO.SaveChunk(this.Map.World.RealityName, Name, Tiles, chunk.X, chunk.Y, ChunkSize, ChunkSaved);
     }
 
     [Client]
@@ -1118,7 +1111,7 @@ public class TileLayer : NetworkBehaviour
     public void ResolveAllPendingOperations()
     {
         // Saves all pending operations to file and clears the pending array.
-        ChunkIO.MergeAllToFile("James' Reality", Name, ChunkSize, WidthInChunks, PendingOperations, OperationsResolved);
+        ChunkIO.MergeAllToFile(this.Map.World.RealityName, Name, ChunkSize, WidthInChunks, PendingOperations, OperationsResolved);
 
         // The operations will be cleared once they have been saved.
     }

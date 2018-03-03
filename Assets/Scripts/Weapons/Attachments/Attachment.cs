@@ -52,6 +52,18 @@ public class Attachment : NetworkBehaviour
             Hidden = true;
     }
 
+    public void ApplyData(ItemDataX x)
+    {
+        // Just apply the effects of this attachment if we have not already applied them.
+        if (IsAttached)
+        {
+            if (!applied)
+            {
+                ApplyEffects();
+            }
+        }
+    }
+
     public virtual void Update()
     {
         if (IsAttached)
@@ -93,8 +105,8 @@ public class Attachment : NetworkBehaviour
             }
         }
 
-        if (isServer && Item.pickup != null)
-            Item.pickup.AllowPickup = !IsAttached;
+        if (isServer && Item.Pickup != null)
+            Item.Pickup.AllowPickup = !IsAttached;
     }
 
     private void SetLayer(string layer)
@@ -217,7 +229,7 @@ public class Attachment : NetworkBehaviour
             if (CustomShotSound != null)
             {
                 // Use an external audio sauce to play the sound, allowing us custom falloff and effects independent of gun sound.
-                AudioManager.Instance.PlayOneShot(transform.position, CustomShotSound, CustomShotVolume, CustomShotPitch, CustomShotRange, CustomShotRange * 0.35f);
+                AudioManager.Instance.PlayOneShot(transform.position, CustomShotSound, CustomShotVolume, CustomShotPitch, CustomShotRange, 2f, CustomShotRange * 0.35f, 0.7f);
             }
         }
     }

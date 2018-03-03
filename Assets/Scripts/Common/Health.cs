@@ -43,16 +43,22 @@ public class Health : NetworkBehaviour {
     [Command]
     public void CmdSetMaxHealth(float health)
     {
+        Server_SetMaxHealth(health);
+    }
+
+    [Server]
+    public void Server_SetMaxHealth(float health)
+    {
         if (health <= 0)
             return;
         this.maxHealth = health;
 
         if (this.health > maxHealth)
-            this.SetHealth(maxHealth);
+            this.Server_SetHealth(maxHealth);
     }
 
     [Server]
-    private void SetHealth(float health)
+    public void Server_SetHealth(float health)
     {
         this.health = health;
         if (this.health < 0)
@@ -79,7 +85,7 @@ public class Health : NetworkBehaviour {
         if (!CanHit)
             return;
 
-        SetHealth(health - Mathf.Abs(damage));
+        Server_SetHealth(health - Mathf.Abs(damage));
 
         if (!isSecondary)
         {
@@ -115,7 +121,7 @@ public class Health : NetworkBehaviour {
                 // Simply allow the heal.
             }            
         }
-        SetHealth(this.health + health);
+        Server_SetHealth(this.health + health);
     }
 
     [Command]

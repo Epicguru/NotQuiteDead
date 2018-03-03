@@ -46,7 +46,7 @@ public class BlueprintRequirementDisplay : MonoBehaviour
         (Parent.transform as RectTransform).sizeDelta = new Vector2(0, 50 * CurrentBlueprint.Requirements.Length);
         foreach (BlueprintRequirement r in Spawned)
         {
-            r.InInventory = PlayerInventory.inv.Inventory.Contains(r.Item, r.Amount);
+            r.InInventory = PlayerInventory.inv.Inventory.Contains(r.Item.Prefab, r.Amount);
         }
         Title.text = CurrentBlueprint.Products[0].Name;
     }

@@ -33,7 +33,13 @@ public class PlayerHolding : NetworkBehaviour
     }
 
     [Command]
-    public void CmdEquip(string prefab, GameObject localPlayer, ItemData data)
+    public void CmdEquip(string prefab, GameObject localPlayer, string data)
+    {        
+        ServerEquip(prefab, localPlayer, data);
+    }
+
+    [Server]
+    public void ServerEquip(string prefab, GameObject localPlayer, string data)
     {
         // We need to equip this item.
         // This runs on the server, which we can think of as in the middle of nowhere.
@@ -47,13 +53,9 @@ public class PlayerHolding : NetworkBehaviour
             return;
         }
 
-        Item created = Item.NewInstance(prefab, localPlayer.transform.position);
-        if(data == null)
-        {
-            data = new ItemData();
-        }
-        created.Data = data; // This should sync.
-        // Data is applied upon 'Start'
+        Item created = Item.NewInstance(prefab, localPlayer.transform.position, null);
+        // Data is applied upon 'Start', and we set pending data.
+        created.PendingData = data;
 
         // Assuming that this item has not been spawned...
         NetworkServer.SpawnWithClientAuthority(created.gameObject, localPlayer);
@@ -105,12 +107,15 @@ public class PlayerHolding : NetworkBehaviour
     }
 
     [Command]
-    public void CmdDrop(bool drop, bool destroy, GameObject localPlayer, ItemData data)
+    public void CmdDrop(bool drop, bool destroy, GameObject localPlayer, string data)
     {
         // Drops the currently held item, if holding anything.
 
         // Drop - If true then the item is dropped to the floor, if false then it is stored in the players inventory.
         // Destroy - If true the item is not stored, not dropped and is removed from existence.
+
+        if (this.Item == null)
+            return;
 
         if (destroy)
         {
@@ -136,11 +141,11 @@ public class PlayerHolding : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void RpcGiveItem(GameObject player, string itemPrefab, ItemData data)
+    private void RpcGiveItem(GameObject player, string itemPrefab, string data)
     {
         if(player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)
         {
-            PlayerInventory.Add(itemPrefab, data, 1);
+            PlayerInventory.Add(itemPrefab, ItemDataX.TryDeserialize(data), 1);
         }
     }
 
@@ -172,7 +177,7 @@ public class PlayerHolding : NetworkBehaviour
                     if (Item != null)
                     {
                         Item.RequestDataUpdate();
-                        CmdDrop(false, false, Player.Local.gameObject, Item.Data);
+                        CmdDrop(false, false, Player.Local.gameObject, Item.Data.Serialize());
                     }
                 }
             }
