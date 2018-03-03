@@ -3,6 +3,7 @@ using System;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Runtime.Serialization;
 
 [Serializable]
 [JsonObject(MemberSerialization = MemberSerialization.OptOut)]
@@ -34,16 +35,22 @@ public class ItemDataX
         _settings.ContractResolver = UnityContractResolver.Instance;
     }
 
-    public ItemDataX()
-    {
-
-    }
-
     [ReadOnly]
     public bool Created = false;
 
     [JsonProperty]
     private Dictionary<string, object> values = new Dictionary<string, object>();
+
+    [SerializeField]
+    [TextArea(5, 20)]
+    [JsonIgnore]
+    private string _debug = "";
+
+    [OnDeserialized]
+    public void OnDeserialized(StreamingContext c)
+    {
+        UpdateDebug();
+    }
 
     public int GetValueCount()
     {
@@ -53,6 +60,28 @@ public class ItemDataX
     public Dictionary<string, object> GetAllValues()
     {
         return values;
+    }
+
+    private void UpdateDebug()
+    {
+        string[] strings = new string[values.Count];
+
+        int index = 0;
+        foreach (var str in values.Keys)
+        {
+            strings[index++] = str + " --> ";
+        }
+        index = 0;
+        foreach (var obj in values.Values)
+        {
+            strings[index++] += (obj == null ? "(null)" : obj.ToString()) + "\n";
+        }
+
+        _debug = "";
+        for (int i = 0; i < strings.Length; i++)
+        {
+            _debug += strings[i];
+        }
     }
 
     public void Add(string key, object value)
@@ -65,6 +94,7 @@ public class ItemDataX
         else
         {
             values.Add(key, value);
+            UpdateDebug();
         }
     }
 
@@ -86,6 +116,7 @@ public class ItemDataX
         else
         {
             values[key] = value;
+            UpdateDebug();
         }
     }
 
@@ -162,6 +193,8 @@ public class ItemDataX
         }
 
         values.Remove(key);
+
+        UpdateDebug();
     }
 
     public string Serialize(bool pretty = false)

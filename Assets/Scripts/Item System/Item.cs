@@ -63,6 +63,10 @@ public class Item : NetworkBehaviour
         }
     }
 
+    [HideInInspector]
+    [SyncVar]
+    public string PendingData = null;
+
     [Tooltip("Current item data.")]
     [SerializeField]
     private ItemDataX _Data;
@@ -93,11 +97,20 @@ public class Item : NetworkBehaviour
     {
         if (Data == null || Data.Created == false)
         {
-            if (Data == null)
-                Data = new ItemDataX();
-            Data.Created = true;
-            RequestSetDefaultData();
-            RequestDataApplication(); // Apply loaded or transmitted data.
+            if (string.IsNullOrWhiteSpace(PendingData))
+            {
+                if (Data == null)
+                    Data = new ItemDataX();
+                Data.Created = true;
+                RequestSetDefaultData();
+                RequestDataApplication(); // Apply default data.
+            }
+            else
+            {
+                Data = ItemDataX.TryDeserialize(PendingData);
+                PendingData = null;
+                RequestDataApplication(); // Apply loaded or transmitted data.
+            }
         }
         else
         {
@@ -211,13 +224,14 @@ public class Item : NetworkBehaviour
     {
         // Indicates that we should get Data up-to-date. Happens when the item changes state.
         this.BroadcastMessage("UpdateData", Data, SendMessageOptions.DontRequireReceiver);
+        Debug.Log("Requesting data update (" + Prefab + ")");
     }
 
     public void RequestDataApplication()
     {
         // Indicates that we should apply the data. Happens when the item changes state.
         this.BroadcastMessage("ApplyData", Data, SendMessageOptions.DontRequireReceiver);
-        Debug.Log("Applied data! (" + Prefab + ")");
+        Debug.Log("Applied data! (" + Prefab + ") (" + Data.Serialize(true) + ")");
 
     }
 
@@ -225,6 +239,7 @@ public class Item : NetworkBehaviour
     {
         // Called when item spawns out of nowhere, such as a random spawn event or a mob drop.
         this.BroadcastMessage("SetDataDefaults", Data, SendMessageOptions.DontRequireReceiver);
+        Debug.Log("Settings default data (" + Prefab + ")");
     }
 
     public void UpdateParent()

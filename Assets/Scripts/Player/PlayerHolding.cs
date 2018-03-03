@@ -35,11 +35,11 @@ public class PlayerHolding : NetworkBehaviour
     [Command]
     public void CmdEquip(string prefab, GameObject localPlayer, string data)
     {        
-        ServerEquip(prefab, localPlayer, ItemDataX.TryDeserialize(data));
+        ServerEquip(prefab, localPlayer, data);
     }
 
     [Server]
-    public void ServerEquip(string prefab, GameObject localPlayer, ItemDataX data)
+    public void ServerEquip(string prefab, GameObject localPlayer, string data)
     {
         // We need to equip this item.
         // This runs on the server, which we can think of as in the middle of nowhere.
@@ -53,12 +53,9 @@ public class PlayerHolding : NetworkBehaviour
             return;
         }
 
-        if (data == null)
-        {
-            data = new ItemDataX();
-        }
-        Item created = Item.NewInstance(prefab, localPlayer.transform.position, data);
-        // Data is applied upon 'Start'
+        Item created = Item.NewInstance(prefab, localPlayer.transform.position, null);
+        // Data is applied upon 'Start', and we set pending data.
+        created.PendingData = data;
 
         // Assuming that this item has not been spawned...
         NetworkServer.SpawnWithClientAuthority(created.gameObject, localPlayer);
