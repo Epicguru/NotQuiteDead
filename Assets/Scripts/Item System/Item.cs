@@ -224,22 +224,18 @@ public class Item : NetworkBehaviour
     {
         // Indicates that we should get Data up-to-date. Happens when the item changes state.
         this.BroadcastMessage("UpdateData", Data, SendMessageOptions.DontRequireReceiver);
-        Debug.Log("Requesting data update (" + Prefab + ")");
     }
 
     public void RequestDataApplication()
     {
         // Indicates that we should apply the data. Happens when the item changes state.
         this.BroadcastMessage("ApplyData", Data, SendMessageOptions.DontRequireReceiver);
-        Debug.Log("Applied data! (" + Prefab + ") (" + Data.Serialize(true) + ")");
-
     }
 
     public void RequestSetDefaultData()
     {
         // Called when item spawns out of nowhere, such as a random spawn event or a mob drop.
         this.BroadcastMessage("SetDataDefaults", Data, SendMessageOptions.DontRequireReceiver);
-        Debug.Log("Settings default data (" + Prefab + ")");
     }
 
     public void UpdateParent()
