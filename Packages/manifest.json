@@ -1,5 +1,6 @@
 {
-	"dependencies": {
-		"com.unity.package-manager-ui": "1.7.0"
-	}
+  "dependencies": {
+    "com.unity.package-manager-ui": "1.7.0",
+    "com.unity.postprocessing": "2.0.1-beta"
+  }
 }
