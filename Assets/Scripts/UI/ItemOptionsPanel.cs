@@ -31,6 +31,7 @@ public class ItemOptionsPanel : MonoBehaviour
 
         ItemOption[] options = item.ItemData.Item.CreateOptions(item.ItemData.Item, item.ItemData.Data);
         SetOptions(options, item.ItemData);
+        Parent.gameObject.SetActive(true);
     }
 
     public void Open(GearUI item)
@@ -43,13 +44,15 @@ public class ItemOptionsPanel : MonoBehaviour
 
         SetOptions(options, item.Item.Prefab, item.Item.Name);
         //SetOptions(options, new InventoryItem() { ItemPrefab = item.Item.Prefab, ItemCount = 1, Inventory = PlayerInventory.inv.Inventory, Resize = false, Item = Item.FindItem(item.Item.Prefab), Data = item.Item.Data });
+
+        Parent.gameObject.SetActive(true);
     }
 
     private void SetOptions(ItemOption[] options, InventoryItemData item)
     {
         open = true;
 
-        GetComponentInChildren<Text>().text = item.Item.Name + "\nOptions";
+        Parent.GetComponentInChildren<Text>().text = item.Item.Name + "\nOptions";
 
         int index = 0;
         foreach (ItemOption option in options)
@@ -78,8 +81,7 @@ public class ItemOptionsPanel : MonoBehaviour
             pos.x = Screen.width - Width;
         if (Input.mousePosition.y - height < 0)
             pos.y = height;
-
-        (Parent.GetComponent<Transform>() as RectTransform).position = pos;
+        (Parent.GetComponent<Transform>() as RectTransform).anchoredPosition = pos;
 
         gameObject.SetActive(true);
     }
@@ -88,7 +90,7 @@ public class ItemOptionsPanel : MonoBehaviour
     {
         open = true;
 
-        GetComponentInChildren<Text>().text = name + "\nOptions";
+        Parent.GetComponentInChildren<Text>().text = name + "\nOptions";
 
         int index = 0;
         foreach (ItemOption option in options)
@@ -118,7 +120,6 @@ public class ItemOptionsPanel : MonoBehaviour
             pos.x = Screen.width - Width;
         if (Input.mousePosition.y - height < 0)
             pos.y = height;
-
         (Parent.GetComponent<Transform>() as RectTransform).anchoredPosition = pos;
 
         gameObject.SetActive(true);
@@ -138,5 +139,6 @@ public class ItemOptionsPanel : MonoBehaviour
         gameObject.SetActive(false);
 
         open = false;
+        Parent.gameObject.SetActive(false);
     }
 }
