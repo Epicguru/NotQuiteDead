@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class MainMenuTransitions : MonoBehaviour
 {
-    public RectTransform Menu, Loading;
+    public RectTransform Menu, Other;
 
-    public bool IsLoading;
+    public bool NotInMenu;
     public float TransitionTime = 1f;
     public AnimationCurve TransitionCurve;
 
@@ -22,12 +22,14 @@ public class MainMenuTransitions : MonoBehaviour
         Menu.anchoredPosition = new Vector2(0f, y);
 
         y = GetProgress() * Screen.height - Screen.height;
-        Loading.anchoredPosition = new Vector2(0f, y);
+        Other.anchoredPosition = new Vector2(0f, y);
+
+        UpdateActiveState();
     }
 
     public void UpdateTimer()
     {
-        timer += Time.unscaledDeltaTime * (IsLoading ? 1f : -1f);
+        timer += Time.unscaledDeltaTime * (NotInMenu ? 1f : -1f);
         timer = Mathf.Clamp(timer, 0f, TransitionTime);
     }
 
@@ -36,5 +38,16 @@ public class MainMenuTransitions : MonoBehaviour
         float p = Mathf.Clamp(timer / TransitionTime, 0f, 1f);
         float x = TransitionCurve.Evaluate(p);
         return x;
+    }
+
+    public void UpdateActiveState()
+    {
+        if(Other != null)
+        {
+            if(timer == 0f)
+            {
+                Other.gameObject.SetActive(false);
+            }
+        }
     }
 }
