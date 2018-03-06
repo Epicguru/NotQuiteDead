@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.U2D;
 
 public class MainMenuImage : MonoBehaviour
 {
@@ -8,17 +9,18 @@ public class MainMenuImage : MonoBehaviour
     public float ChangeInterval;
     public Animator Anim;
     public Sprite[] Sprites;
+    public SpriteAtlas Atlas;
 
     private float angleTimer;
     private float changeTimer;
     private float currentInterval;
     private Vector3 oldAngle;
     private int spriteIndex;
-    private SpriteRenderer sprRenderer;
+    private SpriteRenderer[] sprRenderers;
 
     public void Start()
     {
-        sprRenderer = GetComponent<SpriteRenderer>();
+        sprRenderers = GetComponents<SpriteRenderer>();
         oldAngle = transform.localEulerAngles;
         spriteIndex = RandomSpriteIndex();
         SetNewSprite();
@@ -62,7 +64,12 @@ public class MainMenuImage : MonoBehaviour
 
     public void SetNewSprite()
     {
-        sprRenderer.sprite = Sprites[spriteIndex];
+        Sprite s = Sprites[spriteIndex];
+        foreach (var spr in sprRenderers)
+        {
+            Sprite final = Atlas.GetSprite(s.name);
+            spr.sprite = final;
+        }
     }
 
     public int RandomSpriteIndex()
@@ -74,7 +81,7 @@ public class MainMenuImage : MonoBehaviour
     {
         float x = Random.Range(-Magnitude, Magnitude) * 0.4f;
         float y = Random.Range(-Magnitude, Magnitude);
-        float z = Random.Range(-Magnitude, Magnitude);
+        float z = Random.Range(-Magnitude, Magnitude) * 0.4f;
         RandomRot = new Vector3(x, y, z);
     }
 
