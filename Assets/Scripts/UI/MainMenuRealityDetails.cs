@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainMenuRealityDetails : MonoBehaviour
@@ -84,6 +85,8 @@ public class MainMenuRealityDetails : MonoBehaviour
         }
 
         Debug.Log("Selected play for reality '" + RealityName + "'");
+
+        SceneManager.LoadScene("Setup V2");
     }
 
     public void RealityNameChange()
