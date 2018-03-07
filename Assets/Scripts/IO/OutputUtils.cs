@@ -10,7 +10,8 @@ public static class OutputUtils
 {
     private const char S = '/';
     private const bool LOG_ERROR = false;
-    private static string PersistentDataPath = Application.persistentDataPath;
+    private static string PersistentDataPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
+
 
     // FILE PATHS
 
@@ -18,7 +19,7 @@ public static class OutputUtils
     {
         get
         {
-            return PersistentDataPath + S; // Change me whenever!
+            return PersistentDataPath + S + "My Games" + S + "Not Quite Dead" + S; // Change me whenever!
         }
     }
 

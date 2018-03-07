@@ -124,6 +124,16 @@ public static class InventoryIO
         // Make array.
         GearSaveData[] array = InputUtils.FileToObject<GearSaveData[]>(path);
 
+        if(array == null)
+        {
+            Debug.LogError("Null gear file, removing all player gear...");
+            foreach (var key in player.GearMap.Keys)
+            {
+                player.GearMap[key].SetItem(player.gameObject, null, null, false);
+            }
+            return;
+        }
+
         foreach (var sd in array)
         {
             if(sd != null)
