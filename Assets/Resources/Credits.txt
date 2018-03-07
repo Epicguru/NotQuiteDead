@@ -1,17 +1,43 @@
-Art, code, design and development by:
-Epicguru (James B)
 
-The pathfinding system makes use of BlueRaja's High Speed Priority Queue system:
-Github user:
-https://github.com/BlueRaja
+
+
+
+<b>Art, code, design, development (see exceptions below):</b>
+James B (Epicguru)
+
+The pathfinding system makes use of BlueRaja's High Speed Priority Queue:
+Github user: https://github.com/BlueRaja
 Distributed under the MIT license.
 
-Sound effects:
+<b>Sound effects:</b>
 
 Various explosion and gunshot effects from Freesound.org user:
 EFlexTheSoundDesigner (Evan Boyerman)
 https://freesound.org/people/EFlexTheSoundDesigner/
 Posted under the Create Commons Attribution License. (https://creativecommons.org/licenses/by/3.0/)
 
-Remaining sound effects (excluding music) created by:
+Remaining sound effects:
 Epicguru
+
+<b>Music:</b>
+<i>"Hiding Your Reality"</i> Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0 License
+http://creativecommons.org/licenses/by/3.0/
+
+<i>"Man Down"</i> Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0 License
+http://creativecommons.org/licenses/by/3.0/
+
+<i>"Miami Nights - Extended Theme"</i> Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0 License
+http://creativecommons.org/licenses/by/3.0/
+
+<i>"Division"</i> Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0 License
+http://creativecommons.org/licenses/by/3.0/
+
+<i>"Spellbound"</i> Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0 License
+http://creativecommons.org/licenses/by/3.0/
+
+

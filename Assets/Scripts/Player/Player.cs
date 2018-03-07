@@ -45,10 +45,12 @@ public class Player : NetworkBehaviour
         AllPlayers.Add(this);
         if (isServer)
         {
-            string name = NameGen.GenName();
+            int i = 0;
+            string name = "Player " + i;
             while (PlayerHasName(name))
             {
-                name = NameGen.GenName();
+                name = "Player " + i;
+                i++;
             }
             // Give name and team
             Team = AllPlayers.Count % 2 == 0 ? "Blue" : "Red";
