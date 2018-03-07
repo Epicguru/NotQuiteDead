@@ -22,7 +22,8 @@ public class MainMenuTransitions : MonoBehaviour
         Menu.anchoredPosition = new Vector2(0f, y);
 
         y = GetProgress() * Screen.height - Screen.height;
-        Other.anchoredPosition = new Vector2(0f, y);
+        if(Other != null)
+            Other.anchoredPosition = new Vector2(0f, y);
 
         UpdateActiveState();
     }

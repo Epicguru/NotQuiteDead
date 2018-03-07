@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RealitySelectScreen : MonoBehaviour {
+public class RealitySelectScreen : MonoBehaviour
+{
+    public MainMenuTransitions T;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            T.NotInMenu = false;
+        }
+    }
 }
