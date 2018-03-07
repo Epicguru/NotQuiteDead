@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class RealitySelectScreen : MonoBehaviour
 {
+    [Header("References")]
     public MainMenuTransitions T;
 
     public void Update()
