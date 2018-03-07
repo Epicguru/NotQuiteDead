@@ -6,6 +6,7 @@ using UnityEngine;
 public class MainMenuRealityItemManager : MonoBehaviour
 {
     public MainMenuReality Prefab;
+    public MainMenuRealityDetails Details;
 
     private List<GameObject> spawned = new List<GameObject>();
 
@@ -60,7 +61,7 @@ public class MainMenuRealityItemManager : MonoBehaviour
     {
         // TODO implement icon.
         MainMenuReality r = Instantiate(Prefab, this.transform);
-
+        r.Details = this.Details;
         r.RealityName = realityName;
         //r.Icon = icon;
 

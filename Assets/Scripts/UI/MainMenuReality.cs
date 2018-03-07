@@ -3,9 +3,10 @@ using UnityEngine.UI;
 
 public class MainMenuReality : MonoBehaviour
 {
-    [Header("Header")]
+    [Header("References")]
     public Text NameText;
     public Image IconImage;
+    public MainMenuRealityDetails Details;
 
     [Header("Runtime")]
     public string RealityName;
@@ -24,6 +25,7 @@ public class MainMenuReality : MonoBehaviour
 
     public void Clicked()
     {
-        Debug.Log("Clicked on '" + RealityName + "'");
+        Debug.Log("Selected '" + RealityName + "'");
+        Details.RealityName = this.RealityName;
     }
 }
