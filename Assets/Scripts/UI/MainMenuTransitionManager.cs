@@ -24,6 +24,13 @@ public class MainMenuTransitionManager : MonoBehaviour
         for (int i = 0; i < Screens.Length; i++)
         {
             bool active = i == index;
+            if (active)
+            {
+                if (trans.TimerAtZero())
+                {
+                    active = false;
+                }
+            }
             Screens[i].gameObject.SetActive(active);
         }
 

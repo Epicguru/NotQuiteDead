@@ -41,11 +41,19 @@ public class MainMenuTransitions : MonoBehaviour
         return x;
     }
 
+    public bool TimerAtZero()
+    {
+        if (NotInMenu)
+            return false;
+
+        return timer == 0f;
+    }
+
     public void UpdateActiveState()
     {
         if(Other != null)
         {
-            if(timer == 0f)
+            if(TimerAtZero())
             {
                 Other.gameObject.SetActive(false);
             }

@@ -6,6 +6,12 @@ public class RealitySelectScreen : MonoBehaviour
 {
     [Header("References")]
     public MainMenuTransitions T;
+    public MainMenuRealityDetails Details;
+
+    public void OnEnable()
+    {
+        Details.RealityName = null;
+    }
 
     public void Update()
     {

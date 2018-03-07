@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,9 @@ public class MainMenuRealityDetails : MonoBehaviour
     public Text EnterReality;
     public Button Play;
     public Button Delete;
+    public Text DeleteConfirmationName;
+    public GameObject DeleteScreen;
+    public MainMenuRealityItemManager Items;
 
     public string RealityName
     {
@@ -29,6 +33,11 @@ public class MainMenuRealityDetails : MonoBehaviour
     [ReadOnly]
     private string _RealityName;
 
+    public void OnEnable()
+    {
+        DeleteScreen.SetActive(false);
+    }
+
     public void DeleteCurrent()
     {
         if (RealityName == null)
@@ -36,7 +45,35 @@ public class MainMenuRealityDetails : MonoBehaviour
             return;
         }
 
-        Debug.Log("Wants to delete '" + RealityName + "'");
+        Debug.Log("Selected delete for '" + RealityName + "'");
+
+        // Open confirmation menu.
+        DeleteConfirmationName.text = "\"" + RealityName.Trim() + "\"";
+        DeleteScreen.SetActive(true);
+    }
+
+    public void ConfirmDelete()
+    {
+        DeleteScreen.SetActive(false);
+
+        // Delete currently selected reality.
+        if(RealityName == null)
+        {
+            return;
+        }
+
+        // Permanently delete!
+        Directory.Delete(OutputUtils.RealitySaveDirectory + RealityName, true);
+
+        // Now refresh the whole view.
+        Items.RefreshWithFolderContents();
+
+        RealityName = null;
+    }
+
+    public void CancelDelete()
+    {
+        DeleteScreen.SetActive(false);
     }
 
     public void PlayCurrent()
@@ -46,7 +83,7 @@ public class MainMenuRealityDetails : MonoBehaviour
             return;
         }
 
-        Debug.Log("Wants to play '" + RealityName + "'");
+        Debug.Log("Selected play for reality '" + RealityName + "'");
     }
 
     public void RealityNameChange()
