@@ -2,7 +2,7 @@
 
 
 
-<b>Art, code, design, development:</b>
+<b>Art, code, design, development (see exceptions below):</b>
 James B (Epicguru)
 
 The pathfinding system makes use of BlueRaja's High Speed Priority Queue:

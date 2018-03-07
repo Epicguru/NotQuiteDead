@@ -86,7 +86,30 @@ public class MainMenuRealityDetails : MonoBehaviour
 
         Debug.Log("Selected play for reality '" + RealityName + "'");
 
-        SceneManager.LoadScene("Setup V2");
+        // Setup cross scene loader...
+        MainMenuRealityLoader loader = FindObjectOfType<MainMenuRealityLoader>();
+
+        if(loader != null)
+        {
+            loader.Host = true;
+            loader.RealityName = RealityName;
+            // Leave port as is.
+
+            MainMenuFunctions f = FindObjectOfType<MainMenuFunctions>();
+
+            // Use the main menu functions class to load...
+            // Looks odd because the code is ripped from that class.
+            if(f != null)
+            {
+                f.TM.CurrentScreen = MainMenuScreen.LOADING;
+                f.T.NotInMenu = true;
+                f.LT.RealityName = RealityName.Trim();
+                f.LT.RealityDay = 0;
+                AsyncOperation ao = SceneManager.LoadSceneAsync("Setup V2", LoadSceneMode.Single);
+                ao.completed += f.LoadRealitySceneLoaded;
+                f.AO = ao;
+            }
+        }
     }
 
     public void RealityNameChange()
