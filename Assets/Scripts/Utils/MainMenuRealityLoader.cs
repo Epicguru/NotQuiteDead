@@ -26,14 +26,21 @@ public class MainMenuRealityLoader : MonoBehaviour
 
     public void SceneChange(Scene oldScene, Scene newScene)
     {
+        if (newScene.name != "Setup V2")
+            return;
+
         // Load reality if host...
         if (Host)
         {
-            Debug.Log("Loading '" + RealityName + "' as host...");
+            Debug.Log("Loading '" + RealityName + "' as host in '" + newScene.name + "'...");
 
             NetworkManager m = FindObjectOfType<NetworkManager>();
             if(m != null)
             {
+                if (NetworkServer.active)
+                {
+                    NetworkServer.Shutdown();
+                }
                 m.networkPort = Port;
                 m.StartHost();
                 PostHost = true;
