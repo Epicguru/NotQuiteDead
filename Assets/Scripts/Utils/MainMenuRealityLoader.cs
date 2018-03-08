@@ -79,6 +79,7 @@ public class MainMenuRealityLoader : MonoBehaviour
 
                 // Destroy this object, cycle done.
                 Destroy(this.gameObject);
+                PostHost = false;
             }
         }   
     }
