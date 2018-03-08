@@ -20,15 +20,12 @@ public class MainMenuRealityLoader : MonoBehaviour
     public void Start ()
 	{
         DontDestroyOnLoad(this.gameObject);
-        Debug.Log("Start, current scene is " + SceneManager.GetActiveScene().name);
 
         SceneManager.activeSceneChanged += SceneChange;
 	}
 
     public void SceneChange(Scene oldScene, Scene newScene)
     {
-        Debug.LogWarning("Scene change, scene is now " + newScene.name);
-
         // Load reality if host...
         if (Host)
         {

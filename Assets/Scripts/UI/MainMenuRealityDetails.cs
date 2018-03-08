@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -118,7 +119,7 @@ public class MainMenuRealityDetails : MonoBehaviour
         {
             Title.text = "Select a reality...";
             D_Day.text = "Day: <color=white>---</color>";
-            D_LastPlayed.text = "Last Played: <color=white>-/-/-</color>";
+            D_LastPlayed.text = "Last Played: <color=white>---</color>";
             EnterReality.text = "No Reality Selected";
             Play.interactable = false;
             Delete.interactable = false;
@@ -126,11 +127,27 @@ public class MainMenuRealityDetails : MonoBehaviour
         else
         {
             Title.text = RealityName.Trim();
-            D_Day.text = "Day: <color=white>" + "TODO" + "</color>";
-            D_LastPlayed.text = "Last Played: <color=white>" + "x/y/z" + "</color>";
+            D_Day.text = "Day: <color=white>" + "0" + "</color>";
+            D_LastPlayed.text = "Last Played: <color=white>" + "Never" + "</color>";
             EnterReality.text = "Enter " + RealityName.Trim();
             Play.interactable = true;
             Delete.interactable = true;
+
+            WorldSaveState st = null;
+            try
+            {
+                st = WorldIO.GetSaveState(RealityName);
+            }
+            catch
+            {
+                Debug.LogWarning(string.Format("Error loading reality state for '{0}'", RealityName));
+            }
+
+            if(st != null)
+            {
+                D_Day.text = "Day: <b><color=white>" + (int)(st.Time) + "</color></b>";
+                D_LastPlayed.text = "Last Played: <b><color=white>" + st.LastPlayed.ToString("g") + "</color>\n<color=white>" + st.LastPlayed.TimeAgo() + "</color></b>";
+            }
         }
     }
 }
