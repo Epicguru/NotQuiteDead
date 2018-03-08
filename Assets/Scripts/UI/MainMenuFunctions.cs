@@ -27,6 +27,11 @@ public class MainMenuFunctions : MonoBehaviour
         T.NotInMenu = true;        
     }
 
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
     public void LoadRealitySceneLoaded(AsyncOperation ao)
     {
         Debug.Log("Scene loaded, starting host...");
