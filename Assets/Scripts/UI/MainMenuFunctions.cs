@@ -30,7 +30,6 @@ public class MainMenuFunctions : MonoBehaviour
     public void LoadRealitySceneLoaded(AsyncOperation ao)
     {
         Debug.Log("Scene loaded, starting host...");
-        GameObject.Find("Network Manager").GetComponent<NetworkManager>().StartHost();
         AO = null;
     }
 
