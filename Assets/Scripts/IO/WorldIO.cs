@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public static class WorldIO
 {
@@ -42,6 +43,7 @@ public class WorldSaveState
 {
     // Stuff like time, difficulty, etc.
     public float Time;
+    public DateTime LastPlayed;
 
     public WorldSaveState()
     {
@@ -51,6 +53,7 @@ public class WorldSaveState
     public WorldSaveState(World w)
     {
         Time = w.GameTime.GetTimeRaw();
+        LastPlayed = DateTime.Now;
     }
 
     public void Apply(World world)
