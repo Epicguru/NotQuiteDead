@@ -103,6 +103,14 @@ public static class OutputUtils
         }
     }
 
+    public static string WorldStateSaveFile
+    {
+        get
+        {
+            return S + "World State.txt";
+        }
+    }
+
     public static string RealityMapDirectory
     {
         get

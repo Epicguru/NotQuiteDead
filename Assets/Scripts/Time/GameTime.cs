@@ -48,11 +48,6 @@ public class GameTime : NetworkBehaviour
         Instance = null;
     }
 
-    public void DisplayDayUI()
-    {
-        DayMessage.DisplayDay(GetDay());
-    }
-
     public void Update()
     {
         if (isServer)
@@ -67,6 +62,22 @@ public class GameTime : NetworkBehaviour
             dayTracker = GetDay();
             DayChangedEvent.Invoke();
         }
+    }
+
+    public void DisplayDayUI()
+    {
+        DayMessage.DisplayDay(GetDay());
+    }
+
+    public float GetTimeRaw()
+    {
+        return this.time;
+    }
+
+    public void SetTime(float time)
+    {
+        // Manually sets the time.
+        this.time = Mathf.Max(time, 0f);
     }
 
     public int GetDay()

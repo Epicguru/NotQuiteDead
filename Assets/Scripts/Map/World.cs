@@ -10,6 +10,10 @@ public class World : NetworkBehaviour
 {
     public static World Instance { get; private set; }
 
+    [Header("References")]
+    public GameTime GameTime;
+
+    [Header("World Specific")]
     public string RealityName;
 
     [HideInInspector]
@@ -39,11 +43,17 @@ public class World : NetworkBehaviour
 
         // Save all world items to file.
         ItemIO.ItemsToFile(RealityName, GameObject.FindObjectsOfType<Item>());
+
+        // Save the world state to file.
+        WorldIO.SaveWorldState(this);
     }
 
     [Server]
     public void Load()
     {
+        // Load world state from file.
+        WorldIO.LoadWorldState(this);
+
         // Load player state (position, health, etc.)
         PlayerIO.LoadPlayerState(RealityName, Player.Local);
 

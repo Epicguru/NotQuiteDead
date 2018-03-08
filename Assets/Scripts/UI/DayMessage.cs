@@ -74,7 +74,6 @@ public class DayMessage : MonoBehaviour
             // Time to count up:
             float min = 0.3f;
             float max = 1f;
-            float range = max - min;
             CountupTime = Mathf.Clamp((Day / 100f) * 1f, min, max);
 
             countingUp = true;
