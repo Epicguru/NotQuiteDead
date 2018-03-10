@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -22,6 +23,11 @@ public class FurnitureManager : NetworkBehaviour
     public void Update()
     {
         DebugText.Log(furniture.Count + " furniture placed throughout the world.");
+    }
+
+    public Furniture[] GetAllFurniture()
+    {
+        return furniture.Values.ToArray();
     }
 
     public bool PlaceFurniture(string prefab, int x, int y)

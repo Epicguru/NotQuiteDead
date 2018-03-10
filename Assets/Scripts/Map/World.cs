@@ -44,6 +44,9 @@ public class World : NetworkBehaviour
         // Save all world items to file.
         ItemIO.ItemsToFile(RealityName, GameObject.FindObjectsOfType<Item>());
 
+        // Save placed furniture...
+        FurnitureIO.SaveFurniture(RealityName, Furniture.GetAllFurniture());
+
         // Save the world state to file.
         WorldIO.SaveWorldState(this);
     }
@@ -69,6 +72,9 @@ public class World : NetworkBehaviour
 
         // Load currently held item. TODO see above.
         InventoryIO.LoadHolding(RealityName, Player.Local);
+
+        // Load furniture...
+        FurnitureIO.LoadFurniture(this);
 
         // No need to load tile layers, this is done all the time passively.
     }

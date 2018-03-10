@@ -111,6 +111,22 @@ public static class OutputUtils
         }
     }
 
+    public static string FurnitureSaveDirectory
+    {
+        get
+        {
+            return S + "Furniture" + S;
+        }
+    }
+
+    public static string FurnitureSaveFile
+    {
+        get
+        {
+            return "Placed Furniture.txt";
+        }
+    }
+
     public static string RealityMapDirectory
     {
         get
