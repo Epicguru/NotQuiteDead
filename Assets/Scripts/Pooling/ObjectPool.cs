@@ -7,14 +7,24 @@ using UnityEngine;
 public class ObjectPool : MonoBehaviour
 {
     private static Transform IdleParent;
-    private static Dictionary<PoolType, List<GameObject>> objects = new Dictionary<PoolType, List<GameObject>>();
-    private static StringBuilder builder = new StringBuilder();
+    private static Dictionary<PoolType, List<GameObject>> objects;
+    private static StringBuilder builder;
 
     public Transform idleParent;
 
-    public void Start()
+    public void Awake()
     {
         IdleParent = idleParent;
+        objects = new Dictionary<PoolType, List<GameObject>>();
+        builder = new StringBuilder();
+    }
+
+    public void OnDestroy()
+    {
+        IdleParent = null;
+        objects.Clear();
+        objects = null;
+        builder = null;
     }
 
     public static GameObject Instantiate(GameObject prefab, PoolType type)

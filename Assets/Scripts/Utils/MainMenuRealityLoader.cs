@@ -20,23 +20,26 @@ public class MainMenuRealityLoader : MonoBehaviour
     public void Start ()
 	{
         DontDestroyOnLoad(this.gameObject);
-        Debug.Log("Start, current scene is " + SceneManager.GetActiveScene().name);
 
         SceneManager.activeSceneChanged += SceneChange;
 	}
 
     public void SceneChange(Scene oldScene, Scene newScene)
     {
-        Debug.LogWarning("Scene change, scene is now " + newScene.name);
+        if (newScene.name != "Setup V2")
+            return;
 
         // Load reality if host...
         if (Host)
         {
-            Debug.Log("Loading '" + RealityName + "' as host...");
+            Debug.Log("Loading '" + RealityName + "' as host in '" + newScene.name + "'...");
 
             NetworkManager m = FindObjectOfType<NetworkManager>();
             if(m != null)
             {
+                m.StopClient();
+                NetworkTransport.Init();
+                NetworkServer.Reset();
                 m.networkPort = Port;
                 m.StartHost();
                 PostHost = true;
@@ -44,7 +47,7 @@ public class MainMenuRealityLoader : MonoBehaviour
             }
             else
             {
-                Debug.LogError("Could not find host, cannot start host!");
+                Debug.LogError("Could not find net manager, cannot start host!");
             }
         }
         else

@@ -12,6 +12,7 @@ public class StaticGear : MonoBehaviour
 
     public void Awake()
     {
+        GearUI.GearItems.Clear();
         Register(Hands);
         Register(Head);
         Register(Chest);
