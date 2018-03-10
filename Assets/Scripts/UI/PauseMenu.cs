@@ -66,22 +66,22 @@ public class PauseMenu : MonoBehaviour
 
         NetworkManager m = GameObject.FindObjectOfType<NetworkManager>();
 
-        // Shut down client.
-        if (m.IsClientConnected())
-        {
-            m.client.Disconnect();
-            m.client.Shutdown();
-            Debug.LogWarning("Shut down connected clients...");
-        }
-        // Stop server if it is running.
-        if (NetworkServer.active)
-        {
-            NetworkServer.DisconnectAll();
-            NetworkServer.Shutdown();
-            Debug.LogWarning("Shut down server...");
-        }
+        // Shut down all networking stuff.
+        m.StopClient();
+        m.StopHost();
+        m.StopMatchMaker();
+        Network.Disconnect();
 
         Destroy(m.gameObject);
-        SceneManager.LoadScene("Main Menu");
+        NetworkManager.Shutdown();
+        NetworkTransport.Shutdown();
+
+        SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
+        //Invoke("SwapScene", 1f);
+    }
+
+    public void SwapScene()
+    {        
+        SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
     }
 }

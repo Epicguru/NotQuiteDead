@@ -107,7 +107,6 @@ public class MainMenuRealityDetails : MonoBehaviour
                 f.LT.RealityName = RealityName.Trim();
                 f.LT.RealityDay = 0;
                 AsyncOperation ao = SceneManager.LoadSceneAsync("Setup V2", LoadSceneMode.Single);
-                ao.completed += f.LoadRealitySceneLoaded;
                 f.AO = ao;
             }
         }

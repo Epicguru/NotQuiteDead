@@ -37,10 +37,9 @@ public class MainMenuRealityLoader : MonoBehaviour
             NetworkManager m = FindObjectOfType<NetworkManager>();
             if(m != null)
             {
-                if (NetworkServer.active)
-                {
-                    NetworkServer.Shutdown();
-                }
+                m.StopClient();
+                NetworkTransport.Init();
+                NetworkServer.Reset();
                 m.networkPort = Port;
                 m.StartHost();
                 PostHost = true;
@@ -48,7 +47,7 @@ public class MainMenuRealityLoader : MonoBehaviour
             }
             else
             {
-                Debug.LogError("Could not find host, cannot start host!");
+                Debug.LogError("Could not find net manager, cannot start host!");
             }
         }
         else

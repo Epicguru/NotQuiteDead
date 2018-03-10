@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
@@ -30,12 +33,10 @@ public class MainMenuFunctions : MonoBehaviour
     public void QuitGame()
     {
         Application.Quit();
-    }
 
-    public void LoadRealitySceneLoaded(AsyncOperation ao)
-    {
-        Debug.Log("Scene loaded, starting host...");
-        AO = null;
+#if UNITY_EDITOR
+        EditorApplication.isPlaying = false;
+#endif
     }
 
     public void Update()
