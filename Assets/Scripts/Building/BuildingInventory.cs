@@ -86,6 +86,16 @@ public class BuildingInventory : NetworkBehaviour
         return this.items.Values;
     }
 
+    public void SetItems(BuildingItem[] items)
+    {
+        this.items = new Dictionary<string, BuildingItem>();
+        foreach (var item in items)
+        {
+            if(item != null)
+                this.items.Add(item.Prefab, item);
+        }
+    }
+
     private void OnDestroy()
     {
         items.Clear();

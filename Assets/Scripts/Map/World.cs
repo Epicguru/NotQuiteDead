@@ -50,6 +50,9 @@ public class World : NetworkBehaviour
         // Save placed furniture...
         FurnitureIO.SaveFurniture(RealityName, Furniture.GetAllFurniture());
 
+        // Save the building inventory...
+        BuildingIO.SaveBuildingInventory(RealityName, Player.Local);
+
         // Save the world state to file.
         WorldIO.SaveWorldState(this);
     }
@@ -81,6 +84,9 @@ public class World : NetworkBehaviour
 
         // Load furniture...
         FurnitureIO.LoadFurniture(this);
+
+        // Load player building inventory...
+        BuildingIO.LoadBuildingInventory(RealityName, Player.Local);
 
         // No need to load tile layers, this is done all the time passively.
     }

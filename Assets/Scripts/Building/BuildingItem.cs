@@ -10,6 +10,11 @@ public class BuildingItem
     public string Prefab; // For both tiles and furnitures.
     public int Count; // Since this is within an inventory, how many do we have?
 
+    public BuildingItem()
+    {
+
+    }
+
     public BuildingItem(BaseTile tile, int count)
     {
         Type = BuildingItemType.TILE;

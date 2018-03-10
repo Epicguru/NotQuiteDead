@@ -55,6 +55,30 @@ public static class OutputUtils
         }
     }
 
+    public static string BuildingInventorySaveDirectory
+    {
+        get
+        {
+            return S + "Building Inventory" + S;
+        }
+    }
+
+    public static string BuildingInventorySaveFile
+    {
+        get
+        {
+            return BuildingInventorySaveDirectory + "Inventory.txt";
+        }
+    }
+
+    public static string BuildingInventoryHotbarSaveFile
+    {
+        get
+        {
+            return BuildingInventorySaveDirectory + "Hotbar.txt";
+        }
+    }
+
     public static string HeldItemSaveFile
     {
         get
