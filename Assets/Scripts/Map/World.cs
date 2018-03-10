@@ -25,6 +25,9 @@ public class World : NetworkBehaviour
     [Server]
     public void Save()
     {
+        if (!isServer)
+            return;
+
         // Save all tile layers to file.
         TileMap.SaveAll();
 
@@ -54,6 +57,9 @@ public class World : NetworkBehaviour
     [Server]
     public void Load()
     {
+        if (!isServer)
+            return;
+
         // Load world state from file.
         WorldIO.LoadWorldState(this);
 
@@ -102,21 +108,5 @@ public class World : NetworkBehaviour
     {
         //Instance = null;
         Pawn.Dispose();
-    }
-
-    public void Update()
-    {
-        if (isServer)
-        {
-            if (Input.GetKeyDown(KeyCode.Y))
-            {
-                Save();
-            }
-
-            if (Input.GetKeyDown(KeyCode.U))
-            {
-                Load();
-            }
-        }
     }
 }
