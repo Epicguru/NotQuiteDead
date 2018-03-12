@@ -14,6 +14,6 @@ public class LanguageSelectItemUI : MonoBehaviour
 	
 	public void Selected()
     {
-        Debug.Log("Clicked on language " + Language);
+        Debug.Log("Clicked on language '" + Language + "'");
     }
 }
