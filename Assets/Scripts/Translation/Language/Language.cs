@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
+[JsonObject(MemberSerialization = MemberSerialization.OptOut)]
 public class Language
 {
     [Header("Basic")]
@@ -11,6 +14,7 @@ public class Language
     [Header("Info")]
     public string[] Authors;
 
+    [JsonIgnore]
     public bool IsLoaded
     {
         get

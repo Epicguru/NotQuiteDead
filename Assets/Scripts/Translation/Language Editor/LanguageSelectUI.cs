@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,6 +14,11 @@ public class LanguageSelectUI : MonoBehaviour
     public List<string> InvalidStrings = new List<string>();
 
     private List<GameObject> spawned = new List<GameObject>();
+
+    public void Start()
+    {
+        SpawnFromFolderContents();
+    }
 
     public void DestroySpawned()
     {
@@ -51,6 +57,36 @@ public class LanguageSelectUI : MonoBehaviour
         }
 
         return null;
+    }
+
+    public void NewButtonPressed()
+    {
+        if(IsValidLangName(NewLangIn.text) == null)
+        {
+            string name = NewLangIn.text;
+            NewLangIn.text = "";
+
+            // Add new empty language file.
+            var lang = new Language();
+            lang.Name = name;
+
+            LanguageIO.SaveLanguage(lang);
+
+            Debug.Log("Added new language '" + name + "'");
+            SpawnFromFolderContents();
+        }
+    }
+
+    public void SpawnFromFolderContents()
+    {
+        string[] files = Directory.GetFiles(LanguageIO.LanguageFolder);
+
+        for (int i = 0; i < files.Length; i++)
+        {
+            files[i] = Path.GetFileNameWithoutExtension(files[i]);
+        }
+
+        SpawnAll(files);
     }
 
     public void Update()
