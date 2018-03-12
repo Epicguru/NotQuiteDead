@@ -23,6 +23,7 @@ public class Language
         }
     }
 
+    [JsonProperty]
     private Dictionary<string, string> data;
 
     public virtual string GetDefault(string key)

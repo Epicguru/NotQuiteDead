@@ -3,16 +3,17 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LanguageDefinition
+[CreateAssetMenu(fileName = "Language Definition", order = 3)]
+public class LanguageDefinition : ScriptableObject
 {
     public List<LangDefParam> Data = new List<LangDefParam>();
 }
 
 [Serializable]
-public struct LangDefParam
+public class LangDefParam
 {
     public string Key;
-    public int Params;
+    public string[] Params;
     [TextArea(2, 10)]
     public string Desription;
 }

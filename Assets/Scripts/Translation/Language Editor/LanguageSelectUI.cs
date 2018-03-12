@@ -17,6 +17,10 @@ public class LanguageSelectUI : MonoBehaviour
 
     public void Start()
     {
+        foreach (var c in Path.GetInvalidFileNameChars())
+        {
+            InvalidStrings.Add(c.ToString());
+        }
         SpawnFromFolderContents();
     }
 
@@ -81,12 +85,17 @@ public class LanguageSelectUI : MonoBehaviour
     {
         string[] files = Directory.GetFiles(LanguageIO.LanguageFolder);
 
-        for (int i = 0; i < files.Length; i++)
+        List<string> processed = new List<string>();
+
+        foreach (string file in files)
         {
-            files[i] = Path.GetFileNameWithoutExtension(files[i]);
+            if(Path.GetExtension(file) == ".txt")
+            {
+                processed.Add(Path.GetFileNameWithoutExtension(file));
+            }
         }
 
-        SpawnAll(files);
+        SpawnAll(processed.ToArray());
     }
 
     public void Update()
