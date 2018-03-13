@@ -7,7 +7,7 @@
     "ButtonLabel": "Some crazy text that will never be seen!",
     "ThingWithParams": "Jugador {0} mato a {1} usando {2}! Que salseo!",
     "Advanced Suppressor_Desc": "Some pinche pendejo stuff.",
-    "Eagle Eye_Desc": "<UD>",
+    "Eagle Eye_Desc": "El 'Eagle Eye' es una optica para fusiles de francotirador que incrementa la distancia maxima de tiro y aumenta la precision a larga distancia.",
     "Extended Barrel_Desc": "<UD>",
     "Extended Magazine_Desc": "<UD>",
     "Foregrip_Desc": "<UD>",
@@ -54,10 +54,10 @@
     "Tactical Pistol_Desc": "<UD>",
     "TSMG_Desc": "<UD>",
     "TAQ-18_Desc": "<UD>",
-    "XS22_Desc": "<UD>",
-    "Butterfly_Desc": "<UD>",
-    "Katana_Desc": "<UD>",
-    "Long Bow_Desc": "<UD>",
-    "Frag Grenade_Desc": "<UD>"
+    "XS22_Desc": "t",
+    "Butterfly_Desc": "d Some crazy stuff.",
+    "Katana_Desc": "s",
+    "Long Bow_Desc": "a",
+    "Frag Grenade_Desc": "a"
   }
 }

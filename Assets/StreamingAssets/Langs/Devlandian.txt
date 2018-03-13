@@ -47,7 +47,7 @@
     "Ol Wooden_Desc": "<UD>",
     "OMB_Desc": "<UD>",
     "Potshot 57_Desc": "<UD>",
-    "Quaternion_Desc": "<UD>",
+    "Quaternion_Desc": "El quaternion es un subfusil que hace lo que hacen todas las otras pistolas en este juego.",
     "Sandsweeper_Desc": "<UD>",
     "Super Nova_Desc": "<UD>",
     "TAR_Desc": "<UD>",

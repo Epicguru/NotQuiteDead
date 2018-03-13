@@ -56,8 +56,8 @@
     "TAQ-18_Desc": "<UD>",
     "XS22_Desc": "<UD>",
     "Butterfly_Desc": "<UD>",
-    "Katana_Desc": "<UD>",
-    "Long Bow_Desc": "<UD>",
-    "Frag Grenade_Desc": "<UD>"
+    "Katana_Desc": "saddsa",
+    "Long Bow_Desc": "asd",
+    "Frag Grenade_Desc": "sad"
   }
 }
