@@ -7,6 +7,8 @@ using UnityEngine;
 [JsonObject(MemberSerialization = MemberSerialization.OptOut)]
 public class Language
 {
+    public const string IS_DEFAULT_VALUE = "<UD>";
+
     [Header("Basic")]
     public string Name;
     public string NativeName;
@@ -19,12 +21,13 @@ public class Language
     {
         get
         {
-            return data != null && data.Count != 0;
+            return Data != null && Data.Count != 0;
         }
     }
 
     [JsonProperty]
-    private Dictionary<string, string> data;
+    [HideInInspector]
+    public Dictionary<string, string> Data;
 
     public virtual string GetDefault(string key)
     {
@@ -38,7 +41,7 @@ public class Language
             return false;
         }
 
-        if (!data.ContainsKey(key))
+        if (!Data.ContainsKey(key))
         {
             return false;
         }
@@ -48,12 +51,16 @@ public class Language
 
     public bool KeyIsTranslated(string key)
     {
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            return false;
+        }
         if (!ContainsKey(key))
         {
             return false;
         }
 
-        string raw = data[key];
+        string raw = Data[key];
 
         if (string.IsNullOrWhiteSpace(raw))
         {
@@ -61,8 +68,33 @@ public class Language
         }
         else
         {
-            return true;
+            if(raw.Trim() == IS_DEFAULT_VALUE)
+            {
+                return false;
+            }
+            else
+            {
+                return !IsDefaultLang(key);
+            }
         }
+    }
+
+    public bool IsDefaultLang(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            return false;
+        }
+        if (!ContainsKey(key))
+        {
+            return false;
+        }
+        string raw = Data[key];
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return false;
+        }
+        return raw.Trim() == IS_DEFAULT_VALUE;
     }
 
     public virtual string TryTranslate(string key, params object[] args)
@@ -87,7 +119,7 @@ public class Language
 
         try
         {
-            string raw = data[key];
+            string raw = Data[key];
 
             if(raw == null)
             {

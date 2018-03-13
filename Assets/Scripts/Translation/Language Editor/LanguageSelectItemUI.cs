@@ -15,5 +15,6 @@ public class LanguageSelectItemUI : MonoBehaviour
 	public void Selected()
     {
         Debug.Log("Clicked on language '" + Language + "'");
+        GetComponentInParent<LanguageSelectUI>().LanguageClicked(Language);
     }
 }

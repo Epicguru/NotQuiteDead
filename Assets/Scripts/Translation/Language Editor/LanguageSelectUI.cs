@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class LanguageSelectUI : MonoBehaviour
 {
+    public CurrentLanguageUI CurrentLang;
     public RectTransform Content;
     public LanguageSelectItemUI Prefab;
     public InputField NewLangIn;
@@ -22,6 +23,17 @@ public class LanguageSelectUI : MonoBehaviour
             InvalidStrings.Add(c.ToString());
         }
         SpawnFromFolderContents();
+    }
+
+    public void LanguageClicked(string lang)
+    {
+        LanguageDefinition def = new LanguageDefinition();
+        def.Data.Add("SomeMenuThing", new LangDefParam() { Key = "SomeMenuThing", Desription = "Some menu botton that you really need to translate!" });
+        def.Data.Add("ButtonLabel", new LangDefParam() { Key = "ButtonLabel", Desription = "Another botton that you really need to translate!" });
+        def.Data.Add("ThingWithParams", new LangDefParam() { Key = "ThingWithParams", Desription = "Oooh! This one has params!", Params = new string[] { "Player Name", "Item Name" } });
+        Language loaded = LanguageIO.LoadLanguage(lang);
+
+        CurrentLang.SpawnAll(def, loaded);
     }
 
     public void DestroySpawned()

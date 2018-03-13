@@ -25,6 +25,7 @@ public class LanguageItemUI : MonoBehaviour
     public Toggle UseDefaultToggle;
     public Text KeyText;
     public Image Background;
+    public Text StateText;
 
     private float timer;
 	
@@ -74,26 +75,36 @@ public class LanguageItemUI : MonoBehaviour
         // Warning is if the default value is used or if the value is undefined.
         bool warning = UseDefaultToggle.isOn || !Def.ContainsKey(Key);
 
+        StateText.text = "---";
+
         if (missing)
         {
             Background.color = NotTranslated;
+            StateText.text = "No value saved!";
         }
         else
         {
             if (warning)
             {
                 Background.color = Warning;
+                if(UseDefaultToggle.isOn)
+                    StateText.text = "Uses default language!";
+                else
+                    StateText.text = "This key is not defined in the game!";
+
             }
             else
             {
                 if (translated)
                 {
                     Background.color = Translated;
+                    StateText.text = "Translated!";
                 }
                 else
                 {
                     // Wut?
                     Debug.LogError("Language item '" + Key + "' is not missing, not default, and not translated!?!?!");
+                    StateText.text = "!!State error!!";
                 }
             }
         }
