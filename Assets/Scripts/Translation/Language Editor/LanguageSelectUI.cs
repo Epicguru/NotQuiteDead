@@ -31,6 +31,21 @@ public class LanguageSelectUI : MonoBehaviour
         def.Data.Add("SomeMenuThing", new LangDefParam() { Key = "SomeMenuThing", Desription = "Some menu botton that you really need to translate!" });
         def.Data.Add("ButtonLabel", new LangDefParam() { Key = "ButtonLabel", Desription = "Another botton that you really need to translate!" });
         def.Data.Add("ThingWithParams", new LangDefParam() { Key = "ThingWithParams", Desription = "Oooh! This one has params!", Params = new string[] { "Player Name", "Item Name" } });
+
+        if(Item.Items == null)
+        {
+            Item.LoadItems();
+        }
+
+        foreach (var item in Item.Items.Values)
+        {
+            string key = item.Prefab + "_Desc";
+            LangDefParam p = new LangDefParam();
+            p.Key = key;
+            p.Desription = "The description of this item. Please copy from English as accurately as possible but remove parts that have no logical translation into the target language.";
+            def.Data.Add(key, p);
+        }
+
         Language loaded = LanguageIO.LoadLanguage(lang);
 
         CurrentLang.SpawnAll(def, loaded);

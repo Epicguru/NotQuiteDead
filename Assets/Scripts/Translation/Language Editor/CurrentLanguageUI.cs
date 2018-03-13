@@ -1,15 +1,19 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CurrentLanguageUI : MonoBehaviour
 {
     public Transform Content;
     public LanguageItemUI Prefab;
+    public InputField FilterInput;
 
+    [HideInInspector]
     public Language CurrentLang;
+    [HideInInspector]
     public LanguageDefinition CurrentDef;
 
-    private List<GameObject> spawned = new List<GameObject>();
+    private List<LanguageItemUI> spawned = new List<LanguageItemUI>();
 
     public void SavePressed()
     {
@@ -100,7 +104,7 @@ public class CurrentLanguageUI : MonoBehaviour
                 }
             }
 
-            spawned.Add(item.gameObject);
+            spawned.Add(item);
         }
 
         // Spawn all items within the language that are not defined but are present.
@@ -114,17 +118,41 @@ public class CurrentLanguageUI : MonoBehaviour
                 item.Lang = lang;
                 item.Def = def;
                 item.ValueInput.text = present.Value;
-                spawned.Add(item.gameObject);
+                spawned.Add(item);
             }
   
         }
     }
 
+    public void Update()
+    {
+        Filter(FilterInput.text);
+    }
+
+    public void Filter(string filter)
+    {
+        filter = filter.ToLower().Trim();
+        bool allActive = string.IsNullOrWhiteSpace(filter);
+        foreach (var item in spawned)
+        {
+            if (allActive || item.Key.ToLower().Contains(filter))
+            {
+                if(!item.gameObject.activeSelf)
+                    item.gameObject.SetActive(true);
+            }
+            else
+            {
+                if (item.gameObject.activeSelf)
+                    item.gameObject.SetActive(false);
+            }
+        }
+    }
+
     public void DestroySpawned()
     {
-        foreach (var go in spawned)
+        foreach (var item in spawned)
         {
-            Destroy(go);
+            Destroy(item.gameObject);
         }
         spawned.Clear();
     }

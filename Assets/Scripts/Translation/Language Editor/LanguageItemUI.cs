@@ -88,15 +88,23 @@ public class LanguageItemUI : MonoBehaviour
             {
                 Background.color = Warning;
                 if(UseDefaultToggle.isOn)
-                    StateText.text = "Uses default language!";
+                    StateText.text = "Uses default language";
                 else
-                    StateText.text = "This key is not defined in the game!";
+                    StateText.text = "This key is not defined in the game";
 
             }
             else
             {
-                Background.color = Translated;
-                StateText.text = "Translated!";
+                if (string.IsNullOrWhiteSpace(ValueInput.text))
+                {
+                    Background.color = NotTranslated;
+                    StateText.text = "No translated string. Type something!";
+                }
+                else
+                {
+                    Background.color = Translated;
+                    StateText.text = "Translated";
+                }
             }
         }
     }
