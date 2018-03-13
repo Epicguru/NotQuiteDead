@@ -80,7 +80,7 @@ public class LanguageItemUI : MonoBehaviour
         if (missing)
         {
             Background.color = NotTranslated;
-            StateText.text = "No value saved!";
+            StateText.text = "Not saved!";
         }
         else
         {
@@ -95,17 +95,8 @@ public class LanguageItemUI : MonoBehaviour
             }
             else
             {
-                if (translated)
-                {
-                    Background.color = Translated;
-                    StateText.text = "Translated!";
-                }
-                else
-                {
-                    // Wut?
-                    Debug.LogError("Language item '" + Key + "' is not missing, not default, and not translated!?!?!");
-                    StateText.text = "!!State error!!";
-                }
+                Background.color = Translated;
+                StateText.text = "Translated!";
             }
         }
     }

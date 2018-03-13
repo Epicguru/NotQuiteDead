@@ -2,5 +2,9 @@
   "Name": "English",
   "NativeName": null,
   "Authors": null,
-  "data": null
+  "Data": {
+    "SomeMenuThing": "Join Game",
+    "ButtonLabel": "Exit Game",
+    "ThingWithParams": "Player {0} killed player {1} with a {2}! What a scandal!"
+  }
 }

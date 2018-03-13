@@ -94,7 +94,7 @@ public class Language
         {
             return false;
         }
-        return raw.Trim() == IS_DEFAULT_VALUE;
+        return raw.TrimStart().StartsWith(IS_DEFAULT_VALUE);
     }
 
     public virtual string TryTranslate(string key, params object[] args)

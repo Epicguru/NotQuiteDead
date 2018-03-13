@@ -17,11 +17,8 @@ public class CurrentLanguageUI : MonoBehaviour
         {
             return;
         }
-        if(CurrentLang.IsLoaded == false)
-        {
-            return;
-        }
 
+        Debug.Log("Saving '" + CurrentLang.ToString() + "'");
         ApplyStateToLang();
         LanguageIO.SaveLanguage(CurrentLang);
     }
@@ -45,7 +42,7 @@ public class CurrentLanguageUI : MonoBehaviour
         foreach (var go in spawned)
         {
             LanguageItemUI item = go.GetComponent<LanguageItemUI>();
-            string value = item.UseDefaultToggle.isOn ? Language.IS_DEFAULT_VALUE : item.ValueInput.text.Trim();
+            string value = item.UseDefaultToggle.isOn ? (Language.IS_DEFAULT_VALUE + item.ValueInput.text.Trim()) : item.ValueInput.text.Trim();
             if (!CurrentLang.ContainsKey(item.Key))
             {
                 CurrentLang.Data.Add(item.Key, value);
@@ -82,6 +79,7 @@ public class CurrentLanguageUI : MonoBehaviour
             {
                 // The language does not contain a value for this definition key, set it to be default language version.
                 item.UseDefaultToggle.isOn = true;
+                Debug.Log("Setting up missing key '" + defined.Key + "' in lang '" + lang.ToString() + "'");
             }
             else
             {
@@ -90,6 +88,8 @@ public class CurrentLanguageUI : MonoBehaviour
                 {
                     // This is a default translation! Toggle!
                     item.UseDefaultToggle.isOn = true;
+                    // Extract the text that is written, even though it will never be seen in-game...
+                    item.ValueInput.text = lang.Data[defined.Key].Replace(Language.IS_DEFAULT_VALUE, "").Trim();
                 }
                 else
                 {

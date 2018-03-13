@@ -1,6 +1,10 @@
 {
   "Name": "Spanish",
-  "NativeName": null,
-  "Authors": null,
-  "data": null
+  "NativeName": "",
+  "Authors": [],
+  "Data": {
+    "SomeMenuThing": "<UD>",
+    "ButtonLabel": "Some crazy text that will never be seen!",
+    "ThingWithParams": "Jugador {0} mato a {1} usando {2}! Que salseo!"
+  }
 }
