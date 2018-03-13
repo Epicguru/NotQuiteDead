@@ -46,6 +46,25 @@ public class Language
         return true;
     }
 
+    public bool KeyIsTranslated(string key)
+    {
+        if (!ContainsKey(key))
+        {
+            return false;
+        }
+
+        string raw = data[key];
+
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     public virtual string TryTranslate(string key, params object[] args)
     {
         if (string.IsNullOrWhiteSpace(key))
