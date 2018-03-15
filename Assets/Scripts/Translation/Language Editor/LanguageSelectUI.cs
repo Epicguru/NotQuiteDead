@@ -59,7 +59,7 @@ public class LanguageSelectUI : MonoBehaviour
         // Load language
         Language loaded = LanguageIO.LoadLanguage(lang);
 
-        CurrentLang.SavePressed();l
+        CurrentLang.SavePressed();
         CurrentLang.SpawnAll(def, loaded);
     }
 

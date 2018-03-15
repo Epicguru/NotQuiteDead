@@ -25,13 +25,29 @@ public class Language
         }
     }
 
+    [JsonIgnore]
+    public bool IsDefault
+    {
+        get
+        {
+            return Name == Translation.DefaultLanguageName;
+        }
+    }
+
     [JsonProperty]
     [HideInInspector]
     public Dictionary<string, string> Data;
 
-    public virtual string GetDefault(string key)
+    public virtual string GetDefault(string key, object[] args)
     {
-        return '<' + (key == null ? "null" : key) + '>';
+        if (IsDefault)
+        {
+            return "Unimplemented <" + (key == null ? "null" : key) + '>';
+        }
+        else
+        {
+            return Translation.DefaultLanguage.TryTranslate(key, args);
+        }
     }
 
     public bool ContainsKey(string key)
@@ -102,19 +118,19 @@ public class Language
         if (string.IsNullOrWhiteSpace(key))
         {
             Debug.LogError("Null or blank key used in language translate request.");
-            return GetDefault(null);
+            return GetDefault(null, args);
         }
         key = key.Trim();
         if (!IsLoaded)
         {
             Debug.LogError("Language '" + this + "' is not loaded, cannot translate '" + key + "'.");
-            return GetDefault(key);
+            return GetDefault(key, args);
         }
 
         if (ContainsKey(key))
         {
             Debug.LogWarning("No translation offered for '" + key + "' in '" + this + "'");
-            return GetDefault(key);
+            return GetDefault(key, args);
         }
 
         try
@@ -124,7 +140,7 @@ public class Language
             if(raw == null)
             {
                 Debug.LogWarning("No translation offered for '" + key + "' in '" + this + "'");
-                return GetDefault(key);
+                return GetDefault(key, args);
             }
             else
             {
@@ -146,7 +162,7 @@ public class Language
         {
             Debug.LogWarning("Exception translating '" + key + "' to '" + this + "'.");
             Debug.LogWarning(e);
-            return GetDefault(key);
+            return GetDefault(key, args);
         }
     }
 
