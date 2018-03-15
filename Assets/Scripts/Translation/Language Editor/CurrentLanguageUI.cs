@@ -8,20 +8,78 @@ public class CurrentLanguageUI : MonoBehaviour
     public LanguageItemUI Prefab;
     public InputField FilterInput;
 
+    public Toggle ShowTranslated;
+    public Toggle ShowUndefined;
+
+    public Button SaveButton;
+    public Button DetailsButton;
+
+    public InputField NativeNameInput;
+    public InputField AuthorsNamesInput;
+
+    public GameObject DetailsView;
+
     [HideInInspector]
-    public Language CurrentLang;
+    public Language CurrentLang
+    {
+        get
+        {
+            return _CurrentLang;
+        }
+        set
+        {
+            _CurrentLang = value;
+            //Debug.Log("SET TO '" + _CurrentLang + "'");
+        }
+    }
+    private Language _CurrentLang;
     [HideInInspector]
-    public LanguageDefinition CurrentDef;
+    public LanguageDefinition CurrentDef = null;
 
     private List<LanguageItemUI> spawned = new List<LanguageItemUI>();
+
+    public void OnDestroy()
+    {
+        SavePressed();
+    }
+
+    public void LangChange(Language newLang)
+    {
+        DetailsView.SetActive(false);
+        NativeNameInput.text = newLang.NativeName == null ? "" : newLang.NativeName.Trim();
+        string s = "";
+        if (newLang.Authors != null)
+        {
+            for (int i = 0; i < newLang.Authors.Length; i++)
+            {
+                string name = newLang.Authors[i] == null ? "" : newLang.Authors[i].Trim();
+                string sep = ",\n";
+                if (i == newLang.Authors.Length - 1)
+                    sep = "";
+
+                s += name + sep;
+            }
+        }
+        AuthorsNamesInput.text = s;
+    }
+
+    public void DetailsButtonPressed()
+    {
+        DetailsView.SetActive(true);
+    }
+
+    public void QuitButtonPressed()
+    {
+        DetailsView.SetActive(false);
+    }
 
     public void SavePressed()
     {
         if(CurrentLang == null)        
             return;        
 
-        Debug.Log("Saving '" + CurrentLang.ToString() + "'");
         ApplyStateToLang();
+        Debug.Log("Saving '" + CurrentLang.ToString() + "'");
         LanguageIO.SaveLanguage(CurrentLang);
     }
 
@@ -50,6 +108,14 @@ public class CurrentLanguageUI : MonoBehaviour
                 CurrentLang.Data.Add(item.Key, value);
             }
         }
+
+        CurrentLang.NativeName = NativeNameInput.text.Trim();
+        string[] array = AuthorsNamesInput.text.Trim().Replace("\n", "").Split(',');
+        for (int i = 0; i < array.Length; i++)
+        {
+            array[i] = array[i].Trim();
+        }
+        CurrentLang.Authors = array;
     }
 
     public void SpawnAll(LanguageDefinition def, Language lang)
@@ -126,6 +192,9 @@ public class CurrentLanguageUI : MonoBehaviour
     public void Update()
     {
         Filter(FilterInput.text);
+
+        DetailsButton.interactable = CurrentLang != null;
+        SaveButton.interactable = CurrentLang != null;
     }
 
     public void Filter(string filter)
@@ -134,17 +203,36 @@ public class CurrentLanguageUI : MonoBehaviour
         bool allActive = string.IsNullOrWhiteSpace(filter);
         foreach (var item in spawned)
         {
-            if (allActive || item.Key.ToLower().Contains(filter))
+            bool f = allActive || item.Key.ToLower().Contains(filter);
+            bool ops = ShouldShow(item);
+            bool show = f && ops;
+
+            if(item.gameObject.activeSelf != show)
+                item.gameObject.SetActive(show);
+        }
+    }
+
+    public bool ShouldShow(LanguageItemUI item)
+    {
+        if(!ShowTranslated.isOn)
+        {
+            if (item.IsTranslated())
             {
-                if(!item.gameObject.activeSelf)
-                    item.gameObject.SetActive(true);
-            }
-            else
-            {
-                if (item.gameObject.activeSelf)
-                    item.gameObject.SetActive(false);
+                if (!item.ValueInput.isFocused)
+                {
+                    return false;
+                }
             }
         }
+        if (!ShowUndefined.isOn)
+        {
+            if (item.IsUndefined())
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public void DestroySpawned()

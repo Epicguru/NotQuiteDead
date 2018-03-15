@@ -74,7 +74,7 @@ public class LanguageItemUI : MonoBehaviour
         bool missing = !Lang.ContainsKey(Key);
 
         // Warning is if the default value is used or if the value is undefined.
-        bool warning = UseDefaultToggle.isOn || !Def.ContainsKey(Key);
+        bool warning = UseDefaultToggle.isOn || IsUndefined();
 
         StateText.text = "---";
 
@@ -112,5 +112,20 @@ public class LanguageItemUI : MonoBehaviour
                 }
             }
         }
+    }
+
+    public bool IsTranslated()
+    {
+        bool undef = IsUndefined();
+        bool typedSomething = !string.IsNullOrWhiteSpace(ValueInput.text);
+        bool isDefault = UseDefaultToggle.isOn;
+        bool missing = !Lang.ContainsKey(Key);
+
+        return !undef && typedSomething && !isDefault && !missing;
+    }
+
+    public bool IsUndefined()
+    {
+        return !Def.ContainsKey(Key);
     }
 }

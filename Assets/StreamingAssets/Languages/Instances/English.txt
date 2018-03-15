@@ -1,9 +1,12 @@
 {
   "Name": "English",
-  "NativeName": null,
-  "Authors": null,
+  "NativeName": "English",
+  "Authors": [
+    "Epicguru (James B)"
+  ],
   "Data": {
     "MainMenu_Join": "Join Reality",
+    "MainMenu_Create": "<UD>",
     "Advanced Suppressor_Desc": "<UD>",
     "Advanced Suppressor_Name": "<UD>",
     "Eagle Eye_Desc": "<UD>",
@@ -106,9 +109,9 @@
     "Butterfly_Name": "Butterfly Knife",
     "Katana_Desc": "<UD>",
     "Katana_Name": "Katana",
-    "Long Bow_Desc": "<UD>",
+    "Long Bow_Desc": "asdasd",
     "Long Bow_Name": "Long Bow",
-    "Frag Grenade_Desc": "<UD>",
+    "Frag Grenade_Desc": "asdasdasd",
     "Frag Grenade_Name": "Frag Grenade",
     "LockedThing": "",
     "SomeNewKey": "",
