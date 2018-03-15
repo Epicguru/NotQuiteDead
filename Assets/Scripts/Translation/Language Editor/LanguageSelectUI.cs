@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,27 +28,38 @@ public class LanguageSelectUI : MonoBehaviour
 
     public void LanguageClicked(string lang)
     {
-        LanguageDefinition def = new LanguageDefinition();
-        def.Data.Add("SomeMenuThing", new LangDefParam() { Key = "SomeMenuThing", Desription = "Some menu botton that you really need to translate!" });
-        def.Data.Add("ButtonLabel", new LangDefParam() { Key = "ButtonLabel", Desription = "Another botton that you really need to translate!" });
-        def.Data.Add("ThingWithParams", new LangDefParam() { Key = "ThingWithParams", Desription = "Oooh! This one has params!", Params = new string[] { "Player Name", "Item Name" } });
+        LanguageDefinition def = LanguageDefinition.Core;
 
-        if(Item.Items == null)
-        {
-            Item.LoadItems();
-        }
-
+        // Auto generate item name and description definitions.
+        if (Item.Items == null)        
+            Item.LoadItems();        
         foreach (var item in Item.Items.Values)
         {
+            // Descriptions.
             string key = item.Prefab + "_Desc";
-            LangDefParam p = new LangDefParam();
-            p.Key = key;
-            p.Desription = "The description of this item. Please copy from English as accurately as possible but remove parts that have no logical translation into the target language.";
-            def.Data.Add(key, p);
+            if (!def.ContainsKey(key))
+            {
+                LangDefParam p = new LangDefParam();
+                p.Key = key;
+                p.Desription = "The description of the '" + item.Prefab + "' item. Please copy from English as accurately as possible.";
+                def.Data.Add(key, p);
+            }
+
+            // Names
+            key = item.Prefab + "_Name";
+            if (!def.ContainsKey(key))
+            {
+                LangDefParam p = new LangDefParam();
+                p.Key = key;
+                p.Desription = "The display name of the '" + item.Prefab + "' item.";
+                def.Data.Add(key, p);
+            }
         }
 
+        // Load language
         Language loaded = LanguageIO.LoadLanguage(lang);
 
+        CurrentLang.SavePressed();l
         CurrentLang.SpawnAll(def, loaded);
     }
 

@@ -17,10 +17,8 @@ public class CurrentLanguageUI : MonoBehaviour
 
     public void SavePressed()
     {
-        if(CurrentLang == null)
-        {
-            return;
-        }
+        if(CurrentLang == null)        
+            return;        
 
         Debug.Log("Saving '" + CurrentLang.ToString() + "'");
         ApplyStateToLang();
@@ -117,7 +115,8 @@ public class CurrentLanguageUI : MonoBehaviour
                 item.Key = present.Key;
                 item.Lang = lang;
                 item.Def = def;
-                item.ValueInput.text = present.Value;
+                item.UseDefaultToggle.isOn = false;
+                item.ValueInput.text = present.Value.Replace(Language.IS_DEFAULT_VALUE, "");
                 spawned.Add(item);
             }
   

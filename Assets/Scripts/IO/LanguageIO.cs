@@ -24,6 +24,11 @@ public static class LanguageIO
         return LanguageFolder + langName + ".txt";
     }
 
+    public static string GetDefinitionPath(string defName)
+    {
+        return LanguageDefinitionFolder + defName + ".txt";
+    }
+
     public static void SaveLanguage(Language lang)
     {
         if (lang == null)
@@ -37,5 +42,20 @@ public static class LanguageIO
     public static Language LoadLanguage(string name)
     {
         return InputUtils.FileToObject<Language>(GetLanguagePath(name));
+    }
+
+    public static void SaveDefinition(LanguageDefinition def)
+    {
+        if (def == null)
+            return;
+
+        string path = GetDefinitionPath(def.Name);
+
+        OutputUtils.ObjectToFile(def, path);
+    }
+
+    public static LanguageDefinition LoadDefinition(string name)
+    {
+        return InputUtils.FileToObject<LanguageDefinition>(GetDefinitionPath(name));
     }
 }

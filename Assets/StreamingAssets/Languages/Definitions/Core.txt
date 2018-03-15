@@ -1,0 +1,21 @@
+{
+  "Name": "Core",
+  "Data": {
+    "MainMenu_Join": {
+      "Key": "MainMenu_Join",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Join' button on the main menu.",
+      "Locked": true
+    },
+    "MainMenu_Create": {
+      "Key": "MainMenu_Create",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Create' button on the main menu.",
+      "Locked": true
+    }
+  }
+}

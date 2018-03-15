@@ -1,10 +1,22 @@
 ﻿
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[JsonObject(MemberSerialization = MemberSerialization.OptOut)]
 public class LanguageDefinition
 {
+    public static LanguageDefinition Core
+    {
+        get
+        {
+            return LanguageIO.LoadDefinition("Core");
+        }
+    }
+
+    public string Name;
+
     public Dictionary<string, LangDefParam> Data = new Dictionary<string, LangDefParam>();
 
     public bool ContainsKey(string key)
@@ -43,4 +55,5 @@ public class LangDefParam
     public string[] Params;
     [TextArea(2, 10)]
     public string Desription;
+    public bool Locked;
 }

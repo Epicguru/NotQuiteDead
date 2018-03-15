@@ -18,6 +18,7 @@ public class LanguageItemUI : MonoBehaviour
     public Color Translated = Color.green;
     public Color NotTranslated = Color.red;
     public Color Warning = Color.yellow;
+    public Color Undefined = Color.grey;
 
     [Header("References")]
     public InputField ValueInput;
@@ -86,12 +87,16 @@ public class LanguageItemUI : MonoBehaviour
         {
             if (warning)
             {
-                Background.color = Warning;
-                if(UseDefaultToggle.isOn)
+                if (UseDefaultToggle.isOn)
+                {
+                    Background.color = Warning;
                     StateText.text = "Uses default language";
+                }
                 else
+                {
+                    Background.color = Undefined;
                     StateText.text = "This key is not defined in the game";
-
+                }
             }
             else
             {
