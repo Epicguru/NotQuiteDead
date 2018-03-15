@@ -1,5 +1,6 @@
 ﻿
 using UnityEngine;
+using UnityEngine.Events;
 
 public static class Translation
 {
@@ -17,6 +18,8 @@ public static class Translation
         }
     }
     private static Language _Default;
+
+    public static UnityEvent OnLanguageChange = new UnityEvent();
 
     private static Language Current;
 
@@ -50,13 +53,29 @@ public static class Translation
 
     public static void SetLanguage(string name)
     {
+        if(name == null)
+        {
+            if(Current != DefaultLanguage)
+            {
+                Current = DefaultLanguage;
+                OnLanguageChange.Invoke();
+            }
+        }
         if(name == DefaultLanguageName)
         {
-            Current = DefaultLanguage;
+            if(Current == null || Current != DefaultLanguage)
+            {
+                Current = DefaultLanguage;
+                OnLanguageChange.Invoke();
+            }
         }
         else
         {
-            Current = LanguageIO.LoadLanguage(name);
+            if(Current == null || Current.Name != name)
+            {
+                Current = LanguageIO.LoadLanguage(name);
+                OnLanguageChange.Invoke();
+            }
         }
     }
 
