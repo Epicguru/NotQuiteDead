@@ -11,8 +11,9 @@ public class TranslatedText : MonoBehaviour
 
     private void Start()
     {
-        Translation.OnLanguageChange.AddListener(LanguageChange);
+        Text = GetComponent<Text>();
 
+        Translation.OnLanguageChange.AddListener(LanguageChange);
         if(Mode == TranslatedTextMode.START || Mode == TranslatedTextMode.SCRIPT_AND_START)
         {
             UpdateText();
