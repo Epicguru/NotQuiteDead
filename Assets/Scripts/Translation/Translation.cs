@@ -20,6 +20,8 @@ public static class Translation
 
     private static Language Current;
 
+    public static int TranslationCounter;
+
     public static Language GetCurrentLanguage()
     {
         if(Current == null)
@@ -29,6 +31,20 @@ public static class Translation
         else
         {
             return Current;
+        }
+    }
+
+    public static string GetCurrentLanguageVerbose()
+    {
+        var lang = GetCurrentLanguage();
+
+        if(lang == null)
+        {
+            return "LANGUAGE_ERROR (Missing current language, including default)";
+        }
+        else
+        {
+            return lang.Name + " (" + lang.NativeName + ")" + (lang.IsDefault ? " (Default)" : "");
         }
     }
 
