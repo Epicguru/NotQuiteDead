@@ -1,4 +1,102 @@
 {
   "Name": "Core",
-  "Data": { }
+  "Data": {
+    "MainMenu_Exit": {
+      "Key": "MainMenu_Exit",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Exit' button in the main menu.",
+      "Locked": true
+    },
+    "MainMenu_Credits": {
+      "Key": "MainMenu_Credits",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Credits' button in the main menu.",
+      "Locked": true
+    },
+    "MainMenu_Load": {
+      "Key": "MainMenu_Load",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Load Reality' button in the main menu.",
+      "Locked": true
+    },
+    "Inventory_Title": {
+      "Key": "Inventory_Title",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'INVENTORY' title in the player inventory.",
+      "Locked": true
+    },
+    "MainMenu_Join": {
+      "Key": "MainMenu_Join",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Join Reality' button in the main menu.",
+      "Locked": true
+    },
+    "LoadReality_Title": {
+      "Key": "LoadReality_Title",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'REALITIES' title in the load reality menu.",
+      "Locked": true
+    },
+    "LoadReality_SelectPrompt": {
+      "Key": "LoadReality_SelectPrompt",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Select a reality...' prompt in the load reality menu.",
+      "Locked": true
+    },
+    "LoadReality_NoneSelected": {
+      "Key": "LoadReality_NoneSelected",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'No Reality Selected' message in the load reality menu.",
+      "Locked": true
+    },
+    "LoadReality_CreateButton": {
+      "Key": "LoadReality_CreateButton",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'CREATE!' button in the load reality menu.",
+      "Locked": true
+    },
+    "LoadReality_NamePrompt": {
+      "Key": "LoadReality_NamePrompt",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Enter a new reality name...' prompt in the load reality menu.",
+      "Locked": true
+    },
+    "LoadReality_DayLabel": {
+      "Key": "LoadReality_DayLabel",
+      "Params": [
+        "The day value"
+      ],
+      "Desription": "The 'Day: {0}' display in the details section of the load reality menu.",
+      "Locked": true
+    },
+    "LoadReality_LastPlayed": {
+      "Key": "LoadReality_LastPlayed",
+      "Params": [
+        "The date the reality was last saved",
+        "The verbose time period since last saved"
+      ],
+      "Desription": "The\n'Last Played: {0}\n{1}'\ndisplay in the details section of the load reality menu.",
+      "Locked": true
+    }
+  }
 }

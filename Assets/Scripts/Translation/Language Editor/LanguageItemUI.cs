@@ -60,15 +60,13 @@ public class LanguageItemUI : MonoBehaviour
         float ySize = Mathf.Lerp(InputSizes.x, InputSizes.y, x);
 
         // Set real size.
-        ValueInputRect.sizeDelta = new Vector2(320, ySize);
+        ValueInputRect.sizeDelta = new Vector2(390, ySize);
 
         UpdateState();
     }
 
     private void UpdateState()
     {
-        // Translated is true when a non-null, non-whitespace value is present for the key.
-        bool translated = Lang.KeyIsTranslated(Key);
 
         // Missing is if the key is not even present in the language.
         bool missing = !Lang.ContainsKey(Key);
@@ -100,7 +98,7 @@ public class LanguageItemUI : MonoBehaviour
             }
             else
             {
-                if (translated)
+                if (string.IsNullOrWhiteSpace(ValueInput.text))
                 {
                     Background.color = NotTranslated;
                     StateText.text = "No translated string. Type something!";

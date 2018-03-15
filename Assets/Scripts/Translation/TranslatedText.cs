@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Text))]
@@ -6,6 +7,8 @@ public class TranslatedText : MonoBehaviour
 {
     public string Key;
     public TranslatedTextMode Mode = TranslatedTextMode.START;
+
+    public TranslatedTextDetails Details;
 
     private Text Text;
 
@@ -30,7 +33,12 @@ public class TranslatedText : MonoBehaviour
 
     public void UpdateText()
     {
-        Text.text = Key.Translate();
+        string trans = Key.Translate();
+        if (Details.Capitalize)
+        {
+            trans = trans.ToUpper();
+        }
+        Text.text = trans;
     }
 
     private void OnDestroy()
@@ -50,4 +58,10 @@ public enum TranslatedTextMode
     UPDATE,
     SCRIPT,
     SCRIPT_AND_START
+}
+
+[Serializable]
+public class TranslatedTextDetails
+{
+    public bool Capitalize = false;
 }
