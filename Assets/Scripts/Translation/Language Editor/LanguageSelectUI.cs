@@ -28,33 +28,11 @@ public class LanguageSelectUI : MonoBehaviour
 
     public void LanguageClicked(string lang)
     {
+        // Get base definition.
         LanguageDefinition def = LanguageDefinition.Core;
 
-        // Auto generate item name and description definitions.
-        if (Item.Items == null)        
-            Item.LoadItems();        
-        foreach (var item in Item.Items.Values)
-        {
-            // Descriptions.
-            string key = item.Prefab + "_Desc";
-            if (!def.ContainsKey(key))
-            {
-                LangDefParam p = new LangDefParam();
-                p.Key = key;
-                p.Desription = "The description of the '" + item.Prefab + "' item. Please copy from English as accurately as possible.";
-                def.Data.Add(key, p);
-            }
-
-            // Names
-            key = item.Prefab + "_Name";
-            if (!def.ContainsKey(key))
-            {
-                LangDefParam p = new LangDefParam();
-                p.Key = key;
-                p.Desription = "The display name of the '" + item.Prefab + "' item.";
-                def.Data.Add(key, p);
-            }
-        }
+        // Generate definitions...
+        DefinitionGenerator.GenerateDefinitions(def.Data);
 
         // Load language
         Language loaded = LanguageIO.LoadLanguage(lang);
