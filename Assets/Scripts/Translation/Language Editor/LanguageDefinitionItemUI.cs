@@ -20,7 +20,7 @@ public class LanguageDefinitionItemUI : MonoBehaviour
 
     public void Update()
     {
-        LockedImage.enabled = Lock.isOn;
+        LockedImage.gameObject.SetActive(Lock.isOn);
 
         UpdateError();
     }

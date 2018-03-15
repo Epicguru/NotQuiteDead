@@ -7,7 +7,15 @@ public static class LanguageIO
     {
         get
         {
-            return Application.streamingAssetsPath + "/Langs/";
+            return Application.streamingAssetsPath + "/Languages/Instances/";
+        }
+    }
+
+    public static string LanguageDefinitionFolder
+    {
+        get
+        {
+            return Application.streamingAssetsPath + "/Languages/Definitions/";
         }
     }
 

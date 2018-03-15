@@ -110,6 +110,8 @@ public class LanguageSelectUI : MonoBehaviour
 
     public void SpawnFromFolderContents()
     {
+        if (!Directory.Exists(LanguageIO.LanguageFolder))
+            return;
         string[] files = Directory.GetFiles(LanguageIO.LanguageFolder);
 
         List<string> processed = new List<string>();
