@@ -93,7 +93,6 @@ public class Item : NetworkBehaviour
     public NetPositionSync NetPosSync;
 
     [SyncVar]
-    [SerializeField]
     private bool equipped = false;
     [SyncVar]
     private GameObject PlayerHolding;

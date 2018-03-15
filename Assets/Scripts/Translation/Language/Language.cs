@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [Serializable]
@@ -127,7 +128,7 @@ public class Language
             return GetDefault(key, args);
         }
 
-        if (ContainsKey(key))
+        if (!ContainsKey(key))
         {
             Debug.LogWarning("No translation offered for '" + key + "' in '" + this + "'");
             return GetDefault(key, args);
