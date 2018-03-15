@@ -100,7 +100,7 @@ public class LanguageItemUI : MonoBehaviour
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(ValueInput.text))
+                if (translated)
                 {
                     Background.color = NotTranslated;
                     StateText.text = "No translated string. Type something!";

@@ -45,8 +45,8 @@ public class BlueprintPreviewDisplay : MonoBehaviour
             Image.sprite = spr == null ? Item.ItemIcon : spr;
             Title.text = Item.Name;
             Description.text = "";
-            Description.text += RichText.InBold(RichText.InItalics(Item.Description.ShortDescription)) + "\n";
-            Description.text += Item.Description.LongDescription;
+            Description.text += RichText.InBold(RichText.InItalics(Item.ShortDescription)) + "\n";
+            Description.text += Item.LongDescription;
         }
     }
 

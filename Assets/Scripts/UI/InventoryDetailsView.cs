@@ -148,8 +148,8 @@ public class InventoryDetailsView : MonoBehaviour
     {
         string description = "\n";
 
-        description += RichText.InColour(RichText.InItalics(item.Description.ShortDescription), Color.black) + "\n\n";
-        description += RichText.InColour(item.Description.LongDescription, Color.black) + "\n\n";
+        description += RichText.InColour(RichText.InItalics(item.ShortDescription), Color.black) + "\n\n";
+        description += RichText.InColour(item.LongDescription, Color.black) + "\n\n";
 
         return description;
     }

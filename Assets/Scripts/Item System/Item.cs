@@ -17,8 +17,29 @@ public class Item : NetworkBehaviour
     [Tooltip("The unique ID of this item. Used to spawn new items.")]
     public string Prefab = "Prefab Name";
 
-    [Tooltip("The display name of this item.")]
-    public string Name = "Default Item Name";
+    public string Name
+    {
+        get
+        {
+            return (Prefab + "_Name").Translate();
+        }
+    }
+
+    public string ShortDescription
+    {
+        get
+        {
+            return (Prefab + "_ShortDesc").Translate();
+        }
+    }
+
+    public string LongDescription
+    {
+        get
+        {
+            return (Prefab + "_LongDesc").Translate();
+        }
+    }
 
     [Tooltip("The rarity (tier) of the item.")]
     public ItemRarity Rarity;
@@ -35,9 +56,6 @@ public class Item : NetworkBehaviour
 
     [Tooltip("If true AND Equipable is true, the this item can be quick-slotted.")]
     public bool CanQuickSlot = true;
-
-    [Tooltip("Descriptions of the item.")]
-    public ItemDescription Description;
 
     [Tooltip("Information about the space and weight that this item takes in an inventory.")]
     public InventoryInfo InventoryInfo;

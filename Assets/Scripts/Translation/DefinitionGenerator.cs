@@ -17,12 +17,21 @@ public static class DefinitionGenerator
         foreach (var item in Item.Items.Values)
         {
             // Descriptions.
-            string key = item.Prefab + "_Desc";
+            string key = item.Prefab + "_LongDesc";
             if (!dic.ContainsKey(key))
             {
                 LangDefParam p = new LangDefParam();
                 p.Key = key;
-                p.Desription = "The description of the '" + item.Prefab + "' item. Please copy from English as accurately as possible.";
+                p.Desription = "The long description of the '" + item.Prefab + "' item. Please copy from English as accurately as possible.";
+                dic.Add(key, p);
+            }
+
+            key = item.Prefab + "_ShortDesc";
+            if (!dic.ContainsKey(key))
+            {
+                LangDefParam p = new LangDefParam();
+                p.Key = key;
+                p.Desription = "The short description of the '" + item.Prefab + "' item. Please copy from English as accurately as possible.";
                 dic.Add(key, p);
             }
 

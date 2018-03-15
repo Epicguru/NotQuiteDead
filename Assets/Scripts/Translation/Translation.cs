@@ -68,6 +68,7 @@ public static class Translation
             Debug.LogError("Serious translation error, null current language (default lang is null too!)");
             return "LANG_ERROR";
         }
+        TranslationCounter++;
         return lang.TryTranslate(key, args);
     }
 }
