@@ -350,8 +350,19 @@ public class GunAnimation : NetworkBehaviour
 
         if (FlyingMagazine.MagSprite == null || FlyingMagazine.RealMag == null)
             return;
+        if (FlyingMagazine.Count <= 0)
+            return;
 
-        FlyingMag.Spawn(FlyingMagazine.RealMag.transform.position, FlyingMagazine.RealMag.transform.up * -1f * FlyingMagazine.Force, FlyingMagazine.RealMag.transform.rotation.eulerAngles.z, FlyingMagazine.Rotation * (!Player.Local.Direction.Right ? -1f : 1f), FlyingMagazine.MagSprite, !Player.Local.Direction.Right);
+        for (int i = 0; i < FlyingMagazine.Count; i++)
+        {
+            float magniutude = Mathf.Abs(FlyingMagazine.RandomForce);
+            float random = UnityEngine.Random.Range(-magniutude, magniutude);
+
+            float angmagniutude = Mathf.Abs(FlyingMagazine.RandomRotation);
+            float angrandom = UnityEngine.Random.Range(-angmagniutude, angmagniutude);
+
+            FlyingMag.Spawn(FlyingMagazine.RealMag.transform.position, FlyingMagazine.RealMag.transform.up * -1f * (FlyingMagazine.Force + random), FlyingMagazine.RealMag.transform.rotation.eulerAngles.z, (FlyingMagazine.Rotation + angrandom) * (!Player.Local.Direction.Right ? -1f : 1f), FlyingMagazine.MagSprite, !Player.Local.Direction.Right);
+        }
     }
 
     public void OnDrawGizmosSelected()
