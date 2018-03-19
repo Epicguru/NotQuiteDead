@@ -15,7 +15,8 @@ public class WorkbenchFurniture : NetworkBehaviour
 
         if (mouseInside)
         {
-            ActionHUD.DisplayAction("Press " + InputManager.GetInput("Interact") + " to open the blueprint menu.");
+            string key = InputManager.GetInput("Interact").ToString();
+            ActionHUD.DisplayAction("Blueprint_OpenPrompt".Translate(key));
             if (InputManager.InputDown("Interact"))
             {
                 Workbench.Bench.Open = true;

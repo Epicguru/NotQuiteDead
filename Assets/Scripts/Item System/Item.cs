@@ -155,30 +155,30 @@ public class Item : NetworkBehaviour
             options.Add(new ItemOption() { OptionName = "Equip", OnSelected = Option_Equip });
         options.Add(new ItemOption() { OptionName = "Details", OnSelected = Option_Details });
         if (GetComponent<Attachment>() != null && Player.Local.Holding.Item != null && Player.Local.Holding.Item.GetComponent<GunAttachments>() != null && Player.Local.Holding.Item.GetComponent<GunAttachments>().IsValid(item.GetComponent<Attachment>().Type, item.GetComponent<Attachment>()))
-            options.Add(new ItemOption() { OptionName = "Put On Current Weapon", OnSelected = Option_ApplyAttachment });
+            options.Add(new ItemOption() { OptionName = "EquipAttach", OnSelected = Option_ApplyAttachment });
         if (item.GetComponent<GearItem>() != null)
             options.Add(new ItemOption() { OptionName = "Equip", OnSelected = Option_EquipGear });
         if(item.Equipable)
-            options.Add(new ItemOption() { OptionName = "Quick Slot...", OnSelected = Option_QuickSlot });
+            options.Add(new ItemOption() { OptionName = "QuickSlot", OnSelected = Option_QuickSlot });
 
         if (data == null)
             return options.ToArray();
 
         if (!string.IsNullOrEmpty(data.Get<string>("Magazine Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.Get<string>("Magazine Attachment")), OnSelected = Option_RemoveMagazine });
+            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(data.Get<string>("Magazine Attachment")) }, OnSelected = Option_RemoveMagazine });
         }
         if (!string.IsNullOrEmpty(data.Get<string>("Muzzle Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.Get<string>("Muzzle Attachment")), OnSelected = Option_RemoveMuzzle });
+            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(data.Get<string>("Muzzle Attachment")) }, OnSelected = Option_RemoveMuzzle });
         }
         if (!string.IsNullOrEmpty(data.Get<string>("Sight Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.Get<string>("Sight Attachment")), OnSelected = Option_RemoveSight });
+            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(data.Get<string>("Sight Attachment")) }, OnSelected = Option_RemoveSight });
         }
         if (!string.IsNullOrEmpty(data.Get<string>("Under Barrel Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.Get<string>("Under Barrel Attachment")), OnSelected = Option_RemoveUnderBarrel });
+            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(data.Get<string>("Under Barrel Attachment")) }, OnSelected = Option_RemoveUnderBarrel });
         }
 
         return options.ToArray();

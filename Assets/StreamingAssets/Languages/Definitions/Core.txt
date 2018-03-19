@@ -169,6 +169,266 @@
       ],
       "Desription": "The 'Day' word.",
       "Locked": true
+    },
+    "General_Options": {
+      "Key": "General_Options",
+      "Params": [
+        ""
+      ],
+      "Desription": "A generic 'Options' word.",
+      "Locked": true
+    },
+    "GearSlot_Hands": {
+      "Key": "GearSlot_Hands",
+      "Params": [
+        ""
+      ],
+      "Desription": "The name of the 'Hands' gear slot.",
+      "Locked": true
+    },
+    "GearSlot_Head": {
+      "Key": "GearSlot_Head",
+      "Params": [
+        ""
+      ],
+      "Desription": "The name of the 'Head' gear slot.",
+      "Locked": true
+    },
+    "GearSlot_Chest": {
+      "Key": "GearSlot_Chest",
+      "Params": [
+        ""
+      ],
+      "Desription": "The name of the 'Chest' gear slot.",
+      "Locked": true
+    },
+    "InvOptions_Drop": {
+      "Key": "InvOptions_Drop",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Drop' option in the inventory options menu.",
+      "Locked": true
+    },
+    "InvOptions_Details": {
+      "Key": "InvOptions_Details",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Details' option in the inventory options menu.",
+      "Locked": true
+    },
+    "InvOptions_Equip": {
+      "Key": "InvOptions_Equip",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Equip' option in the inventory options menu.",
+      "Locked": true
+    },
+    "InvOptions_Detach": {
+      "Key": "InvOptions_Detach",
+      "Params": [
+        "The name of the attachment to remove"
+      ],
+      "Desription": "The 'Detach' option in the inventory options menu.",
+      "Locked": true
+    },
+    "InvOptions_QuickSlot": {
+      "Key": "InvOptions_QuickSlot",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Quick Slot' option in the inventory options menu.",
+      "Locked": true
+    },
+    "InvOptions_EquipAttach": {
+      "Key": "InvOptions_EquipAttach",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Put on current weapon' option in the inventory options menu, for gun attachments.",
+      "Locked": true
+    },
+    "PickupPrompt": {
+      "Key": "PickupPrompt",
+      "Params": [
+        "The key to press",
+        "The name of the item"
+      ],
+      "Desription": "The HUD message that shows the key to press to pick up an item.",
+      "Locked": true
+    },
+    "Blueprint_OpenPrompt": {
+      "Key": "Blueprint_OpenPrompt",
+      "Params": [
+        "The key name"
+      ],
+      "Desription": "The 'Press KeyName to open the blueprint menu' HUD display message.",
+      "Locked": true
+    },
+    "InvDetails_Rarity": {
+      "Key": "InvDetails_Rarity",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Rarity' word for use in the details menu of the player inventory.",
+      "Locked": true
+    },
+    "InvDetails_MeleeDamage": {
+      "Key": "InvDetails_MeleeDamage",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Melee Damage' stat for use in the details menu of the player inventory.",
+      "Locked": true
+    },
+    "InvDetails_GunType": {
+      "Key": "InvDetails_GunType",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Gun Type' type for use in the details menu of the player inventory.",
+      "Locked": true
+    },
+    "InvDetails_BaseDamage": {
+      "Key": "InvDetails_BaseDamage",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Base Damage' stat for use in the details menu of the player inventory.",
+      "Locked": true
+    },
+    "InvDetails_PPS": {
+      "Key": "InvDetails_PPS",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Pellets Per Shot' stat for use in the details menu of the player inventory.",
+      "Locked": true
+    },
+    "InvDetails_PPS.Value": {
+      "Key": "InvDetails_PPS.Value",
+      "Params": [
+        "The min number of pellets",
+        "The max number of pellets"
+      ],
+      "Desription": "The 'X to Y' pellets per shot stat value, for example:\n5 to 10\nin Spanish would be\nDe 5 a 10",
+      "Locked": true
+    },
+    "InvDetails_OverAllPellets": {
+      "Key": "InvDetails_OverAllPellets",
+      "Params": [
+        ""
+      ],
+      "Desription": "'Over all pellets' as in shotgun pellets.",
+      "Locked": true
+    },
+    "InvDetails_PerPellet": {
+      "Key": "InvDetails_PerPellet",
+      "Params": [
+        ""
+      ],
+      "Desription": "'Per pellet' as in shotgun pellets.",
+      "Locked": true
+    },
+    "InvDetails_Range": {
+      "Key": "InvDetails_Range",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Range' stat for use in the details menu of the player inventory.",
+      "Locked": true
+    },
+    "InvDetails_MagCapacity": {
+      "Key": "InvDetails_MagCapacity",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Magazine Capacity' stat for use in the details menu of the player inventory.",
+      "Locked": true
+    },
+    "InvDetails_RoundsPerSec": {
+      "Key": "InvDetails_RoundsPerSec",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'RPS' stat for use in the details menu of the player inventory. Use abbreviated version, not full words.",
+      "Locked": true
+    },
+    "InvDetails_Accuracy": {
+      "Key": "InvDetails_Accuracy",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Accuracy' stat for use in the details menu of the player inventory.",
+      "Locked": true
+    },
+    "InvDetails_Accuracy.Value": {
+      "Key": "InvDetails_Accuracy.Value",
+      "Params": [
+        "The degrees of innacuracy"
+      ],
+      "Desription": "The 'X° innacuracy' label where X is the degrees of inaccuracy.",
+      "Locked": true
+    },
+    "InvDetails_Accuracy.Val2": {
+      "Key": "InvDetails_Accuracy.Val2",
+      "Params": [
+        "The min inaccuracy",
+        "The max inaccuracy",
+        "The number of shots before the max inaccuracy"
+      ],
+      "Desription": "The 'From X° to Y° inaccuracy after Z shots' where X is the min inaccuracy, Y is the max inaccuracy and Z is the number of shots before the max inaccuracy.",
+      "Locked": true
+    },
+    "InvDetails_DamageFalloff": {
+      "Key": "InvDetails_DamageFalloff",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Damage Falloff' stat for use in the details menu of the player inventory.",
+      "Locked": true
+    },
+    "InvDetails_DF.Value": {
+      "Key": "InvDetails_DF.Value",
+      "Params": [
+        "The percentage that the damage is decreased"
+      ],
+      "Desription": "The damage falloff value label, such as 'X% less damage' where X is the percentage.",
+      "Locked": true
+    },
+    "InvDetails_Penetration": {
+      "Key": "InvDetails_Penetration",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Penetration' stat for use in the details menu of the player inventory.",
+      "Locked": true
+    },
+    "InvDetails_PenFalloff": {
+      "Key": "InvDetails_PenFalloff",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Penetration Danage Falloff' stat for use in the details menu of the player inventory.",
+      "Locked": true
+    },
+    "InvDetails_AttachmentSlot": {
+      "Key": "InvDetails_AttachmentSlot",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Attachment Slot' stat for use in the details menu of the player inventory.",
+      "Locked": true
+    },
+    "InvDetails_Attribute": {
+      "Key": "InvDetails_Attribute",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Attribute' stat for use in the details menu of the player inventory.",
+      "Locked": true
     }
   }
 }
