@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.Match;
 using UnityEngine.SceneManagement;
@@ -67,17 +68,24 @@ public class MainMenuRealityLoader : MonoBehaviour
         {
             if(Player.Local != null)
             {
-                // Load world once the player has been set up.
-                World w = FindObjectOfType<World>();
-                if (w != null)
+                try
                 {
-                    w.RealityName = RealityName;
-                    w.Load();
-                    Debug.Log("Finished loading world.");
+                    // Load world once the player has been set up.
+                    World w = FindObjectOfType<World>();
+                    if (w != null)
+                    {
+                        w.RealityName = RealityName;
+                        w.Load();
+                        Debug.Log("Finished loading world.");
+                    }
+                    else
+                    {
+                        Debug.LogError("World was null, cannot load reality!");
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    Debug.LogError("World was null, cannot load reality!");
+                    Debug.Log(e);
                 }
 
                 // Destroy this object, cycle done.

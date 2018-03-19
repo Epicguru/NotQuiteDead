@@ -77,10 +77,14 @@ public class Furniture : NetworkBehaviour
         {
             this.X = x;
             this.Y = y;
+            transform.position = new Vector3(X, Y);
+            name = Name + " (" + X + ", " + Y + ")";
         }
+    }
 
-        transform.position = new Vector3(X, Y);
-        name = Name + " (" + X + ", " + Y + ")";
+    public virtual FurnitureSaveData GetSaveData()
+    {
+        return new FurnitureSaveData(this);
     }
 
     public static void LoadAllFurniture()
@@ -116,6 +120,9 @@ public class Furniture : NetworkBehaviour
         return Loaded.ContainsKey(prefab);
     }
 
+    /// <summary>
+    /// Gets a furniture PREFAB given the prefab name. Do not directly modify the return value.
+    /// </summary>
     public static Furniture GetFurniture(string prefab)
     {
         if (FurnitureExists(prefab))

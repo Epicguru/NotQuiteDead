@@ -25,6 +25,9 @@ public class World : NetworkBehaviour
     [Server]
     public void Save()
     {
+        if (!isServer)
+            return;
+
         // Save all tile layers to file.
         TileMap.SaveAll();
 
@@ -44,6 +47,12 @@ public class World : NetworkBehaviour
         // Save all world items to file.
         ItemIO.ItemsToFile(RealityName, GameObject.FindObjectsOfType<Item>());
 
+        // Save placed furniture...
+        FurnitureIO.SaveFurniture(RealityName, Furniture.GetAllFurniture());
+
+        // Save the building inventory...
+        BuildingIO.SaveBuildingInventory(RealityName, Player.Local);
+
         // Save the world state to file.
         WorldIO.SaveWorldState(this);
     }
@@ -51,6 +60,9 @@ public class World : NetworkBehaviour
     [Server]
     public void Load()
     {
+        if (!isServer)
+            return;
+
         // Load world state from file.
         WorldIO.LoadWorldState(this);
 
@@ -69,6 +81,12 @@ public class World : NetworkBehaviour
 
         // Load currently held item. TODO see above.
         InventoryIO.LoadHolding(RealityName, Player.Local);
+
+        // Load furniture...
+        FurnitureIO.LoadFurniture(this);
+
+        // Load player building inventory...
+        BuildingIO.LoadBuildingInventory(RealityName, Player.Local);
 
         // No need to load tile layers, this is done all the time passively.
     }
@@ -96,21 +114,5 @@ public class World : NetworkBehaviour
     {
         //Instance = null;
         Pawn.Dispose();
-    }
-
-    public void Update()
-    {
-        if (isServer)
-        {
-            if (Input.GetKeyDown(KeyCode.Y))
-            {
-                Save();
-            }
-
-            if (Input.GetKeyDown(KeyCode.U))
-            {
-                Load();
-            }
-        }
     }
 }
