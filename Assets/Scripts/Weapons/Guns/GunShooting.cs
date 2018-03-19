@@ -32,6 +32,13 @@ public class GunShooting : RotatingItem
     public GunAudio Audio;
     public AudioSauce AudioSauce;
 
+    [HideInInspector]
+    [SyncVar]
+    public float ReloadSpeedMultiplier = 1f;
+    [HideInInspector]
+    [SyncVar]
+    public float ShootSpeedMultiplier = 1f;
+
     [ReadOnly]
     public int bulletsInMagazine;
 
@@ -71,6 +78,10 @@ public class GunShooting : RotatingItem
     {
         if (!isClient)
             return; // Standalone server does not animate.
+
+        // Animation speeds.
+        animation.Animator.SetFloat("ReloadMultiplier", ReloadSpeedMultiplier);
+        animation.Animator.SetFloat("ShootMultiplier", ShootSpeedMultiplier);
 
         // Shooting...
         if (!hasAuthority || gun.Item == null || !gun.Item.IsEquipped())

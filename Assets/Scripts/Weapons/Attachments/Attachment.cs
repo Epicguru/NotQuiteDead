@@ -300,4 +300,24 @@ public class Attachment : NetworkBehaviour
     {
         GetGun().Shooting.Audio.Volume = GetPrefabGun().Shooting.Audio.Volume;
     }
+
+    public void Effect_ReloadSpeed(float multiplier)
+    {
+        GetGun().Shooting.ReloadSpeedMultiplier *= multiplier;
+    }
+
+    public void Reset_ReloadSpeed()
+    {
+        GetGun().Shooting.ReloadSpeedMultiplier = 1f;
+    }
+
+    public void Effect_ShootSpeed(float multiplier)
+    {
+        GetGun().Shooting.ShootSpeedMultiplier *= multiplier;
+    }
+
+    public void Reset_ShootSpeed()
+    {
+        GetGun().Shooting.ShootSpeedMultiplier = 1f;
+    }
 }
