@@ -80,8 +80,11 @@ public class GunShooting : RotatingItem
             return; // Standalone server does not animate.
 
         // Animation speeds.
-        animation.Animator.SetFloat("ReloadMultiplier", ReloadSpeedMultiplier);
-        animation.Animator.SetFloat("ShootMultiplier", ShootSpeedMultiplier);
+        if(animation.Animator != null)
+        {
+            animation.Animator.SetFloat("ReloadMultiplier", ReloadSpeedMultiplier);
+            animation.Animator.SetFloat("ShootMultiplier", ShootSpeedMultiplier);
+        }
 
         // Shooting...
         if (!hasAuthority || gun.Item == null || !gun.Item.IsEquipped())
