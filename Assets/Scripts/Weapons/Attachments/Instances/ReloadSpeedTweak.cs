@@ -1,6 +1,4 @@
-﻿
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ReloadSpeedTweak : AttachmentTweak
 {
@@ -15,11 +13,11 @@ public class ReloadSpeedTweak : AttachmentTweak
     {
         bool positive = Multiplier > 1f;
 
-        return "Reload Speed " + RichText.InColour(((positive ? "+" : "-") + Mathf.RoundToInt((Multiplier - 1f) * 100f) + "%"), positive ? Color.green : Color.red);
+        return "Reload Speed " + RichText.InColour(((positive ? "+" : "") + Mathf.RoundToInt((Multiplier - 1f) * 100f) + "%"), positive ? Color.green : Color.red);
     }
 
     public override void Remove(Attachment a)
     {
-        throw new NotImplementedException();
+        a.Reset_ReloadSpeed();
     }
 }
