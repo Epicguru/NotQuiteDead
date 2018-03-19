@@ -122,11 +122,11 @@ public class InventoryDetailsView : MonoBehaviour
                 stats.Add(new DetailStat { Icon = AccuracyIcon, Key = "InvDetails_Accuracy".Translate(), Value = "InvDetails_Accuracy.Value".Translate(gun.Shooting.Damage.Inaccuracy.x.ToString()) });
 
             if (gun.Shooting.Damage.DamageFalloff != 1f)
-                stats.Add(new DetailStat { Icon = DamageFalloffIcon, Key = "InvDetails_DamageFalloff".Translate(), Value = "InvDetails_DF.Value".Translate(Mathf.FloorToInt(100f * (1f - gun.Shooting.Damage.DamageFalloff)).ToString()) });
+                stats.Add(new DetailStat { Icon = DamageFalloffIcon, Key = "InvDetails_DamageFalloff".Translate(), Value = "InvDetails_DF.Value".Translate(Mathf.RoundToInt(100f * (1f - gun.Shooting.Damage.DamageFalloff)).ToString()) });
             if(gun.Shooting.Damage.Penetration != 1)
             {
                 stats.Add(new DetailStat { Icon = PenetrationIcon, Key = "InvDetails_Penetration".Translate(), Value = gun.Shooting.Damage.Penetration.ToString() });
-                stats.Add(new DetailStat { Icon = PenetrationDamageFalloffIcon, Key = "InvDetails_PenFalloff".Translate(), Value = Mathf.CeilToInt(100f * (1f - gun.Shooting.Damage.PenetrationFalloff)) + "%" });
+                stats.Add(new DetailStat { Icon = PenetrationDamageFalloffIcon, Key = "InvDetails_PenFalloff".Translate(), Value = Mathf.RoundToInt(100f * (1f - gun.Shooting.Damage.PenetrationFalloff)) + "%" });
             }
         }
 
