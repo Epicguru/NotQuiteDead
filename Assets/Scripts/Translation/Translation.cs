@@ -1,5 +1,6 @@
 ﻿
 using UnityEngine;
+using UnityEngine.Events;
 
 public static class Translation
 {
@@ -17,6 +18,8 @@ public static class Translation
         }
     }
     private static Language _Default;
+
+    public static UnityEvent OnLanguageChange = new UnityEvent();
 
     private static Language Current;
 
@@ -50,13 +53,29 @@ public static class Translation
 
     public static void SetLanguage(string name)
     {
+        if(name == null)
+        {
+            if(Current != DefaultLanguage)
+            {
+                Current = DefaultLanguage;
+                OnLanguageChange.Invoke();
+            }
+        }
         if(name == DefaultLanguageName)
         {
-            Current = DefaultLanguage;
+            if(Current == null || Current != DefaultLanguage)
+            {
+                Current = DefaultLanguage;
+                OnLanguageChange.Invoke();
+            }
         }
         else
         {
-            Current = LanguageIO.LoadLanguage(name);
+            if(Current == null || Current.Name != name)
+            {
+                Current = LanguageIO.LoadLanguage(name);
+                OnLanguageChange.Invoke();
+            }
         }
     }
 
@@ -68,6 +87,7 @@ public static class Translation
             Debug.LogError("Serious translation error, null current language (default lang is null too!)");
             return "LANG_ERROR";
         }
+        TranslationCounter++;
         return lang.TryTranslate(key, args);
     }
 }
@@ -77,5 +97,17 @@ public static class StaticTrans
     public static string Translate(this string key, params object[] args)
     {
         return Translation.Translate(key, args);
+    }
+
+    public static string FirstCap(this string str)
+    {
+        char[] a = str.ToCharArray();
+        a[0] = char.ToUpper(a[0]);
+        return new string(a);
+    }
+
+    public static string LowerFirstCap(this string str)
+    {
+        return str.ToLower().FirstCap();
     }
 }

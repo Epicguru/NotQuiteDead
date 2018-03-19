@@ -20,6 +20,6 @@ public class StaticGear : MonoBehaviour
 
     public static void Register(GearUI gear)
     {
-        GearUI.GearItems.Add(gear.Title, gear);
+        GearUI.GearItems.Add(gear.Slot, gear);
     }
 }

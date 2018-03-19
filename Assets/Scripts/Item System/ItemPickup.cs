@@ -40,8 +40,12 @@ public class ItemPickup : NetworkBehaviour
             if (AllowPickup && !Item.IsEquipped())
             {
                 // Show the user that they can pick this item up.
-                if(InputManager.Active)
-                    ActionHUD.DisplayAction("Press " + InputManager.GetInput("Pick up") + " to pick up " + RichText.InBold(RichText.InColour(Item.Name, ItemRarityUtils.GetColour(Item.Rarity))) + ".");
+                if (InputManager.Active)
+                {
+                    string key = InputManager.GetInput("Pick up").ToString();
+                    string itemName = RichText.InBold(RichText.InColour(Item.Name, ItemRarityUtils.GetColour(Item.Rarity)));
+                    ActionHUD.DisplayAction("PickupPrompt".Translate(key, itemName));
+                }
                 if(InputManager.InputDown("Pick up"))
                 {
                     // Check client-server situation...

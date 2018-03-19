@@ -7,7 +7,7 @@ public class GearUI : MonoBehaviour {
 
     public static Dictionary<string, GearUI> GearItems = new Dictionary<string, GearUI>();
 
-    public string Title;
+    public string Slot;
     public Text Text;
     public Image Image;
     public bool Hands = false;
@@ -27,13 +27,13 @@ public class GearUI : MonoBehaviour {
         this.Item = item;
         if (item == null)
         {
-            Text.text = Title;
+            Text.text = ("GearSlot_" + Slot).Translate();
             Image.sprite = null;
             Image.enabled = false;
         }
         else
         {
-            Text.text = Title + " - " + item.Name;
+            Text.text = ("GearSlot_" + Slot).Translate() + " - " + item.Name;
             Image.sprite = item.ItemIcon;
             Image.enabled = true;
         }
@@ -50,8 +50,8 @@ public class GearUI : MonoBehaviour {
         else
         {
             // Remove from slot noramlly.
-            Player.Local.GearMap[Title].GetGearItem().Item.RequestDataUpdate();
-            Player.Local.NetUtils.CmdSetGear(Title, null, null, true);
+            Player.Local.GearMap[Slot].GetGearItem().Item.RequestDataUpdate();
+            Player.Local.NetUtils.CmdSetGear(Slot, null, null, true);
         }
     }
 
@@ -69,7 +69,7 @@ public class GearUI : MonoBehaviour {
         else
         {
             // Remove from slot and drop on ground.
-            BodyGear g = Player.Local.GearMap[Title];
+            BodyGear g = Player.Local.GearMap[Slot];
 
             if(g.GetGearItem() == null)
             {
@@ -79,7 +79,7 @@ public class GearUI : MonoBehaviour {
 
             g.GetGearItem().Item.RequestDataUpdate();
             ItemDataX data = g.GetGearItem().Item.Data;
-            Player.Local.NetUtils.CmdDropGear(Title, data.Serialize());
+            Player.Local.NetUtils.CmdDropGear(Slot, data.Serialize());
         }
     }
 

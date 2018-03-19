@@ -18,6 +18,7 @@ public class CurrentLanguageUI : MonoBehaviour
     public InputField AuthorsNamesInput;
 
     public GameObject DetailsView;
+    public CurrentLanguageInfoBoxUI InfoBox;
 
     [HideInInspector]
     public Language CurrentLang

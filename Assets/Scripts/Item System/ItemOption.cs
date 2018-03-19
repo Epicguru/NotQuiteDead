@@ -8,6 +8,7 @@ using UnityEngine.Events;
 public class ItemOption
 {
     public string OptionName;
+    public object[] Params;
     public UnityAction<InventoryItemData, string> OnSelected;
     public InventoryItemData InvItem;
     /// <summary>

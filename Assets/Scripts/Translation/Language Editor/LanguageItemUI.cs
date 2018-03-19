@@ -30,6 +30,41 @@ public class LanguageItemUI : MonoBehaviour
 
     private float timer;
 	
+    public void InfoButtonPressed()
+    {
+        CurrentLanguageUI ui = GetComponentInParent<CurrentLanguageUI>();
+
+        ui.InfoBox.Description = Def.ContainsKey(Key) ? Def.Data[Key].Desription : "UNDEFINED!";
+        ui.InfoBox.DefaultLangVersion = Translation.DefaultLanguage.TryTranslate(Key);
+        string args;
+        if (Def.ContainsKey(Key))
+        {
+            string[] p = Def.Data[Key].Params;
+            if(p == null || p.Length == 0 || string.IsNullOrWhiteSpace(p[0]))
+            {
+                args = "None.";
+            }
+            else
+            {
+                args = "";
+                for (int i = 0; i < p.Length; i++)
+                {
+                    string sep = ",\n";
+                    if(i == p.Length - 1)                    
+                        sep = "";
+                    
+                    args += p[i] + sep;
+                }
+            }
+        }
+        else
+        {
+            args = "UNDEFINED!";
+        }
+        ui.InfoBox.Params = args;
+        ui.InfoBox.Open();
+    }
+
 	public void Update ()
 	{
         // Set key text.
@@ -60,15 +95,13 @@ public class LanguageItemUI : MonoBehaviour
         float ySize = Mathf.Lerp(InputSizes.x, InputSizes.y, x);
 
         // Set real size.
-        ValueInputRect.sizeDelta = new Vector2(320, ySize);
+        ValueInputRect.sizeDelta = new Vector2(390, ySize);
 
         UpdateState();
     }
 
     private void UpdateState()
     {
-        // Translated is true when a non-null, non-whitespace value is present for the key.
-        bool translated = Lang.KeyIsTranslated(Key);
 
         // Missing is if the key is not even present in the language.
         bool missing = !Lang.ContainsKey(Key);
