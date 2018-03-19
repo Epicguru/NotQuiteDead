@@ -30,6 +30,41 @@ public class LanguageItemUI : MonoBehaviour
 
     private float timer;
 	
+    public void InfoButtonPressed()
+    {
+        CurrentLanguageUI ui = GetComponentInParent<CurrentLanguageUI>();
+
+        ui.InfoBox.Description = Def.ContainsKey(Key) ? Def.Data[Key].Desription : "UNDEFINED!";
+        ui.InfoBox.DefaultLangVersion = Translation.DefaultLanguage.TryTranslate(Key);
+        string args;
+        if (Def.ContainsKey(Key))
+        {
+            string[] p = Def.Data[Key].Params;
+            if(p == null || p.Length == 0 || string.IsNullOrWhiteSpace(p[0]))
+            {
+                args = "None.";
+            }
+            else
+            {
+                args = "";
+                for (int i = 0; i < p.Length; i++)
+                {
+                    string sep = ",\n";
+                    if(i == p.Length - 1)                    
+                        sep = "";
+                    
+                    args += p[i] + sep;
+                }
+            }
+        }
+        else
+        {
+            args = "UNDEFINED!";
+        }
+        ui.InfoBox.Params = args;
+        ui.InfoBox.Open();
+    }
+
 	public void Update ()
 	{
         // Set key text.
