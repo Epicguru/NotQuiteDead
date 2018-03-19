@@ -24,6 +24,8 @@
     "General_Confirm": "Confirm",
     "LoadReality_ConfirmDelete": "Confirm Reality Delete",
     "General_Delete": "Delete",
+    "General_Loading": "Loading",
+    "General_Day": "Day",
     "Advanced Suppressor_LongDesc": "Not only does it make gun shots almost silent, it also weighs enough to help control bullet spread.",
     "Advanced Suppressor_ShortDesc": "A heavy suppressor that hugely reduces shot sound.",
     "Advanced Suppressor_Name": "Advanced Suppressor",

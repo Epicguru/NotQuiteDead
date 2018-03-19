@@ -153,6 +153,22 @@
       ],
       "Desription": "A generic 'Delete' word.",
       "Locked": true
+    },
+    "General_Loading": {
+      "Key": "General_Loading",
+      "Params": [
+        ""
+      ],
+      "Desription": "A generic 'Loading' word.",
+      "Locked": true
+    },
+    "General_Day": {
+      "Key": "General_Day",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Day' word.",
+      "Locked": true
     }
   }
 }
