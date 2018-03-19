@@ -98,4 +98,16 @@ public static class StaticTrans
     {
         return Translation.Translate(key, args);
     }
+
+    public static string FirstCap(this string str)
+    {
+        char[] a = str.ToCharArray();
+        a[0] = char.ToUpper(a[0]);
+        return new string(a);
+    }
+
+    public static string LowerFirstCap(this string str)
+    {
+        return str.ToLower().FirstCap();
+    }
 }

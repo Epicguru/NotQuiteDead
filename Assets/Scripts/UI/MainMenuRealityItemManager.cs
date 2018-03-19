@@ -39,7 +39,7 @@ public class MainMenuRealityItemManager : MonoBehaviour
         {
             if (name.Contains(invalid))
             {
-                return "Invalid name: Cannot contain character " + invalid;
+                return "LoadReality_Error.Char".Translate(invalid);
             }
         }
 
@@ -49,7 +49,7 @@ public class MainMenuRealityItemManager : MonoBehaviour
             string s = currentRealities[i];
             if(s.Trim() == name.Trim())
             {
-                return "Invalid name: A reality already has that name!";
+                return "LoadReality_Error.Dupe".Translate();
             }
         }
 

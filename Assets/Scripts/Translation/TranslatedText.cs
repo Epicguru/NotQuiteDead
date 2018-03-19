@@ -34,10 +34,24 @@ public class TranslatedText : MonoBehaviour
     public void UpdateText()
     {
         string trans = Key.Translate();
-        if (Details.Capitalize)
+        // Capitalize
+        if (Details.Capitalize && !Details.Lowercase)
         {
             trans = trans.ToUpper();
         }
+        if (Details.Lowercase)
+        {
+            trans = trans.ToLower();
+        }
+        if(Details.FirstCap && !Details.LowerFirstCap)
+        {
+            trans = trans.FirstCap();
+        }
+        if (Details.LowerFirstCap)
+        {
+            trans = trans.LowerFirstCap();
+        }
+
         Text.text = trans;
     }
 
@@ -64,4 +78,7 @@ public enum TranslatedTextMode
 public class TranslatedTextDetails
 {
     public bool Capitalize = false;
+    public bool Lowercase = false;
+    public bool FirstCap = false;
+    public bool LowerFirstCap = false;
 }

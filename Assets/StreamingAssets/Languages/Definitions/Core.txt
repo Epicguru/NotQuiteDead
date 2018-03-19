@@ -97,6 +97,62 @@
       ],
       "Desription": "The\n'Last Played: {0}\n{1}'\ndisplay in the details section of the load reality menu.",
       "Locked": true
+    },
+    "LoadReality_EnterReality": {
+      "Key": "LoadReality_EnterReality",
+      "Params": [
+        "The name of the reality."
+      ],
+      "Desription": "The 'Enter RealityName' button in the load reality menu.",
+      "Locked": true
+    },
+    "LoadReality_Error.Char": {
+      "Key": "LoadReality_Error.Char",
+      "Params": [
+        "The invalid character"
+      ],
+      "Desription": "The error message when the reality name contains a invalid character or string.",
+      "Locked": true
+    },
+    "LoadReality_Error.Dupe": {
+      "Key": "LoadReality_Error.Dupe",
+      "Params": [
+        ""
+      ],
+      "Desription": "The error message when a with that name already exists.",
+      "Locked": true
+    },
+    "General_Cancel": {
+      "Key": "General_Cancel",
+      "Params": [
+        ""
+      ],
+      "Desription": "A generic 'Cancel' word.",
+      "Locked": true
+    },
+    "General_Confirm": {
+      "Key": "General_Confirm",
+      "Params": [
+        ""
+      ],
+      "Desription": "A generic 'Confirm' word.",
+      "Locked": true
+    },
+    "LoadReality_ConfirmDelete": {
+      "Key": "LoadReality_ConfirmDelete",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Confirm Delete' prompt in the delete submenu in the LoadReality menu.",
+      "Locked": true
+    },
+    "General_Delete": {
+      "Key": "General_Delete",
+      "Params": [
+        ""
+      ],
+      "Desription": "A generic 'Delete' word.",
+      "Locked": true
     }
   }
 }
