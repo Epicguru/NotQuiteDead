@@ -192,11 +192,11 @@ public class GunAttachments : NetworkBehaviour
         // - That the item is NOT an instance but IS a prefab.
         // Steps to add attachment: 
         // 1. Ensure that it is a valid attachment.
-        // 2. Pass on to server to instnaciate.
+        // 2. Pass on to server to intsantiate.
 
         bool valid = IsValid(type, attachment.GetComponent<Attachment>());
 
-        if (attachment == null) // If attachment is null, always allow. This 
+        if (attachment == null) // If attachment is null, always allow. This means that the current attachment is removed.
             valid = true;
 
         if (!valid)
@@ -223,7 +223,7 @@ public class GunAttachments : NetworkBehaviour
         // 2. This attachment can be applied on this weapon.
         // 3. This is a valid attachment for this slot.
 
-        // Find the sopt where it is mounted, to check for existing attachments
+        // Find the spot where it is mounted, to check for existing attachments
         Transform mount = GetMountFor(type);
 
         // Create item from prefab, and instanciate.
@@ -284,5 +284,23 @@ public class GunAttachments : NetworkBehaviour
     {
         if(Player.Local.NetworkIdentity.netId == player.GetComponent<NetworkIdentity>().netId)
             PlayerInventory.Add(prefab, null, amount); // Add to inventory...
+    }
+
+    public void RefreshAttachments()
+    {
+        Attachment[] attachments = GetComponentsInChildren<Attachment>();
+        foreach (var item in attachments)
+        {
+            item.RemoveEffects();
+        }
+        foreach (var item in attachments)
+        {
+            item.ApplyEffects();
+        }
+        Debug.Log("Refreshed!");
+        foreach (var item in attachments)
+        {
+            Debug.Log("Removed and applied effects from " + item.GetComponent<Item>().Name);
+        }
     }
 }

@@ -45,25 +45,6 @@ public class Attachment : NetworkBehaviour
         }
     }
 
-    public void Start()
-    {
-        Item = GetComponent<Item>();
-        if (Type == AttachmentType.MAGAZINE)
-            Hidden = true;
-    }
-
-    public void ApplyData(ItemDataX x)
-    {
-        // Just apply the effects of this attachment if we have not already applied them.
-        if (IsAttached)
-        {
-            if (!applied)
-            {
-                ApplyEffects();
-            }
-        }
-    }
-
     public virtual void Update()
     {
         if (IsAttached)
@@ -78,11 +59,6 @@ public class Attachment : NetworkBehaviour
 
             // Reset our local position
             this.transform.localPosition = Vector3.zero;
-
-            if (!applied && transform.parent.childCount == 1)
-            {
-                ApplyEffects();
-            }
 
             if(GetGun().Item.IsEquipped())
                 SetLayer("Equipped Items");
@@ -141,6 +117,7 @@ public class Attachment : NetworkBehaviour
                 GetGun().Shooting.AudioSauce.PitchMultiplier = ShotPitch;
                 GetGun().Shooting.AudioSauce.RangeMultiplier = ShotRange;
                 GetGun().Shooting.AudioSauce.VolumeMultiplier = ShotVolume;
+                Debug.Log("Applied effects for muzzle " + GetComponent<Item>().Name);
             }
         }
     }
@@ -148,13 +125,19 @@ public class Attachment : NetworkBehaviour
     public void RemoveEffects()
     {
         if (!applied)
+        {
+            Debug.LogWarning("Not applied, not removing " + GetComponent<Item>().Name);
             return;
+        }
 
         if (GetGun() != null)
             GetGun().OnShoot.RemoveListener(OnShoot);
 
         if (GetGun() == null)
+        {
+            Debug.LogWarning("GetGun is null, not removing " + GetComponent<Item>().Name);
             return; // If gun has been destroyed!
+        }
 
         foreach (AttachmentTweak tweak in GetComponents<AttachmentTweak>())
         {
@@ -166,41 +149,47 @@ public class Attachment : NetworkBehaviour
             GetGun().Shooting.AudioSauce.PitchMultiplier = 1;
             GetGun().Shooting.AudioSauce.RangeMultiplier = 1;
             GetGun().Shooting.AudioSauce.VolumeMultiplier = 1;
+            Debug.Log("Removed effect of muzzle " + GetComponent<Item>().Name);
         }
 
         applied = false;
     }
 
-    public override void OnNetworkDestroy()
+    public void OnDestroy()
     {
-        // TODO - If gun is being put away, we DO NOT CARE! Just do nothing and avoid errors.
-
+        Debug.Log("Network Destroy for " + GetComponent<Item>().Name);
+        // If gun is being put away, we DO NOT CARE! Just do nothing and avoid errors.
         if (transform.parent == null)
+        {
+            Debug.LogWarning("Parent is null, stopping...");
             return;
+        }
         Gun gun = GetGun();
         if (gun == null)
+        {
+            Debug.LogWarning("GetGun is null, stopping...");
             return;
-
-        RemoveEffects();
-        Attachment[] attachments = gun.GetComponentsInChildren<Attachment>();
-
-        // Remove all effects from gun.
-        foreach (Attachment a in attachments)
-        {
-            if (a == this)
-                continue;
-
-            a.RemoveEffects();
         }
 
-        // Apply all effects again.
-        foreach (Attachment a in attachments)
-        {
-            if (a == this)
-                continue;
+        GetComponentInParent<GunAttachments>().RefreshAttachments();
+    }
 
-            a.ApplyEffects();
+    public void Start()
+    {
+        Item = GetComponent<Item>();
+        if (Type == AttachmentType.MAGAZINE)
+            Hidden = true;
+
+        Debug.Log("Network start for " + GetComponent<Item>().Name);
+        // If gun is being put away, we DO NOT CARE! Just do nothing and avoid errors.
+        Gun gun = GetGun();
+        if (gun == null)
+        {
+            Debug.LogWarning("GetGun is null, stopping...");
+            return;
         }
+
+        gun.GetComponentInParent<GunAttachments>().RefreshAttachments();
     }
 
     public Gun GetGun()
