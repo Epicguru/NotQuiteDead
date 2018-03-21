@@ -4,7 +4,6 @@ using UnityEngine.Networking;
 
 public class NetworkParenting : NetworkBehaviour
 {
-    public UnityEvent OnParentChange;
     public bool IsParented
     {
         get
@@ -15,6 +14,11 @@ public class NetworkParenting : NetworkBehaviour
 
     [SyncVar(hook = "UpdateNetParent")]
     private NetworkInstanceId parentID;
+
+    public override void OnStartClient()
+    {
+        UpdateNetParent(parentID);
+    }
 
     [Server]
     public void SetParent(Transform trans)
@@ -53,7 +57,7 @@ public class NetworkParenting : NetworkBehaviour
     {
         this.parentID = newID;
 
-        if (parentID != NetworkInstanceId.Invalid && !parentID.IsEmpty())
+        if (IsParented)
         {
             GameObject go = ClientScene.FindLocalObject(parentID);
             if (go == null)
@@ -69,7 +73,5 @@ public class NetworkParenting : NetworkBehaviour
         {
             transform.SetParent(null);
         }
-
-        OnParentChange.Invoke();
     }
 }
