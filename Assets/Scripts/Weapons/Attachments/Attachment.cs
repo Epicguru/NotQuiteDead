@@ -86,7 +86,7 @@ public class Attachment : NetworkBehaviour
         {
             GunAttachments ga = transform.GetComponentInParent<GunAttachments>();
 
-            // Does not create infinite loop because transform change is ignored if the parent is equal. I am the best at explaining.
+            // Does not create infinite loop because transform parent change is ignored if the parent is equal. I am the best at explaining.
             if(ga != null)
             {
                 transform.SetParent(ga.GetMountFor(this.Type));

@@ -182,4 +182,55 @@ public class GunAttachments : NetworkBehaviour
             PlayerInventory.Add(prefab, itemData, 1);
         }
     }
+
+    public void UpdateData(ItemDataX data)
+    {
+        Attachment a;
+        Dictionary<AttachmentType, string> dic = new Dictionary<AttachmentType, string>();
+        dic.Add(AttachmentType.MAGAZINE, "Magazine Attachment");
+        dic.Add(AttachmentType.MUZZLE, "Muzzle Attachment");
+        dic.Add(AttachmentType.SIGHT, "Sight Attachment");
+        dic.Add(AttachmentType.UNDER_BARREL, "Under Barrel Attachment");
+
+        foreach (var pair in dic)
+        {
+            a = GetCurrentAttachment(pair.Key);
+            if (a != null)
+            {
+                data.Update(pair.Value, a.Item.Prefab);
+            }
+            else
+            {
+                if (data.ContainsKey(pair.Value))
+                    data.Remove(pair.Value);
+            }
+        }
+    }
+
+    public void ApplyData(ItemDataX data)
+    {
+        if (Player.Local == null)
+            return;
+
+        // TODO:
+        // Because of this, and the UpdateData method, attachment data is useless and non-funtional.
+        string[] keys = new string[]
+        {
+            "Sight Attachment",
+            "Magazine Attachment",
+            "Under Barrel Attachment",
+            "Muzzle Attachment"
+        };
+        GameObject player = Player.Local.gameObject;
+
+        foreach (var key in keys)
+        {
+            if (data.ContainsKey(key))
+            {
+                Item item = Item.GetItem(data.Get<string>(key));
+                Attachment a = item.GetComponent<Attachment>();
+                SetAttachment(player, a.Type, a, null);
+            }
+        }
+    }
 }
