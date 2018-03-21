@@ -21,7 +21,7 @@ public class AccuracyTweak : AttachmentTweak
     {
         string s = "";
         bool positive = Multiplier <= 1f; // Smaller means less spread, which is better!
-        s += "Accuracy " + RichText.InColour((positive ? "+" : "-") + (int)(Mathf.Abs(Multiplier - 1f) * 100.01f) + "%", positive ? Color.green : Color.red);
+        s += "Accuracy " + RichText.InColour((positive ? "+" : "-") + Mathf.RoundToInt((Multiplier - 1f) * 100.01f) + "%", positive ? Color.green : Color.red);
         return s;
     }
 }

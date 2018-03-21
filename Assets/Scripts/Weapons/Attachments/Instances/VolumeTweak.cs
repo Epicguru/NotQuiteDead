@@ -9,7 +9,7 @@ public class VolumeTweak : AttachmentTweak
 
     public override void Apply(Attachment x)
     {
-        x.Effect_ShotVolume(Multiplier);
+        //x.Effect_ShotVolume(Multiplier);
     }
 
     public override string GetEffects()
@@ -23,8 +23,6 @@ public class VolumeTweak : AttachmentTweak
 
     public override void Remove(Attachment x)
     {
-        x.Reset_ShotVolume();
+        //x.Reset_ShotVolume();
     }
-
-
 }
