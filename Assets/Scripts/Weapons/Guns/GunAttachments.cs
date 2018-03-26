@@ -29,6 +29,19 @@ public class GunAttachments : NetworkBehaviour
     }
     private Transform _MagazineMount;
 
+    public Gun Gun
+    {
+        get
+        {
+            if(_Gun == null)
+            {
+                _Gun = GetComponent<Gun>();
+            }
+            return _Gun;
+        }
+    }
+    private Gun _Gun;
+
     public virtual bool IsValid(AttachmentType type, Attachment attachment)
     {
         switch (type)
@@ -232,5 +245,10 @@ public class GunAttachments : NetworkBehaviour
                 SetAttachment(player, a.Type, a, null);
             }
         }
+    }
+
+    public void ResetEffects()
+    {
+        //Gun.Shooting.Damage
     }
 }
