@@ -23,7 +23,6 @@ public class NetworkParenting : NetworkBehaviour
     [Server]
     public void SetParent(Transform trans)
     {
-        Debug.Log("Requesting... " + trans.name);
         if (trans != null)
         {
             // Check to make sure this object is not already attached to that parent.
@@ -41,7 +40,6 @@ public class NetworkParenting : NetworkBehaviour
             }
             parentID = ni.netId;
             transform.SetParent(trans);
-            Debug.Log("Parented!");
         }
         else
         {

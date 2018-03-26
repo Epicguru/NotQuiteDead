@@ -87,12 +87,14 @@ public class Attachment : NetworkBehaviour
             GunAttachments ga = transform.GetComponentInParent<GunAttachments>();
 
             // Does not create infinite loop because transform parent change is ignored if the parent is equal. I am the best at explaining.
-            if(ga != null)
+            Transform mount = ga.GetMountFor(this.Type);
+            if (ga != null && transform.parent != mount)
             {
-                transform.SetParent(ga.GetMountFor(this.Type));
+                transform.SetParent(mount);
                 transform.localPosition = Vector3.zero;
                 transform.localRotation = Quaternion.identity;
                 transform.localScale = Vector3.one;
+                ga.AttachmentsUpdated();
             }
         }
     }
@@ -134,5 +136,12 @@ public class Attachment : NetworkBehaviour
         }
 
         this.layer = layer;
+    }
+
+    public void ApplyEffects(Gun gun)
+    {
+        // Apply all attachment effects onto the gun.
+        if(Type == AttachmentType.MUZZLE)
+            gun.Shooting.AudioSauce.VolumeMultiplier = 0.05f;
     }
 }

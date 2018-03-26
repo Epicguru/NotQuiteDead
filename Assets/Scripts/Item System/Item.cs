@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(ItemPickup), typeof(NetPositionSync))]
+[RequireComponent(typeof(ItemPickup), typeof(NetPosSync))]
 public class Item : NetworkBehaviour
 {
 
@@ -90,7 +90,7 @@ public class Item : NetworkBehaviour
     private ItemDataX _Data;
 
     [HideInInspector]
-    public NetPositionSync NetPosSync;
+    public NetPosSync NetPosSync;
 
     [SyncVar]
     private bool equipped = false;
@@ -108,7 +108,7 @@ public class Item : NetworkBehaviour
         IsPrefab = false;
         IsGear = GetComponent<GearItem>() != null;
         IsAttachment = GetComponent<Attachment>() != null;
-        NetPosSync = GetComponent<NetPositionSync>();
+        NetPosSync = GetComponent<NetPosSync>();
         Pickup = GetComponent<ItemPickup>();
     }
 
@@ -373,7 +373,7 @@ public class Item : NetworkBehaviour
     }
 
     /// <summary>
-    /// Gets an item from the loaded items, this does not create a new instance.
+    /// Gets an item prefab from the loaded item prefab list, this does not create a new instance.
     /// </summary>
     /// <param name="path">The prefab name of the item, as in Item.Prefab .</param>
     /// <returns>The item object, which is a prefab.</returns>

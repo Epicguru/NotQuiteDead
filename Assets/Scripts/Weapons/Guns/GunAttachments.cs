@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -41,6 +39,33 @@ public class GunAttachments : NetworkBehaviour
         }
     }
     private Gun _Gun;
+
+    public Gun Prefab
+    {
+        get
+        {
+            if(_Prefab == null)
+            {
+                _Prefab = Item.GetItem(Gun.Item.Prefab).GetComponent<Gun>();
+            }
+            return _Prefab;
+        }
+    }
+    private Gun _Prefab;
+
+    public void Awake()
+    {
+        foreach (AttachmentType val in Enum.GetValues(typeof(AttachmentType)))
+        {
+            Transform mount = GetMountFor(val);
+
+            if(mount != null)
+            {
+                NetParent parent = mount.gameObject.AddComponent<NetParent>();
+                parent.ID = val.ToString();
+            }
+        }
+    }
 
     public virtual bool IsValid(AttachmentType type, Attachment attachment)
     {
@@ -249,6 +274,53 @@ public class GunAttachments : NetworkBehaviour
 
     public void ResetEffects()
     {
-        //Gun.Shooting.Damage
+        // This resets all changed values to their default state.
+
+        // Damage
+        Gun.Shooting.Damage.Damage = Prefab.Shooting.Damage.Damage;
+        Gun.Shooting.Damage.DamageFalloff = Prefab.Shooting.Damage.DamageFalloff;
+        Gun.Shooting.Damage.Inaccuracy = Prefab.Shooting.Damage.Inaccuracy;
+        Gun.Shooting.Damage.Penetration = Prefab.Shooting.Damage.Penetration;
+        Gun.Shooting.Damage.PenetrationFalloff = Prefab.Shooting.Damage.PenetrationFalloff;
+        Gun.Shooting.Damage.Range = Prefab.Shooting.Damage.Range;
+        Gun.Shooting.Damage.ShotsToInaccuracy = Prefab.Shooting.Damage.ShotsToInaccuracy;
+        Gun.Shooting.Damage.MinIdleTimeToCooldown = Prefab.Shooting.Damage.MinIdleTimeToCooldown;
+
+        // Capacity
+        Gun.Shooting.Capacity.BulletsPerShot = Prefab.Shooting.Capacity.BulletsPerShot;
+        Gun.Shooting.Capacity.MagazineCapacity = Prefab.Shooting.Capacity.MagazineCapacity;
+        Gun.Shooting.Capacity.BurstShots = Prefab.Shooting.Capacity.BurstShots;
+        Gun.Shooting.Capacity.BulletsConsumed = Prefab.Shooting.Capacity.BulletsConsumed;
+
+        // Audio
+        Gun.Shooting.AudioSauce.RangeMultiplier = Gun.Shooting.AudioSauce.RangeMultiplier;
+        Gun.Shooting.AudioSauce.VolumeMultiplier = Gun.Shooting.AudioSauce.VolumeMultiplier;
+        Gun.Shooting.AudioSauce.PitchMultiplier = Gun.Shooting.AudioSauce.PitchMultiplier;
+    }
+
+    public Attachment[] GetAllCurrentAttachments()
+    {
+        return this.GetComponentsInChildren<Attachment>();
+    }
+
+    public void ApplyEffects()
+    {
+        var attachments = GetAllCurrentAttachments();
+        foreach (var att in attachments)
+        {
+            if (att == null)
+                continue;
+            if (!att.NetParent.IsParented)
+                continue;
+
+            att.ApplyEffects(this.Gun);
+        }
+    }
+
+    public void AttachmentsUpdated()
+    {
+        Debug.Log("Attachments updated!");
+        ResetEffects();
+        ApplyEffects();
     }
 }
