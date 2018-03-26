@@ -53,13 +53,13 @@ public class GunAttachments : NetworkBehaviour
     }
     private Gun _Prefab;
 
-    public void Awake()
+    public override void OnStartClient()
     {
         foreach (AttachmentType val in Enum.GetValues(typeof(AttachmentType)))
         {
             Transform mount = GetMountFor(val);
 
-            if(mount != null)
+            if (mount != null)
             {
                 NetParent parent = mount.gameObject.AddComponent<NetParent>();
                 parent.ID = val.ToString();
@@ -178,15 +178,25 @@ public class GunAttachments : NetworkBehaviour
             // Spawn the attachment...
             Item spawnedItem = Item.NewInstance(prefab, transform.position, itemData);
             Attachment spawnedAttachment = spawnedItem.GetComponent<Attachment>();
-            NetworkParenting parenting = spawnedItem.GetComponent<NetworkParenting>();
+            NetPosSync posSync = spawnedItem.NetPosSync;
+            NetParent parent;
+            Transform mount = GetMountFor(type);
+            if(mount != null)
+            {
+                parent = mount.GetComponent<NetParent>();
+            }
+            else
+            {
+                Debug.LogError("Invalid mount (null) for attachment {0}, not good at all. Expect wierd bullshittery.".Form(prefab));
+                Destroy(spawnedItem.gameObject);
+                return;
+            }
 
             // Spawn on server and on all client, with player authority assigned to the player who is using the attachment.
             NetworkServer.SpawnWithClientAuthority(spawnedItem.gameObject, player);
 
-            // Mount it to this object. It needs to be on 'this' object because the mount code requires a NetworkIdentity to act upon.
-            // The real mount is assigned from within the Attachment.cs script.
-            parenting.SetParent(this.transform);
-            
+            // Mount it to the correct NetParent.
+            posSync.SetParent(parent);            
         }
         else
         {
@@ -310,7 +320,7 @@ public class GunAttachments : NetworkBehaviour
         {
             if (att == null)
                 continue;
-            if (!att.NetParent.IsParented)
+            if (!att.Item.NetPosSync.IsParented)
                 continue;
 
             att.ApplyEffects(this.Gun);

@@ -90,7 +90,18 @@ public class Item : NetworkBehaviour
     private ItemDataX _Data;
 
     [HideInInspector]
-    public NetPosSync NetPosSync;
+    public NetPosSync NetPosSync
+    {
+        get
+        {
+            if(_NetPosSync == null)
+            {
+                _NetPosSync = GetComponent<NetPosSync>();
+            }
+            return _NetPosSync;
+        }
+    }
+    private NetPosSync _NetPosSync;
 
     [SyncVar]
     private bool equipped = false;
@@ -108,7 +119,6 @@ public class Item : NetworkBehaviour
         IsPrefab = false;
         IsGear = GetComponent<GearItem>() != null;
         IsAttachment = GetComponent<Attachment>() != null;
-        NetPosSync = GetComponent<NetPosSync>();
         Pickup = GetComponent<ItemPickup>();
     }
 

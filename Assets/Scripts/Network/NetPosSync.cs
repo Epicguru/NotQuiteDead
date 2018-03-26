@@ -39,7 +39,13 @@ public class NetPosSync : NetworkBehaviour
     [System.Serializable]
     private class Parent
     {
-        public bool Sync = false;
+        public bool Sync
+        {
+            get
+            {
+                return true;
+            }
+        }
     }
     [SerializeField]
     private Parent _Parent;

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(Item), typeof(NetworkParenting))]
+[RequireComponent(typeof(Item))]
 public class Attachment : NetworkBehaviour
 {
     [Header("Info")]
@@ -11,24 +11,11 @@ public class Attachment : NetworkBehaviour
     [Header("Muzzle Only")]
     public Transform CustomBulletSpawn = null;
 
-    public NetworkParenting NetParent
-    {
-        get
-        {
-            if(_NetParent == null)
-            {
-                _NetParent = GetComponent<NetworkParenting>();
-            }
-            return _NetParent;
-        }
-    }
-    private NetworkParenting _NetParent;
-
     public bool IsAttached
     {
         get
         {
-            return NetParent.IsParented;
+            return Item.NetPosSync.IsParented;
         }
     }
 
@@ -103,6 +90,8 @@ public class Attachment : NetworkBehaviour
     {
         if (IsAttached)
         {
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
             if (Gun.Item.IsEquipped())
             {
                 SetLayer("Equipped Items");
