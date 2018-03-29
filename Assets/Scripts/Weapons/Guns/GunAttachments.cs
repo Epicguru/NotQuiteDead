@@ -302,9 +302,13 @@ public class GunAttachments : NetworkBehaviour
         Gun.Shooting.Capacity.BulletsConsumed = Prefab.Shooting.Capacity.BulletsConsumed;
 
         // Audio
-        Gun.Shooting.AudioSauce.RangeMultiplier = Gun.Shooting.AudioSauce.RangeMultiplier;
-        Gun.Shooting.AudioSauce.VolumeMultiplier = Gun.Shooting.AudioSauce.VolumeMultiplier;
-        Gun.Shooting.AudioSauce.PitchMultiplier = Gun.Shooting.AudioSauce.PitchMultiplier;
+        Gun.Shooting.AudioSauce.RangeMultiplier = Prefab.Shooting.AudioSauce.RangeMultiplier;
+        Gun.Shooting.AudioSauce.VolumeMultiplier = Prefab.Shooting.AudioSauce.VolumeMultiplier;
+        Gun.Shooting.AudioSauce.PitchMultiplier = Prefab.Shooting.AudioSauce.PitchMultiplier;
+
+        // Animation
+        Gun.Shooting.ReloadSpeedMultiplier = Prefab.Shooting.ReloadSpeedMultiplier;
+        Gun.Shooting.ShootSpeedMultiplier = Prefab.Shooting.ShootSpeedMultiplier;
     }
 
     public Attachment[] GetAllCurrentAttachments()

@@ -16,6 +16,10 @@ public class AttachmentTweak : MonoBehaviour
     [Header("Shooting")]
     [Tooltip("X value is the multiplier for the initial (best) inaccuracy. Y value is the multiplier for the final (worst) inaccuracy.")]
     public Vector2 InaccuracyMultiplier = new Vector2(1f, 1f);
+    public float ShotSpeedMultiplier = 1f;
+
+    [Header("Reloading")]
+    public float ReloadSpeedMultiplier = 1f;
 
     [Header("Range")]
     public float RangeMultiplier = 1f;
@@ -90,6 +94,10 @@ public class AttachmentTweak : MonoBehaviour
         gun.Shooting.AudioSauce.RangeMultiplier *= AudioRangeMultiplier;
         gun.Shooting.AudioSauce.VolumeMultiplier *= AudioVolumeMultiplier;
         gun.Shooting.AudioSauce.PitchMultiplier *= AudioPitchMultiplier;
+
+        // Animation
+        gun.Shooting.ReloadSpeedMultiplier *= ReloadSpeedMultiplier;
+        gun.Shooting.ShootSpeedMultiplier *= ShotSpeedMultiplier;
     }
 
     public void OnShoot()
