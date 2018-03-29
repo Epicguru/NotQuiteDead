@@ -102,7 +102,7 @@ public class GunAttachments : NetworkBehaviour
         }
     }
 
-    public bool SetAttachment(GameObject player, AttachmentType type, Attachment attachment, ItemDataX itemData)
+    public bool SetAttachment(GameObject player, AttachmentType type, Attachment attachment, ItemData itemData)
     {
         if(!IsValid(type, attachment))
         {
@@ -139,7 +139,7 @@ public class GunAttachments : NetworkBehaviour
     [Command]
     private void CmdSetAttachment(GameObject player, AttachmentType type, string prefab, string data)
     {
-        ItemDataX id = ItemDataX.TryDeserialize(data);
+        ItemData id = ItemData.TryDeserialize(data);
         Attachment a;
         if (!string.IsNullOrWhiteSpace(prefab))
         {
@@ -154,7 +154,7 @@ public class GunAttachments : NetworkBehaviour
     }
 
     [Server]
-    private void Server_SetAttachment(GameObject player, AttachmentType type, Attachment a, ItemDataX itemData)
+    private void Server_SetAttachment(GameObject player, AttachmentType type, Attachment a, ItemData itemData)
     {
         if(a != null)
         {
@@ -222,16 +222,16 @@ public class GunAttachments : NetworkBehaviour
     {
         if(player.GetComponent<NetworkIdentity>().netId == Player.Local.netId)
         {
-            ItemDataX itemData = null;
+            ItemData itemData = null;
             if (!string.IsNullOrWhiteSpace(data))
             {
-                itemData = ItemDataX.TryDeserialize(data);
+                itemData = ItemData.TryDeserialize(data);
             }
             PlayerInventory.Add(prefab, itemData, 1);
         }
     }
 
-    public void UpdateData(ItemDataX data)
+    public void UpdateData(ItemData data)
     {
         Attachment a;
         Dictionary<AttachmentType, string> dic = new Dictionary<AttachmentType, string>();
@@ -255,7 +255,7 @@ public class GunAttachments : NetworkBehaviour
         }
     }
 
-    public void ApplyData(ItemDataX data)
+    public void ApplyData(ItemData data)
     {
         if (Player.Local == null)
             return;

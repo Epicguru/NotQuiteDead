@@ -16,7 +16,7 @@ public class BoltActionShooting : GunShooting
         Capacity.ChamberCountsAsMag = true; // No chambering.
     }
 
-    public void SetDataDefaults(ItemDataX data)
+    public void SetDataDefaults(ItemData data)
     {
         data.Update("Bullet In Chamber", true);
         if(data.ContainsKey("Bullets In Magazine"))

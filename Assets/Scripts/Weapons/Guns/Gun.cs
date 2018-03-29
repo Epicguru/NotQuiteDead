@@ -88,21 +88,21 @@ public class Gun : Weapon
         transform.localRotation = Quaternion.identity;
     }
 
-    public void UpdateData(ItemDataX data)
+    public void UpdateData(ItemData data)
     {
         data.Update("Bullet In Chamber", Shooting.BulletInChamber);
         data.Update("Bullets In Magazine", Shooting.bulletsInMagazine);
         data.Update("Firing Mode", Shooting.firingModeIndex);
     }
 
-    public void ApplyData(ItemDataX data)
+    public void ApplyData(ItemData data)
     {
         Shooting.BulletInChamber = data.Get("Bullet In Chamber", true);
         Shooting.bulletsInMagazine = data.Get("Bullets In Magazine", 0);
         Shooting.firingModeIndex = data.Get("Firing Mode", 0);
     }
 
-    public void SetDataDefaults(ItemDataX data)
+    public void SetDataDefaults(ItemData data)
     {
         // Set gun data.
         data.Update("Bullet In Chamber", Shooting.ReloadAutoChambers);

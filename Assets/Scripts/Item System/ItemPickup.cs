@@ -64,7 +64,7 @@ public class ItemPickup : NetworkBehaviour
         }
     }
 
-    public void PickupAccepted(ItemDataX data)
+    public void PickupAccepted(ItemData data)
     {
         PlayerInventory.Add(Item.Prefab, data, 1); // Give real version with data.
     }

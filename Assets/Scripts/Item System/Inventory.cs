@@ -112,7 +112,7 @@ public class Inventory : MonoBehaviour
         SortingOption.AddOptions(options);
     }
 
-    public void AddItem(string prefab, ItemDataX data, int amount = 1)
+    public void AddItem(string prefab, ItemData data, int amount = 1)
     {
         if (amount <= 0)
             return;
