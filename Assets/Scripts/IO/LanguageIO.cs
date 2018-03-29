@@ -7,7 +7,7 @@ public static class LanguageIO
     {
         get
         {
-            return Application.streamingAssetsPath + "/Languages/Instances/";
+            return Application.dataPath + "/Resources/Languages/Instances/";
         }
     }
 
@@ -15,7 +15,7 @@ public static class LanguageIO
     {
         get
         {
-            return Application.streamingAssetsPath + "/Languages/Definitions/";
+            return Application.dataPath + "/Resources/Languages/Definitions/";
         }
     }
 
@@ -33,6 +33,8 @@ public static class LanguageIO
     {
         if (lang == null)
             return;
+        if (!Application.isEditor)
+            return;
 
         string path = GetLanguagePath(lang.Name);
 
@@ -41,12 +43,26 @@ public static class LanguageIO
 
     public static Language LoadLanguage(string name)
     {
-        return InputUtils.FileToObject<Language>(GetLanguagePath(name));
+        if (Application.isEditor)
+        {
+            // Load from absolute file path...
+            return InputUtils.FileToObject<Language>(GetLanguagePath(name));
+        }
+        else
+        {
+            // Load from internal resources...
+            string path = "Languages/Instances/" + name;
+            TextAsset a = Resources.Load<TextAsset>(path);
+            string json = a.text;
+            return InputUtils.JsonToObject<Language>(json);
+        }
     }
 
     public static void SaveDefinition(LanguageDefinition def)
     {
         if (def == null)
+            return;
+        if (!Application.isEditor)
             return;
 
         string path = GetDefinitionPath(def.Name);
@@ -56,6 +72,18 @@ public static class LanguageIO
 
     public static LanguageDefinition LoadDefinition(string name)
     {
-        return InputUtils.FileToObject<LanguageDefinition>(GetDefinitionPath(name));
+        if (Application.isEditor)
+        {
+            // Load from absolute file path...
+            return InputUtils.FileToObject<LanguageDefinition>(GetDefinitionPath(name));
+        }
+        else
+        {
+            // Load from internal resources...
+            string path = "Languages/Definitions/" + name;
+            TextAsset a = Resources.Load<TextAsset>(path);
+            string json = a.text;
+            return InputUtils.JsonToObject<LanguageDefinition>(json);
+        }
     }
 }

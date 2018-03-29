@@ -13,11 +13,6 @@ public class Credits : MonoBehaviour
         SetText();
     }
 
-    public void OnEnable()
-    {
-        SV.verticalNormalizedPosition = 1f;
-    }
-
     public void SetText()
     {
         Text.text = Resources.Load<TextAsset>("Credits").text;
