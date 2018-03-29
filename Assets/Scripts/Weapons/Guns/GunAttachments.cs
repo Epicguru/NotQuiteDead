@@ -219,7 +219,7 @@ public class GunAttachments : NetworkBehaviour
     [ClientRpc]
     private void RpcReturnAttachment(GameObject player, string prefab, string data)
     {
-        if(player == Player.Local)
+        if(player.GetComponent<NetworkIdentity>().netId == Player.Local.netId)
         {
             ItemDataX itemData = null;
             if (!string.IsNullOrWhiteSpace(data))
@@ -284,7 +284,6 @@ public class GunAttachments : NetworkBehaviour
     public void ResetEffects()
     {
         // This resets all changed values to their default state.
-
         // Damage
         Gun.Shooting.Damage.Damage = Prefab.Shooting.Damage.Damage;
         Gun.Shooting.Damage.DamageFalloff = Prefab.Shooting.Damage.DamageFalloff;
@@ -309,6 +308,7 @@ public class GunAttachments : NetworkBehaviour
         // Animation
         Gun.Shooting.ReloadSpeedMultiplier = Prefab.Shooting.ReloadSpeedMultiplier;
         Gun.Shooting.ShootSpeedMultiplier = Prefab.Shooting.ShootSpeedMultiplier;
+        Debug.Log("Reset!");
     }
 
     public Attachment[] GetAllCurrentAttachments()

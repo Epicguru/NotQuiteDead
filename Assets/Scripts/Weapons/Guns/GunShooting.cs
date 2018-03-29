@@ -30,7 +30,18 @@ public class GunShooting : RotatingItem
     public GunCapacity Capacity;
     public ShellData Shells;
     public GunAudio Audio;
-    public AudioSauce AudioSauce;
+    public AudioSauce AudioSauce
+    {
+        get
+        {
+            if(audioSauce == null)
+            {
+                audioSauce = GetComponentInChildren<AudioSauce>();
+            }
+            return audioSauce;
+        }
+    }
+    private AudioSauce audioSauce;
 
     [HideInInspector]
     [SyncVar]
@@ -62,7 +73,6 @@ public class GunShooting : RotatingItem
     {
         gun = GetComponent<Gun>();
         animation = GetComponent<GunAnimation>();
-        AudioSauce = GetComponentInChildren<AudioSauce>();
     }
 
     public virtual void Start()
