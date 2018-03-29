@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(NetworkIdentity))]
-[RequireComponent(typeof(NetPositionSync))]
+[RequireComponent(typeof(NetPosSync))]
 public class ThrowableInstance : NetworkBehaviour
 {
     [SyncVar]

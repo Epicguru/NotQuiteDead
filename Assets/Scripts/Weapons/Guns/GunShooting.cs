@@ -30,7 +30,18 @@ public class GunShooting : RotatingItem
     public GunCapacity Capacity;
     public ShellData Shells;
     public GunAudio Audio;
-    public AudioSauce AudioSauce;
+    public AudioSauce AudioSauce
+    {
+        get
+        {
+            if(audioSauce == null)
+            {
+                audioSauce = GetComponentInChildren<AudioSauce>();
+            }
+            return audioSauce;
+        }
+    }
+    private AudioSauce audioSauce;
 
     [HideInInspector]
     [SyncVar]
@@ -58,12 +69,14 @@ public class GunShooting : RotatingItem
     [HideInInspector]
     public int firingModeIndex = 0;
 
-    public virtual void Start()
+    public void Awake()
     {
         gun = GetComponent<Gun>();
         animation = GetComponent<GunAnimation>();
-        AudioSauce = GetComponentInChildren<AudioSauce>();
+    }
 
+    public virtual void Start()
+    {
         if(DefaultBulletSpawn == null)
         {
             Debug.LogError("Default Bullet Spawn for gun '" + gun.GetComponent<Item>().Name + "' is null!");

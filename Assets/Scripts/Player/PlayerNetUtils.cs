@@ -113,12 +113,6 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
-    public void CmdSetPositionSync(GameObject obj, Vector3 position)
-    {
-        obj.GetComponent<NetPositionSync>().Position = position;
-    }
-
-    [Command]
     public void CmdSpawnDroppedItem(string prefab, Vector3 position, string data)
     {
         Server_SpawnDroppedItem(prefab, position, ItemDataX.TryDeserialize(data));

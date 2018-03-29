@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(ItemPickup), typeof(NetPositionSync))]
+[RequireComponent(typeof(ItemPickup), typeof(NetPosSync))]
 public class Item : NetworkBehaviour
 {
 
@@ -90,7 +90,18 @@ public class Item : NetworkBehaviour
     private ItemDataX _Data;
 
     [HideInInspector]
-    public NetPositionSync NetPosSync;
+    public NetPosSync NetPosSync
+    {
+        get
+        {
+            if(_NetPosSync == null)
+            {
+                _NetPosSync = GetComponent<NetPosSync>();
+            }
+            return _NetPosSync;
+        }
+    }
+    private NetPosSync _NetPosSync;
 
     [SyncVar]
     private bool equipped = false;
@@ -101,12 +112,13 @@ public class Item : NetworkBehaviour
 
     private bool IsPrefab = true;
     private bool IsGear = false;
+    private bool IsAttachment = false;
 
     public void Awake()
     {
         IsPrefab = false;
         IsGear = GetComponent<GearItem>() != null;
-        NetPosSync = GetComponent<NetPositionSync>();
+        IsAttachment = GetComponent<Attachment>() != null;
         Pickup = GetComponent<ItemPickup>();
     }
 
@@ -154,7 +166,7 @@ public class Item : NetworkBehaviour
         if(Equipable && item.GetComponent<GearItem>() == null && !Player.Local.Building.InBuildMode)
             options.Add(new ItemOption() { OptionName = "Equip", OnSelected = Option_Equip });
         options.Add(new ItemOption() { OptionName = "Details", OnSelected = Option_Details });
-        if (GetComponent<Attachment>() != null && Player.Local.Holding.Item != null && Player.Local.Holding.Item.GetComponent<GunAttachments>() != null && Player.Local.Holding.Item.GetComponent<GunAttachments>().IsValid(item.GetComponent<Attachment>().Type, item.GetComponent<Attachment>()))
+        if (this.GetComponent<Attachment>() != null && Player.Local.Holding.Item != null && Player.Local.Holding.Item.GetComponent<GunAttachments>() != null && Player.Local.Holding.Item.GetComponent<GunAttachments>().IsValid(item.GetComponent<Attachment>().Type, item.GetComponent<Attachment>()))
             options.Add(new ItemOption() { OptionName = "EquipAttach", OnSelected = Option_ApplyAttachment });
         if (item.GetComponent<GearItem>() != null)
             options.Add(new ItemOption() { OptionName = "Equip", OnSelected = Option_EquipGear });
@@ -187,7 +199,7 @@ public class Item : NetworkBehaviour
     public void Update()
     {
         // Does not matter where this is running...
-        NetPosSync.enabled = (transform.parent == null);
+        //NetPosSync.enabled = (transform.parent == null);
 
         // Layer
         SetLayer(IsEquipped() ? "Equipped Items" : "Dropped Items");
@@ -261,13 +273,16 @@ public class Item : NetworkBehaviour
         {
             Transform t = PlayerHolding.GetComponent<Player>().Holding.Holding;
             if (transform.parent != t)
+            {
                 transform.SetParent(t);
+
+            }
             transform.localPosition = Vector3.zero;
             transform.localScale = Vector3.one;
         }
         else
         {
-            if (!IsGear)
+            if (!IsGear && !IsAttachment)
                 if (transform.parent != null)
                     transform.SetParent(null);
         }
@@ -371,7 +386,7 @@ public class Item : NetworkBehaviour
     }
 
     /// <summary>
-    /// Gets an item from the loaded items, this does not create a new instance.
+    /// Gets an item prefab from the loaded item prefab list, this does not create a new instance.
     /// </summary>
     /// <param name="path">The prefab name of the item, as in Item.Prefab .</param>
     /// <returns>The item object, which is a prefab.</returns>
@@ -447,7 +462,13 @@ public class Item : NetworkBehaviour
     public static void Option_ApplyAttachment(InventoryItemData x, string prefab)
     {
         // Set attachment...
-        bool worked = Player.Local.Holding.Item.GetComponent<GunAttachments>().SetAttachment(x.Item.GetComponent<Attachment>().Type, x.Item);
+        var attachment = x.Item.GetComponent<Attachment>();
+        if(attachment == null)
+        {
+            Debug.LogError("Attachment is null! What?");
+            return;
+        }
+        bool worked = Player.Local.Holding.Item.GetComponent<GunAttachments>().SetAttachment(Player.Local.gameObject, attachment.Type, attachment, x.Data);
         // Remove from inventory
         if(worked)
             PlayerInventory.Remove(x.Prefab, Vector2.zero, false, 1);

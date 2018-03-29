@@ -53,7 +53,7 @@ public class Gun : Weapon
         get
         {
             if (_Item == null)
-                _Item= GetComponent<Item>();
+                _Item = GetComponent<Item>();
             return _Item;
         }
     }

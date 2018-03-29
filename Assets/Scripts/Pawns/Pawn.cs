@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(Health), typeof(ActiveObject), typeof(NetPositionSync))]
+[RequireComponent(typeof(Health), typeof(ActiveObject), typeof(NetPosSync))]
 [RequireComponent(typeof(PawnPathfinding))]
 public class Pawn : NetworkBehaviour
 {
@@ -37,7 +37,7 @@ public class Pawn : NetworkBehaviour
     public PawnPathfinding Path;
 
     [HideInInspector]
-    public NetPositionSync NetPositionSync;
+    public NetPosSync NetPosSync;
 
     // What should a pawn do in an unloaded chunk?
     // Lets just load the chunks around pawns!
@@ -46,7 +46,7 @@ public class Pawn : NetworkBehaviour
     {
         Health = GetComponent<Health>();
         AO = GetComponent<ActiveObject>();
-        NetPositionSync = GetComponent<NetPositionSync>();
+        NetPosSync = GetComponent<NetPosSync>();
         Path = GetComponent<PawnPathfinding>();
     }
 

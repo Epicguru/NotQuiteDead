@@ -1,159 +1,90 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(Gun))]
 public class GunAttachments : NetworkBehaviour
 {
+    // The component attached to the guns that handles attachments on that gun at all times.
+
     public Transform MuzzleMount;
     public Transform SightMount;
-    public Transform UnderBarrelMount;    
+    public Transform UnderBarrelMount;
     public bool AllowMag = true;
-    private Transform MagazineMount;
 
-    private Gun gun;
-
-    public bool AllowMagazine
+    private Transform MagazineMount
     {
         get
         {
-            return AllowMag;
+            if(_MagazineMount == null)
+            {
+                _MagazineMount = new GameObject("Hidden Attachment Mount").transform;
+                _MagazineMount.SetParent(this.transform);
+            }
+            return _MagazineMount;
         }
     }
+    private Transform _MagazineMount;
 
-    public bool AllowMuzzle
+    public Gun Gun
     {
         get
         {
-            return MuzzleMount != null;
+            if(_Gun == null)
+            {
+                _Gun = GetComponent<Gun>();
+            }
+            return _Gun;
         }
     }
+    private Gun _Gun;
 
-    public bool AllowSight
+    public Gun Prefab
     {
         get
         {
-            return SightMount != null;
+            if(_Prefab == null)
+            {
+                _Prefab = Item.GetItem(Gun.Item.Prefab).GetComponent<Gun>();
+            }
+            return _Prefab;
         }
     }
+    private Gun _Prefab;
 
-    public bool AllowUnderBarrel
+    public override void OnStartClient()
     {
-        get
+        foreach (AttachmentType val in Enum.GetValues(typeof(AttachmentType)))
         {
-            return UnderBarrelMount != null;
+            Transform mount = GetMountFor(val);
+
+            if (mount != null)
+            {
+                NetParent parent = mount.gameObject.AddComponent<NetParent>();
+                parent.ID = val.ToString();
+            }
         }
     }
 
-    public void UpdateData(ItemDataX data)
+    public virtual bool IsValid(AttachmentType type, Attachment attachment)
     {
-        string magazine = AllowMagazine ? MagazineMount.childCount > 0 ? MagazineMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
-        string muzzle = AllowMuzzle ? MuzzleMount.childCount > 0 ? MuzzleMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
-        string sight = AllowSight ? SightMount.childCount > 0 ? SightMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
-        string underBarrel = AllowUnderBarrel ? UnderBarrelMount.childCount > 0 ? UnderBarrelMount.GetChild(0).GetComponent<Item>().Prefab : null : null;
-
-        string name;
-
-        // Apply magazine attachment.
-        name = "Magazine Attachment";
-        if(magazine != null)
+        switch (type)
         {
-            data.Update(name, magazine);
-        }
-        else
-        {
-            if(data.ContainsKey(name))
-                data.Remove(name);
-        }
-
-        // Apply muzzle attachment.
-        name = "Muzzle Attachment";
-        if (muzzle != null)
-        {
-            data.Update(name, muzzle);
-        }
-        else
-        {
-            if (data.ContainsKey(name))
-                data.Remove(name);
-        }
-
-        // Apply sight attachment.
-        name = "Sight Attachment";
-        if (sight != null)
-        {
-            data.Update(name, sight);
-        }
-        else
-        {
-            if (data.ContainsKey(name))
-                data.Remove(name);
-        }
-
-        // Apply under barrel attachment.
-        name = "Under Barrel Attachment";
-        if (underBarrel != null)
-        {
-            data.Update(name, underBarrel);
-        }
-        else
-        {
-            if (data.ContainsKey(name))
-                data.Remove(name);
+            case AttachmentType.MUZZLE:
+                return MuzzleMount != null;
+            case AttachmentType.SIGHT:
+                return SightMount != null;
+            case AttachmentType.MAGAZINE:
+                return AllowMag;
+            case AttachmentType.UNDER_BARREL:
+                return UnderBarrelMount != null;
+            default:
+                return false;
         }
     }
 
-    public void ApplyData(ItemDataX data)
-    {
-        if (!isServer)
-            return;
-
-        string sightName = "Sight Attachment";
-        string magazineName = "Magazine Attachment";
-        string underBarrelName = "Under Barrel Attachment";
-        string muzzleName = "Muzzle Attachment";
-
-        if (data.ContainsKey(muzzleName))
-        {
-            Item item = Item.GetItem(data.Get<string>(muzzleName));
-            Attachment a = item.GetComponent<Attachment>();
-            SetAttachment(a.Type, item);
-        }
-        if (data.ContainsKey(sightName))
-        {
-            Item item = Item.GetItem(data.Get<string>(sightName));
-            Attachment a = item.GetComponent<Attachment>();
-            SetAttachment(a.Type, item);
-        }
-        if (data.ContainsKey(magazineName))
-        {
-            Item item = Item.GetItem(data.Get<string>(magazineName));
-            Attachment a = item.GetComponent<Attachment>();
-            SetAttachment(a.Type, item);
-        }
-        if (data.ContainsKey(underBarrelName))
-        {
-            Item item = Item.GetItem(data.Get<string>(underBarrelName));
-            Attachment a = item.GetComponent<Attachment>();
-            SetAttachment(a.Type, item);
-        }
-    }
-
-    public void Start()
-    {
-        gun = GetComponent<Gun>();
-
-        if (MagazineMount == null)
-        {
-            MagazineMount = new GameObject("Magazine Container").transform;
-            MagazineMount.SetParent(transform);
-        }
-    }
-
-    public Transform GetMountFor(AttachmentType type)
+    public virtual Transform GetMountFor(AttachmentType type)
     {
         switch (type)
         {
@@ -162,145 +93,248 @@ public class GunAttachments : NetworkBehaviour
             case AttachmentType.SIGHT:
                 return SightMount;
             case AttachmentType.MAGAZINE:
-                if(MagazineMount == null)
-                {
-                    MagazineMount = new GameObject("Magazine Container").transform;
-                    MagazineMount.SetParent(transform);
-                }
                 return MagazineMount;
             case AttachmentType.UNDER_BARREL:
                 return UnderBarrelMount;
             default:
-                Debug.LogError("Mount not found.");
+                Debug.LogError("Unsported attachment type, cannot get mount: " + type);
                 return null;
         }
     }
 
-    public bool IsValid(AttachmentType type, Attachment attachment)
+    public bool SetAttachment(GameObject player, AttachmentType type, Attachment attachment, ItemDataX itemData)
     {
-        bool correctType = attachment.Type == type;
-        bool hasMount = GetMountFor(type) != null;
-        if (type == AttachmentType.MAGAZINE && !AllowMagazine)
-            return false;
-
-        return correctType && hasMount;
-    }
-
-    public bool SetAttachment(AttachmentType type, Item attachment)
-    {
-        // Assumes:
-        // - That the item is NOT an instance but IS a prefab.
-        // Steps to add attachment: 
-        // 1. Ensure that it is a valid attachment.
-        // 2. Pass on to server to intsantiate.
-
-        bool valid = IsValid(type, attachment.GetComponent<Attachment>());
-
-        if (attachment == null) // If attachment is null, always allow. This means that the current attachment is removed.
-            valid = true;
-
-        if (!valid)
+        if(!IsValid(type, attachment))
         {
-            Debug.LogError("Not a valid attachment configuration, will not add attachment.");
+            Debug.LogError(string.Format("Invalid attachment setup (Type: {0}, Attachment: {1})", type, attachment == null ? "null" : attachment.GetComponent<Item>().Prefab));
+            return false;
+        }
+        if(player == null)
+        {
+            Debug.LogError("Null played passed to set attachment!");
             return false;
         }
 
-        if (Player.Local == null)
-            return false;
-
-        // Is valid...
-        CmdSetAttachment(type, Player.Local.gameObject, attachment == null ? null : attachment.Prefab);
+        // Check client-server status...
+        if (isServer)
+        {
+            Server_SetAttachment(player, type, attachment, itemData);
+        }
+        else
+        {
+            CmdSetAttachment(player, type, attachment == null ? null : attachment.Item.Prefab, itemData == null ? null : itemData.Serialize());
+        }
 
         return true;
     }
 
-    [Command]
-    private void CmdSetAttachment(AttachmentType type, GameObject player, string prefab)
+    public Attachment GetCurrentAttachment(AttachmentType type)
     {
-        // This is CMD, therefore runs on the server version of this object.
-        // At this point we assume that:
-        // 1. The attachment passes to this object has been spawned on clients and server.
-        // 2. This attachment can be applied on this weapon.
-        // 3. This is a valid attachment for this slot.
-
-        // Find the spot where it is mounted, to check for existing attachments
         Transform mount = GetMountFor(type);
+        Attachment att = mount == null ? null : mount.GetComponentInChildren<Attachment>();
 
-        // Create item from prefab, and instanciate.
-        Item i = Item.GetItem(prefab);
+        return att;
+    }
 
-        GameObject attachment = Instantiate(i.gameObject, transform.position, Quaternion.identity);
-        NetworkServer.SpawnWithClientAuthority(attachment, player);
-
-        if (mount == null)
+    [Command]
+    private void CmdSetAttachment(GameObject player, AttachmentType type, string prefab, string data)
+    {
+        ItemDataX id = ItemDataX.TryDeserialize(data);
+        Attachment a;
+        if (!string.IsNullOrWhiteSpace(prefab))
         {
-            Debug.LogError("Attachment '" + attachment + "' cannot be applied to gun '" + gun.Item.Name + "'! Mount is null!");
-            return;
-        }
-
-        // Object OBJ should be instanciated by now.
-        if(mount.childCount > 0)
-        {
-            // Has a child...
-            if(mount.GetChild(0) == attachment.transform)
-            {
-                // Already attached! Do nothing!
-                Debug.LogError("Attachment '" + attachment == null ? "null" : attachment.GetComponent<Item>().Name + "' is already applied!");
-            }
-            else
-            {
-                // Something else is attached! Remove it and put in inventory.
-                RpcGiveAttachmentItem(player, mount.GetChild(0).GetComponent<Item>().Prefab, 1); // Give item to player...
-                Destroy(mount.GetChild(0).GetComponent<Attachment>().gameObject); // Destroy the old attachment.
-
-                if (attachment == null)
-                    return; // Stop here if we do not have a new object to apply.
-
-                // Now add attachment.
-                Attachment a = attachment.GetComponent<Attachment>();
-
-                a.Gun = gameObject; // This sets the attached state, and the attachment will automatically apply to this gun.
-            }
+            Item i = Item.GetItem(prefab);
+            a = i.GetComponent<Attachment>();
         }
         else
         {
-            // Nothing applied to the item...
+            a = null;
+        }
+        Server_SetAttachment(player, type, a, id);
+    }
 
-            if(attachment == null)
+    [Server]
+    private void Server_SetAttachment(GameObject player, AttachmentType type, Attachment a, ItemDataX itemData)
+    {
+        if(a != null)
+        {
+            Attachment current = GetCurrentAttachment(type);
+            if (current != null)
             {
-                // Do nothing, because there is no attachment applied.
+                current.Item.RequestDataUpdate();
+                itemData = current.Item.Data;
+                string itemDataString = itemData.Serialize();
+
+                // Return the current attachment...
+                RpcReturnAttachment(player, current.Item.Prefab, itemDataString);
+
+                // Destroy the object on the server and all clients.
+                current.transform.parent = null; // Don't ask why, but don't remove either...
+                Destroy(current.gameObject);
+            }
+
+            // Note that attachment, 'a', is a prefab.
+            string prefab = a.Item.Prefab;
+
+            // Spawn the attachment...
+            Item spawnedItem = Item.NewInstance(prefab, transform.position, itemData);
+            NetPosSync posSync = spawnedItem.NetPosSync;
+            NetParent parent;
+            Transform mount = GetMountFor(type);
+            if(mount != null)
+            {
+                parent = mount.GetComponent<NetParent>();
+            }
+            else
+            {
+                Debug.LogError("Invalid mount (null) for attachment {0}, not good at all. Expect wierd bullshittery.".Form(prefab));
+                Destroy(spawnedItem.gameObject);
                 return;
             }
 
-            // Get attachment.
-            Attachment a = attachment.GetComponent<Attachment>();
+            // Spawn on server and on all client, with player authority assigned to the player who is using the attachment.
+            NetworkServer.SpawnWithClientAuthority(spawnedItem.gameObject, player);
 
-            a.Gun = gameObject; // This sets the attached state, and the attachment will automatically apply to this gun.
+            // Mount it to the correct NetParent.
+            posSync.SetParent(parent);            
+        }
+        else
+        {
+            // Attachment is null, remove any existing attachment from that slot...
+            Attachment current = GetCurrentAttachment(type);
+            if(current != null)
+            {
+                current.Item.RequestDataUpdate();
+                itemData = current.Item.Data;
+                string itemDataString = itemData.Serialize();
+
+                // Return the current attachment...
+                RpcReturnAttachment(player, current.Item.Prefab, itemDataString);
+
+                // Destroy the object on the server and all clients.
+                Destroy(current.gameObject);
+            }
         }
     }
 
     [ClientRpc]
-    private void RpcGiveAttachmentItem(GameObject player, string prefab, int amount)
+    private void RpcReturnAttachment(GameObject player, string prefab, string data)
     {
-        if(Player.Local.NetworkIdentity.netId == player.GetComponent<NetworkIdentity>().netId)
-            PlayerInventory.Add(prefab, null, amount); // Add to inventory...
+        if(player.GetComponent<NetworkIdentity>().netId == Player.Local.netId)
+        {
+            ItemDataX itemData = null;
+            if (!string.IsNullOrWhiteSpace(data))
+            {
+                itemData = ItemDataX.TryDeserialize(data);
+            }
+            PlayerInventory.Add(prefab, itemData, 1);
+        }
     }
 
-    public void RefreshAttachments()
+    public void UpdateData(ItemDataX data)
     {
-        Attachment[] attachments = GetComponentsInChildren<Attachment>();
-        foreach (var item in attachments)
+        Attachment a;
+        Dictionary<AttachmentType, string> dic = new Dictionary<AttachmentType, string>();
+        dic.Add(AttachmentType.MAGAZINE, "Magazine Attachment");
+        dic.Add(AttachmentType.MUZZLE, "Muzzle Attachment");
+        dic.Add(AttachmentType.SIGHT, "Sight Attachment");
+        dic.Add(AttachmentType.UNDER_BARREL, "Under Barrel Attachment");
+
+        foreach (var pair in dic)
         {
-            item.RemoveEffects();
+            a = GetCurrentAttachment(pair.Key);
+            if (a != null)
+            {
+                data.Update(pair.Value, a.Item.Prefab);
+            }
+            else
+            {
+                if (data.ContainsKey(pair.Value))
+                    data.Remove(pair.Value);
+            }
         }
-        foreach (var item in attachments)
+    }
+
+    public void ApplyData(ItemDataX data)
+    {
+        if (Player.Local == null)
+            return;
+
+        // TODO:
+        // Because of this, and the UpdateData method, attachment data is useless and non-funtional.
+        string[] keys = new string[]
         {
-            item.ApplyEffects();
-        }
-        Debug.Log("Refreshed!");
-        foreach (var item in attachments)
+            "Sight Attachment",
+            "Magazine Attachment",
+            "Under Barrel Attachment",
+            "Muzzle Attachment"
+        };
+        GameObject player = Player.Local.gameObject;
+
+        foreach (var key in keys)
         {
-            Debug.Log("Removed and applied effects from " + item.GetComponent<Item>().Name);
+            if (data.ContainsKey(key))
+            {
+                Item item = Item.GetItem(data.Get<string>(key));
+                Attachment a = item.GetComponent<Attachment>();
+                SetAttachment(player, a.Type, a, null);
+            }
         }
+    }
+
+    public void ResetEffects()
+    {
+        // This resets all changed values to their default state.
+        // Damage
+        Gun.Shooting.Damage.Damage = Prefab.Shooting.Damage.Damage;
+        Gun.Shooting.Damage.DamageFalloff = Prefab.Shooting.Damage.DamageFalloff;
+        Gun.Shooting.Damage.Inaccuracy = Prefab.Shooting.Damage.Inaccuracy;
+        Gun.Shooting.Damage.Penetration = Prefab.Shooting.Damage.Penetration;
+        Gun.Shooting.Damage.PenetrationFalloff = Prefab.Shooting.Damage.PenetrationFalloff;
+        Gun.Shooting.Damage.Range = Prefab.Shooting.Damage.Range;
+        Gun.Shooting.Damage.ShotsToInaccuracy = Prefab.Shooting.Damage.ShotsToInaccuracy;
+        Gun.Shooting.Damage.MinIdleTimeToCooldown = Prefab.Shooting.Damage.MinIdleTimeToCooldown;
+
+        // Capacity
+        Gun.Shooting.Capacity.BulletsPerShot = Prefab.Shooting.Capacity.BulletsPerShot;
+        Gun.Shooting.Capacity.MagazineCapacity = Prefab.Shooting.Capacity.MagazineCapacity;
+        Gun.Shooting.Capacity.BurstShots = Prefab.Shooting.Capacity.BurstShots;
+        Gun.Shooting.Capacity.BulletsConsumed = Prefab.Shooting.Capacity.BulletsConsumed;
+
+        // Audio
+        Gun.Shooting.AudioSauce.RangeMultiplier = Prefab.Shooting.AudioSauce.RangeMultiplier;
+        Gun.Shooting.AudioSauce.VolumeMultiplier = Prefab.Shooting.AudioSauce.VolumeMultiplier;
+        Gun.Shooting.AudioSauce.PitchMultiplier = Prefab.Shooting.AudioSauce.PitchMultiplier;
+
+        // Animation
+        Gun.Shooting.ReloadSpeedMultiplier = Prefab.Shooting.ReloadSpeedMultiplier;
+        Gun.Shooting.ShootSpeedMultiplier = Prefab.Shooting.ShootSpeedMultiplier;
+    }
+
+    public Attachment[] GetAllCurrentAttachments()
+    {
+        return this.GetComponentsInChildren<Attachment>();
+    }
+
+    public void ApplyEffects()
+    {
+        var attachments = GetAllCurrentAttachments();
+        foreach (var att in attachments)
+        {
+            if (att == null)
+                continue;
+            if (!att.Item.NetPosSync.IsParented)
+                continue;
+
+            // Apply the effects of the tweak.
+            // There is normally only one tweak component per attachment but the system supports more that one, hence the loop.
+            att.ApplyEffects(this.Gun);
+        }
+    }
+
+    public void AttachmentsUpdated()
+    {
+        ResetEffects();
+        ApplyEffects();
     }
 }
