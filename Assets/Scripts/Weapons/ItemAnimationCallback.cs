@@ -15,7 +15,6 @@ public class ItemAnimationCallback : MonoBehaviour
         if (c != null)
         {
             AudioManager.Instance.PlayOneShot(transform.position, c, 0.5f, 1f);
-            //AudioSource.PlayClipAtPoint(c, transform.position, 1f);
         }
     }
 }
