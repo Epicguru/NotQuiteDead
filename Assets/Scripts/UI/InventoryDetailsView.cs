@@ -135,10 +135,16 @@ public class InventoryDetailsView : MonoBehaviour
         if(a != null)
         {
             stats.Add(new DetailStat() { Icon = AttachmentTypeIcon, Key = "InvDetails_AttachmentSlot".Translate(), Value = a.Type.ToString().Replace('_', ' ') });
-            //foreach(AttachmentTweak t in item.GetComponentsInChildren<AttachmentTweak>())
-            //{
-            //    stats.Add(new DetailStat() { Icon = AttachmentTweakIcon, Key = "InvDetails_Attribute".Translate(), Value = t.GetEffects() });
-            //}
+            foreach (AttachmentTweak t in a.Tweaks)
+            {
+                Debug.Log("asd");
+                string[] effects = t.GetEffects();
+                foreach (var effect in effects)
+                {
+                    Debug.Log("asd2");
+                    stats.Add(new DetailStat() { Icon = AttachmentTweakIcon, Key = "InvDetails_Attribute".Translate(), Value =  effect});
+                }
+            }
         }
 
         return stats;

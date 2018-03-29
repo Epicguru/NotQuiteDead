@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Attachment))]
@@ -98,6 +99,93 @@ public class AttachmentTweak : MonoBehaviour
         // Animation
         gun.Shooting.ReloadSpeedMultiplier *= ReloadSpeedMultiplier;
         gun.Shooting.ShootSpeedMultiplier *= ShotSpeedMultiplier;
+    }
+
+    public string[] GetEffects()
+    {
+        List<string> eff = new List<string>();
+        bool pos;
+
+        // Damage
+        if(DamageMultiplier != 1f)
+        {
+            pos = DamageMultiplier > 1f;
+            eff.Add("Base Damage " + RichText.InColour((pos ? "+" : "-") + Mathf.RoundToInt(Mathf.Abs(DamageMultiplier - 1f) * 100f) + "%", pos ? Color.green : Color.red));
+        }
+
+        // Damage Falloff
+        if (DamageFalloffMultiplier != 1f)
+        {
+            pos = DamageFalloffMultiplier > 1f;
+            eff.Add("Damage Falloff " + RichText.InColour((pos ? "-" : "+") + Mathf.RoundToInt(Mathf.Abs(DamageFalloffMultiplier - 1f) * 100f) + "%", pos ? Color.green : Color.red));
+        }
+
+        // Penetration
+        if (PenetrationChange != 0)
+        {
+            pos = PenetrationChange >= 1;
+            eff.Add("Penetration " + RichText.InColour((pos ? "+" : "-") + Mathf.Abs(PenetrationChange), pos ? Color.green : Color.red));
+        }
+
+        // Penetration Falloff
+        if (PenetrationFalloffMultiplier != 1f)
+        {
+            pos = PenetrationFalloffMultiplier > 1f;
+            eff.Add("Penetration Falloff " + RichText.InColour((pos ? "-" : "+") + Mathf.RoundToInt(Mathf.Abs(PenetrationFalloffMultiplier - 1f) * 100f) + "%", pos ? Color.green : Color.red));
+        }
+
+        // Magazine Capacity
+        if (MagazineCapacityMultiplier != 1f)
+        {
+            pos = MagazineCapacityMultiplier > 1f;
+            eff.Add("Magazine Capacity " + RichText.InColour((pos ? "+" : "-") + Mathf.RoundToInt(Mathf.Abs(MagazineCapacityMultiplier - 1f) * 100f) + "%", pos ? Color.green : Color.red));
+        }
+
+        // Inaccuracy
+        if (InaccuracyMultiplier.x == InaccuracyMultiplier.y)
+        {
+            if(InaccuracyMultiplier.x != 1f)
+            {
+                pos = InaccuracyMultiplier.x < 1f;
+                eff.Add("Accuracy " + RichText.InColour((pos ? "+" : "-") + Mathf.RoundToInt(Mathf.Abs(InaccuracyMultiplier.x - 1f) * 100f) + "%", pos ? Color.green : Color.red));
+            }
+        }
+        else
+        {
+            if (InaccuracyMultiplier.x != 1f)
+            {
+                pos = InaccuracyMultiplier.x < 1f;
+                eff.Add("Initial Accuracy " + RichText.InColour((pos ? "+" : "-") + Mathf.RoundToInt(Mathf.Abs(InaccuracyMultiplier.x - 1f) * 100f) + "%", pos ? Color.green : Color.red));
+            }
+            if (InaccuracyMultiplier.y != 1f)
+            {
+                pos = InaccuracyMultiplier.y < 1f;
+                eff.Add("Final Accuracy " + RichText.InColour((pos ? "+" : "-") + Mathf.RoundToInt(Mathf.Abs(InaccuracyMultiplier.y - 1f) * 100f) + "%", pos ? Color.green : Color.red));
+            }
+        }
+
+        // Shot Speed
+        if (ShotSpeedMultiplier != 1f)
+        {
+            pos = ShotSpeedMultiplier > 1f;
+            eff.Add("Fire Rate " + RichText.InColour((pos ? "+" : "-") + Mathf.RoundToInt(Mathf.Abs(ShotSpeedMultiplier - 1f) * 100f) + "%", pos ? Color.green : Color.red));
+        }
+
+        // Reload Speed
+        if (ReloadSpeedMultiplier != 1f)
+        {
+            pos = ReloadSpeedMultiplier > 1f;
+            eff.Add("Reload Speed " + RichText.InColour((pos ? "+" : "-") + Mathf.RoundToInt(Mathf.Abs(ReloadSpeedMultiplier - 1f) * 100f) + "%", pos ? Color.green : Color.red));
+        }
+
+        // Range
+        if (RangeMultiplier != 1f)
+        {
+            pos = RangeMultiplier > 1f;
+            eff.Add("Range " + RichText.InColour((pos ? "+" : "-") + Mathf.RoundToInt(Mathf.Abs(RangeMultiplier - 1f) * 100f) + "%", pos ? Color.green : Color.red));
+        }
+
+        return eff.ToArray();
     }
 
     public void OnShoot()

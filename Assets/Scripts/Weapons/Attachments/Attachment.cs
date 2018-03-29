@@ -71,13 +71,14 @@ public class Attachment : NetworkBehaviour
     {
         get
         {
-            if(tweaks == null)
+            if(tweaks == null || tweaks.Length == 0)
             {
                 tweaks = GetComponentsInChildren<AttachmentTweak>(true);
             }
             return tweaks;
         }
     }
+    [HideInInspector]
     private AttachmentTweak[] tweaks;
 
     [HideInInspector]
