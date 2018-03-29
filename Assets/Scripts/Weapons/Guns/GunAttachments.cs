@@ -169,6 +169,7 @@ public class GunAttachments : NetworkBehaviour
                 RpcReturnAttachment(player, current.Item.Prefab, itemDataString);
 
                 // Destroy the object on the server and all clients.
+                current.transform.parent = null; // Don't ask why, but don't remove either...
                 Destroy(current.gameObject);
             }
 
@@ -308,7 +309,6 @@ public class GunAttachments : NetworkBehaviour
         // Animation
         Gun.Shooting.ReloadSpeedMultiplier = Prefab.Shooting.ReloadSpeedMultiplier;
         Gun.Shooting.ShootSpeedMultiplier = Prefab.Shooting.ShootSpeedMultiplier;
-        Debug.Log("Reset!");
     }
 
     public Attachment[] GetAllCurrentAttachments()
@@ -326,6 +326,8 @@ public class GunAttachments : NetworkBehaviour
             if (!att.Item.NetPosSync.IsParented)
                 continue;
 
+            // Apply the effects of the tweak.
+            // There is normally only one tweak component per attachment but the system supports more that one, hence the loop.
             att.ApplyEffects(this.Gun);
         }
     }

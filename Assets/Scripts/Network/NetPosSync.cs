@@ -84,10 +84,17 @@ public class NetPosSync : NetworkBehaviour
             // This might be called on a host: a client and a server in the same process.
             return;
         }
+
+        transform.localPosition = Position;
+        if (_Rotation.Sync)
+        {
+            transform.localEulerAngles = new Vector3(0f, 0f, Angle);
+        }
         if (_Parent.Sync)
         {
             NewParent(ParentName);
         }
+
     }
 
     public void Update()
