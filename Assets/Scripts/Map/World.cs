@@ -15,6 +15,8 @@ public class World : NetworkBehaviour
 
     [Header("World Specific")]
     public string RealityName;
+    public Vector2 SpawnPoint;
+    public float SpawnRadius = 10f;
 
     [HideInInspector]
     public TileMap TileMap;
@@ -89,6 +91,26 @@ public class World : NetworkBehaviour
         BuildingIO.LoadBuildingInventory(RealityName, Player.Local);
 
         // No need to load tile layers, this is done all the time passively.
+
+        // Call post-load
+        PostLoad();
+    }
+
+    public void PostLoad()
+    {
+        if (SpawnPoint == Vector2.zero)
+        {
+            // Tilemap has a width and height: Use it to determine the spawn point 
+            // Place the spawn point right in the middle of the world.
+            float width = TileMap.Width;
+            float height = TileMap.Height;
+
+            // Get the center...
+            float x = width / 2f;
+            float y = height / 2f;
+
+            SpawnPoint = new Vector2(x, y);
+        }
     }
 
     public void Awake()
@@ -107,7 +129,21 @@ public class World : NetworkBehaviour
 
         Furniture = GetComponent<FurnitureManager>();
 
-        TileMap.Create();
+        TileMap.Create();        
+    }
+
+    public void Start()
+    {
+        // Generate when new?
+        PostLoad();
+    }
+
+    public Vector2 GetRandomSpawnPoint()
+    {
+        Vector2 offset = SpawnRadius == 0f ? Vector2.zero : UnityEngine.Random.insideUnitCircle * SpawnRadius;
+        Vector2 point = SpawnPoint;
+
+        return point + offset;
     }
 
     public void OnDestroy()
