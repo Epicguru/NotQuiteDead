@@ -177,7 +177,6 @@ public class GunAttachments : NetworkBehaviour
 
             // Spawn the attachment...
             Item spawnedItem = Item.NewInstance(prefab, transform.position, itemData);
-            Attachment spawnedAttachment = spawnedItem.GetComponent<Attachment>();
             NetPosSync posSync = spawnedItem.NetPosSync;
             NetParent parent;
             Transform mount = GetMountFor(type);
