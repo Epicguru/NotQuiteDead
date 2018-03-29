@@ -12,6 +12,10 @@ public class GunShooting : RotatingItem
     public FiringMode FiringMode = FiringMode.SEMI;
     public FiringMode[] AllowedModes = new FiringMode[] { FiringMode.SEMI };
 
+    [Header("Switching Exploit")]
+    public bool PreventExploit = false;
+    private float timeRemainingOnShot;
+
     [Header("Bullet Firing")]
     public Transform DefaultBulletSpawn;
     [Tooltip("The type of projectile that this gun fires.")]
@@ -85,6 +89,29 @@ public class GunShooting : RotatingItem
 
         if (AllowedModes.Length == 0)
             Debug.LogError("No allowed firing modes on " + gun.Item.Name);
+    }
+
+    public void UpdateData(ItemDataX data)
+    {
+        if (PreventExploit)
+        {
+            data.Update("Shot Timer", timeRemainingOnShot);
+        }
+        else
+        {
+            if(data.ContainsKey("Shot Timer"))
+            {
+                data.Remove("Shot Timer");
+            }
+        }
+    }
+
+    public void ApplyData(ItemDataX data)
+    {
+        if (PreventExploit)
+        {
+            timeRemainingOnShot = data.Get("Shot Timer", 0f);
+        }
     }
 
     public virtual void Update()
@@ -202,9 +229,30 @@ public class GunShooting : RotatingItem
             shotInaccuracy = 1;
     }
 
+    public bool OnAntiExploitCooldown()
+    {
+        if (!PreventExploit)
+            return false;
+
+        return !(timeRemainingOnShot <= 0f);
+    }
+
     public bool ShootNow()
     {
         // Returns true if the gun SHOULD shoot. Whether the gun will shoot is up to other factors.
+
+        // First, prevent exploit...
+        if (PreventExploit)
+        {
+            timeRemainingOnShot -= Time.deltaTime;
+            if(timeRemainingOnShot <= 0)
+            {
+                timeRemainingOnShot = 0f;
+            }
+        }
+
+        if (OnAntiExploitCooldown())
+            return false;
 
         switch (FiringMode)
         {
@@ -418,8 +466,6 @@ public class GunShooting : RotatingItem
     {
         // Shoot bullets!
 
-        // Update inaccuracy...
-
         int bullets = Random.Range((int)Capacity.BulletsPerShot.y, (int)Capacity.BulletsPerShot.y + 1);
         float range = Damage.Range;
         float angleToMouse = CalculateAngle();
@@ -449,8 +495,15 @@ public class GunShooting : RotatingItem
 
         // Set time since last shot...
         timer = 0; // Now!
+
         // This will add inaccuracy.
         shotInaccuracy += 1f / Damage.ShotsToInaccuracy;
+
+        if (PreventExploit)
+        {
+            GetClips();
+            timeRemainingOnShot = shootClip == null ? 0f : shootClip.length;
+        }
     }
 
     private void EvaluateBulletType(Vector2 endPos, int bulletCount)
@@ -512,10 +565,9 @@ public class GunShooting : RotatingItem
         return final;
     }
 
-    public float GetRPS()
+    public void GetClips()
     {
-        // Aprox rounds per second.
-        if(shootClip == null)
+        if (shootClip == null)
         {
             foreach (var c in GetComponentInChildren<Animator>().runtimeAnimatorController.animationClips)
             {
@@ -533,6 +585,12 @@ public class GunShooting : RotatingItem
                 //}
             }
         }
+    }
+
+    public float GetRPS()
+    {
+        // Aprox rounds per second.
+        GetClips();
 
         if (shootClip == null)
             return 0f;

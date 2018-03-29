@@ -85,31 +85,39 @@ public class GunAnimation : NetworkBehaviour
 
     private void DetectBlocked()
     {
-        // Check if the gun is blocked by a wall directly in fron of it.
+        // Check if the gun is blocked by a wall directly in front of it.
+        // Is also automatically blocked if the Gun.Shooting anti-exploit is triggered.
 
         if (Player.Local == null)
             return;
 
         bool blocked = false;
-        float dst = gun.Shooting.GunBlockedDistance;
-
-        Vector3 dir = transform.right;
-        if (!Player.Local.Direction.Right)
+        if (gun.Shooting.OnAntiExploitCooldown())
         {
-            dir *= -1f;
+            blocked = true;
         }
-        dir *= gun.Shooting.GunBlockedDistance;
-
-        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, dir, dst);
-
-        foreach(RaycastHit2D hit in hits)
+        else
         {
-            if(hit.collider.isTrigger == false)
+            float dst = gun.Shooting.GunBlockedDistance;
+
+            Vector3 dir = transform.right;
+            if (!Player.Local.Direction.Right)
             {
-                if(hit.collider.gameObject.GetComponentInParent<Health>() == null)
+                dir *= -1f;
+            }
+            dir *= gun.Shooting.GunBlockedDistance;
+
+            RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, dir, dst);
+
+            foreach (RaycastHit2D hit in hits)
+            {
+                if (hit.collider.isTrigger == false)
                 {
-                    blocked = true;
-                    break;
+                    if (hit.collider.gameObject.GetComponentInParent<Health>() == null)
+                    {
+                        blocked = true;
+                        break;
+                    }
                 }
             }
         }
