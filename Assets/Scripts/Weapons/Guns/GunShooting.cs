@@ -715,7 +715,7 @@ public class GunShooting : RotatingItem
                 // The bullet will definitely hit something before it exits the barrel, because of the way shooting works in this game.
                 if(!Health.CanDamageObject(hit.collider, Player.Local.Team))
                 {
-                    // If we cant damage this object, return.
+                    // If we can't damage this object, return.
                     return;
                 }
                 else
@@ -732,6 +732,9 @@ public class GunShooting : RotatingItem
                     {
                         Player.Local.NetUtils.CmdDamageHealth(hit.collider.GetComponentInParent<Health>().gameObject, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage, Player.Local.Name + ":" + gun.Item.Prefab, false);
                     }
+
+                    // Return because subsonic bullets have no penetration ability.
+                    return;
                 }
             }
         }
