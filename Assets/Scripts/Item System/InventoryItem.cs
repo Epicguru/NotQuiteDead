@@ -20,7 +20,7 @@ public class InventoryItem : MonoBehaviour
 
     public InventoryItemData ItemData;
 
-    public void Init(ItemDataX data)
+    public void Init(ItemData data)
     {
         // Nothing to do here, all rendering done in editor/game.
         SetText();

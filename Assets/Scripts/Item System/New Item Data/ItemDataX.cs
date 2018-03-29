@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 
 [Serializable]
 [JsonObject(MemberSerialization = MemberSerialization.OptOut)]
-public class ItemDataX
+public class ItemData
 {
     public static JsonSerializerSettings Settings
     {
@@ -204,7 +204,7 @@ public class ItemDataX
         return JsonConvert.SerializeObject(this, Settings);
     }
 
-    public static ItemDataX Deserialize(string json)
+    public static ItemData Deserialize(string json)
     {
         if (string.IsNullOrWhiteSpace(json))
         {
@@ -214,7 +214,7 @@ public class ItemDataX
 
         try
         {
-            ItemDataX itemData = JsonConvert.DeserializeObject<ItemDataX>(json, Settings);
+            ItemData itemData = JsonConvert.DeserializeObject<ItemData>(json, Settings);
             return itemData;
         }
         catch (Exception e)
@@ -224,22 +224,22 @@ public class ItemDataX
         }
     }
 
-    public static ItemDataX TryDeserialize(string json)
+    public static ItemData TryDeserialize(string json)
     {
         if (string.IsNullOrWhiteSpace(json))
         {
-            return new ItemDataX();
+            return new ItemData();
         }
 
         try
         {
-            ItemDataX itemData = JsonConvert.DeserializeObject<ItemDataX>(json, Settings);
+            ItemData itemData = JsonConvert.DeserializeObject<ItemData>(json, Settings);
             return itemData;
         }
         catch (Exception e)
         {
             Debug.LogError("Error deserializing json to create item data:\n" + json + "\nException Info:\n" + e);
-            return new ItemDataX();
+            return new ItemData();
         }
     }
 }

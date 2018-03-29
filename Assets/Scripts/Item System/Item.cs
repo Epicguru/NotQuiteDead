@@ -63,7 +63,7 @@ public class Item : NetworkBehaviour
     [Tooltip("The image for the icon in menus and inventories.")]
     public Sprite ItemIcon;
 
-    public ItemDataX Data
+    public ItemData Data
     {
         get
         {
@@ -87,7 +87,7 @@ public class Item : NetworkBehaviour
 
     [Tooltip("Current item data.")]
     [SerializeField]
-    private ItemDataX _Data;
+    private ItemData _Data;
 
     [HideInInspector]
     public NetPosSync NetPosSync
@@ -129,14 +129,14 @@ public class Item : NetworkBehaviour
             if (string.IsNullOrWhiteSpace(PendingData))
             {
                 if (Data == null)
-                    Data = new ItemDataX();
+                    Data = new ItemData();
                 Data.Created = true;
                 RequestSetDefaultData();
                 RequestDataApplication(); // Apply default data.
             }
             else
             {
-                Data = ItemDataX.TryDeserialize(PendingData);
+                Data = ItemData.TryDeserialize(PendingData);
                 PendingData = null;
                 RequestDataApplication(); // Apply loaded or transmitted data.
             }
@@ -159,7 +159,7 @@ public class Item : NetworkBehaviour
         currentLayer = layer;
     }
 
-    public ItemOption[] CreateOptions(Item item, ItemDataX data)
+    public ItemOption[] CreateOptions(Item item, ItemData data)
     {
         List<ItemOption> options = new List<ItemOption>();
         options.Add(new ItemOption() { OptionName = "Drop", OnSelected = Option_Drop });
@@ -375,7 +375,7 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// Creates a new instance of an object and spawns it into the world. Not networked.
     /// </summary>
-    public static Item NewInstance(string prefab, Vector2 position, ItemDataX data)
+    public static Item NewInstance(string prefab, Vector2 position, ItemData data)
     {
         // Create new instance of item.
         Item x = GetItem(prefab);
@@ -447,7 +447,7 @@ public class Item : NetworkBehaviour
     {
         if (tempSlotData.Data == null)
         {
-            tempSlotData.Data = new ItemDataX();
+            tempSlotData.Data = new ItemData();
             tempSlotData.Data.Add("Quick Slot", number);
         }
         else

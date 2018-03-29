@@ -78,7 +78,7 @@ public class BodyGear : NetworkBehaviour
     }
 
     [Server]
-    public void SetItem(GameObject player, Item item, ItemDataX data, bool returnItem)
+    public void SetItem(GameObject player, Item item, ItemData data, bool returnItem)
     {
         // Item is a PREFAB!
 
@@ -145,7 +145,7 @@ public class BodyGear : NetworkBehaviour
         if (returnToPlayer)
         {
             // Give item back...
-            ItemDataX data = GetGearItem().Item.Data;
+            ItemData data = GetGearItem().Item.Data;
 
             RpcReturnItem(GetGearItem().Item.Prefab, data == null ? null : data.Serialize(), owner);
         }
@@ -171,7 +171,7 @@ public class BodyGear : NetworkBehaviour
         if (Player.Local.netId != owner.GetComponent<Player>().netId)
             return;
 
-        PlayerInventory.Add(itemPrefab, ItemDataX.TryDeserialize(data), 1);
+        PlayerInventory.Add(itemPrefab, ItemData.TryDeserialize(data), 1);
     }
 
     public void Update()

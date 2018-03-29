@@ -78,7 +78,7 @@ public class GearUI : MonoBehaviour {
             }
 
             g.GetGearItem().Item.RequestDataUpdate();
-            ItemDataX data = g.GetGearItem().Item.Data;
+            ItemData data = g.GetGearItem().Item.Data;
             Player.Local.NetUtils.CmdDropGear(Slot, data.Serialize());
         }
     }
@@ -92,7 +92,7 @@ public class GearUI : MonoBehaviour {
             PlayerInventory.inv.Inventory.DetailsView.Enter(Item.GetItem(prefab));
     }
 
-    public ItemOption[] GetOptions(ItemDataX data)
+    public ItemOption[] GetOptions(ItemData data)
     {
         List<ItemOption> options = new List<ItemOption>();
         options.Add(new ItemOption() { OptionName = "Store", OnSelected = Store });

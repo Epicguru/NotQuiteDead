@@ -91,7 +91,7 @@ public class GunShooting : RotatingItem
             Debug.LogError("No allowed firing modes on " + gun.Item.Name);
     }
 
-    public void UpdateData(ItemDataX data)
+    public void UpdateData(ItemData data)
     {
         if (PreventExploit)
         {
@@ -106,7 +106,7 @@ public class GunShooting : RotatingItem
         }
     }
 
-    public void ApplyData(ItemDataX data)
+    public void ApplyData(ItemData data)
     {
         if (PreventExploit)
         {

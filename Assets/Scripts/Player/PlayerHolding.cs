@@ -145,7 +145,7 @@ public class PlayerHolding : NetworkBehaviour
     {
         if(player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)
         {
-            PlayerInventory.Add(itemPrefab, ItemDataX.TryDeserialize(data), 1);
+            PlayerInventory.Add(itemPrefab, ItemData.TryDeserialize(data), 1);
         }
     }
 
