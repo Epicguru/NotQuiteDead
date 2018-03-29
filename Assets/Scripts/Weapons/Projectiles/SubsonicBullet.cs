@@ -108,7 +108,7 @@ public class SubsonicBullet : MonoBehaviour
         float f = Curve.Evaluate(p);
         float x = Mathf.LerpUnclamped(m, d, f);
 
-        Debug.Log("Hit @ {0}, max range {1}, max damage {2}, min damage {3}, position on curve {4}, evaluated value {5}, lerped (final) value {6}".Form(dst, MaxRange, d, m, p, f, x));
+        //Debug.Log("Hit @ {0}, max range {1}, max damage {2}, min damage {3}, position on curve {4}, evaluated value {5}, lerped (final) value {6}".Form(dst, MaxRange, d, m, p, f, x));
 
         return x;
     }
