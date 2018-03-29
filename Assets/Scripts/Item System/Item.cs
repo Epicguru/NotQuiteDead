@@ -199,7 +199,7 @@ public class Item : NetworkBehaviour
     public void Update()
     {
         // Does not matter where this is running...
-        NetPosSync.enabled = (transform.parent == null);
+        //NetPosSync.enabled = (transform.parent == null);
 
         // Layer
         SetLayer(IsEquipped() ? "Equipped Items" : "Dropped Items");
@@ -273,7 +273,10 @@ public class Item : NetworkBehaviour
         {
             Transform t = PlayerHolding.GetComponent<Player>().Holding.Holding;
             if (transform.parent != t)
+            {
                 transform.SetParent(t);
+
+            }
             transform.localPosition = Vector3.zero;
             transform.localScale = Vector3.one;
         }

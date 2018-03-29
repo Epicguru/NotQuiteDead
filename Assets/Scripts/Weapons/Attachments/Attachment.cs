@@ -64,25 +64,45 @@ public class Attachment : NetworkBehaviour
             }
         }
     }
+    private Transform oldTransform;
 
     private string layer;
 
+    private void OnBeforeTransformParentChanged()
+    {
+        // NOTE: for some reason, the parent changing it's parent (like  grandparent?) also calls this. Why?
+        // This is why this method detects the parent and if it is the same as the 'new' parent (see method below) then nothing happens.
+        // Basically fixing the method.
+        oldTransform = transform.parent;
+    }
+
     private void OnTransformParentChanged()
     {
+        Transform old = oldTransform;
+        oldTransform = null;
+
+        //Debug.LogError("Post Parent Change! ({0}) parent is now {1} and was {2}".Form(name, transform.parent == null ? "null" : transform.parent.name, old == null ? "null" : old.name));
+
+        if (old == transform.parent)
+        {
+            return;
+        }
+
         if(transform.parent != null)
         {
             GunAttachments ga = transform.GetComponentInParent<GunAttachments>();
-
-            // Does not create infinite loop because transform parent change is ignored if the parent is equal. I am the best at explaining.
+            if (ga == null)
+                return;
             Transform mount = ga.GetMountFor(this.Type);
-            if (ga != null && transform.parent != mount)
-            {
-                transform.SetParent(mount);
-                transform.localPosition = Vector3.zero;
-                transform.localRotation = Quaternion.identity;
-                transform.localScale = Vector3.one;
-                ga.AttachmentsUpdated();
-            }
+            if (mount == null)
+                return;
+            if (transform.parent != mount)
+                return;
+
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+            transform.localScale = Vector3.one;
+            ga.AttachmentsUpdated();
         }
     }
 
@@ -92,6 +112,8 @@ public class Attachment : NetworkBehaviour
         {
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
+            transform.localScale = transform.localScale.ToAbs();
+
             if (Gun.Item.IsEquipped())
             {
                 SetLayer("Equipped Items");

@@ -329,7 +329,6 @@ public class GunAttachments : NetworkBehaviour
 
     public void AttachmentsUpdated()
     {
-        Debug.Log("Attachments updated!");
         ResetEffects();
         ApplyEffects();
     }
