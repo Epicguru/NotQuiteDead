@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(Item))]
@@ -66,6 +67,22 @@ public class Attachment : NetworkBehaviour
     }
     private Transform oldTransform;
 
+    public AttachmentTweak[] Tweaks
+    {
+        get
+        {
+            if(tweaks == null)
+            {
+                tweaks = GetComponentsInChildren<AttachmentTweak>(true);
+            }
+            return tweaks;
+        }
+    }
+    private AttachmentTweak[] tweaks;
+
+    [HideInInspector]
+    public UnityEvent UponShoot = new UnityEvent();
+
     private string layer;
 
     private void OnBeforeTransformParentChanged()
@@ -103,6 +120,21 @@ public class Attachment : NetworkBehaviour
             transform.localRotation = Quaternion.identity;
             transform.localScale = Vector3.one;
             ga.AttachmentsUpdated();
+            Gun.OnShoot.AddListener(OnShoot);
+        }
+    }
+
+    public void OnShoot()
+    {
+        UponShoot.Invoke();
+    }
+
+    public void OnDestroy()
+    {
+        // Could be at almost any time, just perform all checks...
+        if (Gun != null)
+        {
+            Gun.OnShoot.RemoveListener(OnShoot);
         }
     }
 
@@ -152,7 +184,9 @@ public class Attachment : NetworkBehaviour
     public void ApplyEffects(Gun gun)
     {
         // Apply all attachment effects onto the gun.
-        if(Type == AttachmentType.MUZZLE)
-            gun.Shooting.AudioSauce.VolumeMultiplier = 0.05f;
+        foreach (var tweak in Tweaks)
+        {
+            tweak.Apply(gun);
+        }
     }
 }
