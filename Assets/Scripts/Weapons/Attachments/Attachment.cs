@@ -85,6 +85,14 @@ public class Attachment : NetworkBehaviour
 
     private string layer;
 
+    public void Start()
+    {
+        if(Type == AttachmentType.MAGAZINE)
+        {
+            Hidden = true;
+        }
+    }
+
     private void OnBeforeTransformParentChanged()
     {
         // NOTE: for some reason, the parent changing it's parent (like  grandparent?) also calls this. Why?
