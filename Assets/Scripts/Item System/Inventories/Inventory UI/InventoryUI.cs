@@ -95,4 +95,14 @@ public class InventoryUI : MonoBehaviour
         }
         spawned.Clear();
     }
+
+    public void OnOpen()
+    {
+        InventoryChanged(Inventory);
+    }
+
+    public void OnClose()
+    {
+        DestroySpawned();
+    }
 }
