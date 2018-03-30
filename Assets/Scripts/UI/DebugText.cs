@@ -12,7 +12,8 @@ public class DebugText : MonoBehaviour {
 
     public bool Active;
 
-    private StringBuilder sB = new StringBuilder();
+    public string str;
+
     public Text Text;
 
     public int FPS
@@ -48,16 +49,14 @@ public class DebugText : MonoBehaviour {
     {
         if (!_Instance.Active)
             return;
-        _Instance.sB.Append(text);
-        _Instance.sB.Append('\n');
+        _Instance.str += text + '\n';
     }
 
     public static void Log(string text, Color colour)
     {
         if (!_Instance.Active)
             return;
-        _Instance.sB.Append(RichText.InColour(text, colour));
-        _Instance.sB.Append('\n');
+        _Instance.str += RichText.InColour(text, colour) + '\n';
     }
 
     public void Update()
@@ -91,10 +90,8 @@ public class DebugText : MonoBehaviour {
         if (!Active)
             return;
 
-        sB.Insert(0, RichText.InBold(RichText.InColour("FPS: " + FPS, FPS > 55 ? Color.green : FPS > 30 ? Color.yellow : Color.red)) + "\n");
-        string text = sB.ToString().Trim();
-        sB.Length = 0;
-
-        Text.text = text;
+        str = (RichText.InBold(RichText.InColour("FPS: " + FPS, FPS > 55 ? Color.green : FPS > 30 ? Color.yellow : Color.red)) + "\n") + str;
+        Text.text = str;
+        str = "";
     }
 }

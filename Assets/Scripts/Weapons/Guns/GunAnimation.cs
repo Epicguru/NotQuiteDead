@@ -80,7 +80,8 @@ public class GunAnimation : NetworkBehaviour
 
         AnimDropped(!item.IsEquipped());
 
-        DetectBlocked();
+        if(gun.Item.IsEquipped())
+            DetectBlocked();
     }
 
     private void DetectBlocked()
