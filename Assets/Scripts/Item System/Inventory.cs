@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,11 +28,11 @@ public class Inventory : NetworkBehaviour
         }
     }
 
-    public bool Dirty
+    public bool IsDirty
     {
         get
         {
-            return dirty;
+            return isDirty;
         }
         set
         {
@@ -40,10 +41,68 @@ public class Inventory : NetworkBehaviour
                 Debug.LogError("Cannot set dirty flag on client!");
                 return;
             }
-            dirty = value;
+            isDirty = value;
         }
     }
-    private bool dirty;
+    private bool isDirty;
+
+    [SyncVar(hook = "NetJsonChange")]
+    private string NetworkedJson;
+
+    public void Update()
+    {
+        if (isServer)
+        {
+            // On the server, which is authorative, set the networked json when the inventory dirty flag is true.
+            if (IsDirty)
+            {
+                // Set the networked json.
+                string json = JsonConvert.SerializeObject(Contents, Formatting.None);
+
+                // Set the net version...
+                NetworkedJson = json;
+
+                // Remove dirty flag.
+                IsDirty = false;
+            }
+        }
+        else
+        {
+            // Is client.
+        }
+    }
+
+    private void NetJsonChange(string newJson)
+    {
+        if (isServer)
+            return;
+
+        NetworkedJson = newJson;
+        Debug.Log("Got new json: " + newJson);
+
+        // Check the state of the json, just in case...
+        if (string.IsNullOrWhiteSpace(newJson))
+        {
+            // Oh no. Lets just whine about it and do nothing.
+            Debug.LogError("Client received null or empty json from the server in the inventory '{0}'".Form(Name));
+            return;
+        }
+
+        // Sync the inventory contents with the server's version...
+        try
+        {
+            // Deserialize...
+            var c = JsonConvert.DeserializeObject<Dictionary<string, List<ItemStack>>>(newJson);
+
+            // Just set the contents to the deserialized version...
+            Contents = c;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Exception deserializing the incoming json for inventory '{0}': Raw json:\n{1}".Form(Name, newJson));
+            Debug.LogError(e);
+        }
+    }
 
     /// <summary>
     /// Converts the value of the contents to a json format.
