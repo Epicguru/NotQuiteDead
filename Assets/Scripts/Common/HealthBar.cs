@@ -26,6 +26,12 @@ public class HealthBar : MonoBehaviour
     public void Start()
     {
         oldHealth = CurrentValue;
+        timer = ShowTime + 1f;
+
+        OutlineSprite.enabled = IsShowing();
+        HealthSprite.enabled = IsShowing();
+        NoHealthSprite.enabled = IsShowing();
+
     }
 
     public void Update()
