@@ -57,9 +57,6 @@ public class Item : NetworkBehaviour
     [Tooltip("If true AND Equipable is true, the this item can be quick-slotted.")]
     public bool CanQuickSlot = true;
 
-    [Tooltip("Information about the space and weight that this item takes in an inventory.")]
-    public InventoryInfo InventoryInfo;
-
     [Tooltip("The image for the icon in menus and inventories.")]
     public Sprite ItemIcon;
 

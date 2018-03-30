@@ -384,24 +384,12 @@ public class Inventory : MonoBehaviour
     public int GetCombinedItems()
     {
         int x = 0;
-        foreach(InventoryItemData i in Contents)
+        foreach (InventoryItemData i in Contents)
         {
             x += i.Count;
         }
 
         return x;
-    }
-
-    public float GetCombinedWeight()
-    {
-        float weight = 0;
-
-        foreach(InventoryItemData i in Contents)
-        {
-            weight += i.Item.InventoryInfo.Weight * i.Count;
-        }
-
-        return weight;
     }
 }
 
