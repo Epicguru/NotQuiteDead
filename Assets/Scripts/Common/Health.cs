@@ -163,12 +163,10 @@ public class Health : NetworkBehaviour {
 
     public void Update()
     {
-        if (!isServer)
-        {
-            return;
-        }
+        if (!isServer)        
+            return;        
 
-        if (health <= 0)
+        if (IsDead)
         {
             // Assume dead, check if is first frame dead...
             health = 0;
@@ -179,6 +177,14 @@ public class Health : NetworkBehaviour {
                 // Send message to client who has authority
                 this.DeadEventServer(source, secondary, timeSinceSource, timeSinceSecondary);
             }
+        }
+    }
+
+    public bool IsDead
+    {
+        get
+        {
+            return health <= 0f;
         }
     }
 

@@ -44,6 +44,8 @@ public class WorldSaveState
     // Stuff like time, difficulty, etc.
     public float Time;
     public DateTime LastPlayed;
+    public Vector2 SpawnPoint;
+    public float SpawnRadius;
 
     public WorldSaveState()
     {
@@ -54,10 +56,14 @@ public class WorldSaveState
     {
         Time = w.GameTime.GetTimeRaw();
         LastPlayed = DateTime.Now;
+        SpawnPoint = w.SpawnPoint;
+        SpawnRadius = w.SpawnRadius;
     }
 
     public void Apply(World world)
     {
         world.GameTime.SetTime(Time);
+        world.SpawnPoint = SpawnPoint;
+        world.SpawnRadius = SpawnRadius;
     }
 }

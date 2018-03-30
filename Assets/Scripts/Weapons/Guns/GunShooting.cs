@@ -22,6 +22,8 @@ public class GunShooting : RotatingItem
     public GunBulletType BulletType = GunBulletType.HITSCAN;
     [Header("Bullet Firing - Subsonic")]
     public float SubsonicBulletSpeed = 50f;
+    [Tooltip("The distance at which target-bullet misaligment is accounted for when firing subsnoic bullets. 20 is a good value.")]
+    public float SubsonicTargetCheckRange = 20f;
     [Header("Bullet Firing - Other")]
     [Tooltip("If true, when the reload animation ends, if there is not a round in the chamber then the first bullet from the magazine is automatically chambered, so the chamber animation never plays.")]
     public bool ReloadAutoChambers = false;
@@ -745,6 +747,51 @@ public class GunShooting : RotatingItem
         realEnd *= 1000f;
         realEnd += (Vector2)transform.position;
         Vector2 vector = realEnd - start;
+
+        // Error:
+        // At short range, due to the positioning of the gun, the subsnoic bullet can miss the target even when aiming straight at them.
+        // Solution:
+        // Raycast at short range and if any targets 'would be' hit then direct the bullet at them instead of the distant target.
+        // Will not always solve the problem but it should remove the inaccuracy.
+
+        // Raycast against targets.
+        float range = SubsonicTargetCheckRange;
+        Vector2 newEnd = end;
+        newEnd -= (Vector2)transform.position;
+        newEnd.Normalize();
+        newEnd *= range;
+        newEnd += (Vector2)transform.position;
+        hits = Physics2D.LinecastAll(transform.position, newEnd);
+        bool corrected = false;
+        Vector2 newTarget = Vector2.zero;
+
+        foreach(var hit in hits)
+        {
+            if (Health.CanHitObject(hit.collider, Player.Local.Team))
+            {
+                // The bullet will definitely hit something before it exits the barrel, because of the way shooting works in this game.
+                if (!Health.CanDamageObject(hit.collider, Player.Local.Team))
+                {
+                    // If we can't damage this object, there is no point trying to correct for anything past it.
+                    break;
+                }
+                else
+                {
+                    // We are intersecting an object, but it can be damaged...
+                    // Correct the shot so that we hit it.
+                    newTarget = hit.point;
+                    corrected = true;
+                    break;
+                }
+            }
+        }
+
+        // Now correct the angle if correction is required.
+        if (corrected)
+        {
+            vector = newTarget - start;
+        }
+
         float angle = Mathf.Atan2(vector.y, vector.x) * Mathf.Rad2Deg;
 
         if (isServer)
