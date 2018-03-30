@@ -17,14 +17,7 @@ public class Inventory : NetworkBehaviour
     public int Capacity = 100;
     public Dictionary<string, List<ItemStack>> Contents = new Dictionary<string, List<ItemStack>>();
 
-    public int ContentCount
-    {
-        get
-        {
-            return currentContentSize;
-        }
-    }
-    private int currentContentSize;
+    public int ContentCount { get; private set; }
 
     public bool IsFull
     {
@@ -33,6 +26,24 @@ public class Inventory : NetworkBehaviour
             return ContentCount >= Capacity;
         }
     }
+
+    public bool Dirty
+    {
+        get
+        {
+            return dirty;
+        }
+        set
+        {
+            if (!isServer)
+            {
+                Debug.LogError("Cannot set dirty flag on client!");
+                return;
+            }
+            dirty = value;
+        }
+    }
+    private bool dirty;
 
     /// <summary>
     /// Converts the value of the contents to a json format.
@@ -84,7 +95,7 @@ public class Inventory : NetworkBehaviour
                 // Great add the amount to the stack.
                 // Data is not used in stackable items.
                 Contents[prefab][0].Count += count;
-                currentContentSize += count;
+                ContentCount += count;
             }
             else
             {
@@ -94,7 +105,7 @@ public class Inventory : NetworkBehaviour
                 var list = new List<ItemStack>();
                 list.Add(stack);
                 Contents.Add(prefab, list);
-                currentContentSize += count;
+                ContentCount += count;
             }
         }
         else
@@ -122,7 +133,7 @@ public class Inventory : NetworkBehaviour
                 list.Add(stack);
                 Contents.Add(prefab, list);
             }
-            currentContentSize += 1;
+            ContentCount += 1;
         }
     }
 
@@ -194,7 +205,7 @@ public class Inventory : NetworkBehaviour
             if(stored > count)
             {
                 Contents[prefab][0].Count -= count;
-                currentContentSize -= count;
+                ContentCount -= count;
 
                 removed = count;
                 data = null; // Item data is now allowed for stackables.
@@ -206,7 +217,7 @@ public class Inventory : NetworkBehaviour
                 // Remove the stack list from the inventory completely, because it's count value will be 0 anyway.
                 Contents[prefab][0].Count = 0; // Not really necessary...
                 Contents.Remove(prefab);
-                currentContentSize -= count;
+                ContentCount -= count;
 
                 removed = count;
                 data = null; // Item data is now allowed for stackables.
