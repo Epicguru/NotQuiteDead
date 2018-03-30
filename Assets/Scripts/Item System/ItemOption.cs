@@ -9,8 +9,8 @@ public class ItemOption
 {
     public string OptionName;
     public object[] Params;
-    public UnityAction<InventoryItemData, string> OnSelected;
-    public InventoryItemData InvItem;
+    public UnityAction<ItemStack, string> OnSelected;
+    public ItemStack InvItem;
     /// <summary>
     /// Used when the InvItem cannot be set, such as in gear items.
     /// </summary>

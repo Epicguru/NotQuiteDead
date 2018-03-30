@@ -38,7 +38,7 @@ public class QuickSlot : NetworkBehaviour
             return;
 
 
-        foreach (InventoryItemData i in PlayerInventory.inv.Inventory.Contents)
+        foreach (ItemStack i in PlayerInventory.inv.Inventory.Contents)
         {
             if (i.Data == null)
                 continue;

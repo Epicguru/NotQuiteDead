@@ -54,9 +54,9 @@ public class QuickSlotInput : MonoBehaviour
             {
                 if (Input.GetKeyDown(Player.Local.QuickSlot.Slots[i]))
                 {
-                    InventoryItemData item = null;
+                    ItemStack item = null;
 
-                    foreach(InventoryItemData x in PlayerInventory.inv.Inventory.Contents)
+                    foreach(ItemStack x in PlayerInventory.inv.Inventory.Contents)
                     {
                         if (x.Data == null)
                             continue;

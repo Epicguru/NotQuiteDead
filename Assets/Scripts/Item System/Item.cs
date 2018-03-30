@@ -410,36 +410,36 @@ public class Item : NetworkBehaviour
         return Items.ContainsKey(prefab);
     }
 
-    public static void Option_EquipGear(InventoryItemData x, string prefab)
+    public static void Option_EquipGear(ItemStack x, string prefab)
     {
         PlayerInventory.Remove(x.Prefab, Vector2.zero, false); // Remove, do not drop.
         Player.Local.NetUtils.CmdSetGear(x.Item.GetComponent<GearItem>().Slot, prefab, x.Data == null ? null : x.Data.Serialize(), true);
     }
 
-    public static void Option_Equip(InventoryItemData x, string prefab)
+    public static void Option_Equip(ItemStack x, string prefab)
     {
         PlayerInventory.Remove(x.Prefab, Vector2.zero, false, 1); // Remove, do not drop.
         Player.Local.Holding.CmdEquip(x.Item.Prefab, Player.Local.gameObject, x.Data == null ? null : x.Data.Serialize());
     }
 
-    public static void Option_Drop(InventoryItemData x, string prefab)
+    public static void Option_Drop(ItemStack x, string prefab)
     {
         PlayerInventory.Remove(x.Prefab, Player.Local.transform.position, true);
     }
 
-    public static void Option_Details(InventoryItemData x, string prefab)
+    public static void Option_Details(ItemStack x, string prefab)
     {
         PlayerInventory.inv.Inventory.DetailsView.Enter(x.Prefab);
     }
 
-    public static void Option_QuickSlot(InventoryItemData x, string prefab)
+    public static void Option_QuickSlot(ItemStack x, string prefab)
     {
         PlayerInventory.inv.Inventory.QSI.Open = true;
         PlayerInventory.inv.Inventory.QSI.SelectedEvent.AddListener(UponQuickSlotSelect);
         tempSlotData = x;        
     }
 
-    private static InventoryItemData tempSlotData;
+    private static ItemStack tempSlotData;
     private static void UponQuickSlotSelect(int number)
     {
         if (tempSlotData.Data == null)
@@ -456,7 +456,7 @@ public class Item : NetworkBehaviour
         PlayerInventory.inv.Inventory.Refresh = true;
     }
 
-    public static void Option_ApplyAttachment(InventoryItemData x, string prefab)
+    public static void Option_ApplyAttachment(ItemStack x, string prefab)
     {
         // Set attachment...
         var attachment = x.Item.GetComponent<Attachment>();
@@ -471,7 +471,7 @@ public class Item : NetworkBehaviour
             PlayerInventory.Remove(x.Prefab, Vector2.zero, false, 1);
     }
 
-    public static void Option_RemoveMagazine(InventoryItemData x, string prefab)
+    public static void Option_RemoveMagazine(ItemStack x, string prefab)
     {
         // Remove attachment...
         string old = x.Data.Get<string>("Magazine Attachment");
@@ -481,7 +481,7 @@ public class Item : NetworkBehaviour
         PlayerInventory.Add(old, null, 1);
     }
 
-    public static void Option_RemoveMuzzle(InventoryItemData x, string prefab)
+    public static void Option_RemoveMuzzle(ItemStack x, string prefab)
     {
         // Remove attachment...
         string old = x.Data.Get<string>("Muzzle Attachment");
@@ -491,7 +491,7 @@ public class Item : NetworkBehaviour
         PlayerInventory.Add(old, null, 1);
     }
 
-    public static void Option_RemoveSight(InventoryItemData x, string prefab)
+    public static void Option_RemoveSight(ItemStack x, string prefab)
     {
         // Remove attachment...
         string old = x.Data.Get<string>("Sight Attachment");
@@ -501,7 +501,7 @@ public class Item : NetworkBehaviour
         PlayerInventory.Add(old, null, 1);
     }
 
-    public static void Option_RemoveUnderBarrel(InventoryItemData x, string prefab)
+    public static void Option_RemoveUnderBarrel(ItemStack x, string prefab)
     {
         // Remove attachment...
         string old = x.Data.Get<string>("Under Barrel Attachment");

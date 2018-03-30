@@ -1,404 +1,287 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class Inventory : MonoBehaviour
+public class Inventory : NetworkBehaviour
 {
-    // An inventory with little to no physical structure, that has a limit of items.
-    // The default limits are either:
-    // 1. A maximum amount of items, or
-    // 2. A maximum weight or possibly
-    // 3. Both, a limit on items and weight.
-    // EDIT - Lol this class is terrible.
+    // An inventory holds items.
+    // It can hold an unlimited amount of items for now.
+    // It is completely server authorative and clients (players) all have inventories that are sent states
+    // when necessary.
 
-    [Tooltip("The display name of the inventory.")]
-    public string Name = "Default Name";
+    public string Name = "Inventory Name";
+    public int Capacity = 100;
+    public Dictionary<string, List<ItemStack>> Contents = new Dictionary<string, List<ItemStack>>();
 
-    [Tooltip("The inventory item prefab.")]
-    public GameObject InventoryItemPrefab;
-
-    [Tooltip("The details text object rendererd at the top right of the screen.")]
-    public Text Details;
-
-    [Tooltip("The title of the inventory.")]
-    public Text Title;
-
-    public QuickSlotInput QSI;
-
-    [Tooltip("The details sub-screen.")]
-    public InventoryDetailsView DetailsView;
-
-    [Tooltip("The parent of the item game objects.")]
-    public Transform ItemsParent;
-
-    [Tooltip("The content object in the viewport of a scrollable.")]
-    public RectTransform ViewportContent;
-
-    [Tooltip("The maximum amount of items in this inventory. Negaive numbers means that there is no limit.")]
-    public int MaxItems = -1; // If negative, ignored.
-
-    [Tooltip("The maximum combined weight of all items in this inventory. Negaitve numbers means that there is no limit.")]
-    public float MaxWeight = 100f; // If negative, ignored.
-
-    public Dropdown SortingOption;
-    public Dictionary<InventorySortingMode, string> SortingModeMap = new Dictionary<InventorySortingMode, string>();
-    public Dictionary<string, InventorySortingMode> ReverseMap = new Dictionary<string, InventorySortingMode>();
-
-    public ItemOptionsPanel Options;
-
-    public List<InventoryItemData> Contents = new List<InventoryItemData>();
-
-    private List<GameObject> Spawned = new List<GameObject>();
-
-    public bool Refresh;
-
-    public delegate void OnContentsChange();
-    public event OnContentsChange ContentsChange;
-
-    public void Awake()
+    public int ContentCount
     {
-        SortingModeMap.Clear();
-        SortingModeMap.Add(InventorySortingMode.NONE, "None");
-        SortingModeMap.Add(InventorySortingMode.RARITY, "Rarity");
-        SortingModeMap.Add(InventorySortingMode.COUNT, "Count");
-        SortingModeMap.Add(InventorySortingMode.TYPE, "Item Type");
-        SortingModeMap.Add(InventorySortingMode.QUICKSLOTTED, "Quickslot");
-        SortingModeMap.Add(InventorySortingMode.ALPHA, "Alphabetical");
-
-        ReverseMap.Clear();
-        foreach(InventorySortingMode m in SortingModeMap.Keys)
+        get
         {
-            ReverseMap.Add(SortingModeMap[m], m);
+            return currentContentSize;
         }
-
-        SetDowndownOptions();
     }
+    private int currentContentSize;
 
-    public void Update()
+    public bool IsFull
     {
-        if(Title.text != Name)
+        get
         {
-            Title.text = Name;
-        }
-
-        if (Refresh)
-        {
-            // TODO sort.
-            RefreshItems(Contents);
+            return ContentCount >= Capacity;
         }
     }
 
-    public void Open()
+    /// <summary>
+    /// Converts the value of the contents to a json format.
+    /// </summary>
+    /// <returns></returns>
+    [Server]
+    public string GetJsonContents()
     {
-        RefreshItems(Contents);
+        return JsonConvert.SerializeObject(Contents, Formatting.None);
     }
 
-    public void DropdownChanged()
+    public bool CanFit(int extra)
     {
-        RefreshItems(Contents);
+        return (ContentCount + extra) <= Capacity;
     }
 
-    public void SetDowndownOptions()
+    public void Add(string prefab, int count, ItemData data)
     {
-        SortingOption.ClearOptions();
-        List<string> options = new List<string>();
-        foreach(var x in SortingModeMap.Keys)
+        if (string.IsNullOrWhiteSpace(prefab))
         {
-            options.Add(SortingModeMap[x]);
-        }
-        SortingOption.AddOptions(options);
-    }
-
-    public void AddItem(string prefab, ItemData data, int amount = 1)
-    {
-        if (amount <= 0)
+            Debug.LogWarning("Null, empty or whitespace prefab! Cannot add to inventory '{0}'!".Form(Name));
             return;
-        if (string.IsNullOrEmpty(prefab))
-            return;
-
-        Item item = Item.GetItem(prefab);
-
-        if(item == null)
+        }
+        if(count <= 0)
         {
+            Debug.LogWarning("Tried to add {0}x {1} to inventory '{2}'! That's just stupid!".Form(count, prefab, Name));
+            return;
+        }
+        if(!CanAdd(prefab, count, data))
+        {
+            Debug.LogWarning("Cannot add {0}x {1} to the inventory '{2}'!".Form(count, prefab, Name));
             return;
         }
 
-        Refresh = true;
-
-        if (CanAdd(item, amount))
+        // Get the item prefab
+        Item prefabItem = Item.GetItem(prefab);
+        if(prefabItem == null)
         {
-            // Do we already have a pile with those items?
-            if (item.CanStack)
+            Debug.LogWarning("No item prefab was found for '{0}', cannot add to inventory '{1}'!".Form(prefab, Name));
+            return;
+        }
+
+        // Is it stackable?
+        if (prefabItem.CanStack)
+        {
+            // It can stack, see if we have a stack for that item...
+            if (Contents.ContainsKey(prefab))
             {
-                foreach(InventoryItemData d in Contents)
-                {
-                    if(d.Prefab == prefab)
-                    {
-                        // Found the pile!
-                        d.Count += amount;
-
-                        ContentsChange.Invoke();
-                        return;
-                    }
-                }
-
-                // We looked for a stack but didn't find one... I'll just make a new one.
-                InventoryItemData ID = new InventoryItemData();
-                ID.Prefab = prefab;
-                ID.Data = data;
-                ID.Count = amount;
-                Contents.Insert(0, ID);
-
-                ContentsChange.Invoke();
-                return;
+                // Great add the amount to the stack.
+                // Data is not used in stackable items.
+                Contents[prefab][0].Count += count;
+                currentContentSize += count;
             }
             else
             {
-                // Cool, don't need to check stacking.
-                for (int i = 0; i < amount; i++)
-                {
-                    InventoryItemData ID = new InventoryItemData();
-                    ID.Prefab = prefab;
-                    ID.Data = data;
-                    ID.Count = 1;
-                    Contents.Insert(0, ID);
-                }
-
-                ContentsChange.Invoke();
-                return;
+                // We need to create a new stack, there is not one in the inventory!
+                // Again, data is not used with stackable objects.
+                ItemStack stack = new ItemStack(prefab, count, null);
+                var list = new List<ItemStack>();
+                list.Add(stack);
+                Contents.Add(prefab, list);
+                currentContentSize += count;
             }
         }
         else
         {
-            return;
+            // The item cannot be stacked, we will always need to create and add a new stack for the item.
+            // Adding more that one item like this is invalid, because they need item data.
+            // Even if item data is null, you can't add more than one at a time. Just call the method multiple times.
+
+            if(count > 1)
+            {
+                Debug.LogError("Cannot add more that one non-stackable item at a time: Just call the method in a loop. Tried to add {0} to inventory '{1}', will only add one.".Form(count, Name));
+            }
+
+            // Make stack
+            ItemStack stack = new ItemStack(prefab, 1, data);
+
+            // Do we contain a set of stacks?
+            if (Contents.ContainsKey(prefab))
+            {
+                Contents[prefab].Add(stack);
+            }
+            else
+            {
+                var list = new List<ItemStack>();
+                list.Add(stack);
+                Contents.Add(prefab, list);
+            }
+            currentContentSize += 1;
         }
     }
 
-    public void RefreshItems(List<InventoryItemData> items)
+    public bool Contains(string prefab)
     {
-        ClearSpawned();
-
-        if (items == null || items.Count == 0)
-            return;
-
-        // Sort these items
-        InventorySortingMode mode = GetSelectedSorting();
-        List<InventoryItemData> sorted = Sort(items, mode);
-
-        foreach(InventoryItemData d in sorted)
-        {
-            GameObject spawned = Instantiate(InventoryItemPrefab, ItemsParent);
-            InventoryItem x = spawned.GetComponent<InventoryItem>();
-
-            x.ItemData = d;
-            x.SetText();
-
-            Spawned.Add(spawned);
-        }
-
-        Refresh = false;
+        return Contents.ContainsKey(prefab);
     }
 
-    public InventorySortingMode GetSelectedSorting()
+    public bool Contains(string prefab, int count)
     {
-        return ReverseMap[SortingOption.options[SortingOption.value].text];
+        if (count <= 0)
+            return false;
+
+        int amount = GetAmountOf(prefab);
+
+        return amount >= count;
     }
 
-    public List<InventoryItemData> Sort(List<InventoryItemData> unsorted, InventorySortingMode mode)
+    public int GetAmountOf(string prefab)
     {
-        List<InventoryItemData> alpha = (from x in unsorted orderby x.Item.Name select x).ToList();
-        switch (mode)
-        {
-            case InventorySortingMode.NONE:
-                return unsorted;
-            case InventorySortingMode.COUNT:
-                var s = from x in alpha orderby x.Count descending select x;
-                return s.ToList();
-            case InventorySortingMode.RARITY:
-                s = from x in alpha orderby x.Item.Rarity descending select x;
-                return s.ToList();
-            case InventorySortingMode.QUICKSLOTTED:
-                s = from x in alpha orderby (x.Data == null ? -1 : (x.Data.Get<int>("Quick Slot") == 0 ? -1 : (100 - x.Data.Get<int>("Quick Slot")))) descending select x;
-                return s.ToList();
-            case InventorySortingMode.TYPE:
-                return unsorted;
-            case InventorySortingMode.ALPHA:
-                return alpha;
-            default:
-                return unsorted;
-        }
-    }
-
-    public void ClearSpawned()
-    {
-        if (Spawned.Count == 0)
-            return;
-
-        foreach(var g in Spawned)
-        {
-            Destroy(g);
-        }
-        Spawned.Clear();
-    }
-
-    public int RemoveItem(string prefab, Vector2 position, bool drop = true, int amount = 1)
-    {
-        // Find the item for that prefab.
-        Item item = Item.GetItem(prefab);
-        if(item == null)        
-            return 0;        
-        if (amount <= 0)
+        if (!Contents.ContainsKey(prefab))        
             return 0;
 
-        Refresh = true;
+        List<ItemStack> stackList = Contents[prefab];
+        if (stackList == null)
+            return 0;
+
+        int count = 0;
+        foreach (var stack in stackList)
+        {
+            count += stack.Count;
+        }
+
+        return count;
+    }
+
+    public bool Remove(string prefab, int count, out int removed, out ItemData data)
+    {
+        if(count <= 0)
+        {
+            Debug.LogWarning("Tried to remove {0}x {1} from inventory '{2}'. Why?".Form(count, prefab, Name));
+            removed = 0;
+            data = null;
+            return false;
+        }
+        if (!Contains(prefab))
+        {
+            Debug.LogWarning("Cannot remove any {0}(s), none in this '{1}' inventory.".Form(prefab, Name));
+            removed = 0;
+            data = null;
+            return false;
+        }
+
+        Item item = Item.GetItem(prefab);
+        if(item == null)
+        {
+            Debug.LogWarning("No item prefab found for '{0}', cannot remove any from the '{1}' inventory!".Form(prefab, Name));
+            removed = 0;
+            data = null;
+            return false;
+        }
 
         if (item.CanStack)
         {
-            // Item can stack, find item in inventory and change the item count.
-            for(int y = 0; y < Contents.Count; y++)
-            {
-                var i = Contents[y];
-                if(i.Prefab == prefab)
-                {
-                    int removed = 0;
-                    // Found it!
-                    for (int x = 0; x < amount; x++)
-                    {
-                        if (drop)
-                        {
-                            // Create new instance...
-                            // No need to apply data, because it is up to date.
-                            Vector2 offset = Random.insideUnitCircle * 0.1f;
-                            Player.Local.NetUtils.CmdSpawnDroppedItem(i.Prefab, position + offset, null);
-                        }
-                        i.Count -= 1;
-                        removed += 1;
-                        if(i.Count <= 0)
-                        {
-                            // Cannot remove any more, stop!
-                            Contents.RemoveAt(y);
+            // Is only in one stack, and we definitely have a stack because of the checks above...
+            int stored = Contents[prefab][0].Count;
 
-                            ContentsChange.Invoke();
-                            return removed;
-                        }
-                    }
-                }
+            // More than enough...
+            if(stored > count)
+            {
+                Contents[prefab][0].Count -= count;
+                currentContentSize -= count;
+
+                removed = count;
+                data = null; // Item data is now allowed for stackables.
+                return true;
+            }
+            // Just enough...
+            if(stored == count)
+            {
+                // Remove the stack list from the inventory completely, because it's count value will be 0 anyway.
+                Contents[prefab][0].Count = 0; // Not really necessary...
+                Contents.Remove(prefab);
+                currentContentSize -= count;
+
+                removed = count;
+                data = null; // Item data is now allowed for stackables.
+                return true;
+            }
+            // Not enough... Just remove as many as we can!
+            if(stored < count)
+            {
+                // Remove as many as possible.
+                Contents[prefab][0].Count = 0; // Not really necessary...
+                Contents.Remove(prefab);
+
+                removed = stored;
+                data = null; // Item data is now allowed for stackables.
+                return true;
             }
 
-            ContentsChange.Invoke();
-            return 0;
+            // Will never reach here...
+            // Stupid compiler doesn't realise that I did covered all possible options above.
+            removed = 0;
+            data = null;
+            return false;
         }
         else
         {
-            // Items does not stack so if there are any in the inventory then they will be split up.
-            int removed = 0;
-
-            List<InventoryItemData> bin = new List<InventoryItemData>();
-            foreach(var d in Contents)
+            if(count != 1)
             {
-                if(d.Prefab == prefab)
-                {
-                    // Remove it! We know that it is only one item in the stack because it does not stack!
-                    removed++;
-                    bin.Add(d);
-
-                    if (drop)
-                    {
-                        if (d.Data != null)
-                            d.Data.Update("Quick Slot", 0);
-                        Vector2 offset = Random.insideUnitCircle * 0.1f;
-                        Player.Local.NetUtils.CmdSpawnDroppedItem(d.Prefab, position + offset, d.Data == null ? null : d.Data.Serialize());
-                    }
-
-                    if(removed == amount)
-                    {
-                        break;
-                    }
-                }
-            }
-            foreach(var thing in bin)
-            {
-                Contents.Remove(thing);
+                Debug.LogWarning("Tried to remove {0} non-stackable items ({1}) from inventory '{2}'. Can only remove one at a time! Only one will be removed. Use a loop!".Form(count, prefab, Name));
+                count = 1;
             }
 
-            ContentsChange.Invoke();
-            return removed;
-        }
-    }
+            // The item cannot stack so we need to go through the stack list.
+            List<ItemStack> stacks = Contents[prefab];
 
-    public InventoryItemData GetOfType(string prefab)
-    {
-        foreach (InventoryItemData item in Contents)
-        {
-            if (item.Prefab == prefab)
-                return item;
-        }
-        return null;
-    }
-
-    public bool Contains(string prefab, int amount)
-    {
-        int count = 0;
-        foreach (InventoryItemData item in Contents)
-        {
-            if(item.Prefab == prefab)
+            // Do a little check, not really necessary...
+            if(stacks == null || stacks.Count == 0)
             {
-                count += item.Count;
+                // Should never happen!
+                Debug.LogError("Null stack list (for non-stackable item {1}) in inventory '{0}'".Form(Name, prefab));
+                removed = 0;
+                data = null;
+                return false;
             }
-            if (count >= amount)
-                return true;
-        }
-        if (count >= amount)
+
+            // Get the first stack from the list of stacks (Heap maybe? Heap: A stack of stacks... Hmmm...)
+            ItemStack stack = stacks[0];
+
+            if(stack == null)
+            {
+                // Should never happen!
+                Debug.LogError("Null stack (for non-stackable item {1}) in inventory '{0}'".Form(Name, prefab));
+                removed = 0;
+                data = null;
+                return false;
+            }
+
+            // Get data for this item...
+            ItemData d = stack.Data;
+            // Ignore stack count value: Should always be one.
+            int r = 1;
+
+            // Remove the stack from the heap.
+            stacks.Remove(stack);
+
+            data = d;
+            removed = 1;
             return true;
-        return false;
-    }
-
-    public void Clear()
-    {
-        // Removes all items stacks. Poof. They vanish.
-        while(Contents.Count > 0)
-        {
-            RemoveItem(Contents[0].Prefab, Vector2.zero, false, Contents[0].Count);
         }
     }
 
-    public void DropAll(float radius, Vector2 position)
+    public virtual bool CanAdd(string prefab, int count, ItemData data)
     {
-        // Drop all items and scatter them around the position.
-        while (Contents.Count > 0)
-        {
-            Vector2 offset = Random.insideUnitCircle * 2f;
+        if (IsFull)
+            return false;
 
-            RemoveItem(Contents[0].Prefab, position + offset, true, Contents[0].Count);
-        }
+        return CanFit(count);
     }
-
-    public bool CanAdd(Item i, int amount)
-    {
-        return true;
-    }
-
-    public int GetCombinedItems()
-    {
-        int x = 0;
-        foreach (InventoryItemData i in Contents)
-        {
-            x += i.Count;
-        }
-
-        return x;
-    }
-}
-
-public enum InventorySortingMode
-{
-    NONE,
-    RARITY,
-    COUNT,
-    QUICKSLOTTED,
-    TYPE,
-    ALPHA
 }

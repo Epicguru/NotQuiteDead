@@ -17,8 +17,8 @@ public static class InventoryIO
         }
 
         // Make array of inventory item data.
-        List<InventoryItemData> items = PlayerInventory.inv.Inventory.Contents;
-        InventoryItemData[] array = items.ToArray();
+        List<ItemStack> items = PlayerInventory.inv.Inventory.Contents;
+        ItemStack[] array = items.ToArray();
         items = null;
 
         // Get save file path.
@@ -42,7 +42,7 @@ public static class InventoryIO
         string path = OutputUtils.RealitySaveDirectory + reality + OutputUtils.InventoryItemSaveFile;
 
         // Make the list 
-        InventoryItemData[] data = InputUtils.FileToObject<InventoryItemData[]>(path);
+        ItemStack[] data = InputUtils.FileToObject<ItemStack[]>(path);
 
         if(data != null)
         {
@@ -52,7 +52,7 @@ public static class InventoryIO
             }
 
             // Apply to the player.
-            PlayerInventory.inv.Inventory.Contents = new List<InventoryItemData>(data);
+            PlayerInventory.inv.Inventory.Contents = new List<ItemStack>(data);
         }
         else
         {

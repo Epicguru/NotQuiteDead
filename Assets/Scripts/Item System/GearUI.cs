@@ -39,7 +39,7 @@ public class GearUI : MonoBehaviour {
         }
     }
 
-    public void Store(InventoryItemData item, string prefab)
+    public void Store(ItemStack item, string prefab)
     {
         if (Hands)
         {
@@ -55,7 +55,7 @@ public class GearUI : MonoBehaviour {
         }
     }
 
-    public void Drop(InventoryItemData item, string prefab)
+    public void Drop(ItemStack item, string prefab)
     {
         if (Hands)
         {
@@ -83,7 +83,7 @@ public class GearUI : MonoBehaviour {
         }
     }
 
-    public void Details(InventoryItemData item, string prefab)
+    public void Details(ItemStack item, string prefab)
     {
         // Show the details view.
         if (item != null)

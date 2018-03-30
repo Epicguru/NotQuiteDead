@@ -48,7 +48,7 @@ public class ItemOptionsPanel : MonoBehaviour
         Parent.gameObject.SetActive(true);
     }
 
-    private void SetOptions(ItemOption[] options, InventoryItemData item)
+    private void SetOptions(ItemOption[] options, ItemStack item)
     {
         open = true;
 

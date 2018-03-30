@@ -4,7 +4,7 @@ using System;
 
 [Serializable]
 [JsonObject(MemberSerialization = MemberSerialization.OptOut)]
-public class InventoryItemData
+public class ItemStack
 {
     public string Prefab;
     public int Count;
@@ -21,6 +21,18 @@ public class InventoryItemData
             return _Item;
         }
     }
-
+    [JsonIgnore]
     private Item _Item;
+
+    public ItemStack()
+    {
+
+    }
+
+    public ItemStack(string prefab, int count, ItemData data)
+    {
+        Prefab = prefab;
+        Count = count;
+        Data = data;
+    }
 }
