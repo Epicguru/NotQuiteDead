@@ -56,7 +56,7 @@ public class QuickSlotInput : MonoBehaviour
                 {
                     ItemStack item = null;
 
-                    foreach(ItemStack x in PlayerInventory.inv.Inventory.Contents)
+                    foreach(ItemStack x in Player.Local.Inventory.Contents)
                     {
                         if (x.Data == null)
                             continue;

@@ -8,7 +8,7 @@ public static class InventoryIO
     // IO for inventory and player.
     // EVERYTHING must be called from the SERVER ONLY!
 
-    public static void SaveInventory(string reality)
+    public static void SavePlayerInventory(Player player, string reality)
     {
         if (string.IsNullOrEmpty(reality))
         {
@@ -17,20 +17,18 @@ public static class InventoryIO
         }
 
         // Make array of inventory item data.
-        List<ItemStack> items = PlayerInventory.inv.Inventory.Contents;
-        ItemStack[] array = items.ToArray();
-        items = null;
+        var items = player.Inventory.Content;
 
         // Get save file path.
         string path = OutputUtils.RealitySaveDirectory + reality + OutputUtils.InventoryItemSaveFile;
 
-        Debug.Log("Saving " + array.Length + " inventory items to '" + path + "'");
+        Debug.Log("Saving " + player.Inventory.ContentCount + " inventory items to '" + path + "'");
 
         // Save to file.
-        OutputUtils.ObjectToFile(array, path);
+        OutputUtils.ObjectToFile(items, path);
     }
 
-    public static void LoadInventory(string reality, bool clearInventory = true)
+    public static void LoadPlayerInventory(Player player, string reality, bool clearInventory = true)
     {
         if (string.IsNullOrEmpty(reality))
         {
@@ -42,17 +40,17 @@ public static class InventoryIO
         string path = OutputUtils.RealitySaveDirectory + reality + OutputUtils.InventoryItemSaveFile;
 
         // Make the list 
-        ItemStack[] data = InputUtils.FileToObject<ItemStack[]>(path);
+        var data = InputUtils.FileToObject<Dictionary<string, List<ItemStack>>>(path);
 
         if(data != null)
         {
             if (clearInventory)
             {
-                PlayerInventory.inv.Inventory.Clear();
+                player.Inventory.Clear();
             }
 
             // Apply to the player.
-            PlayerInventory.inv.Inventory.Contents = new List<ItemStack>(data);
+            player.Inventory.Content = data;
         }
         else
         {

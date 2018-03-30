@@ -39,7 +39,7 @@ public class GearUI : MonoBehaviour {
         }
     }
 
-    public void Store(ItemStack item, string prefab)
+    public void Store(ItemStack item)
     {
         if (Hands)
         {
@@ -55,7 +55,7 @@ public class GearUI : MonoBehaviour {
         }
     }
 
-    public void Drop(ItemStack item, string prefab)
+    public void Drop(ItemStack item)
     {
         if (Hands)
         {
@@ -83,13 +83,13 @@ public class GearUI : MonoBehaviour {
         }
     }
 
-    public void Details(ItemStack item, string prefab)
+    public void Details(ItemStack stack)
     {
         // Show the details view.
-        if (item != null)
-            PlayerInventory.inv.Inventory.DetailsView.Enter(item.Prefab);
+        if (stack != null)
+            PlayerInventory.inv.Inventory.DetailsView.Enter(stack.Prefab);
         else
-            PlayerInventory.inv.Inventory.DetailsView.Enter(Item.GetItem(prefab));
+            PlayerInventory.inv.Inventory.DetailsView.Enter(Item.GetItem(stack.Prefab));
     }
 
     public ItemOption[] GetOptions(ItemData data)
@@ -116,14 +116,14 @@ public class GearUI : MonoBehaviour {
         if (InputManager.InputPressed("Quick Store", true))
         {
             // Wants to quick store, do it!
-            Store(null, null);
+            Store(null);
             return;
         }
 
         if (InputManager.InputPressed("Quick Drop", true))
         {
             // Wants to quick drop, do it!
-            Drop(null, null);
+            Drop(null);
             return;
         }
 

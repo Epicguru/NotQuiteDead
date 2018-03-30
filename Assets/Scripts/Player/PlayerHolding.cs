@@ -80,7 +80,7 @@ public class PlayerHolding : NetworkBehaviour
             {
                 // Put in inventory
                 this.Item.RequestDataUpdate(); // Refresh data.
-                PlayerInventory.Add(this.Item.Prefab, this.Item.Data, 1);
+                Player.Local.NetUtils.CmdTryGive(this.Item.Prefab, 1, this.Item.Data.Serialize());
             }
             Destroy(this.Item.gameObject); // Destroy on all clients...
         }
@@ -128,25 +128,20 @@ public class PlayerHolding : NetworkBehaviour
         if (!drop)
         {
             // Put in inventory.
-            RpcGiveItem(localPlayer, this.Item.Prefab, data);
-            Destroy(this.Item.gameObject); // Does this work!?!?
+            ItemData d = null;
+            d = ItemData.TryDeserialize(data);
+            localPlayer.GetComponent<Player>().TryGiveItem(this.Item.Prefab, 1, d);
+            Destroy(this.Item.gameObject); // Will destroy on all clients.
         }
         else
         {
             // Drop item
-            Player.Local.NetUtils.CmdSpawnDroppedItem(this.Item.Prefab, localPlayer.transform.position, data);
-            Destroy(this.Item.gameObject); // Does this work!?!?
+            ItemData d = null;
+            d = ItemData.TryDeserialize(data);
+            localPlayer.GetComponent<Player>().SpawnItemAtFeet(this.Item.Prefab, d);
+            Destroy(this.Item.gameObject); // Will destroy on all clients.
         }
         RpcDrop(localPlayer);
-    }
-
-    [ClientRpc]
-    private void RpcGiveItem(GameObject player, string itemPrefab, string data)
-    {
-        if(player.GetComponent<NetworkIdentity>().netId == Player.Local.NetworkIdentity.netId)
-        {
-            PlayerInventory.Add(itemPrefab, ItemData.TryDeserialize(data), 1);
-        }
     }
 
     [ClientRpc]

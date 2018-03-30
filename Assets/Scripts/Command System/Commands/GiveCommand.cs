@@ -29,7 +29,7 @@ public class GiveCommand : Command
         if (prefab == null)
             return "Could not find item: '" + itemName + "'";
 
-        PlayerInventory.Add(itemName, null, amount);
+        Player.Local.NetUtils.CmdTryGive(itemName, amount, null);
 
         CommandProcessing.Log("Gave local player '" + prefab.Name + "' x" + amount);
 

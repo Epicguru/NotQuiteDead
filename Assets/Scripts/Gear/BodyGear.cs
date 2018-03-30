@@ -145,9 +145,10 @@ public class BodyGear : NetworkBehaviour
         if (returnToPlayer)
         {
             // Give item back...
+            GetGearItem().Item.RequestDataUpdate();
             ItemData data = GetGearItem().Item.Data;
 
-            RpcReturnItem(GetGearItem().Item.Prefab, data == null ? null : data.Serialize(), owner);
+            owner.GetComponent<Player>().TryGiveItem(GetGearItem().Item.Prefab, 1, data);
         }
 
         // Destroy the old equipped item.
@@ -163,15 +164,6 @@ public class BodyGear : NetworkBehaviour
 
         // Set itemGO to this.
         this.IGO = item.gameObject;
-    }
-
-    [ClientRpc]
-    public void RpcReturnItem(string itemPrefab, string data, GameObject owner)
-    {
-        if (Player.Local.netId != owner.GetComponent<Player>().netId)
-            return;
-
-        PlayerInventory.Add(itemPrefab, ItemData.TryDeserialize(data), 1);
     }
 
     public void Update()

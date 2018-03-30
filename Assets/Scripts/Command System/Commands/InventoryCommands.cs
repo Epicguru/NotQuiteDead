@@ -19,19 +19,14 @@ public class InventoryCommands : Command
         {
             case "clear":
 
-                int items = PlayerInventory.inv.Inventory.Contents.Count;
-                PlayerInventory.inv.Inventory.Clear();
+                int items = Player.Local.Inventory.ContentCount;
+                Player.Local.Inventory.Clear();
 
                 CommandProcessing.Log("Cleared " + items + " items out of the player's inventory.");
                 return null;
-            case "drop":
-                items = PlayerInventory.inv.Inventory.Contents.Count;
-                PlayerInventory.inv.Inventory.DropAll(2f, Player.Local.transform.position);
 
-                CommandProcessing.Log("Dropped " + items + " items from the player's inventory.");
-                return null;
             default:
-                return "Not a valid action. Valid actions are: clear, drop.";
+                return "Not a valid action. Valid actions are: clear.";
         }
     }
 }

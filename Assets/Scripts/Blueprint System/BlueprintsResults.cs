@@ -17,14 +17,15 @@ public class BlueprintsResults : MonoBehaviour
 
         for (int i = 0; i < b.Requirements.Length; i++)
         {
-            PlayerInventory.Remove(b.Requirements[i].Prefab, Vector2.zero, false, b.RequirementQuantities[i]);
+            int removed;
+            ItemData data;
+            Player.Local.Inventory.Remove(b.Requirements[i].Prefab, b.RequirementQuantities[i], out removed, out data);
         }
 
         for (int i = 0; i < b.Products.Length; i++)
         {
-            PlayerInventory.Add(b.Products[i].Prefab, null, b.Quantities[i]);
+            Player.Local.TryGiveItem(b.Products[i].Prefab, b.Quantities[i], null);
         }
-        PlayerInventory.inv.Inventory.Refresh = true;
     }
 
     public Blueprint CurrentBlueprint

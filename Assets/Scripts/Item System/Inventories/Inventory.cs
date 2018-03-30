@@ -16,8 +16,10 @@ public class Inventory : NetworkBehaviour
 
     public string Name = "Inventory Name";
     public int Capacity = 100;
-    public Dictionary<string, List<ItemStack>> Content { get; private set; } = new Dictionary<string, List<ItemStack>>();
-    public int ContentCount { get; private set; }
+    public Dictionary<string, List<ItemStack>> Content { get; set; } = new Dictionary<string, List<ItemStack>>();
+
+    [SyncVar]
+    public int ContentCount;
 
     public bool IsFull
     {
@@ -44,6 +46,11 @@ public class Inventory : NetworkBehaviour
         }
     }
     private bool isDirty;
+
+    public override void OnStartClient()
+    {
+        NetJsonChange(NetworkedJson);
+    }
 
     [SyncVar(hook = "NetJsonChange")]
     private string NetworkedJson;
@@ -116,6 +123,13 @@ public class Inventory : NetworkBehaviour
     public bool CanFit(int extra)
     {
         return (ContentCount + extra) <= Capacity;
+    }
+
+    [Server]
+    public void Clear()
+    {
+        Content.Clear();
+        IsDirty = true;
     }
 
     [Server]
@@ -229,6 +243,14 @@ public class Inventory : NetworkBehaviour
         }
 
         return count;
+    }
+
+    public ItemStack GetFirst(string prefab)
+    {
+        if (!Contains(prefab))
+            return null;
+
+        return Content[prefab][0];
     }
 
     [Server]

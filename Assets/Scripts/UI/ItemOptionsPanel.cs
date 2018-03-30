@@ -24,13 +24,13 @@ public class ItemOptionsPanel : MonoBehaviour
         }
     }
 
-    public void Open(InventoryItem item)
+    public void Open(ItemStack item)
     {
         if (open)
             return;
 
-        ItemOption[] options = item.ItemData.Item.CreateOptions(item.ItemData.Item, item.ItemData.Data);
-        SetOptions(options, item.ItemData);
+        ItemOption[] options = item.Item.CreateOptions(item);
+        SetOptions(options, item);
         Parent.gameObject.SetActive(true);
     }
 
@@ -64,7 +64,7 @@ public class ItemOptionsPanel : MonoBehaviour
 
             GO.GetComponentInChildren<Text>().text = ("InvOptions_" + option.OptionName).Translate(option.Params).FirstCap();
 
-            option.InvItem = item;
+            option.ItemStack = item;
             GO.GetComponent<Button>().onClick.AddListener(option.Clicked);
             GO.GetComponent<Button>().onClick.AddListener(Close);
 

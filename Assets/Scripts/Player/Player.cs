@@ -29,6 +29,7 @@ public class Player : NetworkBehaviour
     public QuickSlot QuickSlot;
     public BodyGearStats GearStats;
     public ActiveObject AO;
+    public Inventory Inventory;
     public BuildingInventory BuildingInventory;
     public PlayerBuilding Building;
     public BodyGear[] BodyGear;
@@ -325,5 +326,28 @@ public class Player : NetworkBehaviour
         float nomalized = 1f - Mathf.Clamp(distance / MAX_DISTANCE, 0f, 1f);
 
         Camera.main.GetComponent<CameraShake>().ShakeCamera(nomalized * MAX_SHAKE);
+    }
+
+    [Server]
+    public void SpawnItemAtFeet(string prefab, ItemData data)
+    {
+        Vector2 offset = Random.insideUnitCircle * 1f;
+        Item spawned = Item.NewInstance(prefab, (Vector2)transform.position + offset, data);
+        NetworkServer.Spawn(spawned.gameObject);
+    }
+
+    [Server]
+    public void TryGiveItem(string prefab, int count, ItemData data)
+    {
+        // Attempts to put the item inside the players inventory, and drops it next to the player if that fails.
+        if (this.Inventory.CanAdd(prefab, count, data))
+        {
+            this.Inventory.Add(prefab, count, data);
+        }
+        else
+        {
+            // Drop on ground next to player...
+            this.SpawnItemAtFeet(prefab, data);
+        }
     }
 }

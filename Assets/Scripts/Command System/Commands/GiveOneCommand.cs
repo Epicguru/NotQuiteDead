@@ -25,7 +25,7 @@ public class GiveOneCommand : Command
             // Give all items.
             foreach(var x in Item.Items.Values)
             {
-                PlayerInventory.Add(x.Prefab, null, amount);
+                Player.Local.NetUtils.CmdTryGive(x.Prefab, amount, null);
             }
 
             // Give all tiles.
@@ -50,7 +50,7 @@ public class GiveOneCommand : Command
         if (prefab == null)
             return "Could not find item: '" + itemName + "'";
 
-        PlayerInventory.Add(prefab.Prefab, null, amount);
+        Player.Local.NetUtils.CmdTryGive(prefab.Prefab, amount, null);
         CommandProcessing.Log("Gave local player '" + prefab.Name + "' x" + amount);
 
         return null;

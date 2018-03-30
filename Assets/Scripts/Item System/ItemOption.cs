@@ -9,8 +9,8 @@ public class ItemOption
 {
     public string OptionName;
     public object[] Params;
-    public UnityAction<ItemStack, string> OnSelected;
-    public ItemStack InvItem;
+    public UnityAction<ItemStack> OnSelected;
+    public ItemStack ItemStack;
     /// <summary>
     /// Used when the InvItem cannot be set, such as in gear items.
     /// </summary>
@@ -18,11 +18,11 @@ public class ItemOption
 
     public void Clicked()
     {
-        if(InvItem != null)
+        if(ItemStack != null)
         {
             if(Prefab == null)
             {
-                Prefab = InvItem.Prefab;
+                Prefab = ItemStack.Prefab;
             }
         }
         else
@@ -32,6 +32,6 @@ public class ItemOption
                 Debug.LogError("InvItem AND prefab string are null!");
             }
         }
-        OnSelected.Invoke(InvItem, Prefab);
+        OnSelected.Invoke(ItemStack);
     }
 }

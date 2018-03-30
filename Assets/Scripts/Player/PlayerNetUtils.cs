@@ -18,6 +18,36 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
+    public void CmdGiveItems(string prefab, int count, string data)
+    {
+        GetPlayer().TryGiveItem(prefab, count, ItemData.TryDeserialize(data));
+    }
+
+    [Command]
+    public void CmdRemoveItems(string prefab, int count)
+    {
+        int removed;
+        ItemData data;
+        GetPlayer().Inventory.Remove(prefab, count, out removed, out data);
+    }
+
+    [Command]
+    public void CmdDropAtFeet(string prefab, int count)
+    {
+        int removed;
+        ItemData data;
+        bool worked = GetPlayer().Inventory.Remove(prefab, count, out removed, out data);
+
+        if (worked)
+        {
+            for (int i = 0; i < removed; i++)
+            {
+                GetPlayer().SpawnItemAtFeet(prefab, data);
+            }
+        }
+    }
+
+    [Command]
     public void CmdRequestPickup(GameObject player, GameObject item)
     {
         Debug.Log("Incoming pickup request from " + player.name);
@@ -107,23 +137,17 @@ public class PlayerNetUtils : NetworkBehaviour
     }
 
     [Command]
-    public void CmdSetGear(string name, string prefab, string data, bool returnOldItem)
+    public void CmdTryGive(string prefab, int count, string data)
     {
-        GetPlayer().GearMap[name].SetItem(player.gameObject, prefab == null ? null : Item.GetItem(prefab), ItemData.TryDeserialize(data), returnOldItem);
+        ItemData d = null;
+        d = ItemData.TryDeserialize(data);
+        GetPlayer().TryGiveItem(prefab, count, d);
     }
 
     [Command]
-    public void CmdSpawnDroppedItem(string prefab, Vector3 position, string data)
+    public void CmdSetGear(string name, string prefab, string data, bool returnOldItem)
     {
-        Server_SpawnDroppedItem(prefab, position, ItemData.TryDeserialize(data));
-    }
-
-    [Server]
-    public void Server_SpawnDroppedItem(string prefab, Vector3 position, ItemData data)
-    {
-        Item newItem = Item.NewInstance(prefab, position, data);
-
-        NetworkServer.Spawn(newItem.gameObject);
+        GetPlayer().GearMap[name].SetItem(player.gameObject, prefab == null ? null : Item.GetItem(prefab), ItemData.TryDeserialize(data), returnOldItem);
     }
 
     [Command]

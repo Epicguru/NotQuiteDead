@@ -113,15 +113,17 @@ public class Throwable : RotatingItem
     {
         if (!hasAuthority)
             return;
+
         // Remove from holding, completely destroy...
         GetComponentInParent<PlayerHolding>().CmdDrop(false, true, Player.Local.gameObject, null); // Completely destroy this object...
 
         // Look for new throwable of same type in inventory, and if we find one...
-        ItemStack i = PlayerInventory.inv.Inventory.GetOfType(Item.Prefab);
+        ItemStack i = Player.Local.Inventory.GetFirst(Item.Prefab);
+
         if (i != null)
         {
             // Equip it!
-            Item.Option_Equip(i, i.Prefab);
+            Item.Option_Equip(i);
         }
     }
 

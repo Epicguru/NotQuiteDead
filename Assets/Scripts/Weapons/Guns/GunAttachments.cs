@@ -154,19 +154,20 @@ public class GunAttachments : NetworkBehaviour
     }
 
     [Server]
-    private void Server_SetAttachment(GameObject player, AttachmentType type, Attachment a, ItemData itemData)
+    private void Server_SetAttachment(GameObject player, AttachmentType type, Attachment a, ItemData data)
     {
+        Player p = player.GetComponent<Player>();
         if(a != null)
         {
             Attachment current = GetCurrentAttachment(type);
             if (current != null)
             {
                 current.Item.RequestDataUpdate();
-                itemData = current.Item.Data;
-                string itemDataString = itemData.Serialize();
+                string pre = current.Item.Prefab;
+                data = current.Item.Data;
 
                 // Return the current attachment...
-                RpcReturnAttachment(player, current.Item.Prefab, itemDataString);
+                p.TryGiveItem(pre, 1, data);
 
                 // Destroy the object on the server and all clients.
                 current.transform.parent = null; // Don't ask why, but don't remove either...
@@ -177,7 +178,7 @@ public class GunAttachments : NetworkBehaviour
             string prefab = a.Item.Prefab;
 
             // Spawn the attachment...
-            Item spawnedItem = Item.NewInstance(prefab, transform.position, itemData);
+            Item spawnedItem = Item.NewInstance(prefab, transform.position, data);
             NetPosSync posSync = spawnedItem.NetPosSync;
             NetParent parent;
             Transform mount = GetMountFor(type);
@@ -205,29 +206,15 @@ public class GunAttachments : NetworkBehaviour
             if(current != null)
             {
                 current.Item.RequestDataUpdate();
-                itemData = current.Item.Data;
-                string itemDataString = itemData.Serialize();
+                string prefab = current.Item.Prefab;
+                data = current.Item.Data;
 
                 // Return the current attachment...
-                RpcReturnAttachment(player, current.Item.Prefab, itemDataString);
+                p.TryGiveItem(prefab, 1, data);
 
                 // Destroy the object on the server and all clients.
                 Destroy(current.gameObject);
             }
-        }
-    }
-
-    [ClientRpc]
-    private void RpcReturnAttachment(GameObject player, string prefab, string data)
-    {
-        if(player.GetComponent<NetworkIdentity>().netId == Player.Local.netId)
-        {
-            ItemData itemData = null;
-            if (!string.IsNullOrWhiteSpace(data))
-            {
-                itemData = ItemData.TryDeserialize(data);
-            }
-            PlayerInventory.Add(prefab, itemData, 1);
         }
     }
 

@@ -156,38 +156,38 @@ public class Item : NetworkBehaviour
         currentLayer = layer;
     }
 
-    public ItemOption[] CreateOptions(Item item, ItemData data)
+    public ItemOption[] CreateOptions(ItemStack stack)
     {
         List<ItemOption> options = new List<ItemOption>();
         options.Add(new ItemOption() { OptionName = "Drop", OnSelected = Option_Drop });
-        if(Equipable && item.GetComponent<GearItem>() == null && !Player.Local.Building.InBuildMode)
+        if(Equipable && stack.Item.GetComponent<GearItem>() == null && !Player.Local.Building.InBuildMode)
             options.Add(new ItemOption() { OptionName = "Equip", OnSelected = Option_Equip });
         options.Add(new ItemOption() { OptionName = "Details", OnSelected = Option_Details });
-        if (this.GetComponent<Attachment>() != null && Player.Local.Holding.Item != null && Player.Local.Holding.Item.GetComponent<GunAttachments>() != null && Player.Local.Holding.Item.GetComponent<GunAttachments>().IsValid(item.GetComponent<Attachment>().Type, item.GetComponent<Attachment>()))
+        if (this.GetComponent<Attachment>() != null && Player.Local.Holding.Item != null && Player.Local.Holding.Item.GetComponent<GunAttachments>() != null && Player.Local.Holding.Item.GetComponent<GunAttachments>().IsValid(stack.Item.GetComponent<Attachment>().Type, stack.Item.GetComponent<Attachment>()))
             options.Add(new ItemOption() { OptionName = "EquipAttach", OnSelected = Option_ApplyAttachment });
-        if (item.GetComponent<GearItem>() != null)
+        if (stack.Item.GetComponent<GearItem>() != null)
             options.Add(new ItemOption() { OptionName = "Equip", OnSelected = Option_EquipGear });
-        if(item.Equipable)
+        if(stack.Item.Equipable)
             options.Add(new ItemOption() { OptionName = "QuickSlot", OnSelected = Option_QuickSlot });
 
-        if (data == null)
+        if (stack.Data == null)
             return options.ToArray();
 
-        if (!string.IsNullOrEmpty(data.Get<string>("Magazine Attachment")))
+        if (!string.IsNullOrEmpty(stack.Data.Get<string>("Magazine Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(data.Get<string>("Magazine Attachment")) }, OnSelected = Option_RemoveMagazine });
+            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(stack.Data.Get<string>("Magazine Attachment")) }, OnSelected = Option_RemoveMagazine });
         }
-        if (!string.IsNullOrEmpty(data.Get<string>("Muzzle Attachment")))
+        if (!string.IsNullOrEmpty(stack.Data.Get<string>("Muzzle Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(data.Get<string>("Muzzle Attachment")) }, OnSelected = Option_RemoveMuzzle });
+            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(stack.Data.Get<string>("Muzzle Attachment")) }, OnSelected = Option_RemoveMuzzle });
         }
-        if (!string.IsNullOrEmpty(data.Get<string>("Sight Attachment")))
+        if (!string.IsNullOrEmpty(stack.Data.Get<string>("Sight Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(data.Get<string>("Sight Attachment")) }, OnSelected = Option_RemoveSight });
+            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(stack.Data.Get<string>("Sight Attachment")) }, OnSelected = Option_RemoveSight });
         }
-        if (!string.IsNullOrEmpty(data.Get<string>("Under Barrel Attachment")))
+        if (!string.IsNullOrEmpty(stack.Data.Get<string>("Under Barrel Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(data.Get<string>("Under Barrel Attachment")) }, OnSelected = Option_RemoveUnderBarrel });
+            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(stack.Data.Get<string>("Under Barrel Attachment")) }, OnSelected = Option_RemoveUnderBarrel });
         }
 
         return options.ToArray();
@@ -410,29 +410,29 @@ public class Item : NetworkBehaviour
         return Items.ContainsKey(prefab);
     }
 
-    public static void Option_EquipGear(ItemStack x, string prefab)
+    public static void Option_EquipGear(ItemStack x)
     {
-        PlayerInventory.Remove(x.Prefab, Vector2.zero, false); // Remove, do not drop.
-        Player.Local.NetUtils.CmdSetGear(x.Item.GetComponent<GearItem>().Slot, prefab, x.Data == null ? null : x.Data.Serialize(), true);
+        Player.Local.NetUtils.CmdRemoveItems(x.Prefab, 1); // Remove, do not drop.
+        Player.Local.NetUtils.CmdSetGear(x.Item.GetComponent<GearItem>().Slot, x.Prefab, x.Data == null ? null : x.Data.Serialize(), true);
     }
 
-    public static void Option_Equip(ItemStack x, string prefab)
+    public static void Option_Equip(ItemStack x)
     {
-        PlayerInventory.Remove(x.Prefab, Vector2.zero, false, 1); // Remove, do not drop.
+        Player.Local.NetUtils.CmdRemoveItems(x.Prefab, 1); // Remove, do not drop.
         Player.Local.Holding.CmdEquip(x.Item.Prefab, Player.Local.gameObject, x.Data == null ? null : x.Data.Serialize());
     }
 
-    public static void Option_Drop(ItemStack x, string prefab)
+    public static void Option_Drop(ItemStack x)
     {
-        PlayerInventory.Remove(x.Prefab, Player.Local.transform.position, true);
+        Player.Local.NetUtils.CmdDropAtFeet(x.Prefab, x.Count);
     }
 
-    public static void Option_Details(ItemStack x, string prefab)
+    public static void Option_Details(ItemStack x)
     {
         PlayerInventory.inv.Inventory.DetailsView.Enter(x.Prefab);
     }
 
-    public static void Option_QuickSlot(ItemStack x, string prefab)
+    public static void Option_QuickSlot(ItemStack x)
     {
         PlayerInventory.inv.Inventory.QSI.Open = true;
         PlayerInventory.inv.Inventory.QSI.SelectedEvent.AddListener(UponQuickSlotSelect);
@@ -456,7 +456,7 @@ public class Item : NetworkBehaviour
         PlayerInventory.inv.Inventory.Refresh = true;
     }
 
-    public static void Option_ApplyAttachment(ItemStack x, string prefab)
+    public static void Option_ApplyAttachment(ItemStack x)
     {
         // Set attachment...
         var attachment = x.Item.GetComponent<Attachment>();
@@ -467,47 +467,49 @@ public class Item : NetworkBehaviour
         }
         bool worked = Player.Local.Holding.Item.GetComponent<GunAttachments>().SetAttachment(Player.Local.gameObject, attachment.Type, attachment, x.Data);
         // Remove from inventory
-        if(worked)
-            PlayerInventory.Remove(x.Prefab, Vector2.zero, false, 1);
+        if (worked)
+        {
+            Player.Local.NetUtils.CmdRemoveItems(x.Prefab, 1);
+        }
     }
 
-    public static void Option_RemoveMagazine(ItemStack x, string prefab)
+    public static void Option_RemoveMagazine(ItemStack x)
     {
         // Remove attachment...
         string old = x.Data.Get<string>("Magazine Attachment");
         x.Data.Remove("Magazine Attachment");
 
         // Give item back to player!
-        PlayerInventory.Add(old, null, 1);
+        Player.Local.NetUtils.CmdGiveItems(old, 1, null);
     }
 
-    public static void Option_RemoveMuzzle(ItemStack x, string prefab)
+    public static void Option_RemoveMuzzle(ItemStack x)
     {
         // Remove attachment...
         string old = x.Data.Get<string>("Muzzle Attachment");
         x.Data.Remove("Muzzle Attachment");
 
         // Give item back to player!
-        PlayerInventory.Add(old, null, 1);
+        Player.Local.NetUtils.CmdGiveItems(old, 1, null);
     }
 
-    public static void Option_RemoveSight(ItemStack x, string prefab)
+    public static void Option_RemoveSight(ItemStack x)
     {
         // Remove attachment...
         string old = x.Data.Get<string>("Sight Attachment");
         x.Data.Remove("Sight Attachment");
 
         // Give item back to player!
-        PlayerInventory.Add(old, null, 1);
+        Player.Local.NetUtils.CmdGiveItems(old, 1, null);
     }
 
-    public static void Option_RemoveUnderBarrel(ItemStack x, string prefab)
+    public static void Option_RemoveUnderBarrel(ItemStack x)
     {
         // Remove attachment...
         string old = x.Data.Get<string>("Under Barrel Attachment");
         x.Data.Remove("Under Barrel Attachment");
 
         // Give item back to player!
-        PlayerInventory.Add(old, null, 1);
+        Player.Local.NetUtils.CmdGiveItems(old, 1, null);
     }
 }

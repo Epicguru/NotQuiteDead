@@ -35,7 +35,7 @@ public class World : NetworkBehaviour
 
         // Save the player inventory:
         // This will only save the host's inventory. TODO support other clients saving inventory data.
-        InventoryIO.SaveInventory(RealityName);
+        InventoryIO.SavePlayerInventory(Player.Local, RealityName);
 
         // Save current gear held and worn by local player. TODO see above.
         InventoryIO.SaveGear(RealityName, Player.Local);
@@ -76,7 +76,7 @@ public class World : NetworkBehaviour
 
         // Load the player inventory.
         // This will only load the host's inventory. TODO support other clients loading inventory data.
-        InventoryIO.LoadInventory(RealityName);
+        InventoryIO.LoadPlayerInventory(Player.Local, RealityName);
 
         // Save current gear held and worn by local player. TODO see above.
         InventoryIO.LoadGear(RealityName, Player.Local);
