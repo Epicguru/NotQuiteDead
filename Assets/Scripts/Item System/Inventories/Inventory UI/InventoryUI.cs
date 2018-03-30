@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -25,6 +26,8 @@ public class InventoryUI : MonoBehaviour
     [Header("References")]
     public RectTransform ContentParent;
     public InventoryItemUI Prefab;
+
+    public ItemClickedEvent OnItemClicked = new ItemClickedEvent();
 
     private List<InventoryItemUI> spawned = new List<InventoryItemUI>();
 
@@ -105,4 +108,15 @@ public class InventoryUI : MonoBehaviour
     {
         DestroySpawned();
     }
+
+    public void ItemClicked(ItemStack stack)
+    {
+        OnItemClicked.Invoke(stack);
+        Debug.Log("Got click!");
+    }
+}
+
+public class ItemClickedEvent : UnityEvent<ItemStack>
+{
+
 }
