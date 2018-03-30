@@ -118,6 +118,7 @@ public class Inventory : NetworkBehaviour
         return (ContentCount + extra) <= Capacity;
     }
 
+    [Server]
     public void Add(string prefab, int count, ItemData data)
     {
         if (string.IsNullOrWhiteSpace(prefab))
@@ -165,6 +166,7 @@ public class Inventory : NetworkBehaviour
                 Content.Add(prefab, list);
                 ContentCount += count;
             }
+            IsDirty = true;
         }
         else
         {
@@ -192,6 +194,7 @@ public class Inventory : NetworkBehaviour
                 Content.Add(prefab, list);
             }
             ContentCount += 1;
+            IsDirty = true;
         }
     }
 
@@ -228,6 +231,7 @@ public class Inventory : NetworkBehaviour
         return count;
     }
 
+    [Server]
     public bool Remove(string prefab, int count, out int removed, out ItemData data)
     {
         if(count <= 0)
@@ -267,6 +271,7 @@ public class Inventory : NetworkBehaviour
 
                 removed = count;
                 data = null; // Item data is now allowed for stackables.
+                IsDirty = true;
                 return true;
             }
             // Just enough...
@@ -279,6 +284,7 @@ public class Inventory : NetworkBehaviour
 
                 removed = count;
                 data = null; // Item data is now allowed for stackables.
+                IsDirty = true;
                 return true;
             }
             // Not enough... Just remove as many as we can!
@@ -290,6 +296,7 @@ public class Inventory : NetworkBehaviour
 
                 removed = stored;
                 data = null; // Item data is now allowed for stackables.
+                IsDirty = true;
                 return true;
             }
 
@@ -334,14 +341,13 @@ public class Inventory : NetworkBehaviour
 
             // Get data for this item...
             ItemData d = stack.Data;
-            // Ignore stack count value: Should always be one.
-            int r = 1;
 
             // Remove the stack from the heap.
             stacks.Remove(stack);
 
-            data = d;
-            removed = 1;
+            data = d;            
+            removed = 1; // Ignore stack count value: Should always be one.
+            IsDirty = true;
             return true;
         }
     }
