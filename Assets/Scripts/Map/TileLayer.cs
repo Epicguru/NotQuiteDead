@@ -195,23 +195,21 @@ public class TileLayer : NetworkBehaviour
         if (!InLayerBounds(x, y))
             return false;
 
-        bool tileWalkable = true;
         BaseTile tile = Tiles[x][y];
         if(tile != null)
         {
             if (tile.Walkable == false)
-                tileWalkable = false;
+                return false;
         }
 
-        bool furnitureWalkable = true;
         Furniture f = World.Instance.Furniture.GetFurnitureAt(x, y);
         if(f != null)
         {
             if (!f.Walkable)
-                furnitureWalkable = false;
+                return false;
         }
 
-        return tileWalkable && furnitureWalkable;
+        return true;
     }
 
     /// <summary>

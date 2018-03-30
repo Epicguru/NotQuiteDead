@@ -253,17 +253,14 @@ public class GunAnimation : NetworkBehaviour
         if (IsReloading)
         {
             // Already reloading!
-            Debug.LogError("Already reloading!");
             return;
         }
         if (IsAiming)
         {
-            Debug.LogError("Aiming, cannot reload!");
             return;
         }
         if(IsEquipping)
         {
-            Debug.LogError("Equipping, cannot reload!");
             return;
         }
 

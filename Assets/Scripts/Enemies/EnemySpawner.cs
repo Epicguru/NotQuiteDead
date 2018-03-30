@@ -65,15 +65,45 @@ public class EnemySpawner : NetworkBehaviour
         {
             case EnemySpawnType.AROUND_RANDOM_PLAYER:
 
-                float minDst = 15f;
-                float maxDst = 25f;
-                float dst = Random.Range(minDst, maxDst);
-                Vector2 point = Random.insideUnitCircle.normalized;
-                point *= dst;
+                // Find a player to spawn at, must not be dead.
+                Player player;
+                do
+                {
+                    player = Player.AllPlayers[Random.Range(0, Player.AllPlayers.Count)];
+                }
+                while (player == null || player.Health.IsDead);
 
-                Vector2 position = (Vector2)Player.AllPlayers[Random.Range(0, Player.AllPlayers.Count)].transform.position + point;
+                // Set min and max spawn distances
+                float minDst = 20f;
+                float maxDst = 30f;
 
-                Pawn.SpawnPawn(pawn, position);
+                // Get the player's location.
+                Vector2 playerPos = ((Vector2)player.transform.position.ToInt()).ClampToWorldIndex(World.Instance);
+
+                // Make an offset until it is a valid position...
+                Vector2 offset;
+                Vector2 position;
+                int loop = 0;
+                do
+                {
+                    offset = Random.insideUnitCircle.normalized;
+                    offset *= Random.Range(minDst, maxDst);
+                    offset = offset.ToInt();
+
+                    position = (playerPos + offset).ClampToWorldIndex(World.Instance);
+
+                    // Avoid infinite loop when the enemy simply can't be spawned...
+                    loop++;
+                    if(loop == 100)
+                    {
+                        Debug.LogError("Enemy {0} can't be spawned after trying to find a spot {1} times! Centered around player {2}. Spawning right on top of player :D".Form(pawn, loop, player.Name));
+                        position = playerPos + new Vector2(0.5f, 0.5f);
+                        break;
+                    }
+                }
+                while (!World.Instance.TileMap.GetLayer("Foreground").IsSpotWalkable((int)position.x, (int)position.y));
+
+                Pawn.SpawnPawn(pawn, position + new Vector2(0.5f, 0.5f));
 
                 break;
         }
