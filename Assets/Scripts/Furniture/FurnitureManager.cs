@@ -147,10 +147,13 @@ public class FurnitureManager : NetworkBehaviour
             return;
         }
 
+        // Set parent
         placed.transform.SetParent(Parent);
 
+        // Register furniture at that position.
         furniture.Add(GetIndexAt(x, y), placed);
 
+        // Confirm to pending building system.
         PendingBuildingManager.Instance.ConfirmPlaced(PendingBuildingManager.MakeID(x, y));
     }
 

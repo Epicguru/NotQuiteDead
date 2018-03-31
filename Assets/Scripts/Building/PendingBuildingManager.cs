@@ -83,8 +83,6 @@ public class PendingBuildingManager : MonoBehaviour
     {
         // TODO each request needs a unique Id based on client.
 
-        Debug.Log("Confirm at id {0}".Form(id));
-
         // Remove from pending and remove tile from inventory...
         if (!Pending.ContainsKey(id))
             return; // That's fine, it's just not for us.
