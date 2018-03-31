@@ -143,12 +143,15 @@ public class FurnitureManager : NetworkBehaviour
         // Called on both client and servers when the object is spawned.
         if(IsFurnitureAt(x, y))
         {
+            Debug.LogWarning("Already something at {0}, {1}".Form(x, y));
             return;
         }
 
         placed.transform.SetParent(Parent);
 
         furniture.Add(GetIndexAt(x, y), placed);
+
+        PendingBuildingManager.Instance.ConfirmPlaced(PendingBuildingManager.MakeID(x, y));
     }
 
     public void UnRegister(int x, int y)

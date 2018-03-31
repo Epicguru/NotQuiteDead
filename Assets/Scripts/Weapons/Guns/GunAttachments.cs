@@ -53,7 +53,7 @@ public class GunAttachments : NetworkBehaviour
     }
     private Gun _Prefab;
 
-    public override void OnStartClient()
+    public void Awake()
     {
         foreach (AttachmentType val in Enum.GetValues(typeof(AttachmentType)))
         {
