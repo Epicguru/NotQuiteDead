@@ -253,47 +253,24 @@ public class PlayerBuilding : NetworkBehaviour
         BuildingItem item = GetSelectedItem();
         if(item != null)
         {
-            // Place this item where the mouse is, and remove one from the inventory.
-
+            // Place tile using the pending building system.
+            // My god the code in this project is horrible :/
             string layer = "Foreground";
-
             switch (item.Type)
             {
                 case BuildingItemType.FURNITURE:
-
                     Furniture f = item.GetFurniture();
                     layer = f.Layer;
-
-                    // Place furniture.
-                    bool worked = World.Instance.Furniture.PlaceFurniture(f.Prefab, x, y);
-
-                    // Remove one from inventory.
-                    if(worked)
-                        Player.Local.BuildingInventory.RemoveItems(f.Prefab, 1);
-
                     break;
 
                 case BuildingItemType.TILE:
-
                     BaseTile tile = item.GetTile();
                     layer = tile.Layer;
-
-                    BaseTile oldTile = World.Instance.TileMap.GetLayer(layer).GetTile(x, y);
-
-                    if (oldTile != null && oldTile.Prefab == tile.Prefab)
-                    {
-                        return;
-                    }
-
-                    // Place tile.
-                    worked = World.Instance.TileMap.GetLayer(layer).SetTile(tile, x, y);
-
-                    // Remove one from inventory.
-                    if(worked)
-                        Player.Local.BuildingInventory.RemoveItems(tile.Prefab, 1);
-
                     break;
             }
+
+            PendingBuildingManager.Instance.AddPending(x, y, item.Prefab, item.Type, layer);
+
         }
     }
 }

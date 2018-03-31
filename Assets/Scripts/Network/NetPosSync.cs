@@ -176,8 +176,6 @@ public class NetPosSync : NetworkBehaviour
         if (isServer)
             return;
 
-        Debug.Log("New Parent! {0}".Form(name));
-
         this.ParentName = name;
 
         // The ID should have already updated beforehand.

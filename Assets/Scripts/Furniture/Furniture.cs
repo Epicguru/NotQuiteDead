@@ -39,7 +39,9 @@ public class Furniture : NetworkBehaviour
 
     public override void OnStartClient()
     {
-        base.OnStartClient();
+        // Have to detect X nad Y because they are not networked...
+        X = Mathf.RoundToInt(transform.position.x);
+        Y = Mathf.RoundToInt(transform.position.y);
 
         // Register
         World.Instance.Furniture.RegisterFurniture(this, X, Y);

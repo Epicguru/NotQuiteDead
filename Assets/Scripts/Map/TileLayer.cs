@@ -346,9 +346,14 @@ public class TileLayer : NetworkBehaviour
     {
         // Called on clients when a tile has been set.
 
+        // Confirm to the pending placement system...
+        PendingBuildingManager.Instance.ConfirmPlaced(PendingBuildingManager.MakeID(data.X, data.Y));
+
         // If we are a host, just stop. Tile has already been set.
-        if (isServer) 
+        if (isServer)
+        {
             return;
+        }
 
         // Check if is in bounds.
         if(!InLayerBounds(data.X, data.Y))
