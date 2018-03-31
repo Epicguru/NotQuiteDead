@@ -429,6 +429,14 @@
       ],
       "Desription": "The 'Attribute' stat for use in the details menu of the player inventory.",
       "Locked": true
+    },
+    "InvOptions_Store": {
+      "Key": "InvOptions_Store",
+      "Params": [
+        ""
+      ],
+      "Desription": "The 'Store' option on currently equiped items.",
+      "Locked": true
     }
   }
 }
