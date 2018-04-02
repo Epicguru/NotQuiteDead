@@ -38,7 +38,7 @@ public static class AudioCache
             if (cache)
             {
                 audio.Add(path, loaded);
-                Debug.Log("Chached clip '" + path + "', #" + audio.Count);
+                //Debug.Log("Chached clip '" + path + "', #" + audio.Count);
             }
 
             return loaded;

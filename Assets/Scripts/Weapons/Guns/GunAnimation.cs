@@ -80,36 +80,45 @@ public class GunAnimation : NetworkBehaviour
 
         AnimDropped(!item.IsEquipped());
 
-        DetectBlocked();
+        if(gun.Item.IsEquipped())
+            DetectBlocked();
     }
 
     private void DetectBlocked()
     {
-        // Check if the gun is blocked by a wall directly in fron of it.
+        // Check if the gun is blocked by a wall directly in front of it.
+        // Is also automatically blocked if the Gun.Shooting anti-exploit is triggered.
 
         if (Player.Local == null)
             return;
 
         bool blocked = false;
-        float dst = gun.Shooting.GunBlockedDistance;
-
-        Vector3 dir = transform.right;
-        if (!Player.Local.Direction.Right)
+        if (gun.Shooting.OnAntiExploitCooldown())
         {
-            dir *= -1f;
+            blocked = true;
         }
-        dir *= gun.Shooting.GunBlockedDistance;
-
-        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, dir, dst);
-
-        foreach(RaycastHit2D hit in hits)
+        else
         {
-            if(hit.collider.isTrigger == false)
+            float dst = gun.Shooting.GunBlockedDistance;
+
+            Vector3 dir = transform.right;
+            if (!Player.Local.Direction.Right)
             {
-                if(hit.collider.gameObject.GetComponentInParent<Health>() == null)
+                dir *= -1f;
+            }
+            dir *= gun.Shooting.GunBlockedDistance;
+
+            RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, dir, dst);
+
+            foreach (RaycastHit2D hit in hits)
+            {
+                if (hit.collider.isTrigger == false)
                 {
-                    blocked = true;
-                    break;
+                    if (hit.collider.gameObject.GetComponentInParent<Health>() == null)
+                    {
+                        blocked = true;
+                        break;
+                    }
                 }
             }
         }
@@ -244,17 +253,14 @@ public class GunAnimation : NetworkBehaviour
         if (IsReloading)
         {
             // Already reloading!
-            Debug.LogError("Already reloading!");
             return;
         }
         if (IsAiming)
         {
-            Debug.LogError("Aiming, cannot reload!");
             return;
         }
         if(IsEquipping)
         {
-            Debug.LogError("Equipping, cannot reload!");
             return;
         }
 
@@ -350,8 +356,19 @@ public class GunAnimation : NetworkBehaviour
 
         if (FlyingMagazine.MagSprite == null || FlyingMagazine.RealMag == null)
             return;
+        if (FlyingMagazine.Count <= 0)
+            return;
 
-        FlyingMag.Spawn(FlyingMagazine.RealMag.transform.position, FlyingMagazine.RealMag.transform.up * -1f * FlyingMagazine.Force, FlyingMagazine.RealMag.transform.rotation.eulerAngles.z, FlyingMagazine.Rotation * (!Player.Local.Direction.Right ? -1f : 1f), FlyingMagazine.MagSprite, !Player.Local.Direction.Right);
+        for (int i = 0; i < FlyingMagazine.Count; i++)
+        {
+            float magniutude = Mathf.Abs(FlyingMagazine.RandomForce);
+            float random = UnityEngine.Random.Range(-magniutude, magniutude);
+
+            float angmagniutude = Mathf.Abs(FlyingMagazine.RandomRotation);
+            float angrandom = UnityEngine.Random.Range(-angmagniutude, angmagniutude);
+
+            FlyingMag.Spawn(FlyingMagazine.RealMag.transform.position, FlyingMagazine.RealMag.transform.up * -1f * (FlyingMagazine.Force + random), FlyingMagazine.RealMag.transform.rotation.eulerAngles.z, (FlyingMagazine.Rotation + angrandom) * (!Player.Local.Direction.Right ? -1f : 1f), FlyingMagazine.MagSprite, !Player.Local.Direction.Right);
+        }
     }
 
     public void OnDrawGizmosSelected()

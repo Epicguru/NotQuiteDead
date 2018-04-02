@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -106,7 +107,6 @@ public class MainMenuRealityDetails : MonoBehaviour
                 f.LT.RealityName = RealityName.Trim();
                 f.LT.RealityDay = 0;
                 AsyncOperation ao = SceneManager.LoadSceneAsync("Setup V2", LoadSceneMode.Single);
-                ao.completed += f.LoadRealitySceneLoaded;
                 f.AO = ao;
             }
         }
@@ -116,21 +116,37 @@ public class MainMenuRealityDetails : MonoBehaviour
     {
         if(RealityName == null)
         {
-            Title.text = "Select a reality...";
-            D_Day.text = "Day: <color=white>---</color>";
-            D_LastPlayed.text = "Last Played: <color=white>-/-/-</color>";
-            EnterReality.text = "No Reality Selected";
+            Title.text = "LoadReality_SelectPrompt".Translate();
+            D_Day.text = "LoadReality_DayLabel".Translate("<color=white>---</color>");
+            D_LastPlayed.text = "LoadReality_LastPlayed".Translate("<color=white>---</color>", "");
+            EnterReality.text = "LoadReality_NoneSelected".Translate();
             Play.interactable = false;
             Delete.interactable = false;
         }
         else
         {
             Title.text = RealityName.Trim();
-            D_Day.text = "Day: <color=white>" + "TODO" + "</color>";
-            D_LastPlayed.text = "Last Played: <color=white>" + "x/y/z" + "</color>";
-            EnterReality.text = "Enter " + RealityName.Trim();
+            D_Day.text = "LoadReality_DayLabel".Translate("<color=white>0</color>");
+            D_LastPlayed.text = "LoadReality_LastPlayed".Translate("<color=white>Never</color>", "");
+            EnterReality.text = "LoadReality_EnterReality".Translate(RealityName.Trim());
             Play.interactable = true;
             Delete.interactable = true;
+
+            WorldSaveState st = null;
+            try
+            {
+                st = WorldIO.GetSaveState(RealityName);
+            }
+            catch
+            {
+                Debug.LogWarning(string.Format("Error loading reality state for '{0}'", RealityName));
+            }
+
+            if(st != null)
+            {
+                D_Day.text = "LoadReality_DayLabel".Translate("<b><color=white>" + (int)(st.Time) + "</color></b>");
+                D_LastPlayed.text = "LoadReality_LastPlayed".Translate("<b><color=white>" + st.LastPlayed.ToString("g") + "</color></b>", "<b><color=white>" + st.LastPlayed.TimeAgo() + "</color></b>");
+            }
         }
     }
 }

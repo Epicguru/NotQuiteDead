@@ -1,6 +1,7 @@
 ﻿
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(DayNightCycle))]
@@ -8,6 +9,8 @@ public class GameTime : NetworkBehaviour
 {
     // Holds the current in-game time of day, month, year etc.
     public static GameTime Instance;
+
+    public UnityEvent DayChangedEvent = new UnityEvent();
 
     [HideInInspector]
     public DayNightCycle DayNight;
@@ -23,6 +26,7 @@ public class GameTime : NetworkBehaviour
     [SyncVar]
     [SerializeField]
     private float time;
+    private int dayTracker;
 
     public void Awake()
     {
@@ -52,6 +56,28 @@ public class GameTime : NetworkBehaviour
         }
 
         DebugText.Log("Time: " + GetTimeFull());
+
+        if(dayTracker != GetDay())
+        {
+            dayTracker = GetDay();
+            DayChangedEvent.Invoke();
+        }
+    }
+
+    public void DisplayDayUI()
+    {
+        DayMessage.DisplayDay(GetDay());
+    }
+
+    public float GetTimeRaw()
+    {
+        return this.time;
+    }
+
+    public void SetTime(float time)
+    {
+        // Manually sets the time.
+        this.time = Mathf.Max(time, 0f);
     }
 
     public int GetDay()

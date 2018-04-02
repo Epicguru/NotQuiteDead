@@ -161,6 +161,7 @@ public static class InputManager
     {
         if (!Active && !bypass)
             return false;
+
         return Input.GetKey(GetInput(input));
     }
 
@@ -168,6 +169,7 @@ public static class InputManager
     {
         if (!Active && !bypass)
             return false;
+
         return Input.GetKeyDown(GetInput(input));
     }
 

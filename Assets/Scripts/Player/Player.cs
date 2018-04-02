@@ -264,15 +264,21 @@ public class Player : NetworkBehaviour
 
     private void UponDeath()
     {
-        // 'Respawn'
+        if (!isLocalPlayer)
+            return;
+
+        // Respawn:
+
+        // Heal to max health.
         Health.CmdHeal(Health.GetMaxHealth());
-        transform.position = Random.insideUnitCircle * 3f;
-        Debug.Log("Player died:");
-        string report = Health.GetDamageReport("killed");
-        Debug.Log("Local player was " + report);
+
+        // Go to world spawn point...
+        transform.position = World.Instance.GetRandomSpawnPoint();
 
         // Add to kill feed.
-        Player.Local.NetUtils.CmdAddKill(Health.GetKiller(), this.Name, Health.IsActiveKiller() ? Health.GetKillerItem() : null);
+        NetUtils.CmdAddKill(Health.GetKiller(), this.Name, Health.IsActiveKiller() ? Health.GetKillerItem() : null);
+        string report = Health.GetDamageReport("killed");
+        Debug.Log("Local player was " + report);
     }
 
     /// <summary>

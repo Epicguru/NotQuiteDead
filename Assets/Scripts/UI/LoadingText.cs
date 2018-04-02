@@ -16,6 +16,6 @@ public class LoadingText : MonoBehaviour
     {
         Text.fontSize = NormalSize;
         Percentage = Mathf.Clamp(Percentage, 0f, 100f);
-        Text.text = "<size=" + LargerSize + ">" + RealityName.Trim() + " : DAY " + RealityDay + "</size>\nLOADING\n" + Percentage.ToString("0") + "%";
+        Text.text = "<size=" + LargerSize + ">" + RealityName.Trim() + " : " + "General_Day".Translate().ToUpper() + " " + RealityDay + "</size>\n" + "General_Loading".Translate().ToUpper() + "\n" + Percentage.ToString("0") + "%";
     }
 }

@@ -12,12 +12,18 @@ public class GunShooting : RotatingItem
     public FiringMode FiringMode = FiringMode.SEMI;
     public FiringMode[] AllowedModes = new FiringMode[] { FiringMode.SEMI };
 
+    [Header("Switching Exploit")]
+    public bool PreventExploit = false;
+    private float timeRemainingOnShot;
+
     [Header("Bullet Firing")]
     public Transform DefaultBulletSpawn;
     [Tooltip("The type of projectile that this gun fires.")]
     public GunBulletType BulletType = GunBulletType.HITSCAN;
     [Header("Bullet Firing - Subsonic")]
     public float SubsonicBulletSpeed = 50f;
+    [Tooltip("The distance at which target-bullet misaligment is accounted for when firing subsnoic bullets. 20 is a good value.")]
+    public float SubsonicTargetCheckRange = 20f;
     [Header("Bullet Firing - Other")]
     [Tooltip("If true, when the reload animation ends, if there is not a round in the chamber then the first bullet from the magazine is automatically chambered, so the chamber animation never plays.")]
     public bool ReloadAutoChambers = false;
@@ -30,7 +36,25 @@ public class GunShooting : RotatingItem
     public GunCapacity Capacity;
     public ShellData Shells;
     public GunAudio Audio;
-    public AudioSauce AudioSauce;
+    public AudioSauce AudioSauce
+    {
+        get
+        {
+            if(audioSauce == null)
+            {
+                audioSauce = GetComponentInChildren<AudioSauce>();
+            }
+            return audioSauce;
+        }
+    }
+    private AudioSauce audioSauce;
+
+    [HideInInspector]
+    [SyncVar]
+    public float ReloadSpeedMultiplier = 1f;
+    [HideInInspector]
+    [SyncVar]
+    public float ShootSpeedMultiplier = 1f;
 
     [ReadOnly]
     public int bulletsInMagazine;
@@ -51,12 +75,14 @@ public class GunShooting : RotatingItem
     [HideInInspector]
     public int firingModeIndex = 0;
 
-    public virtual void Start()
+    public void Awake()
     {
         gun = GetComponent<Gun>();
         animation = GetComponent<GunAnimation>();
-        AudioSauce = GetComponentInChildren<AudioSauce>();
+    }
 
+    public virtual void Start()
+    {
         if(DefaultBulletSpawn == null)
         {
             Debug.LogError("Default Bullet Spawn for gun '" + gun.GetComponent<Item>().Name + "' is null!");
@@ -67,10 +93,40 @@ public class GunShooting : RotatingItem
             Debug.LogError("No allowed firing modes on " + gun.Item.Name);
     }
 
+    public void UpdateData(ItemData data)
+    {
+        if (PreventExploit)
+        {
+            data.Update("Shot Timer", timeRemainingOnShot);
+        }
+        else
+        {
+            if(data.ContainsKey("Shot Timer"))
+            {
+                data.Remove("Shot Timer");
+            }
+        }
+    }
+
+    public void ApplyData(ItemData data)
+    {
+        if (PreventExploit)
+        {
+            timeRemainingOnShot = data.Get("Shot Timer", 0f);
+        }
+    }
+
     public virtual void Update()
     {
         if (!isClient)
             return; // Standalone server does not animate.
+
+        // Animation speeds.
+        if(animation.Animator != null)
+        {
+            animation.Animator.SetFloat("ReloadMultiplier", ReloadSpeedMultiplier);
+            animation.Animator.SetFloat("ShootMultiplier", ShootSpeedMultiplier);
+        }
 
         // Shooting...
         if (!hasAuthority || gun.Item == null || !gun.Item.IsEquipped())
@@ -175,9 +231,30 @@ public class GunShooting : RotatingItem
             shotInaccuracy = 1;
     }
 
+    public bool OnAntiExploitCooldown()
+    {
+        if (!PreventExploit)
+            return false;
+
+        return !(timeRemainingOnShot <= 0f);
+    }
+
     public bool ShootNow()
     {
         // Returns true if the gun SHOULD shoot. Whether the gun will shoot is up to other factors.
+
+        // First, prevent exploit...
+        if (PreventExploit)
+        {
+            timeRemainingOnShot -= Time.deltaTime;
+            if(timeRemainingOnShot <= 0)
+            {
+                timeRemainingOnShot = 0f;
+            }
+        }
+
+        if (OnAntiExploitCooldown())
+            return false;
 
         switch (FiringMode)
         {
@@ -391,8 +468,6 @@ public class GunShooting : RotatingItem
     {
         // Shoot bullets!
 
-        // Update inaccuracy...
-
         int bullets = Random.Range((int)Capacity.BulletsPerShot.y, (int)Capacity.BulletsPerShot.y + 1);
         float range = Damage.Range;
         float angleToMouse = CalculateAngle();
@@ -422,8 +497,15 @@ public class GunShooting : RotatingItem
 
         // Set time since last shot...
         timer = 0; // Now!
+
         // This will add inaccuracy.
         shotInaccuracy += 1f / Damage.ShotsToInaccuracy;
+
+        if (PreventExploit)
+        {
+            GetClips();
+            timeRemainingOnShot = shootClip == null ? 0f : shootClip.length;
+        }
     }
 
     private void EvaluateBulletType(Vector2 endPos, int bulletCount)
@@ -485,10 +567,9 @@ public class GunShooting : RotatingItem
         return final;
     }
 
-    public float GetRPS()
+    public void GetClips()
     {
-        // Aprox rounds per second.
-        if(shootClip == null)
+        if (shootClip == null)
         {
             foreach (var c in GetComponentInChildren<Animator>().runtimeAnimatorController.animationClips)
             {
@@ -506,6 +587,12 @@ public class GunShooting : RotatingItem
                 //}
             }
         }
+    }
+
+    public float GetRPS()
+    {
+        // Aprox rounds per second.
+        GetClips();
 
         if (shootClip == null)
             return 0f;
@@ -630,7 +717,7 @@ public class GunShooting : RotatingItem
                 // The bullet will definitely hit something before it exits the barrel, because of the way shooting works in this game.
                 if(!Health.CanDamageObject(hit.collider, Player.Local.Team))
                 {
-                    // If we cant damage this object, return.
+                    // If we can't damage this object, return.
                     return;
                 }
                 else
@@ -647,6 +734,9 @@ public class GunShooting : RotatingItem
                     {
                         Player.Local.NetUtils.CmdDamageHealth(hit.collider.GetComponentInParent<Health>().gameObject, Damage.BulletsShareDamage ? Damage.Damage / bullets : Damage.Damage, Player.Local.Name + ":" + gun.Item.Prefab, false);
                     }
+
+                    // Return because subsonic bullets have no penetration ability.
+                    return;
                 }
             }
         }
@@ -657,6 +747,51 @@ public class GunShooting : RotatingItem
         realEnd *= 1000f;
         realEnd += (Vector2)transform.position;
         Vector2 vector = realEnd - start;
+
+        // Error:
+        // At short range, due to the positioning of the gun, the subsnoic bullet can miss the target even when aiming straight at them.
+        // Solution:
+        // Raycast at short range and if any targets 'would be' hit then direct the bullet at them instead of the distant target.
+        // Will not always solve the problem but it should remove the inaccuracy.
+
+        // Raycast against targets.
+        float range = SubsonicTargetCheckRange;
+        Vector2 newEnd = end;
+        newEnd -= (Vector2)transform.position;
+        newEnd.Normalize();
+        newEnd *= range;
+        newEnd += (Vector2)transform.position;
+        hits = Physics2D.LinecastAll(transform.position, newEnd);
+        bool corrected = false;
+        Vector2 newTarget = Vector2.zero;
+
+        foreach(var hit in hits)
+        {
+            if (Health.CanHitObject(hit.collider, Player.Local.Team))
+            {
+                // The bullet will definitely hit something before it exits the barrel, because of the way shooting works in this game.
+                if (!Health.CanDamageObject(hit.collider, Player.Local.Team))
+                {
+                    // If we can't damage this object, there is no point trying to correct for anything past it.
+                    break;
+                }
+                else
+                {
+                    // We are intersecting an object, but it can be damaged...
+                    // Correct the shot so that we hit it.
+                    newTarget = hit.point;
+                    corrected = true;
+                    break;
+                }
+            }
+        }
+
+        // Now correct the angle if correction is required.
+        if (corrected)
+        {
+            vector = newTarget - start;
+        }
+
         float angle = Mathf.Atan2(vector.y, vector.x) * Mathf.Rad2Deg;
 
         if (isServer)

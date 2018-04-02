@@ -39,33 +39,11 @@ public class SubsonicBullet : MonoBehaviour
         RaycastHit2D hit;
         RaycastHit2D hit2;
         bool collides = DetectCollision(Tip.transform.position, (Vector2)Tip.transform.position + movement, out hit);
-        bool collidesInternal = DetectCollision(transform.position, (Vector2)transform.position + movement, out hit2);
+        bool collidesInternal = DetectCollision(transform.position, Tip.transform.position, out hit2);
 
-        if (collides)
+        if (collidesInternal)
         {
             // Check range...
-            float dst = Vector2.Distance(hit.point, startPos);
-            if(dst > MaxRange)
-            {
-                Recycle();
-                return;
-            }
-
-            // Spawn hit effect.
-            float angle = Mathf.Atan2(hit.normal.y, hit.normal.x) * Mathf.Rad2Deg + 180;
-            HitEffect.Spawn(hit.point, angle, hit.collider, true);
-
-            // Deal damage to the object if we are on the server.
-            HitObject(hit);
-
-            // Pool
-            Recycle();
-
-            // Exit early.
-            return;
-        }
-        else if(collidesInternal)
-        {
             float dst = Vector2.Distance(hit2.point, startPos);
             if (dst > MaxRange)
             {
@@ -79,6 +57,30 @@ public class SubsonicBullet : MonoBehaviour
 
             // Deal damage to the object if we are on the server.
             HitObject(hit2);
+
+            // Pool
+            Recycle();
+
+            // Exit early.
+            return;
+            
+        }
+        else if(collides)
+        {
+            // Check range...
+            float dst = Vector2.Distance(hit.point, startPos);
+            if (dst > MaxRange)
+            {
+                Recycle();
+                return;
+            }
+
+            // Spawn hit effect.
+            float angle = Mathf.Atan2(hit.normal.y, hit.normal.x) * Mathf.Rad2Deg + 180;
+            HitEffect.Spawn(hit.point, angle, hit.collider, true);
+
+            // Deal damage to the object if we are on the server.
+            HitObject(hit);
 
             // Pool
             Recycle();
@@ -108,10 +110,9 @@ public class SubsonicBullet : MonoBehaviour
         float f = Curve.Evaluate(p);
         float x = Mathf.LerpUnclamped(m, d, f);
 
+        //Debug.Log("Hit @ {0}, max range {1}, max damage {2}, min damage {3}, position on curve {4}, evaluated value {5}, lerped (final) value {6}".Form(dst, MaxRange, d, m, p, f, x));
 
-        float final = x; // Apply damage falloff.
-
-        return final;
+        return x;
     }
 
     private void UpdateAlpha()

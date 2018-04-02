@@ -45,7 +45,7 @@ public class PlayerNetUtils : NetworkBehaviour
 
             if(i != null)
             {
-                i.Pickup.PickupAccepted(ItemDataX.TryDeserialize(data));
+                i.Pickup.PickupAccepted(ItemData.TryDeserialize(data));
             }
         }
     }
@@ -79,7 +79,7 @@ public class PlayerNetUtils : NetworkBehaviour
             Item old = g.GetGearItem().Item;
             g.SetItem(GetPlayer().gameObject, null, null, false);
 
-            Item instance = Item.NewInstance(old.Prefab, GetPlayer().transform.position, ItemDataX.TryDeserialize(data));
+            Item instance = Item.NewInstance(old.Prefab, GetPlayer().transform.position, ItemData.TryDeserialize(data));
 
             NetworkServer.Spawn(instance.gameObject);
         }
@@ -109,23 +109,17 @@ public class PlayerNetUtils : NetworkBehaviour
     [Command]
     public void CmdSetGear(string name, string prefab, string data, bool returnOldItem)
     {
-        GetPlayer().GearMap[name].SetItem(player.gameObject, prefab == null ? null : Item.GetItem(prefab), ItemDataX.TryDeserialize(data), returnOldItem);
-    }
-
-    [Command]
-    public void CmdSetPositionSync(GameObject obj, Vector3 position)
-    {
-        obj.GetComponent<NetPositionSync>().Position = position;
+        GetPlayer().GearMap[name].SetItem(player.gameObject, prefab == null ? null : Item.GetItem(prefab), ItemData.TryDeserialize(data), returnOldItem);
     }
 
     [Command]
     public void CmdSpawnDroppedItem(string prefab, Vector3 position, string data)
     {
-        Server_SpawnDroppedItem(prefab, position, ItemDataX.TryDeserialize(data));
+        Server_SpawnDroppedItem(prefab, position, ItemData.TryDeserialize(data));
     }
 
     [Server]
-    public void Server_SpawnDroppedItem(string prefab, Vector3 position, ItemDataX data)
+    public void Server_SpawnDroppedItem(string prefab, Vector3 position, ItemData data)
     {
         Item newItem = Item.NewInstance(prefab, position, data);
 

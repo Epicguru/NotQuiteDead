@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(ItemPickup), typeof(NetPositionSync))]
+[RequireComponent(typeof(ItemPickup), typeof(NetPosSync))]
 public class Item : NetworkBehaviour
 {
 
@@ -17,8 +17,29 @@ public class Item : NetworkBehaviour
     [Tooltip("The unique ID of this item. Used to spawn new items.")]
     public string Prefab = "Prefab Name";
 
-    [Tooltip("The display name of this item.")]
-    public string Name = "Default Item Name";
+    public string Name
+    {
+        get
+        {
+            return (Prefab + "_Name").Translate();
+        }
+    }
+
+    public string ShortDescription
+    {
+        get
+        {
+            return (Prefab + "_ShortDesc").Translate();
+        }
+    }
+
+    public string LongDescription
+    {
+        get
+        {
+            return (Prefab + "_LongDesc").Translate();
+        }
+    }
 
     [Tooltip("The rarity (tier) of the item.")]
     public ItemRarity Rarity;
@@ -36,16 +57,13 @@ public class Item : NetworkBehaviour
     [Tooltip("If true AND Equipable is true, the this item can be quick-slotted.")]
     public bool CanQuickSlot = true;
 
-    [Tooltip("Descriptions of the item.")]
-    public ItemDescription Description;
-
     [Tooltip("Information about the space and weight that this item takes in an inventory.")]
     public InventoryInfo InventoryInfo;
 
     [Tooltip("The image for the icon in menus and inventories.")]
     public Sprite ItemIcon;
 
-    public ItemDataX Data
+    public ItemData Data
     {
         get
         {
@@ -69,13 +87,23 @@ public class Item : NetworkBehaviour
 
     [Tooltip("Current item data.")]
     [SerializeField]
-    private ItemDataX _Data;
+    private ItemData _Data;
 
     [HideInInspector]
-    public NetPositionSync NetPosSync;
+    public NetPosSync NetPosSync
+    {
+        get
+        {
+            if(_NetPosSync == null)
+            {
+                _NetPosSync = GetComponent<NetPosSync>();
+            }
+            return _NetPosSync;
+        }
+    }
+    private NetPosSync _NetPosSync;
 
     [SyncVar]
-    [SerializeField]
     private bool equipped = false;
     [SyncVar]
     private GameObject PlayerHolding;
@@ -84,12 +112,13 @@ public class Item : NetworkBehaviour
 
     private bool IsPrefab = true;
     private bool IsGear = false;
+    private bool IsAttachment = false;
 
     public void Awake()
     {
         IsPrefab = false;
         IsGear = GetComponent<GearItem>() != null;
-        NetPosSync = GetComponent<NetPositionSync>();
+        IsAttachment = GetComponent<Attachment>() != null;
         Pickup = GetComponent<ItemPickup>();
     }
 
@@ -100,14 +129,14 @@ public class Item : NetworkBehaviour
             if (string.IsNullOrWhiteSpace(PendingData))
             {
                 if (Data == null)
-                    Data = new ItemDataX();
+                    Data = new ItemData();
                 Data.Created = true;
                 RequestSetDefaultData();
                 RequestDataApplication(); // Apply default data.
             }
             else
             {
-                Data = ItemDataX.TryDeserialize(PendingData);
+                Data = ItemData.TryDeserialize(PendingData);
                 PendingData = null;
                 RequestDataApplication(); // Apply loaded or transmitted data.
             }
@@ -130,38 +159,38 @@ public class Item : NetworkBehaviour
         currentLayer = layer;
     }
 
-    public ItemOption[] CreateOptions(Item item, ItemDataX data)
+    public ItemOption[] CreateOptions(Item item, ItemData data)
     {
         List<ItemOption> options = new List<ItemOption>();
         options.Add(new ItemOption() { OptionName = "Drop", OnSelected = Option_Drop });
         if(Equipable && item.GetComponent<GearItem>() == null && !Player.Local.Building.InBuildMode)
             options.Add(new ItemOption() { OptionName = "Equip", OnSelected = Option_Equip });
         options.Add(new ItemOption() { OptionName = "Details", OnSelected = Option_Details });
-        if (GetComponent<Attachment>() != null && Player.Local.Holding.Item != null && Player.Local.Holding.Item.GetComponent<GunAttachments>() != null && Player.Local.Holding.Item.GetComponent<GunAttachments>().IsValid(item.GetComponent<Attachment>().Type, item.GetComponent<Attachment>()))
-            options.Add(new ItemOption() { OptionName = "Put On Current Weapon", OnSelected = Option_ApplyAttachment });
+        if (this.GetComponent<Attachment>() != null && Player.Local.Holding.Item != null && Player.Local.Holding.Item.GetComponent<GunAttachments>() != null && Player.Local.Holding.Item.GetComponent<GunAttachments>().IsValid(item.GetComponent<Attachment>().Type, item.GetComponent<Attachment>()))
+            options.Add(new ItemOption() { OptionName = "EquipAttach", OnSelected = Option_ApplyAttachment });
         if (item.GetComponent<GearItem>() != null)
             options.Add(new ItemOption() { OptionName = "Equip", OnSelected = Option_EquipGear });
         if(item.Equipable)
-            options.Add(new ItemOption() { OptionName = "Quick Slot...", OnSelected = Option_QuickSlot });
+            options.Add(new ItemOption() { OptionName = "QuickSlot", OnSelected = Option_QuickSlot });
 
         if (data == null)
             return options.ToArray();
 
         if (!string.IsNullOrEmpty(data.Get<string>("Magazine Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.Get<string>("Magazine Attachment")), OnSelected = Option_RemoveMagazine });
+            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(data.Get<string>("Magazine Attachment")) }, OnSelected = Option_RemoveMagazine });
         }
         if (!string.IsNullOrEmpty(data.Get<string>("Muzzle Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.Get<string>("Muzzle Attachment")), OnSelected = Option_RemoveMuzzle });
+            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(data.Get<string>("Muzzle Attachment")) }, OnSelected = Option_RemoveMuzzle });
         }
         if (!string.IsNullOrEmpty(data.Get<string>("Sight Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.Get<string>("Sight Attachment")), OnSelected = Option_RemoveSight });
+            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(data.Get<string>("Sight Attachment")) }, OnSelected = Option_RemoveSight });
         }
         if (!string.IsNullOrEmpty(data.Get<string>("Under Barrel Attachment")))
         {
-            options.Add(new ItemOption() { OptionName = "Detach " + NameOf(data.Get<string>("Under Barrel Attachment")), OnSelected = Option_RemoveUnderBarrel });
+            options.Add(new ItemOption() { OptionName = "Detach", Params = new object[] { NameOf(data.Get<string>("Under Barrel Attachment")) }, OnSelected = Option_RemoveUnderBarrel });
         }
 
         return options.ToArray();
@@ -170,7 +199,7 @@ public class Item : NetworkBehaviour
     public void Update()
     {
         // Does not matter where this is running...
-        NetPosSync.enabled = (transform.parent == null);
+        //NetPosSync.enabled = (transform.parent == null);
 
         // Layer
         SetLayer(IsEquipped() ? "Equipped Items" : "Dropped Items");
@@ -244,13 +273,16 @@ public class Item : NetworkBehaviour
         {
             Transform t = PlayerHolding.GetComponent<Player>().Holding.Holding;
             if (transform.parent != t)
+            {
                 transform.SetParent(t);
+
+            }
             transform.localPosition = Vector3.zero;
             transform.localScale = Vector3.one;
         }
         else
         {
-            if (!IsGear)
+            if (!IsGear && !IsAttachment)
                 if (transform.parent != null)
                     transform.SetParent(null);
         }
@@ -343,7 +375,7 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// Creates a new instance of an object and spawns it into the world. Not networked.
     /// </summary>
-    public static Item NewInstance(string prefab, Vector2 position, ItemDataX data)
+    public static Item NewInstance(string prefab, Vector2 position, ItemData data)
     {
         // Create new instance of item.
         Item x = GetItem(prefab);
@@ -354,7 +386,7 @@ public class Item : NetworkBehaviour
     }
 
     /// <summary>
-    /// Gets an item from the loaded items, this does not create a new instance.
+    /// Gets an item prefab from the loaded item prefab list, this does not create a new instance.
     /// </summary>
     /// <param name="path">The prefab name of the item, as in Item.Prefab .</param>
     /// <returns>The item object, which is a prefab.</returns>
@@ -415,7 +447,7 @@ public class Item : NetworkBehaviour
     {
         if (tempSlotData.Data == null)
         {
-            tempSlotData.Data = new ItemDataX();
+            tempSlotData.Data = new ItemData();
             tempSlotData.Data.Add("Quick Slot", number);
         }
         else
@@ -430,7 +462,13 @@ public class Item : NetworkBehaviour
     public static void Option_ApplyAttachment(InventoryItemData x, string prefab)
     {
         // Set attachment...
-        bool worked = Player.Local.Holding.Item.GetComponent<GunAttachments>().SetAttachment(x.Item.GetComponent<Attachment>().Type, x.Item);
+        var attachment = x.Item.GetComponent<Attachment>();
+        if(attachment == null)
+        {
+            Debug.LogError("Attachment is null! What?");
+            return;
+        }
+        bool worked = Player.Local.Holding.Item.GetComponent<GunAttachments>().SetAttachment(Player.Local.gameObject, attachment.Type, attachment, x.Data);
         // Remove from inventory
         if(worked)
             PlayerInventory.Remove(x.Prefab, Vector2.zero, false, 1);

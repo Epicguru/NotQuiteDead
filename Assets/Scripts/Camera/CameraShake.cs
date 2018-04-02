@@ -9,7 +9,7 @@ public class CameraShake : MonoBehaviour
     public Camera Camera;
 
     public float ShakeStrength = 5;
-    public float Shake = 1;
+    public float Shake = 0;
 
     Vector3 originalPosition;
 

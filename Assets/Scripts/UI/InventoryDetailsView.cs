@@ -87,46 +87,46 @@ public class InventoryDetailsView : MonoBehaviour
         List<DetailStat> stats = new List<DetailStat>();
 
         // Rarity, all items have this.
-        stats.Add(new DetailStat { Icon = RarityIcon, Key = "Rarity", Value = item.Rarity.ToString() });
+        stats.Add(new DetailStat { Icon = RarityIcon, Key = "InvDetails_Rarity".Translate(), Value = item.Rarity.ToString() });
 
         // Melee weapons damage stat.
         MeleeAttack melee = item.GetComponent<MeleeAttack>();
         if(melee != null)
         {
-            stats.Add(new DetailStat { Icon = DamageIcon, Key = "Melee Damage", Value = melee.Damage.Damage.ToString() });
+            stats.Add(new DetailStat { Icon = DamageIcon, Key = "InvDetails_MeleeDamage".Translate(), Value = melee.Damage.Damage.ToString() });
         }
 
         // Gun stats:
         Gun gun = item.GetComponent<Gun>();
         if(gun != null)
         {
-            stats.Add(new DetailStat { Icon = WeaponTypeIcon, Key = "Gun Type", Value = gun.GunType.ToString().Replace('_', ' ') });
-            stats.Add(new DetailStat { Icon = DamageIcon, Key = "Base Damage", Value = gun.Shooting.Damage.Damage.ToString() + ((gun.Shooting.Capacity.BulletsPerShot.x > 1 || gun.Shooting.Capacity.BulletsPerShot.y > 1) ? (gun.Shooting.Damage.BulletsShareDamage ? " over all pellets." : " per pellet.") : "" )});
+            stats.Add(new DetailStat { Icon = WeaponTypeIcon, Key = "InvDetails_GunType".Translate(), Value = gun.GunType.ToString().Replace('_', ' ') });
+            stats.Add(new DetailStat { Icon = DamageIcon, Key = "InvDetails_BaseDamage".Translate(), Value = gun.Shooting.Damage.Damage.ToString() + ((gun.Shooting.Capacity.BulletsPerShot.x > 1 || gun.Shooting.Capacity.BulletsPerShot.y > 1) ? (gun.Shooting.Damage.BulletsShareDamage ? " " + ("InvDetails_OverAllPellets".Translate()) : " " + ("InvDetails_PerPellet".Translate())) : "" )});
             if((gun.Shooting.Capacity.BulletsPerShot.x > 1 || gun.Shooting.Capacity.BulletsPerShot.y > 1))
             {
                 if((gun.Shooting.Capacity.BulletsPerShot.x != gun.Shooting.Capacity.BulletsPerShot.y))
                 {
-                    stats.Add(new DetailStat { Icon = PelletsPerShotIcon, Key = "Pellets Per Shot", Value = gun.Shooting.Capacity.BulletsPerShot.x + " to " + gun.Shooting.Capacity.BulletsPerShot.y });
+                    stats.Add(new DetailStat { Icon = PelletsPerShotIcon, Key = "InvDetails_PPS".Translate(), Value = "InvDetails_PPS.Value".Translate(gun.Shooting.Capacity.BulletsPerShot.x, gun.Shooting.Capacity.BulletsPerShot.y) });
                 }
                 else
                 {
-                    stats.Add(new DetailStat { Icon = PelletsPerShotIcon, Key = "Pellets Per Shot", Value = gun.Shooting.Capacity.BulletsPerShot.x.ToString() });
+                    stats.Add(new DetailStat { Icon = PelletsPerShotIcon, Key = "InvDetails_PPS".Translate(), Value = gun.Shooting.Capacity.BulletsPerShot.x.ToString() });
                 }
             }
-            stats.Add(new DetailStat { Icon = RangeIcon, Key = "Range", Value = gun.Shooting.Damage.Range.ToString() + " meters"});
-            stats.Add(new DetailStat { Icon = CapacityIcon, Key = "Magazine Capacity", Value = gun.Shooting.Capacity.MagazineCapacity.ToString() });
-            stats.Add(new DetailStat { Icon = RPS_Icon, Key = "RPS", Value = gun.Shooting.GetRPS().ToString("n1") });
+            stats.Add(new DetailStat { Icon = RangeIcon, Key = "InvDetails_Range".Translate(), Value = gun.Shooting.Damage.Range.ToString() + " m"});
+            stats.Add(new DetailStat { Icon = CapacityIcon, Key = "InvDetails_MagCapacity".Translate(), Value = gun.Shooting.Capacity.MagazineCapacity.ToString() });
+            stats.Add(new DetailStat { Icon = RPS_Icon, Key = "InvDetails_RoundsPerSec".Translate(), Value = gun.Shooting.GetRPS().ToString("n1") });
             if(gun.Shooting.Damage.Inaccuracy.x != gun.Shooting.Damage.Inaccuracy.y)
-                stats.Add(new DetailStat { Icon = AccuracyIcon, Key = "Accuracy", Value = "From " + gun.Shooting.Damage.Inaccuracy.x.ToString() + "° to " + gun.Shooting.Damage.Inaccuracy.y.ToString() + "° innaccuracy after " + gun.Shooting.Damage.ShotsToInaccuracy.ToString() + " shots" });
+                stats.Add(new DetailStat { Icon = AccuracyIcon, Key = "InvDetails_Accuracy".Translate(), Value = "InvDetails_Accuracy.Val2".Translate(gun.Shooting.Damage.Inaccuracy.x.ToString(), gun.Shooting.Damage.Inaccuracy.y.ToString(), gun.Shooting.Damage.ShotsToInaccuracy.ToString()) });
             else
-                stats.Add(new DetailStat { Icon = AccuracyIcon, Key = "Accuracy", Value = gun.Shooting.Damage.Inaccuracy.x.ToString() + "° innacuracy" });
+                stats.Add(new DetailStat { Icon = AccuracyIcon, Key = "InvDetails_Accuracy".Translate(), Value = "InvDetails_Accuracy.Value".Translate(gun.Shooting.Damage.Inaccuracy.x.ToString()) });
 
             if (gun.Shooting.Damage.DamageFalloff != 1f)
-                stats.Add(new DetailStat { Icon = DamageFalloffIcon, Key = "Damage Falloff", Value = Mathf.CeilToInt(100f * (1f - gun.Shooting.Damage.DamageFalloff)) + "% less damage" });
+                stats.Add(new DetailStat { Icon = DamageFalloffIcon, Key = "InvDetails_DamageFalloff".Translate(), Value = "InvDetails_DF.Value".Translate(Mathf.RoundToInt(100f * (1f - gun.Shooting.Damage.DamageFalloff)).ToString()) });
             if(gun.Shooting.Damage.Penetration != 1)
             {
-                stats.Add(new DetailStat { Icon = PenetrationIcon, Key = "Penetration", Value = gun.Shooting.Damage.Penetration.ToString() });
-                stats.Add(new DetailStat { Icon = PenetrationDamageFalloffIcon, Key = "Penetration Damage Falloff", Value = Mathf.CeilToInt(100f * (1f - gun.Shooting.Damage.PenetrationFalloff)) + "%" });
+                stats.Add(new DetailStat { Icon = PenetrationIcon, Key = "InvDetails_Penetration".Translate(), Value = gun.Shooting.Damage.Penetration.ToString() });
+                stats.Add(new DetailStat { Icon = PenetrationDamageFalloffIcon, Key = "InvDetails_PenFalloff".Translate(), Value = Mathf.RoundToInt(100f * (1f - gun.Shooting.Damage.PenetrationFalloff)) + "%" });
             }
         }
 
@@ -134,10 +134,16 @@ public class InventoryDetailsView : MonoBehaviour
         Attachment a = item.GetComponent<Attachment>();
         if(a != null)
         {
-            stats.Add(new DetailStat() { Icon = AttachmentTypeIcon, Key = "Attachment Slot", Value = a.Type.ToString().Replace('_', ' ') });
-            foreach(AttachmentTweak t in item.GetComponentsInChildren<AttachmentTweak>())
+            stats.Add(new DetailStat() { Icon = AttachmentTypeIcon, Key = "InvDetails_AttachmentSlot".Translate(), Value = a.Type.ToString().Replace('_', ' ') });
+            foreach (AttachmentTweak t in a.Tweaks)
             {
-                stats.Add(new DetailStat() { Icon = AttachmentTweakIcon, Key = "Attribute", Value = t.GetEffects() });
+                Debug.Log("asd");
+                string[] effects = t.GetEffects();
+                foreach (var effect in effects)
+                {
+                    Debug.Log("asd2");
+                    stats.Add(new DetailStat() { Icon = AttachmentTweakIcon, Key = "InvDetails_Attribute".Translate(), Value =  effect});
+                }
             }
         }
 
@@ -148,8 +154,8 @@ public class InventoryDetailsView : MonoBehaviour
     {
         string description = "\n";
 
-        description += RichText.InColour(RichText.InItalics(item.Description.ShortDescription), Color.black) + "\n\n";
-        description += RichText.InColour(item.Description.LongDescription, Color.black) + "\n\n";
+        description += RichText.InColour(RichText.InItalics(item.ShortDescription), Color.black) + "\n\n";
+        description += RichText.InColour(item.LongDescription, Color.black) + "\n\n";
 
         return description;
     }

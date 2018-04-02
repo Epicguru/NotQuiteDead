@@ -195,23 +195,21 @@ public class TileLayer : NetworkBehaviour
         if (!InLayerBounds(x, y))
             return false;
 
-        bool tileWalkable = true;
         BaseTile tile = Tiles[x][y];
         if(tile != null)
         {
             if (tile.Walkable == false)
-                tileWalkable = false;
+                return false;
         }
 
-        bool furnitureWalkable = true;
         Furniture f = World.Instance.Furniture.GetFurnitureAt(x, y);
         if(f != null)
         {
             if (!f.Walkable)
-                furnitureWalkable = false;
+                return false;
         }
 
-        return tileWalkable && furnitureWalkable;
+        return true;
     }
 
     /// <summary>
@@ -348,9 +346,14 @@ public class TileLayer : NetworkBehaviour
     {
         // Called on clients when a tile has been set.
 
+        // Confirm to the pending placement system...
+        PendingBuildingManager.Instance.ConfirmPlaced(PendingBuildingManager.MakeID(data.X, data.Y));
+
         // If we are a host, just stop. Tile has already been set.
-        if (isServer) 
+        if (isServer)
+        {
             return;
+        }
 
         // Check if is in bounds.
         if(!InLayerBounds(data.X, data.Y))

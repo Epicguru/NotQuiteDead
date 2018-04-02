@@ -55,6 +55,30 @@ public static class OutputUtils
         }
     }
 
+    public static string BuildingInventorySaveDirectory
+    {
+        get
+        {
+            return S + "Building Inventory" + S;
+        }
+    }
+
+    public static string BuildingInventorySaveFile
+    {
+        get
+        {
+            return BuildingInventorySaveDirectory + "Inventory.txt";
+        }
+    }
+
+    public static string BuildingInventoryHotbarSaveFile
+    {
+        get
+        {
+            return BuildingInventorySaveDirectory + "Hotbar.txt";
+        }
+    }
+
     public static string HeldItemSaveFile
     {
         get
@@ -100,6 +124,30 @@ public static class OutputUtils
         get
         {
             return SaveDirectory + "Realities" + S;
+        }
+    }
+
+    public static string WorldStateSaveFile
+    {
+        get
+        {
+            return S + "World State.txt";
+        }
+    }
+
+    public static string FurnitureSaveDirectory
+    {
+        get
+        {
+            return S + "Furniture" + S;
+        }
+    }
+
+    public static string FurnitureSaveFile
+    {
+        get
+        {
+            return "Placed Furniture.txt";
         }
     }
 

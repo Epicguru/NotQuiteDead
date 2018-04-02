@@ -21,8 +21,6 @@ public class ItemPickup : NetworkBehaviour
         if(collider == null)
             collider = GetComponent<Collider2D>();
 
-        GetComponent<NetPositionSync>().Extrapolate = false;
-
         collider.isTrigger = true;
 
         if(GetComponent<Health>() != null)
@@ -40,8 +38,12 @@ public class ItemPickup : NetworkBehaviour
             if (AllowPickup && !Item.IsEquipped())
             {
                 // Show the user that they can pick this item up.
-                if(InputManager.Active)
-                    ActionHUD.DisplayAction("Press " + InputManager.GetInput("Pick up") + " to pick up " + RichText.InBold(RichText.InColour(Item.Name, ItemRarityUtils.GetColour(Item.Rarity))) + ".");
+                if (InputManager.Active)
+                {
+                    string key = InputManager.GetInput("Pick up").ToString();
+                    string itemName = RichText.InBold(RichText.InColour(Item.Name, ItemRarityUtils.GetColour(Item.Rarity)));
+                    ActionHUD.DisplayAction("PickupPrompt".Translate(key, itemName));
+                }
                 if(InputManager.InputDown("Pick up"))
                 {
                     // Check client-server situation...
@@ -62,7 +64,7 @@ public class ItemPickup : NetworkBehaviour
         }
     }
 
-    public void PickupAccepted(ItemDataX data)
+    public void PickupAccepted(ItemData data)
     {
         PlayerInventory.Add(Item.Prefab, data, 1); // Give real version with data.
     }

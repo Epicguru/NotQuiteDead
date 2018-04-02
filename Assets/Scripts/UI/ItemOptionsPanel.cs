@@ -52,7 +52,7 @@ public class ItemOptionsPanel : MonoBehaviour
     {
         open = true;
 
-        Parent.GetComponentInChildren<Text>().text = item.Item.Name + "\nOptions";
+        Parent.GetComponentInChildren<Text>().text = name + "\n" + "General_Options".Translate().LowerFirstCap();
 
         int index = 0;
         foreach (ItemOption option in options)
@@ -62,7 +62,7 @@ public class ItemOptionsPanel : MonoBehaviour
             GameObject GO = Instantiate(Prefab, Parent);
             (GO.transform as RectTransform).anchoredPosition = new Vector2(0, y);
 
-            GO.GetComponentInChildren<Text>().text = option.OptionName;
+            GO.GetComponentInChildren<Text>().text = ("InvOptions_" + option.OptionName).Translate(option.Params).FirstCap();
 
             option.InvItem = item;
             GO.GetComponent<Button>().onClick.AddListener(option.Clicked);
@@ -90,7 +90,7 @@ public class ItemOptionsPanel : MonoBehaviour
     {
         open = true;
 
-        Parent.GetComponentInChildren<Text>().text = name + "\nOptions";
+        Parent.GetComponentInChildren<Text>().text = name + "\n" + "General_Options".Translate().LowerFirstCap();
 
         int index = 0;
         foreach (ItemOption option in options)
@@ -100,7 +100,7 @@ public class ItemOptionsPanel : MonoBehaviour
             GameObject GO = Instantiate(Prefab, Parent);
             (GO.transform as RectTransform).anchoredPosition = new Vector2(0, y);
 
-            GO.GetComponentInChildren<Text>().text = option.OptionName;
+            GO.GetComponentInChildren<Text>().text = ("InvOptions_" + option.OptionName).Translate(option.Params).FirstCap();
 
             //option.InvItem = item;
             option.Prefab = prefab;

@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
@@ -27,11 +30,13 @@ public class MainMenuFunctions : MonoBehaviour
         T.NotInMenu = true;        
     }
 
-    public void LoadRealitySceneLoaded(AsyncOperation ao)
+    public void QuitGame()
     {
-        Debug.Log("Scene loaded, starting host...");
-        GameObject.Find("Network Manager").GetComponent<NetworkManager>().StartHost();
-        AO = null;
+        Application.Quit();
+
+#if UNITY_EDITOR
+        EditorApplication.isPlaying = false;
+#endif
     }
 
     public void Update()

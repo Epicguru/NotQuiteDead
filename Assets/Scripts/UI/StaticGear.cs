@@ -12,6 +12,7 @@ public class StaticGear : MonoBehaviour
 
     public void Awake()
     {
+        GearUI.GearItems.Clear();
         Register(Hands);
         Register(Head);
         Register(Chest);
@@ -19,6 +20,6 @@ public class StaticGear : MonoBehaviour
 
     public static void Register(GearUI gear)
     {
-        GearUI.GearItems.Add(gear.Title, gear);
+        GearUI.GearItems.Add(gear.Slot, gear);
     }
 }

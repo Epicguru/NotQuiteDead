@@ -27,6 +27,11 @@ public class AudioManager : MonoBehaviour
         return PlayOneShot(position, clip, volume, pitch, 20f, 2f, 10f, 0.6f);
     }
 
+    public AudioSauce PlayOneShot(Vector2 position, AudioClip clip, float volume, float pitch, float range)
+    {
+        return PlayOneShot(position, clip, volume, pitch, range, 2f, 10f, 0.6f);
+    }
+
     public AudioSauce PlayOneShot(Vector2 position, AudioClip clip, float volume, float pitch, float range, float minPanRange, float maxPanRange, float lowPassStart)
     {
         AudioSauce s = GetNextSauce();
