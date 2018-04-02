@@ -8,7 +8,15 @@ public class TileRenderData : ScriptableObject
     private Sprite[] Sprites;
 
     [SerializeField]
-    private Color[][] Cache = new Color[16][];
+    private Color[][] Cache;
+
+    public void MakeCache()
+    {
+        if(Cache == null)
+        {
+            Cache = new Color[Sprites.Length][];
+        }
+    }
 
     public Sprite GetSprite(int index)
     {
@@ -17,6 +25,7 @@ public class TileRenderData : ScriptableObject
 
     public bool IsCached(int index)
     {
+        MakeCache();
         if (index >= 0 && index < Cache.Length)
             return Cache[index] != null;
         else
@@ -35,14 +44,15 @@ public class TileRenderData : ScriptableObject
 
     public void SetCachedPixels(int index, Color[] pixels)
     {
+        MakeCache();
         Cache[index] = pixels;
     }
 
     public string GetError()
     {
-        if(Sprites.Length != 16)
+        if(Sprites.Length == 0)
         {
-            return "There are " + Sprites.Length + " sprites, but there should be 16";
+            return "There are " + Sprites.Length + " sprites!";
         }
 
         int index = 0;
