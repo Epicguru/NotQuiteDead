@@ -20,7 +20,7 @@ public class Chunk : MonoBehaviour
 
     public bool Loaded { get; private set; }
 
-    public void Create(int x, int y, int width, int height, int index)
+    public void Create(int x, int y, int width, int height, int index, TileLayer layer)
     {
         // Add one to instance count, debugging only.
         InstanceCount++;
@@ -37,6 +37,8 @@ public class Chunk : MonoBehaviour
         Background.ChunkSize = Width;
 
         Index = index;
+
+        Background.BG = Backgrounds.GetBG(layer.GetBackgroundAt(Index));
 
         // Setup chunk.
         Init();

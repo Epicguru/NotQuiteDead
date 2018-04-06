@@ -22,6 +22,9 @@ public class TileLayer : NetworkBehaviour
     public int OperationsPendingInSave { get; private set; }
     public bool Use_RLE_In_Net = true;
 
+    [HideInInspector]
+    public string[] ChunkBackgrounds;
+
     // Map of chunks, where key is the index. (The calculated index, x * height + y).
     public Dictionary<int, Chunk> Chunks = new Dictionary<int, Chunk>();
     public Dictionary<int, List<NetPendingTile>> PendingOperations = new Dictionary<int, List<NetPendingTile>>();
@@ -82,6 +85,22 @@ public class TileLayer : NetworkBehaviour
 
         DebugText.Log(loading.Count + " chunks are loading.");
         DebugText.Log(unloading.Count + " chunks are unloading.");
+    }
+
+    public string GetBackgroundAt(int chunkIndex)
+    {
+        // TODO network me!
+        if(ChunkBackgrounds == null)
+        {
+            Debug.LogError("Chunk backgrounds array is null!");
+            return null;
+        }
+        if(chunkIndex < 0 || chunkIndex > ChunkBackgrounds.Length - 1)
+        {
+            Debug.LogError("Chunk index out of range of background array (length {0}, index give {1})".Form(ChunkBackgrounds.Length, chunkIndex));
+            return null;
+        }
+        return ChunkBackgrounds[chunkIndex];
     }
 
     [Server]
@@ -611,7 +630,7 @@ public class TileLayer : NetworkBehaviour
         Chunk newChunk = Instantiate(ChunkPrefab.gameObject, transform).GetComponent<Chunk>();
 
         // Create the chunk object.
-        newChunk.Create(x, y, ChunkSize, ChunkSize, index);
+        newChunk.Create(x, y, ChunkSize, ChunkSize, index, this);
 
         // Add to the chunks list.
         Chunks.Add(index, newChunk);
@@ -668,7 +687,7 @@ public class TileLayer : NetworkBehaviour
         Chunk newChunk = Instantiate(ChunkPrefab.gameObject, transform).GetComponent<Chunk>();
 
         // Create the chunk object.
-        newChunk.Create(x, y, ChunkSize, ChunkSize, index);
+        newChunk.Create(x, y, ChunkSize, ChunkSize, index, this);
 
         // Add to the chunks list.
         Chunks.Add(index, newChunk);
@@ -1050,6 +1069,17 @@ public class TileLayer : NetworkBehaviour
             return -1;
         }
         return x + (y * WidthInChunks);
+    }
+
+    public int GetTileIndex(int tileX, int tileY)
+    {
+        // Gets the unique index of a tile.
+        if (!InLayerBounds(tileX, tileY))
+        {
+            Debug.LogError("Tile not in bounds, cannot get index!");
+            return -1;
+        }
+        return tileX + (tileY * Width);
     }
 
     public Vector2Int GetChunkCoordsFromIndex(int index)

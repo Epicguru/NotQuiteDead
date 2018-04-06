@@ -12,6 +12,14 @@ public class Backgrounds : MonoBehaviour
     [SerializeField]
     private List<Background> loaded;
 
+    public static Background GetBG(string prefab)
+    {
+        if (Loaded == null || !Loaded.ContainsKey(prefab))
+            return null;
+
+        return Loaded[prefab];
+    }
+
     public void Awake()
     {
         Instance = this;

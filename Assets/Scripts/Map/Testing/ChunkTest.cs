@@ -8,6 +8,6 @@ public class ChunkTest : MonoBehaviour {
 
     public void Start()
     {
-        GetComponent<ChunkBackground>().BG = Backgrounds.Loaded[BGs[Random.Range(0, BGs.Length)]];
+        //GetComponent<ChunkBackground>().BG = Backgrounds.Loaded[BGs[Random.Range(0, BGs.Length)]];
     }
 }
