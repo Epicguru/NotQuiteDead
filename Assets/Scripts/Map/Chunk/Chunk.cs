@@ -16,6 +16,7 @@ public class Chunk : MonoBehaviour
     public MeshTexture Texture;
     public MeshGen Mesh;
     public ChunkPhysics Physics;
+    public ChunkBackground Background;
 
     public bool Loaded { get; private set; }
 
@@ -32,6 +33,8 @@ public class Chunk : MonoBehaviour
         Y = y;
         Width = width;
         Height = height;
+
+        Background.ChunkSize = Width;
 
         Index = index;
 
