@@ -4,7 +4,7 @@ using UnityEngine.Rendering;
 
 public class ChunkBackground : MonoBehaviour
 {
-    private static Background[] Surroundings = new Background[8];
+    public static ChunkBackground[] Surroundings;
 
     [Header("Controls")]
     public float ChunkSize = 16;
@@ -69,6 +69,13 @@ public class ChunkBackground : MonoBehaviour
             return;
         if (bgs == null)
             return;
+
+        if (BG == null)
+            return;
+
+        SourceTexture = BG.Sprite == null ? null : BG.Sprite.texture;
+        if (SourceTexture == null)
+            return;
         
         if(bgs.Length == 0)
         {
@@ -78,10 +85,22 @@ public class ChunkBackground : MonoBehaviour
         {
             for (int i = 0; i < bgs.Length; i++)
             {
+                Debug.Log("Chunk ({0}): Index {1}, Value {2}, Mask Index {3}".Form(name, i, bgs[i] == null ? "null" : bgs[i].Name, bgs[i] == null ? -1 : bgs[i].Temp_MaskIndex));
                 if (bgs[i] == null)
+                {
+                    // After the first null value, all are null...
+                    // No need to even loop more.
+                    break;
+                }
+
+                // Ensure that is has a greater order than this background, otherwise don't even draw it.
+                // If it is the same order, of course don't bother.
+                int thisOrder = BG.Order;
+                int otherOrder = bgs[i].Order;
+                if (thisOrder >= otherOrder)
                     continue;
 
-                Texture mask = Masks[i];
+                Texture mask = Masks[bgs[i].Temp_MaskIndex];
                 Texture other = bgs[i].Sprite == null ? null : bgs[i].Sprite.texture;
 
                 if (other == null || mask == null)
@@ -109,9 +128,14 @@ public class ChunkBackground : MonoBehaviour
         RenderTexture.active = old;
     }
 
-    public Background[] GetSurroundings()
+    public ChunkBackground[] GetSurroundings()
     {
         // Starts top left, goes clockwise.
+
+        if(Surroundings == null)
+        {
+            Surroundings = new ChunkBackground[8];
+        }
 
         TileLayer layer = Chunk.Layer;
         int x = Chunk.X;
@@ -125,7 +149,7 @@ public class ChunkBackground : MonoBehaviour
         if (layer.IsChunkLoaded(x, y))
         {
             Chunk c = layer.GetChunkFromChunkCoords(x, y);
-            Surroundings[i] = c.Background.BG;
+            Surroundings[i] = c.Background;
         }
         else
         {
@@ -139,7 +163,7 @@ public class ChunkBackground : MonoBehaviour
         if (layer.IsChunkLoaded(x, y))
         {
             Chunk c = layer.GetChunkFromChunkCoords(x, y);
-            Surroundings[i] = c.Background.BG;
+            Surroundings[i] = c.Background;
         }
         else
         {
@@ -153,7 +177,7 @@ public class ChunkBackground : MonoBehaviour
         if (layer.IsChunkLoaded(x, y))
         {
             Chunk c = layer.GetChunkFromChunkCoords(x, y);
-            Surroundings[i] = c.Background.BG;
+            Surroundings[i] = c.Background;
         }
         else
         {
@@ -167,7 +191,7 @@ public class ChunkBackground : MonoBehaviour
         if (layer.IsChunkLoaded(x, y))
         {
             Chunk c = layer.GetChunkFromChunkCoords(x, y);
-            Surroundings[i] = c.Background.BG;
+            Surroundings[i] = c.Background;
         }
         else
         {
@@ -181,7 +205,7 @@ public class ChunkBackground : MonoBehaviour
         if (layer.IsChunkLoaded(x, y))
         {
             Chunk c = layer.GetChunkFromChunkCoords(x, y);
-            Surroundings[i] = c.Background.BG;
+            Surroundings[i] = c.Background;
         }
         else
         {
@@ -195,7 +219,7 @@ public class ChunkBackground : MonoBehaviour
         if (layer.IsChunkLoaded(x, y))
         {
             Chunk c = layer.GetChunkFromChunkCoords(x, y);
-            Surroundings[i] = c.Background.BG;
+            Surroundings[i] = c.Background;
         }
         else
         {
@@ -209,7 +233,7 @@ public class ChunkBackground : MonoBehaviour
         if (layer.IsChunkLoaded(x, y))
         {
             Chunk c = layer.GetChunkFromChunkCoords(x, y);
-            Surroundings[i] = c.Background.BG;
+            Surroundings[i] = c.Background;
         }
         else
         {
@@ -223,7 +247,7 @@ public class ChunkBackground : MonoBehaviour
         if (layer.IsChunkLoaded(x, y))
         {
             Chunk c = layer.GetChunkFromChunkCoords(x, y);
-            Surroundings[i] = c.Background.BG;
+            Surroundings[i] = c.Background;
         }
         else
         {
@@ -233,12 +257,19 @@ public class ChunkBackground : MonoBehaviour
         return Surroundings;
     }
 
-    public Background[] SortByOrder(Background[] bgs)
+    public ChunkBackground[] SortByOrder(ChunkBackground[] bgs)
     {
         if (bgs == null)
             return null;
 
-        var sorted = from x in bgs orderby x.Order ascending select x;
+        var sorted = from x in bgs orderby (x == null ? int.MaxValue : x.BG == null ? int.MaxValue : x.BG.Order) ascending select x;
         return sorted.ToArray();
+    }
+
+    public int GetMaskIndex(ChunkBackground bg)
+    {
+        // Assume that it is 'touching' this chunk, because optimisation.
+
+
     }
 }

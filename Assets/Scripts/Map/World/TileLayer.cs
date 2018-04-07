@@ -1030,7 +1030,7 @@ public class TileLayer : NetworkBehaviour
         // Is a chunk loaded?
         if (!IsChunkInBounds(x, y))
         {
-            Debug.LogError("Chunk out of bounds!");
+            //Debug.LogError("Chunk out of bounds!");
             return false;
         }
 

@@ -156,7 +156,8 @@ public class World : NetworkBehaviour
 
     public void OnDestroy()
     {
-        //Instance = null;
+        Instance = null;
         Pawn.Dispose();
+        ChunkBackground.Surroundings = null;
     }
 }
