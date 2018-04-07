@@ -16,54 +16,68 @@ public class ChunkBackground : MonoBehaviour
             if(_BG != value)
             {
                 _BG = value;
-                UpdateVisuals();
+                UpdatePositioning();
             }
         }
     }
     [SerializeField]
     private Background _BG;
 
-    public Sprite HaloSprite;
-    public bool DrawHalo = true;
+    public Texture SourceTexture;
+    public Texture[] MaskTextures;
+    public Texture[] OtherTextures;
+    public RenderTexture Target;
+    public Material Shader;
+    public Material DefaultShader;
 
     [Header("References")]
-    public Transform Graphics;
-    public Transform HaloScale;
-    public SpriteRenderer HaloRenderer;
-    public SpriteRenderer MainRenderer;
-    public SortingGroup Group;
+    public Transform BackgroundTransform;
+    public MeshRenderer Renderer;
 
-    public void UpdateVisuals()
+    public void UpdatePositioning()
     {
-        Graphics.localPosition = new Vector3(0, 0, 0);
-        Group.transform.localPosition = new Vector3(ChunkSize * 0.5f, ChunkSize * 0.5f, 0f);
+        BackgroundTransform.localPosition = new Vector3(ChunkSize * 0.5f, ChunkSize * 0.5f, 0);
+        BackgroundTransform.localScale = new Vector3(ChunkSize, ChunkSize, 1);
+    }
 
-        if(BG != null)
+    public void CreateTexture2D()
+    {
+        var tex = new Texture2D(320, 320);
+        Renderer.material.mainTexture = tex;
+    }
+
+    public void Regenerate()
+    {
+        if (Shader == null)
+            return;
+        
+        if(MaskTextures.Length == 0)
         {
-            if (DrawHalo)
-            {
-                HaloScale.localScale = Vector3.one * ChunkSize * 3f;
-                HaloRenderer.sprite = HaloSprite;
-                HaloRenderer.material.SetTexture("_ChunkTex", BG.Sprite == null ? null : BG.Sprite.texture);
-                HaloRenderer.material.SetFloat("_Tiling", ChunkSize * 3f);
-                HaloRenderer.material.SetFloat("_Edge", BG.EdgeShortness);
-                HaloScale.gameObject.SetActive(true);
-            }
-            else
-            {
-                HaloScale.gameObject.SetActive(false);
-            }
-            MainRenderer.gameObject.SetActive(true);
+            Graphics.Blit(SourceTexture, Target, DefaultShader);
         }
         else
         {
-            HaloScale.gameObject.SetActive(false);
-            MainRenderer.gameObject.SetActive(false);
+            for (int i = 0; i < MaskTextures.Length; i++)
+            {
+                Shader.SetTexture("_MaskTex", MaskTextures[i]);
+                Shader.SetTexture("_OtherTex", OtherTextures[i]);
+                var source = SourceTexture;
+                if (i != 0)
+                {
+                    source = Target;
+                }
+                Graphics.Blit(source, Target, Shader);
+            }
         }
 
-        MainRenderer.sprite = BG == null ? null : BG.Sprite;
-        MainRenderer.size = new Vector2(ChunkSize, ChunkSize);
+        var t2D = Renderer.material.mainTexture as Texture2D;
 
-        Group.sortingOrder = BG == null ? 0 : BG.Order;
+        RenderTexture old = RenderTexture.active;
+        RenderTexture.active = Target;
+
+        t2D.ReadPixels(new Rect(0, 0, Target.width, Target.height), 0, 0);
+        t2D.Apply();
+
+        RenderTexture.active = old;
     }
 }
