@@ -16,9 +16,9 @@ public class ChunkBackground : MonoBehaviour
         }
         set
         {
-            if(_BG != value)
+            if (_BG != value)
             {
-                _BG = value;                
+                _BG = value;
             }
         }
     }
@@ -63,7 +63,7 @@ public class ChunkBackground : MonoBehaviour
         Regenerate(sorted);
     }
 
-    public void Regenerate(Background[] bgs)
+    public void Regenerate(ChunkBackground[] bgs)
     {
         if (Shader == null)
             return;
@@ -76,45 +76,62 @@ public class ChunkBackground : MonoBehaviour
         SourceTexture = BG.Sprite == null ? null : BG.Sprite.texture;
         if (SourceTexture == null)
             return;
-        
-        if(bgs.Length == 0)
+
+        bool doneAnything = false;
+        bool first = true;
+        for (int i = 0; i < bgs.Length; i++)
+        {
+            if (bgs[i] == null)
+            {
+                // After the first null value, all are null...
+                // No need to even loop more.
+                //break;
+                continue;
+            }
+            if (bgs[i].BG == null)
+            {
+                // Just ignore it.
+                continue;
+            }
+
+            // Ensure that is has a greater order than this background, otherwise don't even draw it.
+            // If it is the same order, of course don't bother.
+            int thisOrder = BG.Order;
+            int otherOrder = bgs[i].BG.Order;
+            if (thisOrder >= otherOrder)
+            {
+                continue;
+            }
+
+            int maskIndex = GetMaskIndex(bgs[i]);
+            Texture mask = Masks[maskIndex];
+            Texture other = bgs[i].BG.Sprite == null ? null : bgs[i].BG.Sprite.texture;
+
+            if (other == null || mask == null)
+            {
+                continue;
+            }
+
+            Shader.SetTexture("_MaskTex", mask);
+            Shader.SetTexture("_OtherTex", other);
+            Texture source;
+            if (first)
+            {
+                source = SourceTexture;
+            }
+            else
+            {
+                source = Target;
+            }
+            Graphics.Blit(source, Target, Shader);
+            doneAnything = true;
+
+            Debug.Log("Drawing {0} using mask {1}".Form(bgs[i].BG, maskIndex));
+        }
+
+        if (!doneAnything)
         {
             Graphics.Blit(SourceTexture, Target, DefaultShader);
-        }
-        else
-        {
-            for (int i = 0; i < bgs.Length; i++)
-            {
-                Debug.Log("Chunk ({0}): Index {1}, Value {2}, Mask Index {3}".Form(name, i, bgs[i] == null ? "null" : bgs[i].Name, bgs[i] == null ? -1 : bgs[i].Temp_MaskIndex));
-                if (bgs[i] == null)
-                {
-                    // After the first null value, all are null...
-                    // No need to even loop more.
-                    break;
-                }
-
-                // Ensure that is has a greater order than this background, otherwise don't even draw it.
-                // If it is the same order, of course don't bother.
-                int thisOrder = BG.Order;
-                int otherOrder = bgs[i].Order;
-                if (thisOrder >= otherOrder)
-                    continue;
-
-                Texture mask = Masks[bgs[i].Temp_MaskIndex];
-                Texture other = bgs[i].Sprite == null ? null : bgs[i].Sprite.texture;
-
-                if (other == null || mask == null)
-                    continue;
-
-                Shader.SetTexture("_MaskTex", mask);
-                Shader.SetTexture("_OtherTex", other);
-                var source = SourceTexture;
-                if (i != 0)
-                {
-                    source = Target;
-                }
-                Graphics.Blit(source, Target, Shader);
-            }
         }
 
         var t2D = Renderer.material.mainTexture as Texture2D;
@@ -132,7 +149,7 @@ public class ChunkBackground : MonoBehaviour
     {
         // Starts top left, goes clockwise.
 
-        if(Surroundings == null)
+        if (Surroundings == null)
         {
             Surroundings = new ChunkBackground[8];
         }
@@ -172,7 +189,7 @@ public class ChunkBackground : MonoBehaviour
 
         // Top right.
         x += 1;
-        y = 0;
+        y += 0;
         i++;
         if (layer.IsChunkLoaded(x, y))
         {
@@ -269,7 +286,79 @@ public class ChunkBackground : MonoBehaviour
     public int GetMaskIndex(ChunkBackground bg)
     {
         // Assume that it is 'touching' this chunk, because optimisation.
+        // Index starts at top left and moves clockwise.
 
+        if (bg == null)
+            return -1;
 
+        int diffX = bg.Chunk.X - Chunk.X;
+        int diffY = bg.Chunk.Y - Chunk.Y;
+
+        if (diffX == -1)
+        {
+            if (diffY == 1)
+            {
+                // Top left.
+                return 0;
+            }
+            if (diffY == 0)
+            {
+                // Left center.
+                return 7;
+            }
+            if (diffY == -1)
+            {
+                // Bottom left.
+                return 6;
+            }
+        }
+        else if (diffX == 0)
+        {
+            if (diffY == 1)
+            {
+                // Top center.
+                return 1;
+            }
+            if (diffY == 0)
+            {
+                // Dead center, this chunk is me!
+                // Lol. Not valid.
+                Debug.LogError("Tried to get index for centered chunk!");
+                return -1;
+            }
+            if (diffY == -1)
+            {
+                // Bottom center.
+                return 5;
+            }
+        }
+        else if (diffX == 1)
+        {
+            if (diffY == 1)
+            {
+                // Top right.
+                return 2;
+            }
+            if (diffY == 0)
+            {
+                // Right center.
+                return 3;
+            }
+            if (diffY == -1)
+            {
+                // Bottom right.
+                return 4;
+            }
+        }
+        else
+        {
+            // No touching...
+            Debug.LogError("Error exit point A: DiffX is {0}, DiffY is {1}. Chunk BG is {2}".Form(diffX, diffY, bg.BG));
+            return -1;
+        }
+
+        // If the code reaches here, it is not touching...
+        Debug.LogError("Error exit point B: DiffX is {0}, DiffY is {1}. Chunk BG is {2}".Form(diffX, diffY, bg.BG));
+        return -1;
     }
 }

@@ -24,4 +24,9 @@ public class Background : ScriptableObject
             return 5f - (EdgeLength);
         }
     }
+
+    public override string ToString()
+    {
+        return "{0} ({1})".Form(Prefab, Name);
+    }
 }
