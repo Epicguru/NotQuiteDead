@@ -19,7 +19,7 @@ public class ChunkBGRegeneration : Editor
         {
             var cbg = (ChunkBackground)target;
 
-            cbg.UpdatePositioning();
+            cbg.SetFinalPosition();
         }
 
         if (GUILayout.Button("Create New T2D"))

@@ -1,5 +1,4 @@
-﻿using UnityEditorInternal;
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "Chunk Background", menuName = "Tiles/Chunk Background", order = 5)]
 public class Background : ScriptableObject

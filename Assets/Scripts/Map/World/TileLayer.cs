@@ -647,8 +647,8 @@ public class TileLayer : NetworkBehaviour
             // Just leave a blank chunk, lol.
 
             // Mark as loaded, after 'generation'.
-            Chunks[index].DoneLoading();
             loading.Remove(index);
+            Chunks[index].DoneLoading();
         }
     }
 
@@ -830,12 +830,10 @@ public class TileLayer : NetworkBehaviour
 
         SetChunkTiles(tiles, chunkX * ChunkSize, chunkY * ChunkSize);
 
-
         // Mark as done loading.
+        loading.Remove(index);
         Chunk c = Chunks[index];
         c.DoneLoading();
-
-        loading.Remove(index);
     }
 
     [Server]
@@ -862,10 +860,10 @@ public class TileLayer : NetworkBehaviour
         // Apply pending operations, if there are any.
         ApplyPendingOperationsToChunk(index);
 
+        loading.Remove(index);
         Chunk c = Chunks[index];
         c.DoneLoading();
 
-        loading.Remove(index);
     }
 
     [Server]

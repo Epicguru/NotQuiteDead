@@ -19,7 +19,8 @@ public class MeshTexture : MonoBehaviour
     public MeshRenderer Renderer;
     public Chunk Chunk;
 
-    public bool Mipmaps, Linear;
+    public bool Mipmaps;
+    public FilterMode FilterMode;
 
     public bool Dirty { get; set; }
 
@@ -28,7 +29,7 @@ public class MeshTexture : MonoBehaviour
 
     public void BuildTexture()
     {
-        Texture2D texture = new Texture2D(TileResolution * Chunk.Width, TileResolution * Chunk.Height, TextureFormat.ARGB32, Mipmaps, Linear);
+        Texture2D texture = new Texture2D(TileResolution * Chunk.Width, TileResolution * Chunk.Height, TextureFormat.ARGB32, Mipmaps);
 
         if(Transparent == null || Transparent.Length != (Chunk.Width * Chunk.Height * TileResolution * TileResolution))
         {
@@ -41,7 +42,7 @@ public class MeshTexture : MonoBehaviour
 
         texture.SetPixels(Transparent);
 
-        texture.filterMode = FilterMode.Point;
+        texture.filterMode = FilterMode;
         texture.wrapMode = TextureWrapMode.Clamp;
         texture.Apply();
 

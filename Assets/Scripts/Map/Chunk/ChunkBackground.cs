@@ -25,6 +25,11 @@ public class ChunkBackground : MonoBehaviour
     [SerializeField]
     private Background _BG;
 
+    public float LerpSpeed;
+    public Vector2 LerpAngle;
+    public Vector2 LerpScale;
+    public FilterMode FilterMode;
+
     public Texture SourceTexture;
     public RenderTexture Target;
     public Material Shader;
@@ -35,12 +40,13 @@ public class ChunkBackground : MonoBehaviour
     public MeshRenderer Renderer;
     public Chunk Chunk;
 
+    public Texture2D Texture;
+
     public Texture[] Masks;
 
-    public void Start()
+    public void DoneLoading()
     {
-        CreateTexture2D();
-        UpdatePositioning();
+        SetFinalPosition();
         UpdateBGAndSurroundings();
     }
 
@@ -52,21 +58,44 @@ public class ChunkBackground : MonoBehaviour
         {
             if(item != null)
             {
-                Regenerate();
+                item.Regenerate();
             }
         }
     }
 
-    public void UpdatePositioning()
+    public void StartLerp()
     {
-        BackgroundTransform.localPosition = new Vector3(ChunkSize * 0.5f, ChunkSize * 0.5f, 0);
-        BackgroundTransform.localScale = new Vector3(ChunkSize, ChunkSize, 1);
+        BackgroundTransform.localScale = new Vector3(LerpScale.x, LerpScale.x, 1f);
+        BackgroundTransform.localEulerAngles = new Vector3(0f, 0f, LerpAngle.x);
+    }
+
+    public void SetLerpingPosition()
+    {
+        float currentAngle = BackgroundTransform.localEulerAngles.z;
+        float newAngle = Mathf.Lerp(currentAngle, LerpAngle.y, Time.unscaledDeltaTime * LerpSpeed);
+        BackgroundTransform.localEulerAngles = new Vector3(0f, 0f, newAngle);
+
+        Vector2 currentScale = BackgroundTransform.localScale;
+        Vector2 newScale = Vector2.Lerp(currentScale, new Vector2(LerpScale.y, LerpScale.y), Time.unscaledDeltaTime * LerpSpeed);
+        BackgroundTransform.localScale = new Vector3(newScale.x, newScale.y, 1f);
+    }
+
+    public void SetFinalPosition()
+    {
+        const float Scale = 1f;
+        BackgroundTransform.localPosition = new Vector3(ChunkSize * 0.5f, ChunkSize * 0.5f, 1);
+        BackgroundTransform.localScale = new Vector3(ChunkSize * Scale, ChunkSize * Scale, 1);
     }
 
     public void CreateTexture2D()
     {
-        var tex = new Texture2D(320, 320);
-        Renderer.material.mainTexture = tex;
+        if (Texture != null)
+            return;
+
+        Texture = new Texture2D(320, 320, TextureFormat.RGBA32, false);
+        Texture.filterMode = FilterMode;
+        Texture.wrapMode = TextureWrapMode.Clamp;
+        Renderer.material.mainTexture = Texture;
     }
 
     public void Regenerate()
@@ -83,13 +112,14 @@ public class ChunkBackground : MonoBehaviour
             return;
         if (bgs == null)
             return;
-
         if (BG == null)
             return;
 
         SourceTexture = BG.Sprite == null ? null : BG.Sprite.texture;
         if (SourceTexture == null)
             return;
+
+        CreateTexture2D();
 
         bool doneAnything = false;
         bool first = true;
@@ -152,6 +182,7 @@ public class ChunkBackground : MonoBehaviour
         RenderTexture old = RenderTexture.active;
         RenderTexture.active = Target;
 
+        // Graphics.CopyTexture(Target, t2D); // Does not apply instantly due to GPU side data only.
         t2D.ReadPixels(new Rect(0, 0, Target.width, Target.height), 0, 0);
         t2D.Apply();
 

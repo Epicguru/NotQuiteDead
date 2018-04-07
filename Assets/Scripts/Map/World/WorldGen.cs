@@ -43,7 +43,7 @@ public class WorldGen : MonoBehaviour
 
         float[][] heightmap = new float[width][];
 
-        float scale = 10f;
+        float scale = 50f;
 
         for (int x = 0; x < width; x++)
         {
@@ -62,27 +62,27 @@ public class WorldGen : MonoBehaviour
                 float h = heightmap[x][y];
                 int index = foreground.GetChunkIndex(x, y);
 
-                if(h >= 0.5f)
-                {
-                    array[index] = "Dirt";
-                }
-                else
-                {
-                    array[index] = "Grass";
-                }
-
-                //if(h >= 0.7f)
-                //{
-                //    array[index] = "Grass";
-                //}
-                //else if(h >= 0.3f)
+                //if(h >= 0.5f)
                 //{
                 //    array[index] = "Dirt";
                 //}
                 //else
                 //{
-                //    array[index] = "Sand";
+                //    array[index] = "Grass";
                 //}
+
+                if (h >= 0.55f)
+                {
+                    array[index] = "Grass";
+                }
+                else if (h >= 0.3f)
+                {
+                    array[index] = "Dirt";
+                }
+                else
+                {
+                    array[index] = "Sand";
+                }
             }
         }
 

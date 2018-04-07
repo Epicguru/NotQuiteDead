@@ -61,7 +61,7 @@ public class Chunk : MonoBehaviour
         gameObject.name = "Chunk (" + X + ", " + Y + ")";
 
         // Set position
-        transform.localPosition = new Vector3(X * Width * Mesh.TileSize, Y * Height * Mesh.TileSize, 0);
+        transform.localPosition = new Vector3(X * Width * Mesh.TileSize, Y * Height * Mesh.TileSize, 0);        
     }
 
     public void DoneLoading()
@@ -71,6 +71,9 @@ public class Chunk : MonoBehaviour
 
         // Enable physics collision generation again.
         Physics.ActivateComposite();
+
+        // Assign the texture to the background.
+        Background.DoneLoading();
     }
 
     public void LateUpdate()
