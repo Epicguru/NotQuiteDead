@@ -24,10 +24,6 @@ public class ChunkBackground : MonoBehaviour
     }
     [SerializeField]
     private Background _BG;
-
-    public float LerpSpeed;
-    public Vector2 LerpAngle;
-    public Vector2 LerpScale;
     public FilterMode FilterMode;
 
     public Texture SourceTexture;
@@ -46,7 +42,7 @@ public class ChunkBackground : MonoBehaviour
 
     public void DoneLoading()
     {
-        SetFinalPosition();
+        SetBGTransform();
         UpdateBGAndSurroundings();
     }
 
@@ -63,24 +59,7 @@ public class ChunkBackground : MonoBehaviour
         }
     }
 
-    public void StartLerp()
-    {
-        BackgroundTransform.localScale = new Vector3(LerpScale.x, LerpScale.x, 1f);
-        BackgroundTransform.localEulerAngles = new Vector3(0f, 0f, LerpAngle.x);
-    }
-
-    public void SetLerpingPosition()
-    {
-        float currentAngle = BackgroundTransform.localEulerAngles.z;
-        float newAngle = Mathf.Lerp(currentAngle, LerpAngle.y, Time.unscaledDeltaTime * LerpSpeed);
-        BackgroundTransform.localEulerAngles = new Vector3(0f, 0f, newAngle);
-
-        Vector2 currentScale = BackgroundTransform.localScale;
-        Vector2 newScale = Vector2.Lerp(currentScale, new Vector2(LerpScale.y, LerpScale.y), Time.unscaledDeltaTime * LerpSpeed);
-        BackgroundTransform.localScale = new Vector3(newScale.x, newScale.y, 1f);
-    }
-
-    public void SetFinalPosition()
+    public void SetBGTransform()
     {
         const float Scale = 1f;
         BackgroundTransform.localPosition = new Vector3(ChunkSize * 0.5f, ChunkSize * 0.5f, 1);
@@ -89,21 +68,36 @@ public class ChunkBackground : MonoBehaviour
 
     public void CreateTexture2D()
     {
-        if (Texture != null)
-            return;
+        if(Texture == null)
+        {
+            Texture = new Texture2D(320, 320, TextureFormat.RGBA32, false);
+            Texture.filterMode = FilterMode;
+            Texture.wrapMode = TextureWrapMode.Clamp;
+        }
 
-        Texture = new Texture2D(320, 320, TextureFormat.RGBA32, false);
-        Texture.filterMode = FilterMode;
-        Texture.wrapMode = TextureWrapMode.Clamp;
-        Renderer.material.mainTexture = Texture;
+        if(Texture != Renderer.material.mainTexture)
+        {
+            Renderer.material.mainTexture = Texture;
+        }
     }
 
     public void Regenerate()
     {
-        var bgs = GetSurroundings();
-        var sorted = SortByOrder(bgs);
+        if (GameSettings.Current.SoftChunkBackgrounds == SettingState.ENABLED)
+        {
+            var bgs = GetSurroundings();
+            var sorted = SortByOrder(bgs);
 
-        Regenerate(sorted);
+            Regenerate(sorted);
+        }
+        else
+        {
+            var tex = BG == null ? null : BG.Sprite == null ? null : BG.Sprite.texture;
+            if (tex != null)
+            {
+                Renderer.material.mainTexture = tex;
+            }
+        }
     }
 
     public void Regenerate(ChunkBackground[] bgs)
