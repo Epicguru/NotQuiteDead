@@ -41,6 +41,20 @@ public class ChunkBackground : MonoBehaviour
     {
         CreateTexture2D();
         UpdatePositioning();
+        UpdateBGAndSurroundings();
+    }
+
+    public void UpdateBGAndSurroundings()
+    {
+        // Updates the current background drawing and state, and also tells all surrounding chunks to regenerate their own backgrounds.
+        Regenerate();
+        foreach (var item in GetSurroundings())
+        {
+            if(item != null)
+            {
+                Regenerate();
+            }
+        }
     }
 
     public void UpdatePositioning()
