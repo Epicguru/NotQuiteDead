@@ -60,9 +60,14 @@ public class ActiveObjectManager : MonoBehaviour
     {
         bin.Clear();
         List<int> keys = new List<int>(RequestedChunks.Keys);
-        foreach(int key in keys)
+
+        float dt = Time.unscaledDeltaTime;
+        if (dt > 1f)
+            dt = 1f;
+
+        foreach (int key in keys)
         {
-            RequestedChunks[key] += Time.unscaledDeltaTime;
+            RequestedChunks[key] += dt;
             if(RequestedChunks[key] >= UnloadTime)
             {
                 // Remove me!
