@@ -35,6 +35,13 @@ public class Player : NetworkBehaviour
     public Dictionary<string, BodyGear> GearMap = new Dictionary<string, BodyGear>();
     public Player _Player;
 
+
+    [Header("Chunk Loading")]
+    public float ChunkRequestsPerSecond = 10f;
+    public int ChunkBoundsIncrement = 1;
+
+    private float timer;
+
     public bool RequestGear = true;
 
     public static Player Local;
@@ -243,20 +250,32 @@ public class Player : NetworkBehaviour
         // If this is the local player, load the chunks around them.
         if (isLocalPlayer)
         {
-            RectInt bounds = World.Instance.TileMap.GetCameraChunkBounds();
-            int chunkSize = World.Instance.TileMap.ChunkSize;
-            int x = bounds.xMin / chunkSize;
-            int y = bounds.yMin / chunkSize;
-            int endX = bounds.xMax / chunkSize;
-            int endY = bounds.yMax / chunkSize;
-
-            AO.CancelAllRequests();
-
-            for (int X = x; X < endX; X++)
+            timer += Time.unscaledDeltaTime;
+            float interval = 1f / ChunkRequestsPerSecond;
+            bool run = false;
+            while(timer >= interval)
             {
-                for (int Y = y; Y < endY; Y++)
+                timer -= interval;
+                run = true;
+            }
+
+            if (run)
+            {
+                RectInt bounds = World.Instance.TileMap.GetCameraChunkBounds(ChunkBoundsIncrement);
+                int chunkSize = World.Instance.TileMap.ChunkSize;
+                int x = bounds.xMin / chunkSize;
+                int y = bounds.yMin / chunkSize;
+                int endX = bounds.xMax / chunkSize;
+                int endY = bounds.yMax / chunkSize;
+
+                AO.CancelAllRequests();
+
+                for (int X = x; X < endX; X++)
                 {
-                    AO.RequestChunk(X, Y);                    
+                    for (int Y = y; Y < endY; Y++)
+                    {
+                        AO.RequestChunk(X, Y);
+                    }
                 }
             }
         }

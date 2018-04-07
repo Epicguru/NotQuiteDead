@@ -16,10 +16,12 @@ public class Chunk : MonoBehaviour
     public MeshTexture Texture;
     public MeshGen Mesh;
     public ChunkPhysics Physics;
+    public ChunkBackground Background;
+    public TileLayer Layer;
 
     public bool Loaded { get; private set; }
 
-    public void Create(int x, int y, int width, int height, int index)
+    public void Create(int x, int y, int width, int height, int index, TileLayer layer)
     {
         // Add one to instance count, debugging only.
         InstanceCount++;
@@ -33,7 +35,12 @@ public class Chunk : MonoBehaviour
         Width = width;
         Height = height;
 
+        Background.ChunkSize = Width;
+
         Index = index;
+        Layer = layer;
+
+        Background.BG = Backgrounds.GetBG(layer.GetBackgroundAt(Index));
 
         // Setup chunk.
         Init();
@@ -54,7 +61,7 @@ public class Chunk : MonoBehaviour
         gameObject.name = "Chunk (" + X + ", " + Y + ")";
 
         // Set position
-        transform.localPosition = new Vector3(X * Width * Mesh.TileSize, Y * Height * Mesh.TileSize, 0);
+        transform.localPosition = new Vector3(X * Width * Mesh.TileSize, Y * Height * Mesh.TileSize, 0);        
     }
 
     public void DoneLoading()
@@ -64,6 +71,9 @@ public class Chunk : MonoBehaviour
 
         // Enable physics collision generation again.
         Physics.ActivateComposite();
+
+        // Assign the texture to the background.
+        Background.DoneLoading();
     }
 
     public void LateUpdate()

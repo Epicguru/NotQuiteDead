@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(TileMap))]
+[RequireComponent(typeof(WorldGen))]
 public class World : NetworkBehaviour
 {
     public static World Instance { get; private set; }
@@ -23,6 +24,9 @@ public class World : NetworkBehaviour
 
     [HideInInspector]
     public FurnitureManager Furniture;
+
+    [HideInInspector]
+    public WorldGen Generation;
 
     [Server]
     public void Save()
@@ -128,8 +132,12 @@ public class World : NetworkBehaviour
         TileMap.World = this;
 
         Furniture = GetComponent<FurnitureManager>();
+        Generation = GetComponent<WorldGen>();
 
-        TileMap.Create();        
+        TileMap.Create();
+
+        int seed = 0;
+        Generation.GenBackgrounds(this, seed);
     }
 
     public void Start()
@@ -148,7 +156,8 @@ public class World : NetworkBehaviour
 
     public void OnDestroy()
     {
-        //Instance = null;
+        Instance = null;
         Pawn.Dispose();
+        ChunkBackground.Surroundings = null;
     }
 }

@@ -108,10 +108,9 @@ public class TileMap : NetworkBehaviour
         DebugText.Log(Chunk.InstanceCount + " chunks instantiated.");
     }
 
-    public RectInt GetCameraChunkBounds()
+    public RectInt GetCameraChunkBounds(int increment = 1)
     {
         float chunkSize = ChunkSize;
-        int increment = 1;
 
         increment *= ChunkSize;
 
