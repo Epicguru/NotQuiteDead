@@ -118,6 +118,7 @@ public class ChunkBackground : MonoBehaviour
             if (first)
             {
                 source = SourceTexture;
+                first = false;
             }
             else
             {
@@ -125,8 +126,6 @@ public class ChunkBackground : MonoBehaviour
             }
             Graphics.Blit(source, Target, Shader);
             doneAnything = true;
-
-            Debug.Log("Drawing {0} using mask {1}".Form(bgs[i].BG, maskIndex));
         }
 
         if (!doneAnything)

@@ -9,5 +9,14 @@ public class ChunkTest : MonoBehaviour
     public void Start()
     {
         GetComponent<ChunkBackground>().BG = Backgrounds.Loaded[BGs[Random.Range(0, BGs.Length)]];
+        GetComponent<ChunkBackground>().Regenerate();
+    }
+
+    public void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            GetComponent<ChunkBackground>().Regenerate();
+        }
     }
 }

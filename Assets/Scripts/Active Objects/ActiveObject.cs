@@ -6,6 +6,7 @@ using UnityEngine;
 public class ActiveObject : MonoBehaviour {
 
     // Represents an active object, which requires one or more chunks to loaded around it.
+
     public List<int> RequestedChunks = new List<int>();
     public string DefaultLayer = "Foreground";
 
