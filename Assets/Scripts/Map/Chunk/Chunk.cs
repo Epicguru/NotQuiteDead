@@ -17,6 +17,7 @@ public class Chunk : MonoBehaviour
     public MeshGen Mesh;
     public ChunkPhysics Physics;
     public ChunkBackground Background;
+    public TileLayer Layer;
 
     public bool Loaded { get; private set; }
 
@@ -37,6 +38,7 @@ public class Chunk : MonoBehaviour
         Background.ChunkSize = Width;
 
         Index = index;
+        Layer = layer;
 
         Background.BG = Backgrounds.GetBG(layer.GetBackgroundAt(Index));
 

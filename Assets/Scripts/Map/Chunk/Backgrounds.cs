@@ -14,6 +14,8 @@ public class Backgrounds : MonoBehaviour
 
     public static Background GetBG(string prefab)
     {
+        if (prefab == null)
+            return null;
         if (Loaded == null || !Loaded.ContainsKey(prefab))
             return null;
 

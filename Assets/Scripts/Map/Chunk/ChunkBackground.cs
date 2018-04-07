@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
+using System.Linq;
 using UnityEngine.Rendering;
 
 public class ChunkBackground : MonoBehaviour
 {
+    private static Background[] Surroundings = new Background[8];
+
     [Header("Controls")]
     public float ChunkSize = 16;
     public Background BG
@@ -15,8 +18,7 @@ public class ChunkBackground : MonoBehaviour
         {
             if(_BG != value)
             {
-                _BG = value;
-                UpdatePositioning();
+                _BG = value;                
             }
         }
     }
@@ -24,8 +26,6 @@ public class ChunkBackground : MonoBehaviour
     private Background _BG;
 
     public Texture SourceTexture;
-    public Texture[] MaskTextures;
-    public Texture[] OtherTextures;
     public RenderTexture Target;
     public Material Shader;
     public Material DefaultShader;
@@ -33,6 +33,15 @@ public class ChunkBackground : MonoBehaviour
     [Header("References")]
     public Transform BackgroundTransform;
     public MeshRenderer Renderer;
+    public Chunk Chunk;
+
+    public Texture[] Masks;
+
+    public void Start()
+    {
+        CreateTexture2D();
+        UpdatePositioning();
+    }
 
     public void UpdatePositioning()
     {
@@ -48,19 +57,38 @@ public class ChunkBackground : MonoBehaviour
 
     public void Regenerate()
     {
+        var bgs = GetSurroundings();
+        var sorted = SortByOrder(bgs);
+
+        Regenerate(sorted);
+    }
+
+    public void Regenerate(Background[] bgs)
+    {
         if (Shader == null)
             return;
+        if (bgs == null)
+            return;
         
-        if(MaskTextures.Length == 0)
+        if(bgs.Length == 0)
         {
             Graphics.Blit(SourceTexture, Target, DefaultShader);
         }
         else
         {
-            for (int i = 0; i < MaskTextures.Length; i++)
+            for (int i = 0; i < bgs.Length; i++)
             {
-                Shader.SetTexture("_MaskTex", MaskTextures[i]);
-                Shader.SetTexture("_OtherTex", OtherTextures[i]);
+                if (bgs[i] == null)
+                    continue;
+
+                Texture mask = Masks[i];
+                Texture other = bgs[i].Sprite == null ? null : bgs[i].Sprite.texture;
+
+                if (other == null || mask == null)
+                    continue;
+
+                Shader.SetTexture("_MaskTex", mask);
+                Shader.SetTexture("_OtherTex", other);
                 var source = SourceTexture;
                 if (i != 0)
                 {
@@ -79,5 +107,138 @@ public class ChunkBackground : MonoBehaviour
         t2D.Apply();
 
         RenderTexture.active = old;
+    }
+
+    public Background[] GetSurroundings()
+    {
+        // Starts top left, goes clockwise.
+
+        TileLayer layer = Chunk.Layer;
+        int x = Chunk.X;
+        int y = Chunk.Y;
+        int i = -1;
+
+        // Top left.
+        x -= 1;
+        y += 1;
+        i++;
+        if (layer.IsChunkLoaded(x, y))
+        {
+            Chunk c = layer.GetChunkFromChunkCoords(x, y);
+            Surroundings[i] = c.Background.BG;
+        }
+        else
+        {
+            Surroundings[i] = null;
+        }
+
+        // Top center.
+        x += 1;
+        y += 0;
+        i++;
+        if (layer.IsChunkLoaded(x, y))
+        {
+            Chunk c = layer.GetChunkFromChunkCoords(x, y);
+            Surroundings[i] = c.Background.BG;
+        }
+        else
+        {
+            Surroundings[i] = null;
+        }
+
+        // Top right.
+        x += 1;
+        y = 0;
+        i++;
+        if (layer.IsChunkLoaded(x, y))
+        {
+            Chunk c = layer.GetChunkFromChunkCoords(x, y);
+            Surroundings[i] = c.Background.BG;
+        }
+        else
+        {
+            Surroundings[i] = null;
+        }
+
+        // Right center.
+        x += 0;
+        y -= 1;
+        i++;
+        if (layer.IsChunkLoaded(x, y))
+        {
+            Chunk c = layer.GetChunkFromChunkCoords(x, y);
+            Surroundings[i] = c.Background.BG;
+        }
+        else
+        {
+            Surroundings[i] = null;
+        }
+
+        // Right bottom.
+        x += 0;
+        y -= 1;
+        i++;
+        if (layer.IsChunkLoaded(x, y))
+        {
+            Chunk c = layer.GetChunkFromChunkCoords(x, y);
+            Surroundings[i] = c.Background.BG;
+        }
+        else
+        {
+            Surroundings[i] = null;
+        }
+
+        // Bottom center.
+        x -= 1;
+        y += 0;
+        i++;
+        if (layer.IsChunkLoaded(x, y))
+        {
+            Chunk c = layer.GetChunkFromChunkCoords(x, y);
+            Surroundings[i] = c.Background.BG;
+        }
+        else
+        {
+            Surroundings[i] = null;
+        }
+
+        // Left bottom.
+        x -= 1;
+        y += 0;
+        i++;
+        if (layer.IsChunkLoaded(x, y))
+        {
+            Chunk c = layer.GetChunkFromChunkCoords(x, y);
+            Surroundings[i] = c.Background.BG;
+        }
+        else
+        {
+            Surroundings[i] = null;
+        }
+
+        // Left center.
+        x += 0;
+        y += 1;
+        i++;
+        if (layer.IsChunkLoaded(x, y))
+        {
+            Chunk c = layer.GetChunkFromChunkCoords(x, y);
+            Surroundings[i] = c.Background.BG;
+        }
+        else
+        {
+            Surroundings[i] = null;
+        }
+
+        return Surroundings;
+    }
+
+    public Background[] SortByOrder(Background[] bgs)
+    {
+        if (bgs == null)
+            return null;
+
+        var sorted = from x in bgs orderby x.Order ascending select x;
+        return sorted.ToArray();
     }
 }
