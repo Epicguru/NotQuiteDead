@@ -6,8 +6,6 @@ public class ChunkPool : MonoBehaviour
     public static ChunkPool Instance;
     public GameObject Prefab;
 
-    public int Max = 100;
-
     [ReadOnly]
     public int Pooled;
     [ReadOnly]
@@ -15,7 +13,7 @@ public class ChunkPool : MonoBehaviour
     [ReadOnly]
     public int Total;
 
-    private List<Chunk> Spawned = new List<Chunk>();
+    private List<Chunk> Pool = new List<Chunk>();
 
     public void Awake()
     {
@@ -24,39 +22,58 @@ public class ChunkPool : MonoBehaviour
 
     public void OnDestroy()
     {
-        Spawned.Clear();
-        Spawned = null;
+        Pool.Clear();
+        Pool = null;
         Instance = null;
     }
 
     public void DestroyPooled()
     {
-        foreach (var chunk in Spawned)
+        foreach (var chunk in Pool)
         {
             Destroy(chunk);
         }
-        Spawned.Clear();
+        Pool.Clear();
     }
 
     private Chunk SpawnNewChunk()
     {
+        Total++;
         return Instantiate(Prefab).GetComponent<Chunk>();
     }
 
-    public Chunk GetChunk()
+    public Chunk GetChunk(Vector2 position, Transform parent = null)
     {
-        if(Spawned.Count > 0)
+        if(Pool.Count > 0)
         {
+            Pooled--;
+            OnLease++;
+            var chunk = Pool[0];
+            Pool.RemoveAt(0);
 
+            chunk.gameObject.SetActive(true);
+            chunk.transform.SetParent(parent);
+            chunk.transform.position = position;
+
+            return chunk;
         }
         else
         {
+            var chunk = SpawnNewChunk();
+            OnLease++;
 
+            return chunk;
         }
     }
 
-    public void ReturnChunk()
+    public void ReturnChunk(Chunk c)
     {
+        if (c == null)
+            return;
 
+        OnLease--;
+        Pooled++;
+
+        Pool.Add(c);
     }
 }

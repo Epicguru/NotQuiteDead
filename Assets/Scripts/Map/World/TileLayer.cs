@@ -10,7 +10,6 @@ public class TileLayer : NetworkBehaviour
     public TileMap Map;
     public string Name;
 
-    public Chunk ChunkPrefab;
     public int ChunkSize = 16;
 
     public int Width { get; private set; }
@@ -635,7 +634,7 @@ public class TileLayer : NetworkBehaviour
         loading.Add(index);
 
         // Instantiate object, TODO pool me.
-        Chunk newChunk = Instantiate(ChunkPrefab.gameObject, transform).GetComponent<Chunk>();
+        Chunk newChunk = ChunkPool.Instance.GetChunk(Vector2.zero, transform).GetComponent<Chunk>();
 
         // Create the chunk object.
         newChunk.Create(x, y, ChunkSize, ChunkSize, index, this);
@@ -692,7 +691,7 @@ public class TileLayer : NetworkBehaviour
         // Flag as loading, even though it is really being sent from the server.
         loading.Add(index);
 
-        Chunk newChunk = Instantiate(ChunkPrefab.gameObject, transform).GetComponent<Chunk>();
+        Chunk newChunk = ChunkPool.Instance.GetChunk(Vector2.zero, transform).GetComponent<Chunk>();
 
         // Create the chunk object.
         newChunk.Create(x, y, ChunkSize, ChunkSize, index, this);
@@ -978,7 +977,7 @@ public class TileLayer : NetworkBehaviour
 
         ClearTilesFrom(startX, startY, ChunkSize, ChunkSize);
         Chunks.Remove(index);
-        Destroy(chunk.gameObject);
+        ChunkPool.Instance.ReturnChunk(chunk);
 
         unloading.Remove(index);
     }
