@@ -11,21 +11,6 @@ public class LightMesh : MonoBehaviour
     public Color32 ColourB;
     public int X, Y;
 
-    public void GenerateMesh()
-    {
-        Gen.GenMesh();
-    }
-
-    public void SetColour(int x, int y, Color32 colour)
-    {
-        Interaction.SetColour(x, y, colour);
-    }
-
-    public Color32 GetColour(int x, int y)
-    {
-        return Interaction.GetColour(x, y);
-    }
-
     public void RunColourSet()
     {
         Vector2 origin = new Vector2(X, Y);
@@ -38,8 +23,13 @@ public class LightMesh : MonoBehaviour
                 float p = dst / Range;
                 float strength = 1f - p;
 
-                SetColour(X + x, Y + y, Color32.Lerp(GetColour(X + x, Y + y), ColourA, strength));
+                Interaction.SetColour(X + x, Y + y, Color32.Lerp(Interaction.GetColour(X + x, Y + y), ColourA, strength));
             }
         }
+    }
+
+    public void RunEdgeSet()
+    {
+        Interaction.SetEdgeColours(0, 0, 0, Gen.Height, ColourA, ColourB);
     }
 }

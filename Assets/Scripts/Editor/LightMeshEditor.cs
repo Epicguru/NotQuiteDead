@@ -11,12 +11,17 @@ public class LightMeshEditor : Editor
 
         if (GUILayout.Button("Regenerate"))
         {
-            lm.GenerateMesh();
+            lm.Gen.GenMesh();
         }
 
         if (GUILayout.Button("Run Colour Set"))
         {
             lm.RunColourSet();
+        }
+
+        if (GUILayout.Button("Run Edge Set"))
+        {
+            lm.RunEdgeSet();
         }
     }
 }
