@@ -86,6 +86,36 @@ public class Chunk : MonoBehaviour
 
         // Update lighting...
         LightMesh.UpdateLighting();
+
+        // Update surrounding chunk lighting...
+        UpdateLightingOfSurroundings();
+    }
+
+    private void UpdateLightingOfSurroundings()
+    {
+        // Left
+        if(Layer.IsChunkLoaded(X - 1, Y))
+        {
+            Layer.GetChunkFromChunkCoords(X - 1, Y).UpdateLight();
+        }
+
+        // Right
+        if (Layer.IsChunkLoaded(X + 1, Y))
+        {
+            Layer.GetChunkFromChunkCoords(X + 1, Y).UpdateLight();
+        }
+
+        // Down
+        if (Layer.IsChunkLoaded(X, Y - 1))
+        {
+            Layer.GetChunkFromChunkCoords(X, Y - 1).UpdateLight();
+        }
+
+        // Up
+        if (Layer.IsChunkLoaded(X, Y + 1))
+        {
+            Layer.GetChunkFromChunkCoords(X, Y + 1).UpdateLight();
+        }
     }
 
     public void TileChanged(BaseTile tile, int x, int y)

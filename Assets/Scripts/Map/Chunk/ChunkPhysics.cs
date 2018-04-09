@@ -80,11 +80,13 @@ public class ChunkPhysics : MonoBehaviour {
 
     public void DeactivateComposite()
     {
+        Composite.generationType = CompositeCollider2D.GenerationType.Manual;
         Composite.enabled = false;
     }
 
     public void ActivateComposite()
     {
+        Composite.generationType = CompositeCollider2D.GenerationType.Synchronous;
         Composite.enabled = true;
     }
 }
