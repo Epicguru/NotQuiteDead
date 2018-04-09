@@ -33,7 +33,6 @@ public class Chunk : MonoBehaviour
 
         // Deactivate composite to avoid unecessary geometry generation when loading.
         Loaded = false;
-        Physics.DeactivateComposite();
 
         X = x;
         Y = y;
@@ -62,6 +61,7 @@ public class Chunk : MonoBehaviour
         //Mesh.GenMesh();
         Texture.BuildTexture();
         Physics.BuildMap();
+        Physics.RemoveAll();
 
         gameObject.name = "Chunk (" + X + ", " + Y + ")";
 
@@ -79,7 +79,7 @@ public class Chunk : MonoBehaviour
         Loaded = true;
 
         // Enable physics collision generation again.
-        Physics.ActivateComposite();
+        Physics.RebuildAll();
 
         // Assign the texture to the background.
         Background.DoneLoading();
@@ -115,6 +115,30 @@ public class Chunk : MonoBehaviour
         if (Layer.IsChunkLoaded(X, Y + 1))
         {
             Layer.GetChunkFromChunkCoords(X, Y + 1).UpdateLight();
+        }
+
+        // Bottom left corner.
+        if (Layer.IsChunkLoaded(X - 1, Y - 1))
+        {
+            Layer.GetChunkFromChunkCoords(X - 1, Y - 1).UpdateLight();
+        }
+
+        // Bottom right corner
+        if (Layer.IsChunkLoaded(X + 1, Y - 1))
+        {
+            Layer.GetChunkFromChunkCoords(X + 1, Y - 1).UpdateLight();
+        }
+
+        // Top left corner
+        if (Layer.IsChunkLoaded(X - 1, Y + 1))
+        {
+            Layer.GetChunkFromChunkCoords(X - 1, Y + 1).UpdateLight();
+        }
+
+        // Top right corner.
+        if (Layer.IsChunkLoaded(X + 1, Y + 1))
+        {
+            Layer.GetChunkFromChunkCoords(X + 1, Y + 1).UpdateLight();
         }
     }
 
@@ -160,6 +184,8 @@ public class Chunk : MonoBehaviour
                 Layer.GetChunkFromChunkCoords(X, Y + 1).UpdateLight();
             }
         }
+
+        Physics.Dirty = true;
     }
 
     public void UpdateLight()

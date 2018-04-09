@@ -8,15 +8,79 @@ public class ChunkPhysics : MonoBehaviour {
     public CompositeCollider2D Composite;
     public bool Enabled = true;
 
+    [ReadOnly]
+    public bool Dirty;
+    int framesDirty = 0;
+
     public Collider2D[][] Colliders;
+
+    public void LateUpdate()
+    {
+        if (Dirty)
+        {
+            framesDirty++;
+            if(framesDirty == 2)
+            {
+                Dirty = false;
+                framesDirty = 0;
+                Composite.GenerateGeometry();
+            }
+        }
+    }
 
     public void BuildMap()
     {
+        RemoveAll();
         Colliders = new Collider2D[Chunk.Width][];
         for (int x = 0; x < Chunk.Width; x++)
         {
             Colliders[x] = new Collider2D[Chunk.Height];
         }
+    }
+
+    public void RemoveAll()
+    {
+        if (Colliders == null)
+            return;
+        for (int x = 0; x < Chunk.Width; x++)
+        {
+            for (int y = 0; y < Chunk.Height; y++)
+            {
+                RemoveCollider(x, y);
+            }
+        }
+
+        Dirty = true;
+    }
+
+    public void AssignAll()
+    {
+        TileLayer layer = Chunk.Layer;
+        for (int x = 0; x < Chunk.Width; x++)
+        {
+            for (int y = 0; y < Chunk.Height; y++)
+            {
+                int X = Chunk.X * Chunk.Width + x;
+                int Y = Chunk.Y * Chunk.Height + y;
+
+                BaseTile tile = layer.GetTile(X, Y);
+                if(tile != null)
+                {
+                    if (tile.Physics != null)
+                    {
+                        AssignCollider(tile.Physics, x, y);
+                    }
+                }
+            }
+        }
+
+        Dirty = true;
+    }
+
+    public void RebuildAll()
+    {
+        RemoveAll();
+        AssignAll();
     }
 
     public void AssignCollider(Collider2D prefab, int x, int y)
@@ -35,6 +99,8 @@ public class ChunkPhysics : MonoBehaviour {
         {
             Destroy(Colliders[x][y].gameObject);
         }
+
+        Dirty = true;
 
         if(prefab == null)
         {
@@ -57,6 +123,8 @@ public class ChunkPhysics : MonoBehaviour {
         }
 
         Colliders[x][y] = colliderInstance;
+
+        Dirty = true;
     }
 
     public void RemoveCollider(int x, int y)
@@ -71,22 +139,12 @@ public class ChunkPhysics : MonoBehaviour {
         Colliders[x][y] = null;
 
         Destroy(c.gameObject);
+
+        Dirty = true;
     }
 
     public bool ColliderExists(int x, int y)
     {
         return Colliders[x][y] != null;
-    }
-
-    public void DeactivateComposite()
-    {
-        Composite.generationType = CompositeCollider2D.GenerationType.Manual;
-        Composite.enabled = false;
-    }
-
-    public void ActivateComposite()
-    {
-        Composite.generationType = CompositeCollider2D.GenerationType.Synchronous;
-        Composite.enabled = true;
     }
 }
