@@ -68,6 +68,12 @@ public class Threader : MonoBehaviour
             SleepTimeOver10Seconds = 0;
             ExecutedOperationsOver10Seconds = 0;
         }
+
+        DebugText.Log(RichText.InColour("Threader sleep time: " + ThreadWaitTime, Color.grey));
+        DebugText.Log(RichText.InColour("Threader updates per second: " + UpdatesPerSecond, Color.grey));
+        DebugText.Log(RichText.InColour("Thread Stats Over 10 Seconds:", Color.cyan));
+        DebugText.Log(RichText.InColour("Executed operations: " + ExecutedOperationsOver10Seconds, Color.cyan));
+        DebugText.Log(RichText.InColour("Time spent sleeping: " + SleepTimeOver10Seconds, Color.cyan));
     }
 
     public void UpdateTimer(float deltaTime)

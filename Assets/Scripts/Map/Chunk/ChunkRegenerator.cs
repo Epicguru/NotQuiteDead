@@ -8,7 +8,10 @@ public class ChunkRegenerator : MonoBehaviour
 
     public static ChunkRegenerator Instance;
 
-    public int MaxTimePerFrame = 2;
+    public long MaxTimePerFrame = 4;
+    [HideInInspector]
+    public long TimeSpent;
+
     private Queue<ChunkBackground> backgrounds = new Queue<ChunkBackground>();
     private Stopwatch timer = new Stopwatch();
 
@@ -23,8 +26,15 @@ public class ChunkRegenerator : MonoBehaviour
         GenerateBackgrounds(MaxTimePerFrame);
     }
 
-    public void GenerateBackgrounds(int maxTime)
+    public void GenerateBackgrounds(long maxTime)
     {
+        if (backgrounds.Count == 0)
+        {
+            TimeSpent = 0;
+            return;
+        }
+
+        timer.Reset();
         timer.Start();
 
         bool run = true;
@@ -40,7 +50,14 @@ public class ChunkRegenerator : MonoBehaviour
             {
                 run = false;
             }
+            if(backgrounds.Count == 0)
+            {
+                run = false;
+            }
         }
+
+        TimeSpent = timer.ElapsedMilliseconds;
+        timer.Stop();
     }
 
     public void Awake()

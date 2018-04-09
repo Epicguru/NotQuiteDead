@@ -97,6 +97,7 @@ public class DebugText : MonoBehaviour {
 
         Str.Insert(0, RichText.InBold(RichText.InColour("FPS: " + FPS, FPS > 55 ? Color.green : FPS > 30 ? Color.yellow : Color.red)) + '\n');
         Str.Append(RichText.InBold("Light mesh updates in second: " + MeshLightingUpdates) + '\n');
+        Str.Append(RichText.InBold("Chunk BG regen time : " + ChunkRegenerator.Instance.TimeSpent + "/" + ChunkRegenerator.Instance.MaxTimePerFrame) + '\n');
         Text.text = Str.ToString();
         Str.Clear();
     }
