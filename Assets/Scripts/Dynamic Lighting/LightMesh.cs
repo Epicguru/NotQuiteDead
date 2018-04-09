@@ -4,6 +4,7 @@ public class LightMesh : MonoBehaviour
 {
     public LightMeshGen Gen;
     public LightMeshInteraction Interaction;
+    public LightMeshChunk Chunk;
 
     [Header("Vertex Colour Set")]
     public int Range;

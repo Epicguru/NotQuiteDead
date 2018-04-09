@@ -4,6 +4,7 @@ public class LightMeshInteraction : MonoBehaviour
 {
     public MeshFilter Filter;
     public LightMeshGen Gen;
+    public bool SuppressBoundsWarnings;
 
     private static Color32 BLANK_COLOUR = new Color32(0, 0, 0, 0);
 
@@ -148,6 +149,7 @@ public class LightMeshInteraction : MonoBehaviour
 
     private void LogOutOfBounds(int x, int y)
     {
-        Debug.LogWarning("X: {0} or Y: {1} are out of mesh vertex bounds! Width: {2}, Height: {3}".Form(x, y, Gen.Width, Gen.Height));
+        if(!SuppressBoundsWarnings)
+            Debug.LogWarning("X: {0} or Y: {1} are out of mesh vertex bounds! Width: {2}, Height: {3}".Form(x, y, Gen.Width, Gen.Height));
     }
 }

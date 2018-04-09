@@ -29,6 +29,9 @@ public class MeshTexture : MonoBehaviour
 
     public void BuildTexture()
     {
+        if (Texture != null)
+            return;
+
         Texture2D texture = new Texture2D(TileResolution * Chunk.Width, TileResolution * Chunk.Height, TextureFormat.ARGB32, Mipmaps);
 
         if(Transparent == null || Transparent.Length != (Chunk.Width * Chunk.Height * TileResolution * TileResolution))
@@ -297,5 +300,10 @@ public class MeshTexture : MonoBehaviour
         Texture.Apply();
 
         Dirty = false;
+    }
+
+    public void OnDestroy()
+    {
+        Destroy(Texture);
     }
 }

@@ -405,4 +405,9 @@ public class ChunkBackground : MonoBehaviour
         Debug.LogError("Error exit point B: DiffX is {0}, DiffY is {1}. Chunk BG is {2}".Form(diffX, diffY, bg.BG));
         return -1;
     }
+
+    public void OnDestroy()
+    {
+        Destroy(Texture);
+    }
 }

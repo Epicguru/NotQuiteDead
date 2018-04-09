@@ -23,5 +23,10 @@ public class LightMeshEditor : Editor
         {
             lm.RunEdgeSet();
         }
+
+        if (GUILayout.Button("Run Chunk Test"))
+        {
+            lm.Chunk.LightEmUp();
+        }
     }
 }
