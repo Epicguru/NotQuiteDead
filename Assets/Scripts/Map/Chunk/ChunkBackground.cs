@@ -63,28 +63,11 @@ public class ChunkBackground : MonoBehaviour
         }
     }
 
-    public void StartLerp()
-    {
-        BackgroundTransform.localScale = new Vector3(LerpScale.x, LerpScale.x, 1f);
-        BackgroundTransform.localEulerAngles = new Vector3(0f, 0f, LerpAngle.x);
-    }
-
-    public void SetLerpingPosition()
-    {
-        float currentAngle = BackgroundTransform.localEulerAngles.z;
-        float newAngle = Mathf.Lerp(currentAngle, LerpAngle.y, Time.unscaledDeltaTime * LerpSpeed);
-        BackgroundTransform.localEulerAngles = new Vector3(0f, 0f, newAngle);
-
-        Vector2 currentScale = BackgroundTransform.localScale;
-        Vector2 newScale = Vector2.Lerp(currentScale, new Vector2(LerpScale.y, LerpScale.y), Time.unscaledDeltaTime * LerpSpeed);
-        BackgroundTransform.localScale = new Vector3(newScale.x, newScale.y, 1f);
-    }
-
     public void SetFinalPosition()
     {
         const float Scale = 1f;
         BackgroundTransform.localPosition = new Vector3(ChunkSize * 0.5f, ChunkSize * 0.5f, 1);
-        BackgroundTransform.localScale = new Vector3(ChunkSize * Scale, ChunkSize * Scale, 1);
+        BackgroundTransform.localScale = new Vector3(ChunkSize * Scale, -ChunkSize * Scale, 1);
     }
 
     public void CreateTexture2D()

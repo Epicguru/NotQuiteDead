@@ -6,31 +6,36 @@ public class LightMeshInteraction : MonoBehaviour
     public LightMeshGen Gen;
     public bool SuppressBoundsWarnings;
 
-    private static Color32 BLANK_COLOUR = new Color32(0, 0, 0, 0);
+    public static Color32 BLACK = new Color32(0, 0, 0, 0);
+
+    private Color32[] CacheColours;
 
     private Color32[] GetColours()
     {
-        if (Filter == null)
-            return null;
-        if (Filter.mesh == null)
-            return null;
-
-        if(Filter.mesh.colors32 == null)
+        if(CacheColours == null)
         {
-            Filter.mesh.colors32 = new Color32[Filter.mesh.vertexCount];
-            return Filter.mesh.colors32;
-        }
-        else
-        {
-            if(Filter.mesh.colors32.Length != Filter.mesh.vertexCount)
+            if (Filter.mesh.colors32 == null || Filter.mesh.colors32.Length != Filter.mesh.vertexCount)
             {
-                Filter.mesh.colors32 = new Color32[Filter.mesh.vertexCount];
-                return Filter.mesh.colors32;
+                CacheColours = new Color32[Filter.mesh.vertexCount];
+                Filter.mesh.colors32 = CacheColours;
+                return CacheColours;
             }
             else
             {
-                return Filter.mesh.colors32;
+                CacheColours = Filter.mesh.colors32;
+                return CacheColours;
             }
+        }
+        else
+        {
+            if(CacheColours.Length != Filter.mesh.vertexCount)
+            {
+                CacheColours = new Color32[Filter.mesh.vertexCount];
+                Filter.mesh.colors32 = CacheColours;
+                return CacheColours;
+
+            }
+            return CacheColours;
         }
     }
 
@@ -52,8 +57,11 @@ public class LightMeshInteraction : MonoBehaviour
         int index = x + (y * (Gen.Width + 1));
 
         colours[index] = colour;
+    }
 
-        Filter.mesh.colors32 = colours;
+    public void Apply()
+    {
+        Filter.mesh.colors32 = CacheColours;
     }
 
     public void SetEdgeColours(int x, int y, int x2, int y2, Color32 a, Color32 b)
@@ -132,13 +140,13 @@ public class LightMeshInteraction : MonoBehaviour
         if (x < 0 || y < 0)
         {
             LogOutOfBounds(x, y);
-            return BLANK_COLOUR;
+            return BLACK;
         }
 
         if (x > Gen.Width || y > Gen.Height)
         {
             LogOutOfBounds(x, y);
-            return BLANK_COLOUR;
+            return BLACK;
         }
 
         var colours = GetColours();

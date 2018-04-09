@@ -368,6 +368,16 @@ public class TileLayer : NetworkBehaviour
         // Confirm to the pending placement system...
         PendingBuildingManager.Instance.ConfirmPlaced(PendingBuildingManager.MakeID(data.X, data.Y));
 
+        // Tell the chunk that it has a tile changed...
+        int index = GetChunkIndexFromTileCoords(data.X, data.Y);
+        Chunk chunk = GetChunkFromIndex(index);
+
+        BaseTile tile = data.Prefab == null ? null : BaseTile.GetTile(data.Prefab);
+        if(chunk != null)
+        {
+            chunk.TileChanged(tile, data.X, data.Y);
+        }
+
         // If we are a host, just stop. Tile has already been set.
         if (isServer)
         {
@@ -386,8 +396,6 @@ public class TileLayer : NetworkBehaviour
         {
             // Place tile in position.
             BaseTile oldTile = Tiles[data.X][data.Y];
-
-            BaseTile tile = data.Prefab == null ? null : BaseTile.GetTile(data.Prefab);
 
             Chunk c = GetChunkFromIndex(GetChunkIndexFromTileCoords(data.X, data.Y));
 

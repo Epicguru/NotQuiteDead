@@ -13,10 +13,15 @@ public class Chunk : MonoBehaviour
 
     public int Index { get; private set; }
 
+    [Header("Chunk & Texture")]
     public MeshTexture Texture;
     public MeshGen Mesh;
     public ChunkPhysics Physics;
     public ChunkBackground Background;
+
+    [Header("Lighting")]
+    public LightMesh LightMesh;
+
     public TileLayer Layer;
 
     public bool Loaded { get; private set; }
@@ -54,14 +59,19 @@ public class Chunk : MonoBehaviour
     public void Init()
     {
         // Gen mesh, then build a texture, then finally init the physics class.
-        Mesh.GenMesh();
+        //Mesh.GenMesh();
         Texture.BuildTexture();
         Physics.BuildMap();
 
         gameObject.name = "Chunk (" + X + ", " + Y + ")";
 
         // Set position
-        transform.localPosition = new Vector3(X * Width * Mesh.TileSize, Y * Height * Mesh.TileSize, 0);        
+        transform.localPosition = new Vector3(X * Width * Mesh.TileSize, Y * Height * Mesh.TileSize, 0);
+
+        // Light mesh init.
+        LightMesh.Chunk.ChunkX = X;
+        LightMesh.Chunk.ChunkY = Y;
+        LightMesh.UpdateLighting();
     }
 
     public void DoneLoading()
@@ -74,6 +84,12 @@ public class Chunk : MonoBehaviour
 
         // Assign the texture to the background.
         Background.DoneLoading();
+    }
+
+    public void TileChanged(BaseTile tile, int x, int y)
+    {
+        // Update lighting...
+        LightMesh.UpdateLighting();
     }
 
     public void LateUpdate()

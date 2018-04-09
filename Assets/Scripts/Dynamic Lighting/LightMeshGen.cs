@@ -4,6 +4,8 @@ public class LightMeshGen : MonoBehaviour
 {
     public MeshFilter Filter;
 
+    public bool Enabled = false;
+
     public int Width;
     public int Height;
     public float Size = 1;
@@ -12,6 +14,9 @@ public class LightMeshGen : MonoBehaviour
 
     public void GenMesh()
     {
+        if (!Enabled)
+            return;
+
         int numTiles = Width * Height;
         int numTris = numTiles * 2;
 

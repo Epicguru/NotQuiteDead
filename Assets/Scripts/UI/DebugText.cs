@@ -12,7 +12,7 @@ public class DebugText : MonoBehaviour {
 
     public bool Active;
 
-    public string str;
+    public StringBuilder Str;
 
     public Text Text;
 
@@ -29,6 +29,7 @@ public class DebugText : MonoBehaviour {
     }
     private int fps;
 
+    private int MeshLightingUpdates;
     private int frames;
     private float timer;
 
@@ -49,14 +50,16 @@ public class DebugText : MonoBehaviour {
     {
         if (!_Instance.Active)
             return;
-        _Instance.str += text + '\n';
+        _Instance.Str.Append(text);
+        _Instance.Str.Append('\n');
     }
 
     public static void Log(string text, Color colour)
     {
         if (!_Instance.Active)
             return;
-        _Instance.str += RichText.InColour(text, colour) + '\n';
+        _Instance.Str.Append(RichText.InColour(text, colour));
+        _Instance.Str.Append('\n');
     }
 
     public void Update()
@@ -81,6 +84,8 @@ public class DebugText : MonoBehaviour {
             }
 
             FPS = frames;
+            MeshLightingUpdates = LightMesh.UpdateCount;
+            LightMesh.UpdateCount = 0;
             frames = 0;
         }
     }
@@ -90,8 +95,9 @@ public class DebugText : MonoBehaviour {
         if (!Active)
             return;
 
-        str = (RichText.InBold(RichText.InColour("FPS: " + FPS, FPS > 55 ? Color.green : FPS > 30 ? Color.yellow : Color.red)) + "\n") + str;
-        Text.text = str;
-        str = "";
+        Str.Insert(0, RichText.InBold(RichText.InColour("FPS: " + FPS, FPS > 55 ? Color.green : FPS > 30 ? Color.yellow : Color.red)) + '\n');
+        Str.Append(RichText.InBold("Light mesh updates in second: " + MeshLightingUpdates) + '\n');
+        Text.text = Str.ToString();
+        Str.Clear();
     }
 }

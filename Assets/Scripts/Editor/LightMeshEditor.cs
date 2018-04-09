@@ -14,19 +14,14 @@ public class LightMeshEditor : Editor
             lm.Gen.GenMesh();
         }
 
-        if (GUILayout.Button("Run Colour Set"))
+        if (GUILayout.Button("Apply Ambient Light"))
         {
-            lm.RunColourSet();
+            lm.Chunk.ApplyAmbientLight();
         }
 
-        if (GUILayout.Button("Run Edge Set"))
+        if (GUILayout.Button("Apply Pending"))
         {
-            lm.RunEdgeSet();
-        }
-
-        if (GUILayout.Button("Run Chunk Test"))
-        {
-            lm.Chunk.LightEmUp();
+            lm.Interaction.Apply();
         }
     }
 }

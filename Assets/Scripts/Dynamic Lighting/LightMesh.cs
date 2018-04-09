@@ -2,35 +2,40 @@
 
 public class LightMesh : MonoBehaviour
 {
+    public static int UpdateCount;
+
     public LightMeshGen Gen;
     public LightMeshInteraction Interaction;
     public LightMeshChunk Chunk;
 
-    [Header("Vertex Colour Set")]
-    public int Range;
-    public Color32 ColourA;
-    public Color32 ColourB;
-    public int X, Y;
+    [ReadOnly]
+    public bool Dirty;
 
-    public void RunColourSet()
+    public void Start()
     {
-        Vector2 origin = new Vector2(X, Y);
+        // No need to generate mesh every time, it is saved as a prefab.
+        // Will not generate normally, see inside.
+        Gen.GenMesh();
+    }
 
-        for (int x = -Range; x <= Range; x++)
+    public void UpdateLighting()
+    {
+        Dirty = true;
+    }
+
+    public void LateUpdate()
+    {
+        // Update lighting if dirty...
+        if (Dirty)
         {
-            for (int y = -Range; y <= Range; y++)
-            {
-                float dst = Vector2.Distance(origin, new Vector2(X + x, Y + y));
-                float p = dst / Range;
-                float strength = 1f - p;
-
-                Interaction.SetColour(X + x, Y + y, Color32.Lerp(Interaction.GetColour(X + x, Y + y), ColourA, strength));
-            }
+            Dirty = false;
+            UpdateAndApplyLighting();
         }
     }
 
-    public void RunEdgeSet()
+    private void UpdateAndApplyLighting()
     {
-        Interaction.SetEdgeColours(0, 0, 0, Gen.Height, ColourA, ColourB);
+        Chunk.ApplyAmbientLight();
+        UpdateCount++;
     }
 }

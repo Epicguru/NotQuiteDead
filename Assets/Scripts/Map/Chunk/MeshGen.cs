@@ -13,7 +13,7 @@ public class MeshGen : MonoBehaviour
 
     public void Start()
     {
-        GenMesh();
+        //GenMesh();
     }
 
     public void GenMesh()
