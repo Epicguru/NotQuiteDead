@@ -12,7 +12,7 @@ public class DebugText : MonoBehaviour {
 
     public bool Active;
 
-    public StringBuilder Str;
+    public StringBuilder Str = new StringBuilder();
 
     public Text Text;
 

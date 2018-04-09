@@ -108,6 +108,7 @@ public class GunAnimation : NetworkBehaviour
             }
             dir *= gun.Shooting.GunBlockedDistance;
 
+            // TODO raycast non alloc!
             RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, dir, dst);
 
             foreach (RaycastHit2D hit in hits)
