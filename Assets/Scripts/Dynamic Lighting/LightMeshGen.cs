@@ -8,6 +8,8 @@ public class LightMeshGen : MonoBehaviour
     public int Height;
     public float Size = 1;
 
+    public Vector3[] Vertices;
+
     public void GenMesh()
     {
         int numTiles = Width * Height;
@@ -57,6 +59,8 @@ public class LightMeshGen : MonoBehaviour
         mesh.triangles = triangles;
         mesh.normals = normals;
         mesh.uv = uv;
+
+        this.Vertices = vertices;
 
         Filter.mesh = mesh;
     }
