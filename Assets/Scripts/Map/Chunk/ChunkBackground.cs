@@ -53,12 +53,12 @@ public class ChunkBackground : MonoBehaviour
     public void UpdateBGAndSurroundings()
     {
         // Updates the current background drawing and state, and also tells all surrounding chunks to regenerate their own backgrounds.
-        Regenerate();
+        ChunkRegenerator.Instance.Regenerate(this);
         foreach (var item in GetSurroundings())
         {
             if(item != null)
             {
-                item.Regenerate();
+                ChunkRegenerator.Instance.Regenerate(item);
             }
         }
     }
