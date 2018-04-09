@@ -75,5 +75,8 @@ public class ChunkPool : MonoBehaviour
         Pooled++;
 
         Pool.Add(c);
+
+        c.gameObject.SetActive(false);
+        c.transform.SetParent(this.transform);
     }
 }

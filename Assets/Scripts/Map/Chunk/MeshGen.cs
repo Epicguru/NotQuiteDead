@@ -11,11 +11,6 @@ public class MeshGen : MonoBehaviour
 
     public Chunk Chunk;
 
-    public void Start()
-    {
-        //GenMesh();
-    }
-
     public void GenMesh()
     {
         int numTiles = Chunk.Width * Chunk.Height;
