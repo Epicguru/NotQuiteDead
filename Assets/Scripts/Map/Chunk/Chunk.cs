@@ -71,7 +71,6 @@ public class Chunk : MonoBehaviour
         // Light mesh init.
         LightMesh.Chunk.ChunkX = X;
         LightMesh.Chunk.ChunkY = Y;
-        LightMesh.UpdateLighting();
     }
 
     public void DoneLoading()
@@ -84,9 +83,56 @@ public class Chunk : MonoBehaviour
 
         // Assign the texture to the background.
         Background.DoneLoading();
+
+        // Update lighting...
+        LightMesh.UpdateLighting();
     }
 
     public void TileChanged(BaseTile tile, int x, int y)
+    {
+        // Update lighting...
+        UpdateLight();
+
+        int localX = x - (X * Width);
+        int localY = y - (Y * Height);
+
+        // TODO when a chunk is loaded in, the chunks around it also need lighting updated.
+
+        if(localX == 0)
+        {
+            // On left edge, update any chunk to the left too.
+            if(Layer.IsChunkLoaded(X - 1, Y))
+            {
+                Layer.GetChunkFromChunkCoords(X - 1, Y).UpdateLight();
+            }
+        }
+        if(localY == 0)
+        {
+            // On bottom edge, update any chunk below here too.
+            if (Layer.IsChunkLoaded(X, Y - 1))
+            {
+                Layer.GetChunkFromChunkCoords(X, Y - 1).UpdateLight();
+            }
+        }
+        if(localX == Width - 1)
+        {
+            // On right edge, update any chunk to the right too.
+            if (Layer.IsChunkLoaded(X + 1, Y))
+            {
+                Layer.GetChunkFromChunkCoords(X + 1, Y).UpdateLight();
+            }
+        }
+        if(localY == Height - 1)
+        {
+            // On top edge, update any chunk above too.
+            if (Layer.IsChunkLoaded(X, Y + 1))
+            {
+                Layer.GetChunkFromChunkCoords(X, Y + 1).UpdateLight();
+            }
+        }
+    }
+
+    public void UpdateLight()
     {
         // Update lighting...
         LightMesh.UpdateLighting();
