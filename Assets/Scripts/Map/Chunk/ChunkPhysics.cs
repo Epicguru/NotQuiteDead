@@ -66,9 +66,9 @@ public class ChunkPhysics : MonoBehaviour {
                 BaseTile tile = layer.GetTile(X, Y);
                 if(tile != null)
                 {
-                    if (tile.Physics != null)
+                    if (tile.HasCollider)
                     {
-                        AssignCollider(tile.Physics, x, y);
+                        AssignCollider(x, y);
                     }
                 }
             }
@@ -83,7 +83,7 @@ public class ChunkPhysics : MonoBehaviour {
         AssignAll();
     }
 
-    public void AssignCollider(Collider2D prefab, int x, int y)
+    public void AssignCollider(int x, int y)
     {
         if (!Enabled)
             return;
@@ -102,25 +102,13 @@ public class ChunkPhysics : MonoBehaviour {
 
         Dirty = true;
 
-        if(prefab == null)
-        {
-            Colliders[x][y] = null;
-            return;
-        }
-
-        GameObject instance = Instantiate(prefab.gameObject, transform);
+        var instance = ObjectPool.Instantiate(Spawnables.I.TileCollider, PoolType.TILE_COLLIDER, transform);
         Collider2D colliderInstance = instance.GetComponent<Collider2D>();
 
         instance.transform.localPosition = new Vector3((x * Chunk.Mesh.TileSize) + (Chunk.Mesh.TileSize * 0.5f), (y * Chunk.Mesh.TileSize) + (Chunk.Mesh.TileSize * 0.5f), 0);
 
         instance.name = instance.name.Replace("(Clone)", "");
         instance.name = instance.name + " (" + x + "," + y + ")";
-
-        if(colliderInstance == null)
-        {
-            Debug.LogError("There is not a collider2D on the prefab supplied! (On the instance created from it).");
-            return;
-        }
 
         Colliders[x][y] = colliderInstance;
 
@@ -138,7 +126,7 @@ public class ChunkPhysics : MonoBehaviour {
         Collider2D c = Colliders[x][y];
         Colliders[x][y] = null;
 
-        Destroy(c.gameObject);
+        ObjectPool.Destroy(c.gameObject, PoolType.TILE_COLLIDER);
 
         Dirty = true;
     }

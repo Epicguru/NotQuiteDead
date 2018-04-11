@@ -13,5 +13,6 @@ public enum PoolType
     ARROW,
     HIT_EFFECT,
     DAMAGE_NUMBER,
-    SUBSONIC_BULLET
+    SUBSONIC_BULLET,
+    TILE_COLLIDER
 }

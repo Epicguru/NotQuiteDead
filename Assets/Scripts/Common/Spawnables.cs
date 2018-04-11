@@ -12,6 +12,7 @@ public class Spawnables : MonoBehaviour
     public GameObject DamageNumber;
     public GameObject SubsonicBullet;
     public GameObject HitEffect;
+    public GameObject TileCollider;
 
     public void Awake()
     {

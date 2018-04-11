@@ -461,9 +461,9 @@ public class TileLayer : NetworkBehaviour
         int localY = y - (ChunkSize * chunk.Y);
 
         // Set physics if the tile is not null.
-        if (newTile != null && newTile.Physics)
+        if (newTile != null && newTile.HasCollider)
         {
-            chunk.Physics.AssignCollider(newTile.Physics, localX, localY);
+            chunk.Physics.AssignCollider(localX, localY);
         }
 
         // Works if it is null or not.

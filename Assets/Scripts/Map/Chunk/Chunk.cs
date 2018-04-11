@@ -28,6 +28,9 @@ public class Chunk : MonoBehaviour
 
     public void Create(int x, int y, int width, int height, int index, TileLayer layer)
     {
+        // Deactivate until loaded...
+        gameObject.SetActive(false);
+
         // Add one to instance count, debugging only.
         InstanceCount++;
 
@@ -89,6 +92,9 @@ public class Chunk : MonoBehaviour
 
         // Update surrounding chunk lighting...
         UpdateLightingOfSurroundings();
+
+        // Reactivate now that it is loaded...
+        gameObject.SetActive(true);
     }
 
     private void UpdateLightingOfSurroundings()

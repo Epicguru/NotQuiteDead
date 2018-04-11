@@ -23,8 +23,8 @@ public class BaseTile : ScriptableObject
     [Tooltip("Can this tile be walked though.")]
     public bool Walkable = false;
 
-    [Tooltip("A reference to the physics body.")]
-    public Collider2D Physics;
+    [Tooltip("Has a physics collider or not: Can be hit by bullets, not walked through, blocks explosions, if true.")]
+    public bool HasCollider = true;
 
     [Tooltip("The icon used in UI.")]
     public Sprite Icon;
