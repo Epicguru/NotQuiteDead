@@ -3,59 +3,45 @@
 public class LightMeshChunk : MonoBehaviour
 {
     public LightMesh LightMesh;
+    public int ChunkWidth = 16;
+    public int ChunkHeight = 16;
     public int ChunkX;
     public int ChunkY;
     public Color32 Colour;
 
     public void ApplyAmbientLight()
     {
-        int chunkSize = LightMesh.Gen.Width;
+        int width = ChunkWidth;
+        int height = ChunkHeight;
         TileLayer layer = World.Instance.TileMap.GetLayer("Foreground");
 
-        // Pass one: Fully obscure all solid tiles.
-        for (int x = -1; x <= chunkSize; x++)
-        {
-            for (int y = -1; y <= chunkSize; y++)
-            {
-                int X = (chunkSize * ChunkX) + x;
-                int Y = (chunkSize * ChunkY) + y;
+        Color32 dark = LightMeshInteraction.BLACK;
 
-                BaseTile tile = layer.GetTile(X, Y);
+        // First, fill the chunk with the ambient light colour...
+        LightMesh.Interaction.Fill(Colour);
+
+        // Now do a world interaction pass: darken tiles that are solid.
+        for (int x = -1; x <= width; x++)
+        {
+            for (int y = -1; y <= height; y++)
+            {
+                int tileX = (width * ChunkX) + x;
+                int tileY = (height * ChunkY) + y;
+
+                BaseTile tile = layer.GetTile(tileX, tileY);
 
                 // If it is solid...
                 if (tile != null)
                 {
-                    // Set whole tile to darkness.
-                    LightMesh.Interaction.SetColour(x, y, LightMeshInteraction.BLACK);
-                    LightMesh.Interaction.SetColour(x + 1, y, LightMeshInteraction.BLACK);
-                    LightMesh.Interaction.SetColour(x, y + 1, LightMeshInteraction.BLACK);
-                    LightMesh.Interaction.SetColour(x + 1, y + 1, LightMeshInteraction.BLACK);
+                    // Calc vert x and y
+                    int vertX = x * 2 + 1;
+                    int vertY = y * 2 + 1;
+
+                    // Set tile to darkness...
+                    LightMesh.Interaction.SetColour(vertX, vertY, dark);                    
                 }
             }
-        }
-
-        // Pass two: light up all non-solid tiles, which will overwrite the darkness on the edges of all tiles that are exposed to air, since they
-        // share vertices.
-        for (int x = -1; x <= chunkSize; x++)
-        {
-            for (int y = -1; y <= chunkSize; y++)
-            {
-                int X = (chunkSize * ChunkX) + x;
-                int Y = (chunkSize * ChunkY) + y;
-
-                BaseTile tile = layer.GetTile(X, Y);
-
-                // If it is NOT solid...
-                if(tile == null)
-                {
-                    // Set to light!
-                    LightMesh.Interaction.SetColour(x, y, Colour);
-                    LightMesh.Interaction.SetColour(x + 1, y, Colour);
-                    LightMesh.Interaction.SetColour(x, y + 1, Colour);
-                    LightMesh.Interaction.SetColour(x + 1, y + 1, Colour);
-                }
-            }
-        }
+        }        
 
         // Apply to the mesh.
         LightMesh.Interaction.Apply();

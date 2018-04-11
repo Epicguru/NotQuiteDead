@@ -54,9 +54,25 @@ public class LightMeshInteraction : MonoBehaviour
         }
 
         var colours = GetColours();
-        int index = x + (y * (Gen.Width + 1));
+        SetColourInternal(colours, x, y, colour);
+    }
 
-        colours[index] = colour;
+    private void SetColourInternal(Color32[] colours, int x, int y, Color32 c)
+    {
+        int index = x + (y * (Gen.Width + 1));
+        colours[index] = c;
+    }
+
+    public void Fill(Color32 colour)
+    {
+        var colours = GetColours();
+        for (int x = 0; x <= Gen.Width; x++)
+        {
+            for (int y = 0; y <= Gen.Height; y++)
+            {
+                SetColourInternal(colours, x, y, colour);
+            }
+        }
     }
 
     public void Apply()
@@ -130,6 +146,75 @@ public class LightMeshInteraction : MonoBehaviour
             {
                 float p = (float)Y / y2;
                 SetColour(x, Y, Color32.Lerp(a, b, p));
+            }
+            return;
+        }
+    }
+
+    public void SetEdgeColour(int x, int y, int x2, int y2, Color32 a)
+    {
+        // Each tile is 4 vertices
+        if (x < 0 || y < 0)
+        {
+            LogOutOfBounds(x, y);
+            return;
+        }
+
+        if (x > Gen.Width || y > Gen.Height)
+        {
+            LogOutOfBounds(x, y);
+            return;
+        }
+
+        if (x2 < 0 || y2 < 0)
+        {
+            LogOutOfBounds(x, y);
+            return;
+        }
+
+        if (x2 > Gen.Width || y2 > Gen.Height)
+        {
+            return;
+        }
+
+        bool hor = false;
+        bool vert = false;
+        if (x != x2)
+        {
+            // Is a horizontal edge...
+            hor = true;
+        }
+        if (y != y2)
+        {
+            // Is a vertical edge
+            vert = true;
+        }
+
+        if (!hor && !vert)
+        {
+            Debug.LogWarning("Tried to colour an edge but provided a point: ({0}, {1})".Form(x, y));
+            return;
+        }
+        if (hor && vert)
+        {
+            Debug.LogWarning("Tried to colour an edge put provided a line. Edge must be vertical or horizontal only. (From {0}, {1} to {2}, {3}".Form(x, y, x2, y2));
+            return;
+        }
+
+        if (hor)
+        {
+            for (int X = x; X <= x2; X++)
+            {
+                SetColour(X, y, a);
+            }
+            return;
+        }
+
+        if (vert)
+        {
+            for (int Y = y; Y <= y2; Y++)
+            {
+                SetColour(x, Y, a);
             }
             return;
         }
