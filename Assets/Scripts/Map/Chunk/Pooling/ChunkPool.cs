@@ -46,8 +46,6 @@ public class ChunkPool : MonoBehaviour
     {
         if(Pool.Count > 0)
         {
-            Pooled--;
-            OnLease++;
             var chunk = Pool[0];
             Pool.RemoveAt(0);
 
@@ -55,11 +53,17 @@ public class ChunkPool : MonoBehaviour
             chunk.transform.SetParent(parent);
             chunk.transform.position = position;
 
+            OnLease++;
+            Pooled--;
+
             return chunk;
         }
         else
         {
             var chunk = SpawnNewChunk();
+            chunk.transform.position = position;
+            chunk.transform.SetParent(parent);
+
             OnLease++;
 
             return chunk;
