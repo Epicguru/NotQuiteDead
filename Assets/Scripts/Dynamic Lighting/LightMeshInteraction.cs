@@ -39,7 +39,7 @@ public class LightMeshInteraction : MonoBehaviour
         }
     }
 
-    public void SetColour(int x, int y, Color32 colour)
+    public void SetColour(int x, int y, Color32 colour, Color32[] colours = null)
     {
         if (x < 0 || y < 0)
         {
@@ -53,7 +53,8 @@ public class LightMeshInteraction : MonoBehaviour
             return;
         }
 
-        var colours = GetColours();
+        if(colours == null)
+            colours = GetColours();
         SetColourInternal(colours, x, y, colour);
     }
 
@@ -71,6 +72,23 @@ public class LightMeshInteraction : MonoBehaviour
             for (int y = 0; y <= Gen.Height; y++)
             {
                 SetColourInternal(colours, x, y, colour);
+            }
+        }
+    }
+
+    public void SetBox(int x, int y, int x2, int y2, Color32 c)
+    {
+        if (x2 < x)
+            return;
+        if (y2 < y)
+            return;
+
+        var colours = GetColours();
+        for (int X = x; X <= x2; X++)
+        {
+            for (int Y = y; Y <= y2; Y++)
+            {
+                SetColour(X, Y, c, colours);
             }
         }
     }

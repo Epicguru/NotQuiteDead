@@ -7,6 +7,7 @@ public class LightMeshChunk : MonoBehaviour
     public int ChunkHeight = 16;
     public int ChunkX;
     public int ChunkY;
+    public int VERTS_PER_TILE;
     public Color32 Colour;
 
     public void ApplyAmbientLight()
@@ -29,19 +30,52 @@ public class LightMeshChunk : MonoBehaviour
                 int tileY = (height * ChunkY) + y;
 
                 BaseTile tile = layer.GetTile(tileX, tileY);
+                BaseTile r = layer.GetTile(tileX + 1, tileY);
+                BaseTile l = layer.GetTile(tileX - 1, tileY);
+                BaseTile u = layer.GetTile(tileX, tileY + 1);
+                BaseTile d = layer.GetTile(tileX, tileY - 1);
+                int solid = 0;
+                if (r != null) solid++;
+                if (l != null) solid++;
+                if (u != null) solid++;
+                if (d != null) solid++;
 
-                // If it is solid...
+                if (solid < 3)
+                    continue;
+
+                // If is 'solid'
                 if (tile != null)
                 {
                     // Calc vert x and y
-                    int vertX = x * 2 + 1;
-                    int vertY = y * 2 + 1;
-
+                    int vertX = x * VERTS_PER_TILE;
+                    int vertY = y * VERTS_PER_TILE;
                     // Set tile to darkness...
-                    LightMesh.Interaction.SetColour(vertX, vertY, dark);                    
+                    LightMesh.Interaction.SetBox(vertX, vertY, vertX + VERTS_PER_TILE, vertY + VERTS_PER_TILE, dark);                  
                 }
             }
-        }        
+        }
+
+        // Apply ambient light to all non-solid tiles.
+        for (int x = -1; x <= width; x++)
+        {
+            for (int y = -1; y <= height; y++)
+            {
+                int tileX = (width * ChunkX) + x;
+                int tileY = (height * ChunkY) + y;
+
+                BaseTile tile = layer.GetTile(tileX, tileY);
+
+                // If is 'air'
+                if (tile == null)
+                {
+                    // Calc vert x and y
+                    int vertX = x * VERTS_PER_TILE;
+                    int vertY = y * VERTS_PER_TILE;
+                    // Set tile to darkness...
+                    LightMesh.Interaction.SetBox(vertX, vertY, vertX + VERTS_PER_TILE, vertY + VERTS_PER_TILE, Colour);
+                }
+            }
+        }
 
         // Apply to the mesh.
         LightMesh.Interaction.Apply();
