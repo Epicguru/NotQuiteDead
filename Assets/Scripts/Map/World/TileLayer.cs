@@ -418,6 +418,9 @@ public class TileLayer : NetworkBehaviour
 
         // Intended for use when loading chunks, and nothing else.
         // Not networked at all.
+        int cX = x / ChunkSize;
+        int cY = y / ChunkSize;
+        Chunk c = GetChunkFromChunkCoords(cX, cY);
 
         for (int X = x; X < x + tiles.Length; X++)
         {
@@ -425,14 +428,12 @@ public class TileLayer : NetworkBehaviour
 
             for (int Y = y; Y < y + yArray.Length; Y++)
             {
-                if(CanPlaceTile(X, Y))
+                if (CanPlaceTile(X, Y))
                 {
                     BaseTile tile = yArray[Y - y];
 
                     // For now, just place tile in position.
                     BaseTile oldTile = Tiles[X][Y];
-
-                    Chunk c = GetChunkFromIndex(GetChunkIndexFromTileCoords(X, Y));
 
                     if (oldTile != null)
                     {
@@ -443,13 +444,82 @@ public class TileLayer : NetworkBehaviour
                     Tiles[X][Y] = tile;
 
                     // Update tiles sourrounding and update physics bodies.
-                    TilePlaced(X, Y, tile, c);
+                    TilePlaced(X, Y, tile, c, false, false);
+                }
+            }
+        }
+
+        // Set textures...
+        for (int X = x; X < x + tiles.Length; X++)
+        {
+            BaseTile[] yArray = tiles[X - x];
+            for (int Y = y; Y < y + yArray.Length; Y++)
+            {
+                BaseTile tile = yArray[Y - y];
+                c.Texture.SetTile(tile, this, X, Y, X - (ChunkSize * c.X), Y - (ChunkSize * c.Y));
+            }
+        }
+
+        // Update textures of surrounding chunks.
+
+        // Left
+        if(IsChunkInBounds(cX - 1, cY))
+        {
+            int X = x - 1;
+            c = GetChunkFromChunkCoords(cX - 1, cY);
+            if(c != null)
+            {
+                for (int Y = y; Y < y + ChunkSize; Y++)
+                {
+                    c.Texture.SetTile(Unsafe_GetTile(X, Y), this, X, Y, X - (ChunkSize * c.X), Y - (ChunkSize * c.Y));
+                }
+            }
+        }
+
+        // Right
+        if (IsChunkInBounds(cX + 1, cY))
+        {
+            int X = x + ChunkSize;
+            c = GetChunkFromChunkCoords(cX + 1, cY);
+            if (c != null)
+            {
+                for (int Y = y; Y < y + ChunkSize; Y++)
+                {
+                    c.Texture.SetTile(Unsafe_GetTile(X, Y), this, X, Y, X - (ChunkSize * c.X), Y - (ChunkSize * c.Y));
+                }
+            }
+        }
+
+        // Bottom
+        if (IsChunkInBounds(cX, cY - 1))
+        {
+            int Y = y - 1;
+            c = GetChunkFromChunkCoords(cX, cY - 1);
+            if (c != null)
+            {
+                for (int X = x; X < x + ChunkSize; X++)
+                {
+                    c.Texture.SetTile(Unsafe_GetTile(X, Y), this, X, Y, X - (ChunkSize * c.X), Y - (ChunkSize * c.Y));
+                }
+            }
+        }
+
+        // Top
+        if (IsChunkInBounds(cX, cY + 1))
+        {
+            int Y = y + ChunkSize;
+            c = GetChunkFromChunkCoords(cX, cY + 1);
+            if (c != null)
+            {
+                for (int X = x; X < x + ChunkSize; X++)
+                {
+                    c.Texture.SetTile(Unsafe_GetTile(X, Y), this, X, Y, X - (ChunkSize * c.X), Y - (ChunkSize * c.Y));
                 }
             }
         }
     }
 
-    private void TilePlaced(int x, int y, BaseTile newTile, Chunk chunk)
+    private void TilePlaced(int x, int y, BaseTile newTile, Chunk chunk, bool texture = true, bool surroundingTextures = true)
     {
         if (chunk == null)
         {
@@ -469,7 +539,10 @@ public class TileLayer : NetworkBehaviour
         // Works if it is null or not.
         chunk.Texture.SetTile(newTile, this, x, y, localX, localY);
 
-        UpdateSurroundingTextures(x, y);
+        if (surroundingTextures)
+        {
+            UpdateSurroundingTextures(x, y);
+        }
     }
 
     private void UpdateSurroundingTextures(int x, int y)

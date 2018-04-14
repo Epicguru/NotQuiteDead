@@ -13,8 +13,7 @@ public class LightMesh : MonoBehaviour
 
     public void Start()
     {
-        // No need to generate mesh every time, it is saved as a prefab.
-        // Will not generate normally, see inside.
+        // No need to generate mesh every time, it is pooled.
         Gen.GenMesh();
     }
 

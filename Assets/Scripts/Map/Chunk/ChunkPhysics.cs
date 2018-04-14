@@ -16,7 +16,7 @@ public class ChunkPhysics : MonoBehaviour {
 
     public void LateUpdate()
     {
-        if (Dirty)
+        if (Dirty && Enabled)
         {
             framesDirty++;
             if(framesDirty == 2)
@@ -87,7 +87,6 @@ public class ChunkPhysics : MonoBehaviour {
     {
         if (!Enabled)
             return;
-
 
         if(!Chunk.InBounds(x, y))
         {

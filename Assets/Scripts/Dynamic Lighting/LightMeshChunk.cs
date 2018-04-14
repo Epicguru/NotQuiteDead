@@ -29,19 +29,7 @@ public class LightMeshChunk : MonoBehaviour
                 int tileX = (width * ChunkX) + x;
                 int tileY = (height * ChunkY) + y;
 
-                BaseTile tile = layer.GetTile(tileX, tileY);
-                BaseTile r = layer.GetTile(tileX + 1, tileY);
-                BaseTile l = layer.GetTile(tileX - 1, tileY);
-                BaseTile u = layer.GetTile(tileX, tileY + 1);
-                BaseTile d = layer.GetTile(tileX, tileY - 1);
-                int solid = 0;
-                if (r != null) solid++;
-                if (l != null) solid++;
-                if (u != null) solid++;
-                if (d != null) solid++;
-
-                if (solid < 3)
-                    continue;
+                BaseTile tile = layer.Unsafe_GetTile(tileX, tileY);
 
                 // If is 'solid'
                 if (tile != null)
@@ -63,7 +51,7 @@ public class LightMeshChunk : MonoBehaviour
                 int tileX = (width * ChunkX) + x;
                 int tileY = (height * ChunkY) + y;
 
-                BaseTile tile = layer.GetTile(tileX, tileY);
+                BaseTile tile = layer.Unsafe_GetTile(tileX, tileY);
 
                 // If is 'air'
                 if (tile == null)
@@ -73,6 +61,62 @@ public class LightMeshChunk : MonoBehaviour
                     int vertY = y * VERTS_PER_TILE;
                     // Set tile to darkness...
                     LightMesh.Interaction.SetBox(vertX, vertY, vertX + VERTS_PER_TILE, vertY + VERTS_PER_TILE, Colour);
+                }
+            }
+        }
+
+        // Remove darkness from tiles that have their corners lit. Looks much better.
+        for (int x = -1; x <= width; x++)
+        {
+            for (int y = -1; y <= height; y++)
+            {
+                int tileX = (width * ChunkX) + x;
+                int tileY = (height * ChunkY) + y;
+
+                BaseTile tile = layer.Unsafe_GetTile(tileX, tileY);
+
+                // If is 'solid'
+                if (tile != null)
+                {
+                    // Calc bottom left vert x and y
+                    int vertX = x * VERTS_PER_TILE;
+                    int vertY = y * VERTS_PER_TILE;
+
+                    int lit = 0;
+
+                    // Bottom left
+                    if(LightMesh.Interaction.GetColour(vertX, vertY).IsEqual(Colour))
+                    {
+                        // It is lit!
+                        lit++;
+                    }
+
+                    // Bottom right
+                    if (LightMesh.Interaction.GetColour(vertX + VERTS_PER_TILE, vertY).IsEqual(Colour))
+                    {
+                        // It is lit!
+                        lit++;
+                    }
+
+                    // Top left
+                    if (LightMesh.Interaction.GetColour(vertX, vertY + VERTS_PER_TILE).IsEqual(Colour))
+                    {
+                        // It is lit!
+                        lit++;
+                    }
+
+                    // Top right
+                    if (LightMesh.Interaction.GetColour(vertX + VERTS_PER_TILE, vertY + VERTS_PER_TILE).IsEqual(Colour))
+                    {
+                        // It is lit!
+                        lit++;
+                    }
+
+                    if(lit >= 4)
+                    {
+                        // Set the tile to light...
+                        LightMesh.Interaction.SetBox(vertX, vertY, vertX + VERTS_PER_TILE, vertY + VERTS_PER_TILE, Colour);
+                    }
                 }
             }
         }

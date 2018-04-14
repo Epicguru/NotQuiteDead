@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ActiveObjectManager : MonoBehaviour
@@ -59,13 +60,12 @@ public class ActiveObjectManager : MonoBehaviour
     public void UpdateAndRemoveChunks()
     {
         bin.Clear();
-        List<int> keys = new List<int>(RequestedChunks.Keys);
 
         float dt = Time.unscaledDeltaTime;
         if (dt > 1f)
             dt = 1f;
 
-        foreach (int key in keys)
+        foreach (int key in RequestedChunks.Keys.ToArray())
         {
             RequestedChunks[key] += dt;
             if(RequestedChunks[key] >= UnloadTime)
