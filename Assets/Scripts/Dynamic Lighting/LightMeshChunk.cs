@@ -8,7 +8,13 @@ public class LightMeshChunk : MonoBehaviour
     public int ChunkX;
     public int ChunkY;
     public int VERTS_PER_TILE;
-    public Color32 Colour;
+    public Color32 LightColour;
+    public MeshRenderer Renderer;
+
+    public void Update()
+    {
+        Renderer.material.SetColor("_AmbientColour", AmbientLight.Instance.GetCurrentColour());
+    }
 
     public void ApplyAmbientLight()
     {
@@ -16,10 +22,10 @@ public class LightMeshChunk : MonoBehaviour
         int height = ChunkHeight;
         TileLayer layer = World.Instance.TileMap.GetLayer("Foreground");
 
-        Color32 dark = LightMeshInteraction.BLACK;
+        Color32 dark = LightMesh.Interaction.Shadow;
 
         // First, fill the chunk with the ambient light colour...
-        LightMesh.Interaction.Fill(Colour);
+        LightMesh.Interaction.Fill(LightColour);
 
         // Now do a world interaction pass: darken tiles that are solid.
         for (int x = -1; x <= width; x++)
@@ -60,7 +66,7 @@ public class LightMeshChunk : MonoBehaviour
                     int vertX = x * VERTS_PER_TILE;
                     int vertY = y * VERTS_PER_TILE;
                     // Set tile to darkness...
-                    LightMesh.Interaction.SetBox(vertX, vertY, vertX + VERTS_PER_TILE, vertY + VERTS_PER_TILE, Colour);
+                    LightMesh.Interaction.SetBox(vertX, vertY, vertX + VERTS_PER_TILE, vertY + VERTS_PER_TILE, LightColour);
                 }
             }
         }
@@ -85,28 +91,28 @@ public class LightMeshChunk : MonoBehaviour
                     int lit = 0;
 
                     // Bottom left
-                    if(LightMesh.Interaction.GetColour(vertX, vertY).IsEqual(Colour))
+                    if(LightMesh.Interaction.GetColour(vertX, vertY).IsEqual(LightColour))
                     {
                         // It is lit!
                         lit++;
                     }
 
                     // Bottom right
-                    if (LightMesh.Interaction.GetColour(vertX + VERTS_PER_TILE, vertY).IsEqual(Colour))
+                    if (LightMesh.Interaction.GetColour(vertX + VERTS_PER_TILE, vertY).IsEqual(LightColour))
                     {
                         // It is lit!
                         lit++;
                     }
 
                     // Top left
-                    if (LightMesh.Interaction.GetColour(vertX, vertY + VERTS_PER_TILE).IsEqual(Colour))
+                    if (LightMesh.Interaction.GetColour(vertX, vertY + VERTS_PER_TILE).IsEqual(LightColour))
                     {
                         // It is lit!
                         lit++;
                     }
 
                     // Top right
-                    if (LightMesh.Interaction.GetColour(vertX + VERTS_PER_TILE, vertY + VERTS_PER_TILE).IsEqual(Colour))
+                    if (LightMesh.Interaction.GetColour(vertX + VERTS_PER_TILE, vertY + VERTS_PER_TILE).IsEqual(LightColour))
                     {
                         // It is lit!
                         lit++;
@@ -115,7 +121,7 @@ public class LightMeshChunk : MonoBehaviour
                     if(lit >= 4)
                     {
                         // Set the tile to light...
-                        LightMesh.Interaction.SetBox(vertX, vertY, vertX + VERTS_PER_TILE, vertY + VERTS_PER_TILE, Colour);
+                        LightMesh.Interaction.SetBox(vertX, vertY, vertX + VERTS_PER_TILE, vertY + VERTS_PER_TILE, LightColour);
                     }
                 }
             }

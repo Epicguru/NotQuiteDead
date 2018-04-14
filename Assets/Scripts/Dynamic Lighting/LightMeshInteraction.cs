@@ -6,7 +6,7 @@ public class LightMeshInteraction : MonoBehaviour
     public LightMeshGen Gen;
     public bool SuppressBoundsWarnings;
 
-    public static Color32 BLACK = new Color32(0, 0, 0, 0);
+    public Color32 Shadow = new Color32(0, 0, 0, 0);
 
     private Color32[] CacheColours;
 
@@ -243,13 +243,13 @@ public class LightMeshInteraction : MonoBehaviour
         if (x < 0 || y < 0)
         {
             LogOutOfBounds(x, y);
-            return BLACK;
+            return Shadow;
         }
 
         if (x > Gen.Width || y > Gen.Height)
         {
             LogOutOfBounds(x, y);
-            return BLACK;
+            return Shadow;
         }
 
         var colours = GetColours();

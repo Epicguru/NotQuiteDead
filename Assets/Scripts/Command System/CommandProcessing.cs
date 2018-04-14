@@ -45,6 +45,7 @@ public static class CommandProcessing
         commands.Add(new TeamData());
         commands.Add(new PathfindingCommand());
         commands.Add(new GiveBuildable());
+        commands.Add(new TimeCommand());
     }
 
     // Returns true to clear the console.

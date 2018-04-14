@@ -4,7 +4,6 @@
 	{
 		_MainTex("Scene Texture", 2D) = "white" {}
 		_LightTexture ("Light Texture", 2D) = "white" {}
-		_AmbientLight ("Ambient Light", Color) = (1, 1, 1, 1)
 	}
 	SubShader
 	{
@@ -41,14 +40,12 @@
 			
 			sampler2D _MainTex;
 			sampler2D _LightTexture;
-			half4 _AmbientLight;
 
 			fixed4 frag (v2f i) : SV_Target
 			{
 				fixed4 col = tex2D(_MainTex, i.uv);
-				fixed4 lightCol = tex2D(_LightTexture, i.uv) * _AmbientLight;
-				col.rgb = col.rgb * lightCol.rgb;
-				return col;
+				fixed4 lightCol = tex2D(_LightTexture, i.uv);
+				return col * lightCol;
 			}
 			ENDCG
 		}

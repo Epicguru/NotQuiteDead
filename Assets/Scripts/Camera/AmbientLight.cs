@@ -6,7 +6,7 @@ public class AmbientLight : MonoBehaviour
     public static AmbientLight Instance;
 
     [SerializeField]
-    private LightingShader Light;
+    private Camera Camera;
 
     public Color OverrideColour = Color.clear;
 
@@ -20,19 +20,26 @@ public class AmbientLight : MonoBehaviour
         Instance = null;
     }
 
-    public void LateUpdate()
+    public Color GetCurrentColour()
     {
-        if (Light == null)
-            return;
-
-        if(OverrideColour == Color.clear)
+        if (OverrideColour == Color.clear)
         {
-            if(GameTime.Instance != null)
-                Light.AmbientLight = GameTime.Instance.DayNight.GetAmbientLight();
+            if (GameTime.Instance != null)
+                return GameTime.Instance.DayNight.GetAmbientLight();
+            else
+                return Color.white;
         }
         else
         {
-            Light.AmbientLight = OverrideColour;
+            return OverrideColour;
         }
+    }
+
+    public void LateUpdate()
+    {
+        if (Camera == null)
+            return;
+
+        Camera.backgroundColor = GetCurrentColour();
     }
 }

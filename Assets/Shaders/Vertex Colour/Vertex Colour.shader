@@ -3,11 +3,23 @@
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "white" {}
+		_AmbientColour ("Ambient Light Colour", Color) = (1, 1, 1, 1)
 	}
 	SubShader
 	{
-		// No culling or depth
-		Cull Off ZWrite Off ZTest Always
+		Tags
+		{ 
+			"Queue"="Transparent" 
+			"IgnoreProjector"="True" 
+			"RenderType"="Transparent" 
+			"PreviewType"="Plane"
+			"CanUseSpriteAtlas"="True"
+		}
+
+		Cull Off
+		Lighting Off
+		ZWrite Off
+		Blend One OneMinusSrcAlpha
 
 		Pass
 		{
@@ -36,12 +48,13 @@
 			}
 			
 			sampler2D _MainTex;
+			fixed4 _AmbientColour;
 
 			fixed4 frag (v2f i) : SV_Target
 			{
-				fixed4 col = i.color;
-				
-				return col;
+				fixed4 main = i.color;	
+				main.rgb *= _AmbientColour;
+				return main;
 			}
 			ENDCG
 		}
